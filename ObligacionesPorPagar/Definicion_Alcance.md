@@ -1,4 +1,4 @@
-# Sistema OXP - Definición de Alcance - AP
+# Sistema OXP - Definición de Alcance
 
 ## Tabla de contenido
 
