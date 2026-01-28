@@ -1,6 +1,6 @@
-# Sistema OXP - Definición de Alcance -- AP2
+# Sistema OXP - Definición de Alcance
 
-## Tabla de contenido -- AP#
+## Tabla de contenido
 
 1. [Contexto y problema a resolver](#sección-1-contexto-y-problema-a-resolver)
 2. [Glosario de términos](#sección-2-glosario-de-términos)
