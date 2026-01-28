@@ -11,7 +11,7 @@
 7. [Qué está dentro y fuera del alcance](#sección-7-qué-está-dentro-y-fuera-del-alcance)
 8. [Beneficios esperados](#sección-8-beneficios-esperados)
 
----
+
 
 ## Sección 1: Contexto y problema a resolver
 
