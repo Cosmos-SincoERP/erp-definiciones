@@ -1,5 +1,6 @@
 # Sistema OXP - Definición de Alcance
 
+Con los buenos días.
 ## Tabla de contenido
 
 1. [Contexto y problema a resolver](#sección-1-contexto-y-problema-a-resolver)
