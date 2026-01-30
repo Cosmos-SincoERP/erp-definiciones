@@ -92,7 +92,7 @@ El diseño debe contemplar escalabilidad para compañías con mayor volumen y la
 | **Radicador** | Usuario responsable de completar el registro de las transacciones en el sistema con sus respectivos soportes documentales. Puede ser el mismo solicitante u otra persona. También puede cargar extractos bancarios. |
 | **Confirmador** | Usuario que revisa y confirma las OXP en estado pendiente para habilitar su integración con el sistema contable. Este rol es opcional según las preferencias configuradas por empresa; en algunos casos las OXP pueden generarse directamente en estado confirmado. |
 
-Cualquier usuario puede acceder a vistas de monitoreo (OXP pendientes, confirmadas, contabilizadas) según los permisos asignados.
+Cualquier usuario puede acceder a vistas de monitoreo (OXP pendientes, confirmadas, causadas) según los permisos asignados.
 
 ### Actores externos (sistemas integrados)
 
@@ -164,6 +164,8 @@ Las **etapas** son las actividades del flujo de trabajo (qué se hace). Los **es
 | Confirmación (Extracto) | — | Confirmada |
 | Causación (Extracto) | — | Causada |
 | Pago | — | Pagada |
+
+**Nota:** Según la configuración de la empresa, la causación puede ejecutarse de dos formas: (1) automáticamente como consecuencia directa de la confirmación, o (2) como una acción independiente realizada por un usuario sobre las OXP ya confirmadas.
 
 ---
 
@@ -322,7 +324,7 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 | ID | Regla | Configurable |
 |----|-------|--------------|
 | R01 | Las compras del exterior que no generan factura electrónica deben tener documento soporte emitido dentro de los 6 días hábiles posteriores a la fecha de la transacción (requisito DIAN). | No |
-| R02 | Toda OXP de Comercio se crea inicialmente en estado pendiente. | Sí (por empresa) |
+| R02 | Toda OXP de Comercio se crea inicialmente en estado pendiente. Según parametrización por empresa, la OXP puede crearse en estado pendiente (requiere confirmación posterior) o crearse y confirmarse automáticamente. | Sí (por empresa) |
 | R03 | Si no se cuenta con el soporte documental, se puede crear la OXP como Anticipo. | No |
 | R04 | Las devoluciones deben legalizarse y asociarse a la OXP de comercio original cuando esté disponible. | No |
 | R04b | Los anticipos deben legalizarse (amortizarse) dentro del plazo configurado. El plazo puede variar según acuerdos con el comercio/proveedor. El sistema genera alertas cuando un anticipo excede el tiempo permitido sin legalización. | Sí (por empresa, default 30 días) |
@@ -339,7 +341,7 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 | R06 | El extracto debe estar 100% conciliado antes de pasar a la etapa de confirmación. *Nota: Las partidas del extracto que no cuenten con OXP de comercio pueden resolverse mediante: (a) anticipos, o (b) marca de **Partida en Disputa** (para errores bancarios, fraudes potenciales o transacciones no reconocidas). Los cargos adicionales del extracto (4x1000, cuota de manejo, intereses) se consideran conciliados como parte de la OXP de Extracto, no requieren OXP de Comercio y no generan anticipos. Se debe configurar por cada tarjeta cuáles cargos adicionales maneja, para detectarlos automáticamente en el extracto.* | No |
 | R06b | Las **Partidas en Disputa** permiten alcanzar el 100% de conciliación sin generar anticipos. Su resolución posterior puede ser: (1) **Descartada:** la partida específica dentro de la OXP de Extracto se marca como descartada cuando el banco reversa o la reclamación se resuelve; (2) **Conciliación posterior:** cuando se identifica el gasto y se radica la OXP de Comercio, la partida se concilia y se genera una segunda OXP de Extracto para agrupar estas partidas. | No |
 | R07 | El sistema alerta cuando la conciliación no está completada dentro del plazo configurado previo a la fecha de pago. | Sí (por tarjeta, default 3 días) |
-| R08 | Las partidas del extracto sin OXP de comercio asociada pueden resolverse mediante: (a) solicitud de radicación de OXP faltante, o (b) generación de Anticipo. | No |
+| R08 | Las partidas del extracto sin OXP de comercio asociada pueden resolverse mediante: (a) solicitud de radicación de OXP faltante (opción inicial y temporal), o (b) generación de Anticipo. Si la radicación no se completa dentro del plazo definido por la operación, la partida debe formalizarse como Anticipo para permitir el cierre del extracto y cumplir la conciliación 100%. | No |
 | R09 | El sistema persiste las asociaciones entre patrones de descripción del extracto bancario y comercios/terceros. Estas asociaciones se establecen durante la conciliación (manual o asistida por el agente inteligente) y se aplican automáticamente para sugerir cruces en conciliaciones futuras. *Ejemplo: Si el extracto muestra "AMZN\*1X2Y3Z SEATTLE" y el usuario lo asocia a "Amazon.com", el sistema almacena el patrón "AMZN\*" vinculado a ese tercero. En extractos futuros, cualquier transacción con descripción similar (ej: "AMZN\*ABC123") será sugerida automáticamente para cruce con OXP de Amazon.com.* | No |
 | R10 | La conciliación automática aplica una tolerancia en la comparación de valores. Si la diferencia está dentro de la tolerancia, se acepta el cruce automáticamente. Si la diferencia supera la tolerancia, el sistema funciona en modo asistido sugiriendo al usuario las partidas que considera correspondientes. **Importante:** La diferencia dentro de tolerancia no desaparece; el sistema genera automáticamente un movimiento de ajuste contra la cuenta de "Gastos Bancarios" (si el extracto es mayor) o "Aprovechamientos Bancarios" (si el extracto es menor), según la configuración definida para cada tarjeta. | Sí (por empresa, default +/- 1000 COP) |
 | R10b | **Ajuste por Diferencia en Cambio:** Para cada OXP de Comercio en moneda extranjera, si existe diferencia entre el valor radicado (TRM del día de la transacción) y el valor reflejado en el extracto (TRM del día de corte), el sistema genera automáticamente movimientos contables de ajuste **sobre la OXP de Extracto**: gasto financiero si la TRM subió, o ingreso financiero si la TRM bajó. Se genera un ajuste por cada OXP de Comercio en moneda extranjera. Estos movimientos permiten el cruce exacto sin crear nuevas OXP. | No |
@@ -413,7 +415,7 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 | **Monitoreo de pago** | Consulta del estado de pago de OXP de extracto desde SincoA&F. |
 | **Integración con SincoADPRO** | Ratificación de compras que requieren formalización en este módulo. |
 | **Alertas** | Notificaciones de plazos de conciliación, montos que exceden límites configurados, y anticipos pendientes de legalización que superen el plazo establecido. |
-| **Vistas de monitoreo** | Consultas del estado de OXP (pendientes, confirmadas, contabilizadas) según permisos de usuario. |
+| **Vistas de monitoreo** | Consultas del estado de OXP (pendientes, confirmadas, causadas) según permisos de usuario. |
 | **Configuraciones por empresa** | Preferencias de confirmación automática, tolerancias de conciliación, límites de monto, plazos de alerta. |
 
 ---
