@@ -93,6 +93,7 @@ El diseño debe contemplar escalabilidad para compañías con mayor volumen y la
 | **Solicitante** | Empleado que realiza compras con tarjeta de crédito corporativa o tarjeta de débito prepago. Puede iniciar el proceso de radicación adjuntando el soporte disponible al momento de la compra. También puede cargar extractos bancarios. |
 | **Radicador** | Usuario responsable de completar el registro de las transacciones en el sistema con sus respectivos soportes documentales. Puede ser el mismo solicitante u otra persona. También puede cargar extractos bancarios. |
 | **Confirmador** | Usuario que revisa y confirma las OXP en estado pendiente para habilitar su integración con el sistema contable. Este rol es opcional según las preferencias configuradas por empresa; en algunos casos las OXP pueden generarse directamente en estado confirmado. |
+| **Autorizador** | Usuario responsable de autorizar ajustes que superan la tolerancia definida en R10, resolver Partidas en Disputa y manejar las excepciones que se presentan durante el proceso. |
 
 Cualquier usuario puede acceder a vistas de monitoreo (OXP pendientes, confirmadas, causadas) según los permisos asignados.
 
@@ -400,6 +401,8 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 | R23 | La confirmación de OXP puede limitarse a perfiles específicos. | Sí (por empresa) |
 | R24 | La causación de OXP puede limitarse a perfiles específicos. | Sí (por empresa) |
 | R25 | **Segregación de Funciones:** El sistema debe impedir que un usuario con rol de Confirmador apruebe OXP en las que él mismo haya actuado como Radicador. | Sí (por empresa) |
+| R26 | **Validación de Unicidad (Anti-Fraude):** El sistema no permitirá la radicación de una OXP si ya existe en la base de datos un registro con el mismo **NIT de Proveedor/Comercio + Número de Factura + Fecha de Factura/Soporte**. Esta validación es obligatoria para evitar duplicidades de gasto. | No |
+| R27 | **Gestión de Saldos Pendientes al Cierre:** Las OXP causadas cuya fecha de factura pertenezca al período actual, pero que no aparezcan en el extracto bancario del mismo período, permanecerán en estado **Confirmada** (Pasivo) y se arrastrarán automáticamente al siguiente período para su conciliación. El sistema debe permitir generar un reporte de "OXP Pendientes de Conciliar" para el cierre de mes. | No |
 
 ---
 
