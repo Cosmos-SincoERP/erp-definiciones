@@ -64,9 +64,11 @@ El diseño debe contemplar escalabilidad para compañías con mayor volumen y la
 | **Compensada (OXP de Comercio)** | Estado operativo que indica que una OXP de comercio ha sido vinculada a una OXP de Extracto. Este estado no representa un pago financiero, pero sí constituye el insumo que el sistema OXP entrega al sistema contable (SincoA&F) para que se realicen los cruces contables efectivos. Es decir: la compensación es operativa en OXP, pero tiene impacto contable indirecto al habilitar el registro de la relación OXP-Extracto en el sistema contable. |
 | **Pagada (OXP de Extracto)** | Estado que indica que el sistema contable externo (SincoA&F) ha confirmado la ejecución del pago financiero correspondiente al extracto. |
 | **Radicación / Legalización** | Proceso de registro formal de una transacción en el sistema, incluyendo sus soportes documentales. Ambos términos son sinónimos. |
-| **Anticipo** | Obligación por pagar que no cuenta con los soportes correspondientes pero se debe entregar el dinero al comercio/proveedor. Se registra en cuentas específicas y posteriormente se reclasifica a las cuentas definitivas cuando se completa la legalización. El sistema mantiene trazabilidad del anticipo desde su creación hasta su legalización, permitiendo el seguimiento de saldos pendientes. Se aplican políticas de plazo configurables para alertar sobre anticipos que excedan el tiempo permitido sin legalizar. Aplica para ambos medios de pago. |
-| **Devolución** | Reintegro de dinero del comercio hacia la compañía por una compra devuelta. Se refleja como valor negativo en el extracto y se representa contablemente como nota crédito. Debe legalizarse y queda relacionada en la OXP de extracto. La devolución puede aparecer en un período diferente al de la OXP de comercio original. |
-| **Nota Crédito** | Documento contable que representa una devolución o ajuste a favor de la compañía. Se genera al legalizar una devolución. |
+| **Anticipo** | Obligación por pagar que no cuenta con los soportes correspondientes pero se debe entregar el dinero al comercio/proveedor. Se registra en cuentas específicas y posteriormente se reclasifica a las cuentas definitivas cuando se completa la regularización. El sistema mantiene trazabilidad del anticipo desde su creación hasta su regularización, permitiendo el seguimiento de saldos pendientes. Se aplican políticas de plazo configurables para alertar sobre anticipos que excedan el tiempo permitido sin regularizar. Aplica para ambos medios de pago. |
+| **Regularización de Anticipos** | Proceso operativo mediante el cual una OXP registrada como anticipo se completa con los soportes documentales correspondientes y se prepara para su cierre definitivo. La regularización ocurre en el sistema OXP y genera la información estructurada necesaria para la amortización contable. No implica un registro contable directo en OXP. |
+| **Amortización del Anticipo** | Efecto contable mediante el cual el saldo del anticipo se reclasifica total o parcialmente a las cuentas de gasto o costo definitivas. La amortización es ejecutada por el sistema contable externo (SincoA&F) a partir de la información estructurada entregada por OXP. Equivale al concepto internacional de *Down Payment Clearing* (SAP). |
+| **Devolución** | Reintegro de dinero del comercio hacia la compañía por una compra devuelta. Se refleja como valor negativo en el extracto y se representa contablemente como nota crédito. Debe registrarse y queda relacionada en la OXP de extracto. La devolución puede aparecer en un período diferente al de la OXP de comercio original. |
+| **Nota Crédito** | Documento contable que representa una devolución o ajuste a favor de la compañía. Se genera al registrar una devolución. |
 | **Documento Soporte Electrónico** | Documento requerido por el ente regulador para respaldar compras que no generan factura electrónica, como por ejemplo compras en el exterior o proveedores informales. |
 | **TRM (Tasa Representativa del Mercado)** | Tasa de cambio oficial publicada por el Banco de la República de Colombia. Utilizada para valorar transacciones en moneda extranjera. |
 | **Diferencia en Cambio** | Variación en el valor de una transacción en moneda extranjera ocasionada por fluctuaciones en la TRM entre la fecha de la transacción (radicación) y la fecha de compensación en el extracto. Al momento de la conciliación, el sistema genera automáticamente movimientos contables adicionales de ajuste **sobre la OXP de Extracto** por cada OXP de Comercio en moneda extranjera: si la TRM subió, se registra un gasto financiero; si la TRM bajó, se registra un ingreso financiero. Estos movimientos permiten el cruce exacto entre la OXP de Comercio y la partida del extracto sin crear una nueva OXP. |
@@ -75,9 +77,10 @@ El diseño debe contemplar escalabilidad para compañías con mayor volumen y la
 | **Causación** | Registro contable de una obligación por pagar en el sistema contable de la compañía. |
 | **Fecha de Causación** | Fecha utilizada para el registro contable del gasto. Corresponde a la **fecha del soporte/factura**, respetando el principio de devengo (NIIF). Esto garantiza el reconocimiento del gasto en el período contable correcto, independientemente de cuándo se refleje en el extracto bancario. |
 | **Fecha de Compensación** | Fecha del extracto bancario utilizada exclusivamente para el asiento de pago (cruzar la cuenta por pagar contra la cuenta de banco). No afecta el período de reconocimiento del gasto. |
+| **Ventana de Validación de Duplicidad** | Período de 24 meses calendario contados hacia atrás desde la fecha de radicación, dentro del cual no se permite la repetición de un número de factura para un mismo proveedor. |
 | **Extracto Bancario** | Documento emitido por la entidad financiera que detalla las transacciones y cargos de la tarjeta en un período determinado. |
 | **Conciliación** | Proceso de cruce y verificación entre las OXP de comercio registradas y las transacciones reportadas en el extracto bancario. |
-| **Recarga** | Proceso de reposición de fondos a una tarjeta de débito prepago, originado a partir de las transacciones realizadas y legalizadas. |
+| **Recarga** | Proceso de reposición de fondos a una tarjeta de débito prepago, originado a partir de las transacciones radicadas y causadas. |
 | **4x1000** | Gravamen a los Movimientos Financieros (GMF) aplicado en Colombia sobre las transacciones financieras. Aplica para ambos medios de pago. |
 | **Cuota de Manejo** | Cargo periódico cobrado por la entidad financiera por la administración de la tarjeta. Aplica para ambos medios de pago. |
 | **Intereses** | Cargos financieros aplicados por la entidad bancaria sobre saldos diferidos o en mora. Aplica únicamente para tarjetas de crédito. |
@@ -93,7 +96,7 @@ El diseño debe contemplar escalabilidad para compañías con mayor volumen y la
 | **Solicitante** | Empleado que realiza compras con tarjeta de crédito corporativa o tarjeta de débito prepago. Puede iniciar el proceso de radicación adjuntando el soporte disponible al momento de la compra. También puede cargar extractos bancarios. |
 | **Radicador** | Usuario responsable de completar el registro de las transacciones en el sistema con sus respectivos soportes documentales. Puede ser el mismo solicitante u otra persona. También puede cargar extractos bancarios. |
 | **Confirmador** | Usuario que revisa y confirma las OXP en estado pendiente para habilitar su integración con el sistema contable. Este rol es opcional según las preferencias configuradas por empresa; en algunos casos las OXP pueden generarse directamente en estado confirmado. |
-| **Autorizador** | Usuario responsable de autorizar ajustes que superan la tolerancia definida en R10, resolver Partidas en Disputa y manejar las excepciones que se presentan durante el proceso. |
+| **Autorizador** | Usuario responsable de autorizar ajustes que superan la tolerancia definida en R10, resolver Partidas en Disputa y manejar las excepciones que se presentan durante el proceso. Tiene la facultad adicional de gestionar el tablero de Partidas en Disputa y autorizar cierres de OXP que presenten discrepancias superiores a la tolerancia definida, dejando siempre un registro de auditoría. También es responsable de auditar y liberar los registros bloqueados por la regla R26, determinando si una coincidencia de NIT y número corresponde a una numeración reciclada legalmente (fuera de la ventana de 24 meses) o a un intento de doble cobro. |
 
 Cualquier usuario puede acceder a vistas de monitoreo (OXP pendientes, confirmadas, causadas) según los permisos asignados.
 
@@ -184,10 +187,10 @@ Las **etapas** son las actividades del flujo de trabajo (qué se hace). Los **es
 | **Proceso - OXP de Extracto** | El solicitante o radicador carga el extracto en el sistema. Se extraen las transacciones y cargos adicionales (4x1000, cuota de manejo, intereses si aplica). |
 | **Salida - OXP de Comercio** | OXP de Comercio creada en estado pendiente. |
 | **Salida - OXP de Extracto** | OXP de Extracto creada con el detalle de transacciones y cargos del período. |
-| **Variante - Anticipo** | Si no se cuenta con el soporte, se crea la OXP de Comercio como Anticipo para su posterior legalización. |
+| **Variante - Anticipo** | Si no se cuenta con el soporte, se crea la OXP de Comercio como Anticipo para su posterior regularización. |
 | **Variante - Devolución** | Si la transacción es una devolución, se registra y se asocia a la OXP de comercio original cuando esta se encuentre disponible. Si la OXP original no está disponible (por ejemplo, por aparecer en un período diferente), la devolución se registra y queda pendiente de asociación hasta que pueda relacionarse posteriormente. |
 | **Variante - Moneda Extranjera** | Para compras del exterior, la OXP de Comercio se radica con la TRM del día de la transacción. El sistema siempre almacena el valor original de la compra en la moneda de origen y el valor convertido a la moneda funcional del país donde opera el sistema. |
-| **Variante - Distribución de Costos (Split)** | Durante la radicación o legalización, el usuario puede realizar una distribución porcentual o por valor del costo entre diferentes centros de costo o cuentas contables. Una OXP de Comercio puede generar N registros de causación de costo. El sistema valida que la suma de las distribuciones sea igual al 100% del valor de la OXP. |
+| **Variante - Distribución de Costos (Split)** | Durante la radicación (o al regularizar un anticipo), el usuario puede realizar una distribución porcentual o por valor del costo entre diferentes centros de costo o cuentas contables. Una OXP de Comercio puede generar N registros de causación de costo. El sistema valida que la suma de las distribuciones sea igual al 100% del valor de la OXP. |
 
 ---
 
@@ -257,7 +260,7 @@ El sistema OXP se integrará con **SincoERP** como plataforma central, interactu
 |--------|--------|---------|
 | **SincoA&F** | Administrativo y Financiero | Sistema contable. Recibe causaciones, gestiona pagos y confirma estado de pago de las OXP. |
 | **SincoRE** | Recepción Electrónica | Transforma facturas electrónicas colombianas en información estructurada y la expone mediante API. |
-| **SincoADPRO** | Compras y Contratación | Ratifica la legalización de compras que requieren formalización en este módulo (no aplica para todas las compras). |
+| **SincoADPRO** | Compras y Contratación | Ratifica la formalización de compras que requieren validación en este módulo (no aplica para todas las compras). |
 
 ---
 
@@ -266,7 +269,7 @@ El sistema OXP se integrará con **SincoERP** como plataforma central, interactu
 | Origen | Datos recibidos | Formato | Método de integración | Observación |
 |--------|-----------------|---------|----------------------|-------------|
 | **SincoRE** | Datos estructurados de facturas electrónicas colombianas | JSON | Consumo de API | Solo facturas electrónicas colombianas |
-| **SincoADPRO** | Ratificación de legalización de compras | JSON | Consumo de API | Solo para compras que requieren formalización en este módulo |
+| **SincoADPRO** | Ratificación de formalización de compras | JSON | Consumo de API | Solo para compras que requieren formalización en este módulo |
 | **SincoA&F** | Confirmación de pago de OXP de Extracto | JSON | Consumo de API | |
 | **Entidad Bancaria** | Extracto con transacciones y cargos del período | PDF, CSV | Carga manual de archivo por usuario | |
 | **Soportes documentales** | Recibos, facturas no electrónicas, comprobantes | PDF, Imágenes (JPG, PNG) | Carga manual de archivo por usuario | Compras del exterior u otras sin factura electrónica |
@@ -280,7 +283,7 @@ El sistema OXP se integrará con **SincoERP** como plataforma central, interactu
 | **SincoA&F** | Causación de OXP de Comercio (individual por cada OXP) | JSON | Consumo de API |
 | **SincoA&F** | Causación de OXP de Extracto | JSON | Consumo de API |
 | **SincoA&F** | Nota Crédito por devoluciones | JSON | Consumo de API |
-| **SincoA&F** | Reclasificación contable por legalización de anticipos | JSON | Consumo de API |
+| **SincoA&F** | Reclasificación contable por amortización de anticipos | JSON | Consumo de API |
 
 ---
 
@@ -330,11 +333,11 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 | R01 | Las compras del exterior que no generan factura electrónica deben tener documento soporte emitido dentro de los 6 días hábiles posteriores a la fecha de la transacción (requisito DIAN). **Consecuencia:** El sistema OXP debe alertar sobre OXP de compras del exterior que se acerquen al vencimiento del plazo. La emisión del Documento Soporte Electrónico es responsabilidad del sistema contable (una vez causada la OXP) en conjunto con el sistema de emisión electrónica, el cual informa al sistema OXP la regularización del documento. Esta integración es complementaria y su comportamiento puede variar según el ecosistema de sistemas con el que se integre. | Sí |
 | R02 | Toda OXP de Comercio se crea inicialmente en estado pendiente. Según parametrización por empresa, la OXP puede crearse en estado pendiente (requiere confirmación posterior) o crearse y confirmarse automáticamente. | Sí (por empresa) |
 | R03 | Si no se cuenta con el soporte documental, se puede crear la OXP como Anticipo. | No |
-| R04 | Las devoluciones deben legalizarse y asociarse a la OXP de comercio original cuando esté disponible. | No |
-| R04b | Los anticipos deben legalizarse (amortizarse) dentro del plazo configurado. El plazo puede variar según acuerdos con el comercio/proveedor. El sistema genera alertas cuando un anticipo excede el tiempo permitido sin legalización. | Sí (por empresa, default 30 días) |
+| R04 | Las devoluciones deben registrarse y asociarse a la OXP de comercio original cuando esté disponible. | No |
+| R04b | Los anticipos deben regularizarse dentro del plazo configurado. El plazo puede variar según acuerdos con el comercio/proveedor. El sistema genera alertas cuando un anticipo excede el tiempo permitido sin regularización. | Sí (por empresa, default 30 días) |
 | R05 | Las OXP que superen un monto máximo configurado generan una alerta informativa indicando que deben cumplir el flujo completo de aprobación. | Sí (por empresa, default 30 millones COP) |
 | R05b | **Valoración en Moneda Extranjera:** Las OXP de Comercio originadas en compras del exterior se radican con la TRM del día de la transacción. El sistema siempre almacena el valor original de la compra en la moneda de origen y el valor convertido a la moneda funcional del país donde opera el sistema. | No |
-| R05c | **Distribución de Costos (Split):** Durante la radicación o legalización, el usuario puede distribuir el costo de una OXP de Comercio entre múltiples centros de costo o cuentas contables, ya sea porcentualmente o por valor. La suma de las distribuciones debe ser igual al 100% del valor de la OXP. Una OXP de Comercio puede generar N registros de causación de costo. | No |
+| R05c | **Distribución de Costos (Split):** Durante la radicación (o al regularizar un anticipo), el usuario puede distribuir el costo de una OXP de Comercio entre múltiples centros de costo o cuentas contables, ya sea porcentualmente o por valor. La suma de las distribuciones debe ser igual al 100% del valor de la OXP. Una OXP de Comercio puede generar N registros de causación de costo. | No |
 
 ---
 
@@ -362,7 +365,7 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 | R12 | Al confirmar una OXP, se genera automáticamente la integración con el sistema contable. | Sí (por empresa) |
 | R13 | Se genera una causación individual por cada OXP de comercio. | No |
 | R14 | Se genera una causación por cada OXP de extracto. | No |
-| R15 | Al legalizar un anticipo, se genera la reclasificación contable correspondiente. | No |
+| R15 | Al regularizar un anticipo, se genera la información para la amortización contable correspondiente. | No |
 | R16 | Al causar una devolución, se genera una nota crédito en el sistema contable. | No |
 
 ---
@@ -401,7 +404,7 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 | R23 | La confirmación de OXP puede limitarse a perfiles específicos. | Sí (por empresa) |
 | R24 | La causación de OXP puede limitarse a perfiles específicos. | Sí (por empresa) |
 | R25 | **Segregación de Funciones:** El sistema debe impedir que un usuario con rol de Confirmador apruebe OXP en las que él mismo haya actuado como Radicador. | Sí (por empresa) |
-| R26 | **Validación de Unicidad (Anti-Fraude):** El sistema no permitirá la radicación de una OXP si ya existe en la base de datos un registro con el mismo **NIT de Proveedor/Comercio + Número de Factura + Fecha de Factura/Soporte**. Esta validación es obligatoria para evitar duplicidades de gasto. | No |
+| R26 | **Validación de Unicidad y Antigüedad (Anti-Fraude):** Para prevenir la duplicidad de pagos y el fraude por reutilización de soportes, el sistema validará la combinación de **NIT del Tercero + Número de Soporte**. (1) **Bloqueo por Duplicidad:** Si existe un registro previo con el mismo NIT y Número de Soporte cuya fecha de emisión tenga una diferencia menor a 24 meses respecto a la actual, el sistema bloqueará la radicación automáticamente. (2) **Alerta por Reuso:** Si la combinación existe pero la fecha es mayor a 24 meses, el sistema emitirá una alerta de advertencia, permitiendo la radicación pero marcándola para revisión prioritaria por el Autorizador. (3) **Validación de Valor:** Independientemente de la fecha, si el Valor también coincide, el bloqueo será mandatorio y solo podrá ser levantado por el Autorizador tras verificar la autenticidad del soporte. | No |
 | R27 | **Gestión de Saldos Pendientes al Cierre:** Las OXP causadas cuya fecha de factura pertenezca al período actual, pero que no aparezcan en el extracto bancario del mismo período, permanecerán en estado **Confirmada** (Pasivo) y se arrastrarán automáticamente al siguiente período para su conciliación. El sistema debe permitir generar un reporte de "OXP Pendientes de Conciliar" para el cierre de mes. | No |
 
 ---
@@ -414,7 +417,7 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 |------|-------------|
 | **Medios de pago** | Tarjetas de crédito corporativas y tarjetas de débito prepago. |
 | **Radicación / Legalización** | Registro de transacciones con soportes documentales (XML, PDF, imágenes). Extracción automática de datos desde facturas electrónicas colombianas vía SincoRE. |
-| **Gestión de anticipos** | Creación de OXP sin soporte documental y posterior reclasificación al legalizar. |
+| **Gestión de anticipos** | Creación de OXP sin soporte documental y posterior reclasificación al regularizar. |
 | **Gestión de devoluciones** | Registro de devoluciones, asociación con OXP original y generación de nota crédito. |
 | **Carga de extractos** | Carga manual de extractos bancarios en formato PDF o CSV. Extracción de transacciones y cargos adicionales. |
 | **Conciliación** | Cruce automático y asistido entre OXP de comercio y extractos bancarios. Aprendizaje de relaciones comercio-descripción. |
@@ -422,7 +425,7 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 | **Causación** | Generación automática de causaciones individuales por OXP de comercio y OXP de extracto hacia SincoA&F. |
 | **Monitoreo de pago** | Consulta del estado de pago de OXP de extracto desde SincoA&F. |
 | **Integración con SincoADPRO** | Ratificación de compras que requieren formalización en este módulo. |
-| **Alertas** | Notificaciones de plazos de conciliación, montos que exceden límites configurados, y anticipos pendientes de legalización que superen el plazo establecido. |
+| **Alertas** | Notificaciones de plazos de conciliación, montos que exceden límites configurados, y anticipos pendientes de regularización que superen el plazo establecido. |
 | **Vistas de monitoreo** | Consultas del estado de OXP (pendientes, confirmadas, causadas) según permisos de usuario. |
 | **Configuraciones por empresa** | Preferencias de confirmación automática, tolerancias de conciliación, límites de monto, plazos de alerta. |
 
@@ -509,7 +512,7 @@ Esta arquitectura de servicios desacoplados con responsabilidades claras permite
 | **Trazabilidad completa** | Cada transacción tiene un registro desde la radicación hasta el pago, con los soportes documentales asociados. |
 | **Segregación de funciones** | Roles diferenciados (solicitante, radicador, confirmador) con permisos configurables por empresa. |
 | **Auditoría facilitada** | Información centralizada y estructurada que simplifica los procesos de auditoría interna y externa. |
-| **Gestión de anticipos** | Control sobre las OXP sin soporte documental, con seguimiento hasta su legalización y reclasificación contable. |
+| **Gestión de anticipos** | Control sobre las OXP sin soporte documental, con seguimiento hasta su regularización y amortización contable. |
 
 ---
 
