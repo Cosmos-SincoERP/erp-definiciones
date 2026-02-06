@@ -63,7 +63,7 @@ El diseño debe contemplar escalabilidad para compañías con mayor volumen y la
 | **OXP de Extracto** | Obligación por pagar consolidada que agrupa las OXP de comercio de un período, incluyendo las devoluciones y los cargos adicionales aplicables según el medio de pago. |
 | **Compensada (OXP de Comercio)** | Estado operativo que indica que una OXP de comercio ha sido vinculada a una OXP de Extracto. Este estado no representa un pago financiero, pero sí constituye el insumo que el sistema OXP entrega al sistema contable (SincoA&F) para que se realicen los cruces contables efectivos. Es decir: la compensación es operativa en OXP, pero tiene impacto contable indirecto al habilitar el registro de la relación OXP-Extracto en el sistema contable. |
 | **Pagada (OXP de Extracto)** | Estado que indica que el sistema contable externo (SincoA&F) ha confirmado la ejecución del pago financiero correspondiente al extracto. |
-| **Radicación / Legalización** | Proceso de registro formal de una transacción en el sistema, incluyendo sus soportes documentales. Ambos términos son sinónimos. |
+| **Radicación** | Fase operativa inicial mediante la cual una evidencia económica (soporte documental, extracto bancario, cargo financiero o devolución) es incorporada al dominio OXP como una obligación por pagar en estado pendiente. La radicación puede iniciar con información parcial y contempla la completitud progresiva de datos y soportes requeridos. |
 | **Anticipo** | Obligación por pagar que no cuenta con los soportes correspondientes pero se debe entregar el dinero al comercio/proveedor. Se registra en cuentas específicas y posteriormente se reclasifica a las cuentas definitivas cuando se completa la regularización. El sistema mantiene trazabilidad del anticipo desde su creación hasta su regularización, permitiendo el seguimiento de saldos pendientes. Se aplican políticas de plazo configurables para alertar sobre anticipos que excedan el tiempo permitido sin regularizar. Aplica para ambos medios de pago. |
 | **Regularización de Anticipos** | Proceso operativo mediante el cual una OXP registrada como anticipo se completa con los soportes documentales correspondientes y se prepara para su cierre definitivo. La regularización ocurre en el sistema OXP y genera la información estructurada necesaria para la amortización contable. No implica un registro contable directo en OXP. |
 | **Amortización del Anticipo** | Efecto contable mediante el cual el saldo del anticipo se reclasifica total o parcialmente a las cuentas de gasto o costo definitivas. La amortización es ejecutada por el sistema contable externo (SincoA&F) a partir de la información estructurada entregada por OXP. Equivale al concepto internacional de *Down Payment Clearing* (SAP). |
@@ -125,6 +125,8 @@ Cualquier usuario puede acceder a vistas de monitoreo (OXP pendientes, confirmad
 ### Flujos del proceso
 
 El sistema OXP maneja dos flujos diferenciados que convergen en la conciliación:
+
+**Nota conceptual:** Los diagramas siguientes representan las **fases del ciclo de vida** de una Obligación por Pagar dentro del dominio OXP, no una secuencia de pasos operativos ni un workflow de tareas de usuario. Cada fase describe una etapa de evolución de la obligación que habilita capacidades del sistema y transiciones de estado. El sistema OXP gobierna la obligación desde su incorporación (radicación) hasta su cierre (pago/recarga), actuando como sistema de dominio integral y no como un subproceso aislado.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
@@ -416,7 +418,7 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 | Área | Descripción |
 |------|-------------|
 | **Medios de pago** | Tarjetas de crédito corporativas y tarjetas de débito prepago. |
-| **Radicación / Legalización** | Registro de transacciones con soportes documentales (XML, PDF, imágenes). Extracción automática de datos desde facturas electrónicas colombianas vía SincoRE. |
+| **Radicación** | Registro de obligaciones al sistema con sus soportes documentales (XML, PDF, imágenes, CSV, etc...). Extracción automática de datos desde facturas electrónicas colombianas vía SincoRE. |
 | **Gestión de anticipos** | Creación de OXP sin soporte documental y posterior reclasificación al regularizar. |
 | **Gestión de devoluciones** | Registro de devoluciones, asociación con OXP original y generación de nota crédito. |
 | **Carga de extractos** | Carga manual de extractos bancarios en formato PDF o CSV. Extracción de transacciones y cargos adicionales. |
