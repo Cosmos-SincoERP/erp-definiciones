@@ -2,7 +2,7 @@
 
 ## Tabla de contenido
 
-1. [Contexto y problema a resolver](#sección-1-contexto-y-problema-a-resolver)
+1. [Definición, Contexto actual y problema a resolver](#sección-1-definición-contexto-actual-y-problema-a-resolver)
 2. [Glosario de términos](#sección-2-glosario-de-términos)
 3. [Actores del sistema](#sección-3-actores-del-sistema)
 4. [Flujo principal](#sección-4-flujo-principal)
@@ -13,9 +13,13 @@
 
 
 
-## Sección 1: Contexto y problema a resolver
+## Sección 1: Definición, Contexto actual y problema a resolver
 
-### Contexto
+### Definición
+
+OXP se define como un sistema de dominio que gobierna el ciclo de vida operativo completo de las Obligaciones por Pagar, incorporando, estructurando y gestionando la información asociada a los hechos económicos de egreso que dan origen a dichas obligaciones (compras, gastos y costos), desde su radicación hasta su cierre operativo, y habilitando su correcta traducción hacia los procesos contables y financieros externos.
+
+### Contexto actual
 
 La compañía realiza compras a través de dos medios de pago corporativos:
 
@@ -162,9 +166,9 @@ El sistema OXP maneja dos flujos diferenciados que convergen en la conciliación
 
 ### Relación entre etapas y estados
 
-Las **etapas** son las actividades del flujo de trabajo (qué se hace). Los **estados** son las condiciones de cada OXP en un momento dado (cómo está). Al completar una etapa, la OXP cambia de estado.
+Las **etapas** son las fases del ciclo de vida de la obligación; cada una agrupa las actividades que se realizan en ella. Los **estados** son las condiciones de cada OXP en un momento dado (cómo está). Al completar una etapa, la OXP transiciona de estado.
 
-| Etapa (actividad) | Estado resultante OXP Comercio | Estado resultante OXP Extracto |
+| Etapa (fase) | Estado resultante OXP Comercio | Estado resultante OXP Extracto |
 |-------------------|-------------------------------|-------------------------------|
 | Radicación | Pendiente | Pendiente |
 | Confirmación | Confirmada | — |
@@ -223,7 +227,7 @@ Las **etapas** son las actividades del flujo de trabajo (qué se hace). Los **es
 |---------|-------------|
 | **Disparador** | OXP conciliadas listas para confirmar. |
 | **Entrada** | OXP de Comercio y OXP de Extracto pendientes de confirmación (extracto con conciliación 100% completada). |
-| **Proceso** | El confirmador revisa y confirma las OXP (o se confirman automáticamente según configuración de la empresa). La confirmación es el requisito previo para la causación e integra el proceso con el sistema contable (SincoA&F). Según la configuración de la empresa, la causación puede ejecutarse (1) automáticamente como consecuencia directa de la confirmación o (2) como una acción independiente realizada por un usuario sobre las OXP ya confirmadas. |
+| **Proceso** | El confirmador revisa y confirma las OXP (o se confirman automáticamente según configuración de la empresa). La confirmación es la condición que habilita la transición hacia la causación e integra el proceso con el sistema contable (SincoA&F). Según la configuración de la empresa, la causación puede ejecutarse (1) automáticamente como consecuencia directa de la confirmación o (2) como una acción independiente realizada por un usuario sobre las OXP ya confirmadas. |
 | **Proceso - Rechazo** | Si el confirmador no aprueba una OXP, esta pasa a estado **"Devuelta"** y retorna a la bandeja del radicador. El confirmador debe registrar obligatoriamente un **"Motivo de Rechazo"** que explique la razón de la devolución. El radicador puede entonces corregir la OXP y reenviarla a confirmación, o descartarla según corresponda. |
 | **Causación** | Se genera una causación individual por cada OXP de comercio y una causación por la OXP de extracto. La causación de la OXP de Extracto tiene como propósito registrar el total del extracto contra la entidad bancaria o el medio de pago, incluyendo los cargos adicionales (4x1000, cuota de manejo, intereses). Esto no representa doble causación respecto a las OXP de Comercio, ya que cada una tiene naturaleza contable diferente. |
 | **Salida** | OXP en estado confirmado. Causaciones registradas en el sistema contable externo. |
