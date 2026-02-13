@@ -116,7 +116,7 @@ OXP (Obligaciones por Pagar) es un **bounded context** — no un agregado. Conti
 | `SoporteDocumental` | Tipo (PDF, imagen, XML), referencia, datos extraídos |
 | `DesgloseFiscal` | Agrupa los cálculos fiscales derivados de un `ConceptoDeGasto`. Inmutable — se reemplaza completo al recalcular. Contiene: `List<Tributo>` de impuestos y `List<Tributo>` de retenciones. |
 | `Tributo` | Cálculo fiscal individual (impuesto o retención). Tipo, base, tarifa, valor. Inmutable — es el resultado de aplicar reglas fiscales al gasto. |
-| `InstruccionDistribucion` | Instrucción que indica cómo distribuir un componente del agregado. Referencia al componente (ConceptoDeGasto o Tributo específico), `List<DestinoDeNegocio>` (invariante I2: suma = 100%). |
+| `InstruccionDistribucion` | Distribución por unidad organizacional. Indica cómo distribuir un valor entre unidades organizacionales. Se aplica al valor total de la obligación y a cada componente individual (ConceptoDeGasto o Tributo). Cada referencia tiene su propia distribución independiente. `List<DestinoDeNegocio>` (invariante I2: suma = 100%). |
 | `DestinoDeNegocio` | Identificador de unidad organizacional (Shared Kernel con el contexto contable), porcentaje. Ej: `{ unidadOrganizacional: "VTA-001", porcentaje: 60 }`. Usado dentro de `InstruccionDistribucion`. |
 
 **Diagrama de composición:**
@@ -151,7 +151,9 @@ OXP (Obligaciones por Pagar) es un **bounded context** — no un agregado. Conti
 │  └────────────────────────────────────────────────────────┘  │
 │                                                              │
 │  ┌────────────────────────────────────────────────────────┐  │
-│  │ Instrucciones de Distribución (VO)                     │  │
+│  │ InstruccionDistribucion — unidad organizacional (VO)        │  │
+│  │                                                        │  │
+│  │  ○ Total obligación → { FIN-001: 100% }                │  │
 │  │                                                        │  │
 │  │  ○ Gasto #1       → { VTA-001: 60%, ADM-001: 40% }    │  │
 │  │  ○ IVA de #1      → { FIN-001: 100% }                 │  │
@@ -236,6 +238,8 @@ Los valores totales y las líneas de traducción no se almacenan — se derivan 
 | `InformacionTercero` | NIT, razón social |
 | `MedioDePago` | Tipo (crédito/débito prepago), número, entidad bancaria |
 | `ValorMonetario` | Monto, moneda, TRM (si aplica), monto en moneda funcional |
+| `InstruccionDistribucion` | Distribución por unidad organizacional. Indica cómo distribuir un valor entre unidades organizacionales. Se aplica al valor total del extracto y a cada componente individual (CargoFinanciero, AjustePorDiferenciaCambio o AjustePorTolerancia). Cada referencia tiene su propia distribución independiente. `List<DestinoDeNegocio>` (invariante I2: suma = 100%). |
+| `DestinoDeNegocio` | Identificador de unidad organizacional (Shared Kernel con el contexto contable), porcentaje. Ej: `{ unidadOrganizacional: "FIN-001", porcentaje: 100 }`. Usado dentro de `InstruccionDistribucion`. |
 
 **Diagrama de composición:**
 
@@ -282,6 +286,27 @@ Los valores totales y las líneas de traducción no se almacenan — se derivan 
 │  │  ref Anticipo · partida                             │     │
 │  └─────────────────────────────────────────────────────┘     │
 │                                                              │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │ InstruccionDistribucion — unidad organizacional (VO)        │  │
+│  │                                                        │  │
+│  │  ○ Total extracto      → { ADM-001: 100% }             │  │
+│  │                                                        │  │
+│  │  ○ CargoFin. 4x1000   → { FIN-001: 100% }             │  │
+│  │  ○ CargoFin. cuota    → { FIN-001: 100% }             │  │
+│  │  ○ AjusteDifCambio #1 → { VTA-001: 60%, ADM-001: 40%} │  │
+│  │  ○ AjusteTolerancia #1→ { VTA-001: 100% }             │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                                              │
+│  Comportamiento calculado (no almacenado):                   │
+│  ┌────────────────────────────────────────────────────────┐  │
+│  │  lineasParaTraduccion() → List<LineaTraduccion>        │  │
+│  │   Pre-computa líneas planas por combinación            │  │
+│  │   (componente × destino) con valor distribuido.        │  │
+│  │   Componentes: CargoFinanciero, AjustePorDiferencia    │  │
+│  │   Cambio, AjustePorTolerancia.                         │  │
+│  │   El traductor solo mapea, no distribuye.              │  │
+│  └────────────────────────────────────────────────────────┘  │
+│                                                              │
 │  ● = Entidad (tiene identidad)   ○ = Value Object (sin ID)  │
 └──────────────────────────────────────────────────────────────┘
 ```
@@ -303,7 +328,7 @@ Los valores totales y las líneas de traducción no se almacenan — se derivan 
 | `MedioDePago` | VO | Tipo (crédito/débito prepago), número, entidad bancaria |
 | `saldoPendiente` | Valor | Monto aún no regularizado (inicia igual al valor total) |
 | `justificacion` | Texto | Motivo de ausencia de soporte documental |
-| `InstruccionDistribucion` | VO | Instrucción que indica cómo distribuir el valor del anticipo. `List<DestinoDeNegocio>` (invariante I2: suma = 100%). |
+| `InstruccionDistribucion` | VO | Distribución por unidad organizacional. Indica cómo distribuir el valor del anticipo entre unidades organizacionales. `List<DestinoDeNegocio>` (invariante I2: suma = 100%). |
 
 **Diagrama de composición:**
 
@@ -315,7 +340,7 @@ Los valores totales y las líneas de traducción no se almacenan — se derivan 
 │  ○ justificacion         ○ saldoPendiente                    │
 │                                                              │
 │  ┌────────────────────────────────────────────────────────┐  │
-│  │ Instrucciones de Distribución (VO)                     │  │
+│  │ InstruccionDistribucion — unidad organizacional (VO)        │  │
 │  │                                                        │  │
 │  │  ○ Valor anticipo → { VTA-001: 60%, ADM-001: 40% }    │  │
 │  └────────────────────────────────────────────────────────┘  │
@@ -895,6 +920,7 @@ El agregado `OxpComercio` tiene una única entidad interna (`ConceptoDeGasto`) q
 | **Tipo** | Entidad interna (una por cada OxpComercio en moneda extranjera con diferencia). |
 | **Aparece en** | Conciliación (al vincular OxpComercio en moneda extranjera). |
 | **Información (dominio OXP)** | OxpComercio de origen, TRM de radicación, TRM del extracto, valor de la diferencia, clasificación (gasto o ingreso financiero) `[R10b]`. |
+| **Distribución** | Gestionada por `InstruccionDistribucion` a nivel del agregado OxpExtracto. |
 | **Traducción contable (frontera)** | El servicio de Traducción Contable deduce gasto financiero por diferencia en cambio (si TRM subió) o ingreso financiero (si TRM bajó). |
 
 ### AjustePorTolerancia
@@ -905,6 +931,7 @@ El agregado `OxpComercio` tiene una única entidad interna (`ConceptoDeGasto`) q
 | **Tipo** | Entidad interna (una por cada vinculación con diferencia dentro de tolerancia). |
 | **Aparece en** | Conciliación (al vincular con diferencia dentro de tolerancia). |
 | **Información (dominio OXP)** | OxpComercio de origen, valor de la diferencia, dirección (extracto mayor o menor que OxpComercio) `[R10]`. |
+| **Distribución** | Gestionada por `InstruccionDistribucion` a nivel del agregado OxpExtracto. |
 | **Evento creador** | `AjustePorToleranciaGenerado` (Sección 5.3). |
 | **Traducción contable (frontera)** | El servicio de Traducción Contable deduce gastos bancarios (si extracto > OxpComercio) o aprovechamientos bancarios (si extracto < OxpComercio). |
 
@@ -917,6 +944,7 @@ El agregado `OxpComercio` tiene una única entidad interna (`ConceptoDeGasto`) q
 | **Aparece en** | Radicación del extracto. |
 | **Subtipos** | 4x1000 (GMF): aplica ambos medios de pago. Cuota de manejo: aplica ambos medios de pago. Intereses: aplica únicamente tarjeta de crédito. |
 | **Información (dominio OXP)** | Tipo de cargo, valor, período. Configurado por tarjeta `[R06]` `[R19]`. |
+| **Distribución** | Gestionada por `InstruccionDistribucion` a nivel del agregado OxpExtracto. |
 | **Traducción contable (frontera)** | El servicio de Traducción Contable deduce cuenta de gasto financiero según subtipo. |
 
 ---
@@ -928,7 +956,7 @@ Las invariantes son restricciones estructurales que deben ser verdaderas en todo
 | # | Invariante | Agregado | Referencia |
 |---|-----------|----------|------------|
 | I1 | **Unicidad de obligación:** No pueden existir dos OxpComercio con el mismo NIT + número de soporte dentro de la ventana de 24 meses. | OxpComercio | `[R26]` |
-| I2 | **Integridad de distribución:** Para cualquier `InstruccionDistribucion` del agregado OxpComercio, la suma de sus `DestinoDeNegocio` es exactamente 100%. Se valida por cada instrucción individual (ya sea de un `ConceptoDeGasto` o de un `Tributo`). | OxpComercio | `[R05c]` |
+| I2 | **Integridad de distribución:** Para cualquier `InstruccionDistribucion` de los agregados OxpComercio, OxpExtracto o Anticipo, la suma de sus `DestinoDeNegocio` es exactamente 100%. Se valida por cada instrucción individual, ya sea referenciando un `ConceptoDeGasto`, un `Tributo`, un `CargoFinanciero`, un ajuste (diferencia cambio o tolerancia), o el valor de un anticipo. | OxpComercio, OxpExtracto, Anticipo | `[R05c]` |
 | I3 | **Completitud de conciliación:** Un OxpExtracto en estado Conciliado tiene el 100% de sus partidas vinculadas a OxpComercio, cubiertas por anticipo, marcadas como disputa, o clasificadas como cargos adicionales. | OxpExtracto | `[R06]` |
 | I4 | **Progresión de estados:** Cada agregado solo puede avanzar en su máquina de estados; no puede retroceder excepto por la transición explícita Devuelta → Pendiente en OxpComercio (vía corrección). | Ambos | — |
 | I5 | **Consistencia de moneda:** Toda OxpComercio en moneda extranjera almacena tanto el valor en moneda de origen como el valor en moneda funcional. | OxpComercio | `[R05b]` |
@@ -990,3 +1018,4 @@ Registro de las decisiones tomadas durante la definición del modelo de dominio.
 | 1.4 | Febrero 2026 | DestinoDeNegocio con identificador estandarizado (Shared Kernel). Comportamiento calculado del agregado (valorBruto, valorNeto, lineasParaTraduccion). Sección 9: Decisiones de arquitectura y diseño (D1–D11). |
 | 1.5 | Febrero 2026 | Devolución absorbida como variante de OxpComercio (`TipoOxpComercio`). Corrección de 7 inconsistencias entre agregados, máquinas de estado y catálogo de eventos. Nuevo evento `AjustePorToleranciaGenerado`. 27 eventos (OxpComercio: 12, OxpExtracto: 15). Decisión D12. |
 | 1.6 | Febrero 2026 | Anticipo extraído como agregado independiente con 4 eventos propios. Nuevo domain service `ServicioDeRegularizacion`. Nuevo estado terminal Pagada en OxpComercio. Nuevo evento `PartidaCubiertaPorAnticipo` en OxpExtracto. Nuevo evento `OxpComercioPagada` en OxpComercio. Nueva invariante I11 (saldo no negativo). 30 eventos (OxpComercio: 10, OxpExtracto: 16, Anticipo: 4). Decisiones D13, D14. |
+| 1.7 | Febrero 2026 | Distribución unificada con dos niveles: (1) agregado — valor total de la obligación (Shared Kernel), (2) componente — detalle por concepto/cargo/ajuste. `InstruccionDistribucion` aplicado a los tres agregados. OxpExtracto: distribución en CargoFinanciero, AjustePorDiferenciaCambio y AjustePorTolerancia con `lineasParaTraduccion()`. Anticipo: distribución sobre el valor del anticipo. Invariante I2 extendida a OxpComercio, OxpExtracto y Anticipo. |
