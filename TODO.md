@@ -1,4 +1,5 @@
 (OK) - 1. Es importante tener calculado el valor total de la OXP en alguna propiedad del agregado o se vuelve otro concepto o esto queda encapsulado en el agregado.
+1.5 Especificar el saldo tanto para la OXP de comercio como para la OXP de extracto.
 2. Algunos tributos pueden tener dependecia de existencia de otros tributos, esto pasa mucho con la retención de IVA no puede existir si no existe el IVA. 
 3. La información de la moneda y TRM va a nivel del concepto, ya que una OXP puede tener conceptos con diferentes monedas. (Pasa mucho con las de Extracto).
 4. Validar el comportamiento completo de la OXP del extracto si debe aplicar impuestos a los conceptos de cargos financieros.

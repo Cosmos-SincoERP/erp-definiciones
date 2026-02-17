@@ -11,6 +11,7 @@
 7. [Invariantes del dominio](#7-invariantes-del-dominio)
 8. [Qué NO contiene este documento](#8-qué-no-contiene-este-documento)
 9. [Decisiones de arquitectura y diseño](#9-decisiones-de-arquitectura-y-diseño)
+10. [Premisas de negocio](#10-premisas-de-negocio)
 
 ---
 
@@ -35,6 +36,7 @@ Las reglas de negocio se referencian como `[R##]` y su texto completo vive en `D
 
 - **Eventos:** PascalCase en español. Ej: `OxpComercioRadicada`, `ExtractoConciliado`.
 - **Referencias a reglas:** `[R##]` remite a `Definicion_Alcance.md`, Sección 6.
+- **Premisas de negocio:** `[P##]` remite a Sección 10 de este documento.
 - **Agregados:** OxpComercio, OxpExtracto, Anticipo.
 - **Estados OxpComercio:** Pendiente, Confirmada, Causada, Compensada, Pagada, Devuelta.
 - **Estados OxpExtracto:** Pendiente, Parcialmente Conciliado, Conciliado, Confirmado, Causado, Pagado.
@@ -338,7 +340,7 @@ En ambos casos, la **regularización** siempre ocurre vía OxpComercio que aport
 | Componente | Tipo | Contenido |
 |---|---|---|
 | `InformacionTercero` | VO | NIT, razón social |
-| `ValorMonetario` | VO | Valor del anticipo: monto adelantado. Monto, moneda, TRM si aplica, monto en moneda funcional. |
+| `ValorMonetario` | VO | Valor del anticipo: monto adelantado. Monto, moneda, TRM si aplica, monto en moneda funcional. Valor global sin desglose fiscal `[P1]`. |
 | `MedioDePago` | VO | Tipo (crédito/débito prepago), número, entidad bancaria |
 | `SoporteDocumental` | VO (opcional) | Soporte preliminar del anticipo (ej: cuenta de cobro). Opcional — el anticipo puede registrarse sin soporte. El soporte formal definitivo (factura) llega vía OxpComercio durante la regularización. |
 | `valorTotal` | Valor preestablecido | Inicialmente igual al valor anticipo. Puede diferir si el cargo bancario real (extracto) o el monto a pagar (pago directo) resulta diferente. El saldo se deriva de los cruces (ver comportamiento calculado). |
@@ -1071,7 +1073,7 @@ Las invariantes son restricciones estructurales que deben ser verdaderas en todo
 | # | Invariante | Agregado | Referencia |
 |---|-----------|----------|------------|
 | I1 | **Unicidad de obligación:** No pueden existir dos OxpComercio con el mismo NIT + número de soporte dentro de la ventana de 24 meses. | OxpComercio | `[R26]` |
-| I2 | **Integridad de distribución:** Para cualquier `InstruccionDistribucion` de los agregados OxpComercio, OxpExtracto o Anticipo, la suma de sus `DestinoDeNegocio` es exactamente 100%. Se valida por cada instrucción individual, ya sea referenciando un `ConceptoDeGasto`, un `Tributo`, un `CargoFinanciero`, un ajuste (diferencia cambio o tolerancia), o el valor de un anticipo. | OxpComercio, OxpExtracto, Anticipo | `[R05c]` |
+| I2 | **Integridad de distribución:** Para cualquier `InstruccionDistribucion` de los agregados OxpComercio, OxpExtracto o Anticipo, la suma de sus `DestinoDeNegocio` es exactamente 100%. Se valida por cada instrucción individual, ya sea referenciando un `ConceptoDeGasto`, un `Tributo`, un `CargoFinanciero`, un ajuste (diferencia cambio o tolerancia), o el valor global de un anticipo (sin desglose fiscal `[P1]`). | OxpComercio, OxpExtracto, Anticipo | `[R05c]` |
 | I3 | **Completitud de conciliación:** Un OxpExtracto en estado Conciliado tiene el 100% de sus partidas vinculadas a OxpComercio, cubiertas por anticipo, marcadas como disputa, o clasificadas como cargos adicionales. | OxpExtracto | `[R06]` |
 | I4 | **Progresión de estados:** Cada agregado solo puede avanzar en su máquina de estados; no puede retroceder excepto por la transición explícita Devuelta → Pendiente en OxpComercio (vía corrección). | OxpComercio, OxpExtracto, Anticipo | — |
 | I5 | **Consistencia de moneda:** Toda OxpComercio en moneda extranjera almacena tanto el valor en moneda de origen como el valor en moneda funcional. | OxpComercio | `[R05b]` |
@@ -1125,6 +1127,16 @@ Registro de las decisiones tomadas durante la definición del modelo de dominio.
 
 ---
 
+## 10. Premisas de negocio
+
+Premisas que provienen del negocio, la regulación o la fiscalidad y que condicionan el diseño del modelo. No son decisiones arquitectónicas (D##) ni invariantes estructurales (I##) — son verdades externas al modelo que se toman como base.
+
+| # | Premisa | Justificación | Aplica a |
+|---|---|---|---|
+| P1 | **El anticipo registra únicamente el valor global; no aplica desglose fiscal.** | Fiscalmente, el IVA solo puede tomarse como descontable cuando existe factura o documento válido. El anticipo es un pago adelantado sin factura — el soporte formal (factura) llega durante la regularización vía OxpComercio. Por esta razón, el Anticipo no contiene `ConceptoDeGasto`, `DesgloseFiscal` ni `Tributo`. | Anticipo |
+
+---
+
 ## Control de versiones
 
 | Versión | Fecha | Descripción |
@@ -1139,3 +1151,4 @@ Registro de las decisiones tomadas durante la definición del modelo de dominio.
 | 1.7 | Febrero 2026 | Distribución unificada con dos niveles: (1) agregado — valor total de la obligación (Shared Kernel), (2) componente — detalle por concepto/cargo/ajuste. `InstruccionDistribucion` aplicado a los tres agregados. OxpExtracto: distribución en CargoFinanciero, AjustePorDiferenciaCambio y AjustePorTolerancia con `lineasParaTraduccion()`. Anticipo: distribución sobre el valor del anticipo. Invariante I2 extendida a OxpComercio, OxpExtracto y Anticipo. |
 | 1.8 | Febrero 2026 | Reestructuración del Anticipo: dos comportamientos (vinculado a extracto / pendiente de pago), dos dimensiones de valor (valor anticipo y valor total), dos estados terminales (Compensado y Pagado). Anticipo puede tener o no soporte documental preliminar (ej: cuenta de cobro); la regularización siempre es vía OxpComercio con soporte formal. Nuevo: 3 eventos (`AnticipoVinculadoAPartida`, `AnticipoCompensado`, `AnticipoPagado`), entidad `CoberturaPartida`, `SoporteDocumental` opcional, `saldoPendienteRegularizacion`. Relación Anticipo → PartidaExtracto cambia de 1:1 a 1:N. Conexión Anticipo → OxpExtracto en diagrama BC. Nueva invariante I12 (consistencia de cobertura). 33 eventos (OxpComercio: 10, OxpExtracto: 16, Anticipo: 7). Decisión D15. 12 invariantes. |
 | 1.9 | Febrero 2026 | Cruces parciales y nuevo modelo de estados del Anticipo. Entidades `CoberturaPartida` y `saldoPendienteRegularizacion` reemplazadas por dos componentes de cruce parcial: `CrucePagoAplicado` (resuelve valorTotal, tipo extracto o pago_directo, inmutable, coexistentes) y `CruceRegularizacionAplicada` (resuelve valorAnticipo). Saldos derivados: `saldoPorPagar()` y `saldoPorRegularizar()`. `valorTotal` inicialmente igual al valor anticipo. Nuevo modelo de 4 estados con dos dimensiones independientes: Vigente → Pagado / Regularizado → Cerrado ■. Distinción entre eventos de progreso (reducen saldos) y eventos de transición (cambian estado). Evento `AnticipoCompensado` eliminado; nuevos eventos: `PagoAnticipoAplicado`, `RegularizacionDeAnticipoCompletada`. Los dos tipos de cruce (extracto y pago directo) pueden coexistir sobre el mismo anticipo. `AnticipoAmortizado` puede ocurrir desde Regularizado o Cerrado. `OxpComercioPagada` marcada pendiente de redefinición (futuro `saldoPorPagar` de OxpComercio). Eliminado acoplamiento `AnticipoAmortizado` → `OxpComercioPagada`. Distribución única aplica proporcionalmente a ambas dimensiones de valor. Corrección de inconsistencias: D2 (3 agregados), I4 (todos los agregados), I8/I11/I12 actualizadas, dualidad `CoberturaAnticipo`/`CrucePagoAplicado` documentada. 34 eventos (OxpComercio: 10, OxpExtracto: 16, Anticipo: 8). Decisiones D15 actualizada, D16 nueva. 12 invariantes. |
+| 2.0 | Febrero 2026 | Nueva Sección 10: Premisas de Negocio (`P##`). Nomenclatura `[P##]` agregada a convenciones (Sección 2) y tabla de contenido. P1: el anticipo registra únicamente el valor global sin desglose fiscal — el IVA solo es descontable con factura o documento válido, que llega vía OxpComercio durante la regularización. Referencia `[P1]` en estructura del Anticipo (`ValorMonetario`). I2 actualizada con referencia explícita a `[P1]` para distribución del anticipo. |
