@@ -9,3 +9,4 @@
 8. Revisar y establecer los conceptos claros de cuando una OXP es de anticipo.
 9. Re-definir los datos del agregado OXP Comercio y OXP Extracto.
 10. Incluir la OXP de proveedores. 
+11. Los abonos y devoluciones en el extracto 
