@@ -41,7 +41,7 @@ Las reglas de negocio se referencian como `[R##]` y su texto completo vive en `D
 - **Agregados:** OxpComercio, OxpExtracto, Anticipo, Devolucion.
 - **Estados OxpComercio:** Pendiente, Confirmada, Causada, Pagada, Devuelta.
 - **Estados Devolucion:** Pendiente, Confirmada, Causada.
-- **Estados OxpExtracto:** Pendiente, Parcialmente Conciliado, Conciliado, Confirmado, Causado, Pagado.
+- **Estados OxpExtracto:** Pendiente, Parcialmente Conciliado, Conciliado, Confirmada, Causado, Pagado.
 - **Estados Anticipo:** Vigente, Pagado, Regularizado, Cerrado, Reversado.
 
 ### Template de evento
@@ -51,6 +51,7 @@ Cada evento del catálogo (Sección 5) se documenta con la siguiente estructura:
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | Qué ocurrió en términos de negocio. |
+| **Causalidad** | _(Solo si no es directa.)_ Derivado por transición / Derivado por configuración / Efecto inter-agregado / Evento compensatorio. Ver Causalidad entre eventos. |
 | **Agregado** | OxpComercio / OxpExtracto / Anticipo / Devolucion. |
 | **Estado previo** | Estado(s) desde los que puede emitirse. |
 | **Estado resultante** | Estado al que transiciona la entidad. |
@@ -64,13 +65,14 @@ Las máquinas de estado usan notación ASCII. Los estados terminales se marcan c
 
 ### Causalidad entre eventos
 
-Cuando un evento produce otro evento, se distinguen tres tipos de causalidad:
+Cuando un evento produce otro evento, se distinguen cuatro tipos de causalidad:
 
 | Tipo | Alcance | Mecanismo | Ejemplo |
 |---|---|---|---|
 | **Evento derivado por transición** | Mismo agregado, mismo append | El agregado evalúa una condición de estado y emite un segundo evento en la misma operación. | `PagoOxpComercioViaExtractoAplicado` reduce `saldoPorPagar()`; si llega a 0, emite `OxpComercioPagada`. `VinculacionRealizada` resuelve una partida; si 100% resueltas, emite `ExtractoConciliado`. |
 | **Evento derivado por configuración** | Mismo agregado, condicional | El agregado emite un segundo evento solo si una regla de negocio configurable lo habilita. | `OxpComercioRadicada` emite `OxpComercioConfirmada` si `[R02]` está configurada como automática. `OxpComercioConfirmada` emite `OxpComercioCausada` si `[R12]` está configurada como automática. |
 | **Efecto inter-agregado** | Múltiples streams, consistencia eventual | Un domain service coordina la emisión de eventos en streams de agregados diferentes. | `ServicioDeConciliacion` emite `VinculacionRealizada` (OxpExtracto) + `PagoOxpComercioViaExtractoAplicado` (OxpComercio). `ServicioDeAplicacionDevolucion` emite `DevolucionConfirmada` (Devolucion) + evento de efecto en el agregado OXP origen. |
+| **Evento compensatorio** | Múltiples streams, reversión por fallo | Un domain service emite un evento que revierte el efecto de un paso anterior cuando un paso posterior falla. Solo se dispara por fallo del proceso — nunca por operación de negocio directa. Cada domain service documenta su tabla de compensación (ver Sección 3). | Si `PagoOxpComercioViaExtractoAplicado` (paso 5) falla permanentemente después de `VinculacionRealizada` (paso 4), el proceso emite `VinculacionRevertida` → stream OxpExtracto. |
 
 ---
 
@@ -275,6 +277,7 @@ Los valores totales y las líneas de traducción no se almacenan — se derivan 
 | `ValorMonetario` | Monto, moneda, TRM (si aplica), monto en moneda funcional |
 | `InstruccionDistribucion` | Distribución por unidad organizacional. Indica cómo distribuir un valor entre unidades organizacionales. Se aplica al valor total del extracto y a cada componente individual (CargoFinanciero, AjustePorDiferenciaCambio o AjustePorTolerancia). Cada referencia tiene su propia distribución independiente. `List<DestinoDeNegocio>` (invariante I2: suma = 100%). |
 | `DestinoDeNegocio` | Identificador de unidad organizacional (Shared Kernel con el contexto contable), porcentaje. Ej: `{ unidadOrganizacional: "FIN-001", porcentaje: 100 }`. Usado dentro de `InstruccionDistribucion`. |
+| `SoporteDocumental` | Tipo (PDF, imagen, XML), referencia, datos extraídos. Soporte del extracto bancario y documentación de disputas. |
 
 **Comportamiento calculado del agregado:**
 
@@ -283,7 +286,7 @@ Los valores totales del extracto no se almacenan — se derivan de los component
 | Comportamiento | Descripción |
 |---|---|
 | `valorTotalExtracto()` | Suma del valor de todas las `PartidaExtracto` + suma de todos los `CargoFinanciero`. Excluye `AjustePorDiferenciaCambio` y `AjustePorTolerancia` porque estos se generan durante la conciliación como cálculos internos de OXP — no representan montos cobrados por el banco. El extracto bancario define qué se debe (partidas + cargos); los ajustes son correcciones contables que se causan junto con el extracto pero no modifican el monto por pagar. |
-| `saldoPorPagar()` | `valorTotalExtracto()` - sum(`CrucePagoExtractoAplicado`.valor). Derivado desde radicación (evoluciona con partidas y cargos). Pagos solo se aplican desde estado Causado. Cuando `saldoPorPagar()` = 0 → transición a Pagado. |
+| `saldoPorPagar()` | `valorTotalExtracto()` - sum(`CrucePagoExtractoAplicado`.valor). Derivado desde radicación (evoluciona con partidas y cargos). Pagos de origen externo (SincoA&F) solo se aplican desde estado Causado; pagos de origen interno (devolución) se aplican desde Confirmada. Cuando `saldoPorPagar()` = 0 → transición a Pagado. |
 | `lineasParaTraduccion()` | Pre-computa una lista plana de líneas, una por cada combinación (componente × destino de negocio), con el valor ya distribuido (valor × porcentaje). Componentes: CargoFinanciero, AjustePorDiferenciaCambio, AjustePorTolerancia. El servicio de Traducción Contable recibe estas líneas y solo necesita mapear `(tipo componente + unidad organizacional) → cuenta contable`. |
 
 **Diagrama de composición:**
@@ -293,6 +296,7 @@ Los valores totales del extracto no se almacenan — se derivan de los component
 │  OxpExtracto (Agregado)                                      │
 │                                                              │
 │  ○ InformacionTercero    ○ MedioDePago    ○ ValorMonetario   │
+│  ○ SoporteDocumental                                        │
 │                                                              │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │ PartidaExtracto #1 (Entidad)                           │  │
@@ -393,6 +397,22 @@ El anticipo tiene **dos comportamientos** según su relación con el extracto, y
 
 En ambos casos, la **regularización** siempre ocurre vía OxpComercio que aporta el soporte formal definitivo (factura), independiente de si el anticipo tenía documentación preliminar (ej: cuenta de cobro). El estado terminal (Cerrado) requiere **ambos valores resueltos**: pago del valor total (Pagado) + regularización completa (Regularizado).
 
+**Escenarios de regularización:**
+
+| # | Escenario | Estado del Anticipo | OxpComercio requerida en |
+|---|-----------|---------------------|--------------------------|
+| R1 | Anticipo independiente, pago pendiente (externo) | Vigente | Confirmada o posterior |
+| R2 | Anticipo vinculado a extracto (pago ya cubierto por partida) | Pagado | Confirmada o posterior |
+| R3 | Anticipo nacido de devolución sobre OxpComercio pagada (C3, C4) — pago cubierto al crearse | Pagado | Confirmada o posterior |
+| R4 | Regularización parcial contra múltiples OxpComercio | Vigente o Pagado | Confirmada o posterior (cada una) |
+
+- La regularización afecta **ambos agregados** en una sola operación coordinada por `ServicioDeRegularizacion`: reduce `saldoPorRegularizar()` del Anticipo y reduce `saldoPorPagar()` de la OxpComercio como si fuera un pago (crea `PagoAplicado` tipo anticipo).
+- La OxpComercio debe estar en estado **Confirmada o posterior** — Confirmada es el estado más temprano donde `valorNeto()` es estable (la FSM no permite correcciones después de Confirmada).
+- La dimensión de pago del Anticipo (`saldoPorPagar()`) es independiente de la regularización: la resuelven sistemas o procesos externos (partida de extracto, pago directo vía SincoA&F) o el origen del anticipo (devolución).
+- La dimensión de regularización (`saldoPorRegularizar()`) es controlada internamente por el bounded context OXP vía la(s) OxpComercio que aportan soporte formal definitivo (factura).
+- **R3 — Devolución que crea anticipo:** Una devolución sobre OxpComercio ya pagada (`saldoPorPagar` = 0, escenarios C3/C4 en Devolucion) crea un nuevo Anticipo que nace en estado Pagado (`saldoPorPagar()` = 0, cubierto por `CrucePagoAplicado` tipo devolucion) con `saldoPorRegularizar()` = `valorNeto(devolucion)`. Este anticipo necesita regularización contra una nueva OxpComercio que aporte soporte formal definitivo. Al regularizarse completamente, transiciona directamente a Cerrado (ya estaba Pagado).
+- Un anticipo puede tener pagos mixtos (extracto + pago directo) y regularizaciones parciales contra múltiples OxpComercio simultáneamente.
+
 **Dimensiones de valor:**
 
 1. **Valor anticipo** (`ValorMonetario`) — monto adelantado. Se resuelve por **regularización** (OxpComercio aporta soporte formal definitivo).
@@ -456,6 +476,11 @@ En ambos casos, la **regularización** siempre ocurre vía OxpComercio que aport
 │  │                           - sum(cruces compensación)       │  │
 │  │  saldoPorRegularizar()  → valorAnticipo                    │  │
 │  │                           - sum(cruces regularización)     │  │
+│  │                                                            │  │
+│  │  lineasParaTraduccion() → List<LineaTraduccion>            │  │
+│  │   Línea única: valor anticipo × distribución               │  │
+│  │   (destino de negocio). Sin desglose fiscal [P1].          │  │
+│  │   El traductor mapea como anticipo a proveedor.            │  │
 │  └────────────────────────────────────────────────────────────┘  │
 │                                                                  │
 │  ● = Entidad (tiene identidad)   ○ = Value Object (sin ID)      │
@@ -496,10 +521,11 @@ La devolución es un documento independiente que referencia exactamente **un** a
 | C3 | Devolución total, OXP ya pagada | = 0 | = valorNeto OXP | — | Crea Anticipo (Pagado, pendiente regularización) |
 | C4 | Devolución parcial, OXP ya pagada | = 0 | < valorNeto OXP | — | Crea Anticipo (Pagado, pendiente regularización) |
 | C5 | Devolución parcial = saldo restante | > 0 | = saldoPorPagar | saldoPorPagar → 0 (Pagada) | — |
+| C6 | Devolución con excedente, OXP parcialmente pagada | > 0 | > saldoPorPagar | saldoPorPagar → 0 (Pagada) | Crea Anticipo por excedente (`valorNeto(devolucion) - saldoPorPagar`) |
 
-- Cuando `saldoPorPagar > 0`: `valorNeto(devolucion) ≤ saldoPorPagar(OXP)`. El crédito reduce el saldo directamente.
-- Cuando `saldoPorPagar = 0`: la devolución completa se convierte en Anticipo (dimensión pago resuelta, regularización pendiente).
-- ⚠️ **Pendiente:** escenario donde `valorNeto(devolucion) > saldoPorPagar` en OXP parcialmente pagada. Puede involucrar nota débito u otro mecanismo contable no definido en este dominio.
+- Cuando `saldoPorPagar > 0` y `valorNeto(devolucion) ≤ saldoPorPagar`: el crédito reduce el saldo directamente (C1, C2, C5).
+- Cuando `saldoPorPagar > 0` y `valorNeto(devolucion) > saldoPorPagar`: **bifurcación** — la devolución se divide en crédito por `saldoPorPagar` (reduce saldo a 0, emite `OxpComercioPagada`) + crea Anticipo por el excedente (`valorNeto(devolucion) - saldoPorPagar`), estado Pagado, pendiente regularización. Rama Comercio-C en `ServicioDeAplicacionDevolucion` (C6).
+- Cuando `saldoPorPagar = 0`: la devolución completa se convierte en Anticipo (dimensión pago resuelta, regularización pendiente) (C3, C4).
 - ⚠️ **Pendiente:** reembolso cuando no existe OxpComercio futura para regularizar el Anticipo generado — puede requerir integración con CXC u otro dominio.
 
 **Tipo Extracto:**
@@ -659,8 +685,8 @@ La conciliación es la operación que vincula OxpComercio y OxpExtracto. No pert
 1. Carga la instancia de `OxpComercio` (stream `oxp-comercio-{id}`)
 2. Carga la instancia de `OxpExtracto` (stream `oxp-extracto-{id}`)
 3. Valida precondiciones sobre ambos agregados
-4. Emite `PagoOxpComercioViaExtractoAplicado` → stream de OxpComercio (crea `PagoAplicado` tipo extracto, reduce `saldoPorPagar()`)
-5. Emite `VinculacionRealizada` → stream de OxpExtracto
+4. Emite `VinculacionRealizada` → stream de OxpExtracto (hecho de negocio: partida vinculada)
+5. Emite `PagoOxpComercioViaExtractoAplicado` → stream de OxpComercio (efecto financiero: crea `PagoAplicado` tipo extracto, reduce `saldoPorPagar()`)
 
 **Flujo de partidas de retorno (devoluciones):**
 
@@ -673,20 +699,53 @@ Si la partida es un crédito (retorno de dinero), el servicio busca Devoluciones
 
 Dos streams, consistencia eventual, coordinados por el domain service.
 
+**Compensación `[SI3]`:**
+
+| Paso | Evento (hecho de negocio primero) | Stream | Si falla paso posterior → Estrategia |
+|------|----------------------------------|--------|--------------------------------------|
+| 4 | `VinculacionRealizada` | OxpExtracto | Si paso 5 falla permanentemente: `VinculacionRevertida` → stream OxpExtracto |
+| 5 | `PagoOxpComercioViaExtractoAplicado` | OxpComercio | (último paso — reintentable `[D20]`) |
+
+**Protocolo de proceso:**
+- **correlationId:** UUID generado al inicio de cada ejecución de conciliación. Incluido en `VinculacionRealizada` y `PagoOxpComercioViaExtractoAplicado`.
+- **Persistencia:** Stream propio `conciliacion-{correlationId}` con estado del proceso (pasos completados, referencias a streams afectados).
+
 ### Servicio de dominio: ServicioDeRegularizacion
 
-La regularización es la operación que vincula un Anticipo con una OxpComercio. Es un **domain service** que coordina efectos en ambos streams:
+La regularización es la operación que vincula un Anticipo con una OxpComercio, aportando el soporte documental formal (factura) que justifica el anticipo. Es un **domain service** que coordina efectos en ambos streams:
 
-1. Detecta que la OxpComercio tiene un tercero con anticipo vigente
+**Trigger:** El usuario selecciona una OxpComercio en estado Confirmada o posterior y un Anticipo del mismo tercero con `saldoPorRegularizar()` > 0. El sistema permite seleccionar el monto a regularizar (default: `min(saldoPorRegularizar(), saldoPorPagar(OxpComercio))`).
+
+**Flujo principal:**
+
+1. Recibe comando con: `anticipoId`, `oxpComercioId`, `montoARegularizar`
 2. Carga la instancia de `Anticipo` (stream `anticipo-{id}`)
 3. Carga la instancia de `OxpComercio` (stream `oxp-comercio-{id}`)
-4. Valida precondiciones (anticipo en estado no terminal — ni Cerrado ni Reversado, mismo tercero, `saldoPorRegularizar()` suficiente, `saldoPorPagar()` suficiente en OxpComercio)
-5. Emite `AnticipoRegularizado` → stream del Anticipo (crea `CruceRegularizacionAplicada`, reduce saldo por regularizar)
+4. Valida precondiciones:
+   - Anticipo en estado no terminal (ni Cerrado ni Reversado)
+   - Mismo tercero
+   - `saldoPorRegularizar()` ≥ `montoARegularizar`
+   - OxpComercio en estado Confirmada o posterior
+   - `saldoPorPagar()` ≥ `montoARegularizar` en OxpComercio
+5. Emite `AnticipoRegularizado` → stream del Anticipo (crea `CruceRegularizacionAplicada`, reduce `saldoPorRegularizar()`)
 6. Emite `PagoOxpComercioViaAnticipoAplicado` → stream de OxpComercio (crea `PagoAplicado` tipo anticipo, reduce `saldoPorPagar()`)
 
 Dos streams, consistencia eventual, coordinados por el domain service.
 
-⚠️ **Pendiente de precisar:** el momento exacto de la regularización y la coordinación temporal entre ambos agregados. La regularización debe ocurrir en Pendiente/Confirmada (negocio), pero: (1) si `valorNeto()` de la OxpComercio cambia después de regularizar, los cruces inmutables en ambos agregados quedan desfasados; (2) múltiples OxpComercio pueden referenciar el mismo anticipo y el saldo debe reservarse correctamente. Además, I16 actualmente restringe pagos a Causada (integración SincoA&F), pero con el futuro sistema de Tesorería el pago podría desacoplarse de la causación. Requiere diseño detallado.
+**Escenario 1:N (R4):** Un anticipo puede regularizarse contra múltiples OxpComercio. Cada ejecución del servicio opera sobre un par (anticipo, OxpComercio) con un `montoARegularizar` específico. La concurrencia entre múltiples ejecuciones simultáneas sobre el mismo anticipo se controla por control de concurrencia `[D20]` — la segunda ejecución falla y reintenta con el saldo actualizado.
+
+**Compensación `[SI3]`:**
+
+| Paso | Evento emitido | Stream | Si falla paso posterior → Compensación |
+|------|---------------|--------|---------------------------------------|
+| 5 | `AnticipoRegularizado` | Anticipo | `RegularizacionRevertida` → stream Anticipo |
+| 6 | `PagoOxpComercioViaAnticipoAplicado` | OxpComercio | `PagoOxpComercioViaAnticipoRevertido` → stream OxpComercio |
+
+**Protocolo de proceso:**
+- **correlationId:** UUID generado al inicio de cada ejecución de regularización. Incluido en `AnticipoRegularizado` y `PagoOxpComercioViaAnticipoAplicado`.
+- **Persistencia:** Stream propio `regularizacion-{correlationId}` con estado del proceso (pasos completados, referencias a streams afectados).
+
+**Momento de la regularización:** La OxpComercio debe estar en estado **Confirmada o posterior**. Confirmada es el estado más temprano donde `valorNeto()` es estable — la FSM no permite correcciones después de Confirmada (no hay transición Confirmada → Devuelta), por lo que los cruces inmutables en ambos agregados reflejan un `valorNeto()` definitivo. La reserva de saldo del anticipo cuando múltiples OxpComercio lo referencian se controla por control de concurrencia `[D20]`. Si el anticipo cubre 100% de la OxpComercio en Confirmada, al causarse se emite `OxpComercioPagada` como derivado por transición.
 
 ### Servicio de dominio: ServicioDeAplicacionDevolucion
 
@@ -700,45 +759,70 @@ La aplicación de devolución es la operación que aplica el crédito de una Dev
 
 **Rama Comercio** (escenarios C1–C5):
 
-3c. Carga OxpComercio referenciada (stream `oxp-comercio-{id}`) — debe estar en estado Causada o Pagada
+3c. Carga OxpComercio referenciada (stream `oxp-comercio-{id}`) — debe estar en estado Confirmada o posterior
 4c. Evalúa según `saldoPorPagar(OXP)`:
 
-  **Rama Comercio-A — saldoPorPagar > 0** (C1, C2, C5):
+  **Rama Comercio-A — saldoPorPagar > 0 y valorNeto(devolucion) ≤ saldoPorPagar** (C1, C2, C5):
 
-  5ca. Valida: `valorNeto(devolucion) ≤ saldoPorPagar(OXP)`
-  6ca. Emite `PagoOxpComercioViaDevolucionAplicado` → stream OxpComercio (crea `PagoAplicado` tipo devolucion, reduce `saldoPorPagar()`)
-  7ca. Emite `DevolucionConfirmada` → stream Devolucion
+  5ca. Emite `DevolucionConfirmada` → stream Devolucion
+  6ca. Emite `PagoOxpComercioViaDevolucionAplicado` → stream OxpComercio (crea `PagoAplicado` tipo devolucion por `valorNeto(devolucion)`, reduce `saldoPorPagar()`)
 
   **Rama Comercio-B — saldoPorPagar = 0** (C3, C4):
 
-  5cb. Crea nuevo Anticipo → stream `anticipo-{id}`
+  5cb. Emite `DevolucionConfirmada` → stream Devolucion
+  6cb. Crea nuevo Anticipo → stream `anticipo-{id}`
     - Anticipo nace con `valorTotal = valorNeto(devolucion)`, `valorAnticipo = valorNeto(devolucion)`
     - Inmediatamente tiene un `CrucePagoAplicado` (tipo devolucion) que referencia la Devolucion que lo originó → `saldoPorPagar() = 0` → estado Pagado
     - `saldoPorRegularizar() = valorNeto(devolucion)` → pendiente de regularización contra nueva OxpComercio o reembolso
-  6cb. Emite `DevolucionConfirmada` → stream Devolucion
+
+  **Rama Comercio-C — saldoPorPagar > 0 y valorNeto(devolucion) > saldoPorPagar** (C6):
+
+  5cc. `montoCredito = saldoPorPagar(OXP)`, `montoExcedente = valorNeto(devolucion) - saldoPorPagar(OXP)`
+  6cc. Emite `DevolucionConfirmada` → stream Devolucion
+  7cc. Emite `PagoOxpComercioViaDevolucionAplicado` → stream OxpComercio (crea `PagoAplicado` tipo devolucion por `montoCredito`, reduce `saldoPorPagar()` a 0, emite `OxpComercioPagada`)
+  8cc. Crea nuevo Anticipo → stream `anticipo-{id}`
+    - Anticipo nace con `valorTotal = montoExcedente`, `valorAnticipo = montoExcedente`
+    - Inmediatamente tiene un `CrucePagoAplicado` (tipo devolucion) → `saldoPorPagar() = 0` → estado Pagado
+    - `saldoPorRegularizar() = montoExcedente` → pendiente de regularización
 
 **Rama Extracto** (escenario E2 — cargo financiero devuelto):
 
-3e. Carga OxpExtracto referenciado (stream `oxp-extracto-{id}`) — debe estar en estado Causado (`saldoPorPagar > 0`)
+3e. Carga OxpExtracto referenciado (stream `oxp-extracto-{id}`) — debe estar en estado Confirmada o posterior (`saldoPorPagar > 0`)
 4e. Valida: `valorNeto(devolucion) ≤ saldoPorPagar(OxpExtracto)`
-5e. Emite `PagoExtractoViaDevolucionAplicado` → stream OxpExtracto (crea `CrucePagoExtractoAplicado` tipo devolucion, reduce `saldoPorPagar()`)
-6e. Emite `DevolucionConfirmada` → stream Devolucion
+5e. Emite `DevolucionConfirmada` → stream Devolucion
+6e. Emite `PagoExtractoViaDevolucionAplicado` → stream OxpExtracto (crea `CrucePagoExtractoAplicado` tipo devolucion, reduce `saldoPorPagar()`)
 
-Devoluciones sobre extracto solo aplican cuando hay saldo pendiente. No aplica rama `saldoPorPagar = 0` para extracto (a diferencia de Comercio).
+Devoluciones sobre extracto solo aplican cuando hay saldo pendiente (`saldoPorPagar > 0`). No aplica rama `saldoPorPagar = 0` para extracto (a diferencia de Comercio). El extracto debe estar en estado Confirmada o posterior.
 
 **Rama Anticipo** (escenario A1):
 
 3a. Carga Anticipo referenciado (stream `anticipo-{id}`) — debe estar en estado Vigente
 4a. Valida: sin `CrucePagoAplicado`, sin `CruceRegularizacionAplicada`
 5a. Valida: `valorNeto(devolucion) = valorTotal` del anticipo (reversa total)
-6a. Emite `AnticipoReversado` → stream Anticipo (nuevo evento — estado terminal)
-7a. Emite `DevolucionConfirmada` → stream Devolucion
+6a. Emite `DevolucionConfirmada` → stream Devolucion
+7a. Emite `AnticipoReversado` → stream Anticipo (nuevo evento — estado terminal)
 
 Hasta 3 streams por rama, consistencia eventual, coordinados por el domain service.
 
+**Compensación `[SI3]`:**
+
+En todas las ramas, `DevolucionConfirmada` se emite primero (hecho de negocio). Los efectos en otros agregados son pasos posteriores, idempotentes y reintentables `[D20]`.
+
+| Rama | Paso | Evento efecto (último) | Si falla → Estrategia |
+|------|------|----------------------|----------------------|
+| Comercio-A | 6ca | `PagoOxpComercioViaDevolucionAplicado` | Reintentable (idempotente) `[D20]`. Si fallo permanente: `PagoOxpComercioViaDevolucionRevertido` → stream OxpComercio + `DevolucionRevertida` → stream Devolucion. |
+| Comercio-B | 6cb | Crea Anticipo | Reintentable (idempotente) `[D20]`. Fallo permanente improbable (stream nuevo, sin conflicto de precondiciones). |
+| Comercio-C | 7cc | `PagoOxpComercioViaDevolucionAplicado` | Reintentable `[D20]`. Si fallo permanente: `PagoOxpComercioViaDevolucionRevertido` → stream OxpComercio + `DevolucionRevertida` → stream Devolucion. |
+| Comercio-C | 8cc | Crea Anticipo (excedente) | Reintentable `[D20]`. Fallo permanente improbable (stream nuevo). Si fallo permanente: compensar 7cc (`PagoOxpComercioViaDevolucionRevertido`) + `DevolucionRevertida`. |
+| Extracto | 6e | `PagoExtractoViaDevolucionAplicado` | Reintentable (idempotente) `[D20]`. Si fallo permanente: `PagoExtractoViaDevolucionRevertido` → stream OxpExtracto + `DevolucionRevertida` → stream Devolucion. |
+| Anticipo | 7a | `AnticipoReversado` | Reintentable (idempotente y terminal) `[D20]`. Fallo permanente improbable (validación completa en pasos 4a-5a). |
+
+**Protocolo de proceso:**
+- **correlationId:** UUID generado al inicio de cada ejecución. Incluido en `DevolucionConfirmada` y en el evento efecto correspondiente a la rama ejecutada.
+- **Persistencia:** Stream propio `aplicacion-devolucion-{correlationId}` con estado del proceso (rama seleccionada, pasos completados, referencias a streams afectados).
+
 ⚠️ **Pendientes:**
-- **Excedente Comercio (devolución > saldoPorPagar cuando saldo > 0):** no se modela todavía. Puede involucrar nota débito u otro mecanismo contable no definido en este dominio.
-- **Reembolso:** cuando no existe OxpComercio futura para regularizar el Anticipo generado — puede requerir integración con CXC u otro dominio.
+- **Reembolso:** cuando no existe OxpComercio futura para regularizar el Anticipo generado (Rama B o C) — puede requerir integración con CXC u otro dominio.
 - **Anticipo A2 (proveedor devuelve dinero):** diferido — requiere dominio CXC.
 
 ### [SI2] ServicioDeAplicacionDevolucion con 3 ramas → Strategy pattern
@@ -751,6 +835,16 @@ El servicio tiene 3 ramas con lógica diferenciada por tipo de OXP. Se sugiere c
 | Testear una rama individual | Instanciar todo el servicio | Instanciar solo la estrategia específica |
 | Responsabilidad | Una clase conoce toda la lógica | Cada clase conoce solo su rama |
 | Riesgo al modificar | Puede afectar otras ramas | Cada rama está aislada |
+
+### [SI3] Domain services multi-agregado con compensación → Wolverine Saga
+
+Los domain services que coordinan eventos en múltiples streams y documentan eventos compensatorios se implementan como clases `Saga` de Wolverine `[D20]`. Wolverine persiste el estado del proceso en Marten, gestiona retries/timeouts y ejecuta los handlers de compensación. Cada paso del domain service corresponde a un handler de la saga; cada evento compensatorio corresponde a un compensation handler.
+
+| Domain service | Saga sugerida | Agregados |
+|---|---|---|
+| `ServicioDeConciliacion` | `ConciliacionSaga` | OxpComercio, OxpExtracto |
+| `ServicioDeRegularizacion` | `RegularizacionSaga` | Anticipo, OxpComercio |
+| `ServicioDeAplicacionDevolucion` | `AplicacionDevolucionSaga` | Devolucion + OxpComercio / OxpExtracto / Anticipo (según rama `[SI2]`) |
 
 ### Relaciones entre agregados
 
@@ -769,7 +863,7 @@ Devolucion ─────────┤                │                    
 ```
 
 - 1 Devolucion referencia exactamente 1 agregado OXP origen (relación 1:1 desde devolución).
-- **Tipo Comercio:** N Devolucion referencian 1 OxpComercio (relación N:1). Si `saldoPorPagar(OXP) = 0` al confirmar: se crea Anticipo por el valor completo de la devolución (dimensión pago resuelta, regularización pendiente).
+- **Tipo Comercio:** N Devolucion referencian 1 OxpComercio (relación N:1). Si `saldoPorPagar(OXP) = 0` al confirmar: se crea Anticipo por el valor completo (Rama B). Si `saldoPorPagar(OXP) > 0` y `valorNeto(devolucion) > saldoPorPagar`: bifurcación — crédito + Anticipo por excedente (Rama C).
 - **Tipo Extracto:** N Devolucion referencian 1 OxpExtracto (relación N:1). Solo aplica cuando `saldoPorPagar > 0`.
 - **Tipo Anticipo:** 1 Devolucion referencia 1 Anticipo (relación 1:1). Solo reversa total. Anticipo transiciona a Reversado (estado terminal).
 - 1 Anticipo puede ser regularizado por N OxpComercio (regularización parcial).
@@ -807,11 +901,16 @@ Cuando una operación inter-agregado crea una relación entre dos agregados, cad
      │
      │ OxpComercioConfirmada
      ▼
-┌──────────┐
-│Confirmada│
-└────┬─────┘
-     │ OxpComercioCausada
-     ▼
+┌─────────────────────────────────────────────┐
+│            Confirmada                        │
+│                                             │
+│  Eventos de progreso (reducen saldoPorPagar,  │
+│  sin cambio de estado):                      │
+│    · PagoOxpComercioViaAnticipoAplicado      │
+│    · PagoOxpComercioViaDevolucionAplicado    │
+└────────────────┬────────────────────────────┘
+                 │ OxpComercioCausada
+                 ▼
 ┌─────────────────────────────────────────────┐
 │             Causada                          │
 │                                             │
@@ -833,8 +932,9 @@ Cuando una operación inter-agregado crea una relación entre dos agregados, cad
 
 **Notas:**
 - `Pendiente` es el estado inicial para toda radicación.
+- `Confirmada` recibe eventos de progreso de origen interno (domain services): `PagoOxpComercioViaAnticipoAplicado` (regularización, coordinado por `ServicioDeRegularizacion`) y `PagoOxpComercioViaDevolucionAplicado` (devolución, coordinado por `ServicioDeAplicacionDevolucion`). Confirmada es el estado más temprano donde `valorNeto()` es estable.
 - `Causada` recibe **eventos de progreso** que reducen `saldoPorPagar()` sin cambiar de estado. Cuatro vías de pago: extracto (conciliación, coordinado por `ServicioDeConciliacion`), anticipo (regularización, coordinado por `ServicioDeRegularizacion`), pago directo (futuro), devolución (coordinado por `ServicioDeAplicacionDevolucion`). Los cuatro tipos pueden coexistir (pagos mixtos).
-- `Pagada`: **evento de transición** cuando `saldoPorPagar()` = 0. Único estado terminal financiero, independiente de la(s) fuente(s) de pago.
+- `Pagada`: **evento de transición** cuando `saldoPorPagar()` = 0. Si el anticipo cubrió 100% en Confirmada, `OxpComercioPagada` se emite como derivado por transición al causarse. Único estado terminal financiero, independiente de la(s) fuente(s) de pago.
 - La transición `Devuelta → Pendiente` ocurre vía `OxpComercioCorregida`.
 - Si `[R02]` está configurada como automática, `OxpComercioRadicada` puede emitir `OxpComercioConfirmada` inmediatamente.
 
@@ -852,11 +952,15 @@ Cuando una operación inter-agregado crea una relación entre dos agregados, cad
                                     └─────────┬─────────┘
                                               │ ExtractoConfirmado
                                               ▼
-                                    ┌───────────────────┐
-                                    │Confirmado         │
-                                    └─────────┬─────────┘
-                                              │ ExtractoCausado
-                                              ▼
+                                    ┌──────────────────────────────────────────────┐
+                                    │  Confirmada                                  │
+                                    │                                              │
+                                    │  Evento de progreso (reduce saldoPorPagar,   │
+                                    │  sin cambio de estado):                      │
+                                    │    · PagoExtractoViaDevolucionAplicado       │
+                                    └──────────────────────┬───────────────────────┘
+                                                           │ ExtractoCausado
+                                                           ▼
                                     ┌───────────────────┐
                                     │Causado            │
                                     └─────────┬─────────┘
@@ -870,8 +974,9 @@ Cuando una operación inter-agregado crea una relación entre dos agregados, cad
 **Notas:**
 - La transición a `Conciliado` requiere 100% de partidas vinculadas a OxpComercio, cubiertas por anticipo, cubiertas por devolución, descartadas, marcadas como disputa, o clasificadas como cargos adicionales `[R06]`.
 - Las partidas en disputa, cubiertas por anticipo y cubiertas por devolución cuentan como resueltas para este umbral.
+- `Confirmada` recibe `PagoExtractoViaDevolucionAplicado` como evento de progreso de origen interno — la devolución de cargo financiero reduce `saldoPorPagar()` desde el estado más temprano donde el extracto está conciliado y confirmado (coordinado por `ServicioDeAplicacionDevolucion`).
 - `Causado` recibe **eventos de progreso** que reducen `saldoPorPagar()` sin cambiar de estado. Dos vías de pago: SincoA&F confirma pagos parciales (`PagoExtractoAplicado`, crea `CrucePagoExtractoAplicado` tipo pago_sincoa) y devolución (`PagoExtractoViaDevolucionAplicado`, crea `CrucePagoExtractoAplicado` tipo devolucion). Ambos tipos pueden coexistir.
-- `Pagado`: **evento de transición** (`ExtractoPagado`) cuando `saldoPorPagar()` = 0. Único estado terminal financiero.
+- `Pagado`: **evento de transición** (`ExtractoPagado`) cuando `saldoPorPagar()` = 0. Si la devolución cubrió 100% en Confirmada, `ExtractoPagado` se emite como derivado por transición al causarse. Único estado terminal financiero.
 
 #### 4.2.1. PartidaExtracto — máquina de estados interna
 
@@ -1018,6 +1123,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | Los cargos financieros del extracto (4x1000, cuota de manejo, intereses) han sido detectados y registrados como conceptos de la OXP. |
+| **Causalidad** | Derivado por transición de `ExtractoRadicado`. |
 | **Agregado** | OxpExtracto |
 | **Estado previo** | Radicación del extracto en curso. |
 | **Estado resultante** | (sin cambio de estado; conceptos agregados al extracto). |
@@ -1058,12 +1164,26 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | Una OxpComercio vinculada aporta el **soporte formal definitivo** (factura), reduciendo el saldo por regularizar del anticipo. |
+| **Causalidad** | Efecto inter-agregado — `ServicioDeRegularizacion`. |
 | **Agregado** | Anticipo |
 | **Estado previo** | Vigente o Pagado. |
 | **Estado resultante** | Vigente o Pagado (reduce `saldoPorRegularizar()`). Si `saldoPorRegularizar()` = 0: transiciona a Regularizado (o Cerrado si ya estaba Pagado). |
-| **Precondiciones** | Anticipo en estado no terminal (ni Cerrado ni Reversado). OxpComercio del mismo tercero ⚠️ (ver ServicioDeRegularizacion — momento exacto pendiente de precisar). `saldoPorRegularizar()` suficiente para el monto a regularizar. Coordinado por `ServicioDeRegularizacion`. |
+| **Precondiciones** | Anticipo en estado no terminal (ni Cerrado ni Reversado). OxpComercio del mismo tercero, en estado Confirmada o posterior. `saldoPorRegularizar()` suficiente para el monto a regularizar. Coordinado por `ServicioDeRegularizacion`. |
 | **Información capturada** | Referencia a OxpComercio vinculada, monto regularizado, fecha. |
 | **Efectos** | Crea entidad `CruceRegularizacionAplicada` en el agregado Anticipo. Reduce `saldoPorRegularizar()`. Genera información estructurada para amortización contable `[R15]`. Si `saldoPorRegularizar()` = 0: emite `RegularizacionDeAnticipoCompletada`. |
+
+#### RegularizacionRevertida
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | Evento compensatorio de `AnticipoRegularizado`. Revierte la `CruceRegularizacionAplicada` creada por una regularización cuyo paso posterior (`PagoOxpComercioViaAnticipoAplicado`) falló permanentemente. Restaura `saldoPorRegularizar()`. Solo emitido por compensación del `ServicioDeRegularizacion` `[SI3]` — nunca por operación de negocio directa. |
+| **Causalidad** | Evento compensatorio de `AnticipoRegularizado` — `ServicioDeRegularizacion` `[SI3]`. |
+| **Agregado** | Anticipo |
+| **Estado previo** | Vigente o Pagado. |
+| **Estado resultante** | Vigente o Pagado (restaura `saldoPorRegularizar()` al valor previo a la regularización fallida). |
+| **Precondiciones** | Existe `CruceRegularizacionAplicada` correspondiente al `correlationId` del proceso fallido `[D20]`. |
+| **Información capturada** | Referencia a la `CruceRegularizacionAplicada` revertida, `correlationId` del proceso, monto restaurado, motivo del fallo. |
+| **Efectos** | Elimina la `CruceRegularizacionAplicada` del agregado. Restaura `saldoPorRegularizar()`. |
 
 #### AnticipoAmortizado
 
@@ -1082,6 +1202,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | Una partida del extracto ha sido cubierta por este anticipo. Contraparte del evento `PartidaCubiertaPorAnticipo` emitido sobre el stream del OxpExtracto. Registra el lado Anticipo de la operación de cobertura. Puede coexistir con cruces tipo pago directo sobre el mismo anticipo. |
+| **Causalidad** | Efecto inter-agregado — contraparte de `PartidaCubiertaPorAnticipo` (OxpExtracto). |
 | **Agregado** | Anticipo |
 | **Estado previo** | Vigente o Regularizado. |
 | **Estado resultante** | Vigente o Regularizado (reduce `saldoPorPagar()`). Si `saldoPorPagar()` = 0: transiciona a Pagado (o Cerrado si ya estaba Regularizado). |
@@ -1106,6 +1227,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | El valor total del anticipo ha sido completamente cubierto. El pago pudo realizarse mediante partida(s) de extracto (TC), pago directo confirmado por SincoA&F (forma de pago diferente a TC), devolución (anticipo nacido de `ServicioDeAplicacionDevolucion`), o una combinación de estos. |
+| **Causalidad** | Derivado por transición — emitido cuando `saldoPorPagar()` = 0. |
 | **Agregado** | Anticipo |
 | **Estado previo** | Vigente o Regularizado. |
 | **Estado resultante** | Pagado. Si ya estaba Regularizado: Cerrado (estado terminal). |
@@ -1118,6 +1240,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | El valor anticipo ha sido completamente regularizado mediante OxpComercio con soporte documental formal (factura). |
+| **Causalidad** | Derivado por transición — emitido cuando `saldoPorRegularizar()` = 0. |
 | **Agregado** | Anticipo |
 | **Estado previo** | Vigente o Pagado. |
 | **Estado resultante** | Regularizado. Si ya estaba Pagado: Cerrado (estado terminal). |
@@ -1130,6 +1253,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | El anticipo ha sido completamente reversado por error (proveedor incorrecto o valor incorrecto). Ambos saldos llevados a cero vía cruces tipo reversa. |
+| **Causalidad** | Efecto inter-agregado — `ServicioDeAplicacionDevolucion` (Rama Anticipo). |
 | **Agregado** | Anticipo |
 | **Estado previo** | Vigente. |
 | **Estado resultante** | Reversado (estado terminal). |
@@ -1170,6 +1294,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | Una partida del extracto ha sido vinculada con una o más OxpComercio. Este evento registra el lado Extracto de la operación de conciliación coordinada por `ServicioDeConciliacion`. |
+| **Causalidad** | Efecto inter-agregado — `ServicioDeConciliacion`. |
 | **Agregado** | OxpExtracto |
 | **Estado previo** | Parcialmente Conciliado. |
 | **Estado resultante** | Parcialmente Conciliado. Si el 100% de partidas quedan resueltas, el agregado emite `ExtractoConciliado` automáticamente. |
@@ -1177,11 +1302,25 @@ Completada)    └──────────────┬─────�
 | **Información capturada** | Tipo de vinculación (1:1 o N:1), referencia(s) a OxpComercio vinculada(s), partida del extracto, valor de diferencia (si existe), origen (automática o manual). |
 | **Efectos** | `ServicioDeConciliacion` emite simultáneamente `PagoOxpComercioViaExtractoAplicado` sobre cada OxpComercio vinculada (crea `PagoAplicado` tipo extracto, reduce `saldoPorPagar()`). Si diferencia dentro de tolerancia: emite `AjustePorToleranciaGenerado` `[R10]`. Si OxpComercio en moneda extranjera con diferencia de TRM: emite `DiferenciaEnCambioDetectada` `[R10b]`. Persiste asociación de patrón comercio-descripción `[R09]`. |
 
+#### VinculacionRevertida
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | Evento compensatorio de `VinculacionRealizada`. Revierte la vinculación de una partida cuando el paso posterior (`PagoOxpComercioViaExtractoAplicado`) falló permanentemente. Solo emitido por compensación del `ServicioDeConciliacion` `[SI3]` — nunca por operación de negocio directa. |
+| **Causalidad** | Evento compensatorio de `VinculacionRealizada` — `ServicioDeConciliacion` `[SI3]`. |
+| **Agregado** | OxpExtracto |
+| **Estado previo** | Parcialmente Conciliado o Conciliado. |
+| **Estado resultante** | Parcialmente Conciliado (partida revertida a pendiente de vinculación). Si estaba Conciliado por efecto derivado de esta vinculación, retorna a Parcialmente Conciliado. |
+| **Precondiciones** | Existe vinculación correspondiente al `correlationId` del proceso fallido `[D20]`. Extracto no ha avanzado más allá de Conciliado (no Confirmada ni Causado). |
+| **Información capturada** | Referencia a partida desvinculada, referencia(s) a OxpComercio desvinculadas, `correlationId` del proceso, motivo del fallo. |
+| **Efectos** | Revierte vinculación de la partida. Partida disponible para nueva conciliación. |
+
 #### DiferenciaEnCambioDetectada
 
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | Durante la conciliación, se ha detectado que la TRM de radicación difiere de la TRM del extracto para una OxpComercio en moneda extranjera. |
+| **Causalidad** | Derivado por transición de `VinculacionRealizada` / `PagoOxpComercioViaExtractoAplicado`. |
 | **Agregado** | OxpExtracto |
 | **Estado previo** | Conciliación en curso, OxpComercio en moneda extranjera siendo vinculada. |
 | **Estado resultante** | (sin cambio de estado; genera concepto de ajuste). |
@@ -1194,6 +1333,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | Se ha generado un concepto de ajuste por diferencia en cambio sobre el OxpExtracto, permitiendo el cruce exacto sin crear una nueva OXP. |
+| **Causalidad** | Derivado por transición de `DiferenciaEnCambioDetectada`. |
 | **Agregado** | OxpExtracto |
 | **Estado previo** | Conciliación en curso. |
 | **Estado resultante** | (sin cambio de estado; concepto agregado al extracto). |
@@ -1206,6 +1346,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | Se ha generado un ajuste por tolerancia sobre el OxpExtracto, registrando la diferencia menor entre el valor de la partida del extracto y la OxpComercio vinculada. |
+| **Causalidad** | Derivado por transición de `VinculacionRealizada`. |
 | **Agregado** | OxpExtracto |
 | **Estado previo** | Conciliación en curso. |
 | **Estado resultante** | (sin cambio de estado; ajuste agregado al extracto). |
@@ -1218,6 +1359,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | Una partida del extracto sin OxpComercio asociada ha sido cubierta por un anticipo, permitiendo avanzar en la conciliación sin generar una nueva OxpComercio. |
+| **Causalidad** | Efecto inter-agregado — contraparte de `AnticipoVinculadoAPartida` (Anticipo). |
 | **Agregado** | OxpExtracto |
 | **Estado previo** | Parcialmente Conciliado. |
 | **Estado resultante** | Parcialmente Conciliado. Si el 100% de partidas quedan resueltas, el agregado emite `ExtractoConciliado` automáticamente. |
@@ -1230,6 +1372,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | Una partida del extracto que representa un retorno de dinero ha sido cubierta por una Devolucion. Permite avanzar en la conciliación. |
+| **Causalidad** | Efecto inter-agregado — `ServicioDeConciliacion` (flujo de partidas de retorno). |
 | **Agregado** | OxpExtracto |
 | **Estado previo** | Parcialmente Conciliado. |
 | **Estado resultante** | Parcialmente Conciliado. Si el 100% de partidas quedan resueltas, el agregado emite `ExtractoConciliado` automáticamente. |
@@ -1242,6 +1385,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | El 100% de las partidas del extracto han sido vinculadas a OxpComercio, cubiertas por anticipo, cubiertas por devolución, descartadas, clasificadas como cargos adicionales, o marcadas como partida en disputa. |
+| **Causalidad** | Derivado por transición — emitido cuando 100% de partidas resueltas. |
 | **Agregado** | OxpExtracto |
 | **Estado previo** | Parcialmente Conciliado. |
 | **Estado resultante** | Conciliado. |
@@ -1306,6 +1450,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | La OXP ha sido validada y aprobada para causación contable. |
+| **Causalidad** | Directa (confirmación manual) o Derivado por configuración de `OxpComercioRadicada` `[R02]`. |
 | **Agregado** | OxpComercio |
 | **Estado previo** | Pendiente. |
 | **Estado resultante** | Confirmada. |
@@ -1342,12 +1487,13 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | El sistema contable externo (SincoA&F) ha confirmado el registro exitoso de la causación. |
+| **Causalidad** | Directa (confirmación SincoA&F) o Derivado por configuración de `OxpComercioConfirmada` `[R12]`. |
 | **Agregado** | OxpComercio |
 | **Estado previo** | Confirmada. |
 | **Estado resultante** | Causada. |
 | **Precondiciones** | OXP confirmada. SincoA&F confirma registro exitoso de la causación enviada `[R13]`. |
 | **Información capturada** | Número de asiento contable externo, fecha de causación (fecha del soporte/factura, principio de devengo). |
-| **Efectos** | Integración saliente: causación individual enviada a SincoA&F (JSON). Si la OxpComercio regulariza un anticipo: la información de amortización se incluye en la integración saliente `[R15]`. OxpComercio disponible para recibir pagos (`saldoPorPagar()` > 0): vía extracto (conciliación), vía anticipo (regularización), pago directo (SincoA&F), o devolución (`ServicioDeAplicacionDevolucion`). |
+| **Efectos** | Integración saliente: causación individual enviada a SincoA&F (JSON). Si la OxpComercio regulariza un anticipo: la información de amortización se incluye en la integración saliente `[R15]`. Si `saldoPorPagar()` > 0: OxpComercio disponible para recibir pagos vía extracto (conciliación), anticipo (regularización), pago directo (SincoA&F), o devolución (`ServicioDeAplicacionDevolucion`). Si `saldoPorPagar()` = 0 (pagos internos — anticipo y/o devolución — cubrieron 100% en Confirmada): emite `OxpComercioPagada` como derivado por transición. |
 
 #### ExtractoConfirmado
 
@@ -1356,7 +1502,7 @@ Completada)    └──────────────┬─────�
 | **Descripción** | El extracto conciliado ha sido validado y aprobado para causación contable. |
 | **Agregado** | OxpExtracto |
 | **Estado previo** | Conciliado. |
-| **Estado resultante** | Confirmado. |
+| **Estado resultante** | Confirmada. |
 | **Precondiciones** | Extracto en estado Conciliado (100%) `[R11]`. Usuario con rol de Confirmador `[R23]`. |
 | **Información capturada** | Usuario confirmador, fecha y hora de confirmación. |
 | **Efectos** | Habilita la transición hacia causación. Si `[R12]` está configurada como automática: emite `ExtractoCausado`. |
@@ -1366,12 +1512,13 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | El sistema contable externo (SincoA&F) ha confirmado el registro exitoso de la causación del extracto. |
+| **Causalidad** | Directa (confirmación SincoA&F) o Derivado por configuración de `ExtractoConfirmado` `[R12]`. |
 | **Agregado** | OxpExtracto |
-| **Estado previo** | Confirmado. |
+| **Estado previo** | Confirmada. |
 | **Estado resultante** | Causado. |
-| **Precondiciones** | Extracto confirmado. SincoA&F confirma registro exitoso `[R14]`. |
+| **Precondiciones** | Extracto en estado Confirmada. SincoA&F confirma registro exitoso `[R14]`. |
 | **Información capturada** | Número de asiento contable externo, fecha de causación (fecha de compensación), conceptos causados (incluye cargos adicionales y ajustes). |
-| **Efectos** | Integración saliente: causación de OxpExtracto enviada a SincoA&F (JSON). Registra el total del extracto contra la entidad bancaria, incluyendo cargos adicionales. |
+| **Efectos** | Integración saliente: causación de OxpExtracto enviada a SincoA&F (JSON). Registra el total del extracto contra la entidad bancaria, incluyendo cargos adicionales. Si `saldoPorPagar()` > 0: extracto disponible para recibir pagos (SincoA&F y/o devolución). Si `saldoPorPagar()` = 0 (devolución cubrió 100% en Confirmada): emite `ExtractoPagado` como derivado por transición. |
 
 ---
 
@@ -1382,6 +1529,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | La OxpComercio ha recibido un pago parcial o total vía vinculación con una partida del extracto durante la conciliación. Evento de progreso — reduce `saldoPorPagar()` sin cambiar de estado. Emitido por `ServicioDeConciliacion` como contraparte de `VinculacionRealizada`. Puede coexistir con pagos tipo anticipo y pago directo sobre la misma OxpComercio. |
+| **Causalidad** | Efecto inter-agregado — `ServicioDeConciliacion`. |
 | **Agregado** | OxpComercio |
 | **Estado previo** | Causada. |
 | **Estado resultante** | Causada (reduce `saldoPorPagar()`). Si `saldoPorPagar()` = 0: emite `OxpComercioPagada`. |
@@ -1394,12 +1542,26 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | El anticipo que regulariza esta OxpComercio cubre parcial o totalmente el valor por pagar. Evento de progreso — reduce `saldoPorPagar()` sin cambiar de estado. Emitido por `ServicioDeRegularizacion`. Puede coexistir con pagos tipo extracto y pago directo sobre la misma OxpComercio. |
+| **Causalidad** | Efecto inter-agregado — `ServicioDeRegularizacion`. |
 | **Agregado** | OxpComercio |
-| **Estado previo** | Causada. |
-| **Estado resultante** | Causada (reduce `saldoPorPagar()`). Si `saldoPorPagar()` = 0: emite `OxpComercioPagada`. |
-| **Precondiciones** | OxpComercio causada ⚠️ (ver I16). Anticipo en estado no terminal (ni Cerrado ni Reversado), vinculado vía regularización. `saldoPorPagar()` suficiente para el monto cubierto. Coordinado por `ServicioDeRegularizacion`. |
+| **Estado previo** | Confirmada o Causada. |
+| **Estado resultante** | Confirmada o Causada (reduce `saldoPorPagar()`). Si `saldoPorPagar()` = 0 en Causada: emite `OxpComercioPagada`. Si `saldoPorPagar()` = 0 en Confirmada: `OxpComercioPagada` se emitirá como derivado por transición al causarse. |
+| **Precondiciones** | OxpComercio en estado Confirmada o posterior. Anticipo en estado no terminal (ni Cerrado ni Reversado), vinculado vía regularización. `saldoPorPagar()` suficiente para el monto cubierto. Coordinado por `ServicioDeRegularizacion`. |
 | **Información capturada** | Referencia a Anticipo, monto cubierto por anticipo, fecha. |
 | **Efectos** | Crea entidad `PagoAplicado` (tipo: anticipo). Reduce `saldoPorPagar()`. |
+
+#### PagoOxpComercioViaAnticipoRevertido
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | Evento compensatorio de `PagoOxpComercioViaAnticipoAplicado`. Revierte el `PagoAplicado` (tipo: anticipo) cuando el proceso de regularización falló permanentemente. Restaura `saldoPorPagar()`. Solo emitido por compensación del `ServicioDeRegularizacion` `[SI3]` — nunca por operación de negocio directa. Se emite junto con `RegularizacionRevertida` → stream Anticipo. |
+| **Causalidad** | Evento compensatorio de `PagoOxpComercioViaAnticipoAplicado` — `ServicioDeRegularizacion` `[SI3]`. |
+| **Agregado** | OxpComercio |
+| **Estado previo** | Confirmada, Causada o Pagada. |
+| **Estado resultante** | Confirmada o Causada (restaura `saldoPorPagar()`). Si estaba Pagada por efecto de este pago: retorna a Confirmada o Causada. |
+| **Precondiciones** | Existe `PagoAplicado` (tipo: anticipo) correspondiente al `correlationId` del proceso fallido `[D20]`. |
+| **Información capturada** | Referencia a Anticipo, monto restaurado, `correlationId` del proceso, motivo del fallo. |
+| **Efectos** | Elimina `PagoAplicado` (tipo: anticipo). Restaura `saldoPorPagar()`. |
 
 #### PagoOxpComercioDirectoAplicado
 
@@ -1418,6 +1580,7 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | La obligación ha sido liquidada financieramente. `saldoPorPagar()` = 0. El pago pudo realizarse mediante extracto (conciliación), anticipo (regularización), pago directo (SincoA&F), devolución (`ServicioDeAplicacionDevolucion`), o una combinación de estos. |
+| **Causalidad** | Derivado por transición — emitido cuando `saldoPorPagar()` = 0. |
 | **Agregado** | OxpComercio |
 | **Estado previo** | Causada. |
 | **Estado resultante** | Pagada (estado terminal). |
@@ -1442,30 +1605,59 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | Una devolución confirmada (tipo Extracto) cubre parcial o totalmente el valor por pagar del extracto. Evento de progreso — reduce `saldoPorPagar()` del OxpExtracto sin cambiar de estado. Emitido por `ServicioDeAplicacionDevolucion`. Puede coexistir con pagos tipo pago_sincoa sobre el mismo extracto. |
+| **Causalidad** | Efecto inter-agregado — `ServicioDeAplicacionDevolucion` (Rama Extracto). |
 | **Agregado** | OxpExtracto |
-| **Estado previo** | Causado. |
-| **Estado resultante** | Causado (reduce `saldoPorPagar()`). Si `saldoPorPagar()` = 0: emite `ExtractoPagado`. |
-| **Precondiciones** | Devolucion tipo Extracto en confirmación. `saldoPorPagar()` suficiente para el monto cubierto. Coordinado por `ServicioDeAplicacionDevolucion`. |
+| **Estado previo** | Confirmada o Causado. |
+| **Estado resultante** | Confirmada o Causado (reduce `saldoPorPagar()`). Si `saldoPorPagar()` = 0 en Causado: emite `ExtractoPagado`. Si `saldoPorPagar()` = 0 en Confirmada: `ExtractoPagado` se emitirá como derivado por transición al causarse. |
+| **Precondiciones** | OxpExtracto en estado Confirmada o posterior. Devolucion tipo Extracto en confirmación. `saldoPorPagar()` suficiente para el monto cubierto. Coordinado por `ServicioDeAplicacionDevolucion`. |
 | **Información capturada** | Referencia a Devolucion, monto cubierto, fecha. |
 | **Efectos** | Crea entidad `CrucePagoExtractoAplicado` (tipo: devolucion). Reduce `saldoPorPagar()`. |
+
+#### PagoExtractoViaDevolucionRevertido
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | Evento compensatorio de `PagoExtractoViaDevolucionAplicado`. Revierte el `CrucePagoExtractoAplicado` (tipo: devolucion) cuando el proceso de aplicación de devolución falló permanentemente. Restaura `saldoPorPagar()`. Solo emitido por compensación del `ServicioDeAplicacionDevolucion` `[SI3]` — nunca por operación de negocio directa. Se emite junto con `DevolucionRevertida` → stream Devolucion. |
+| **Causalidad** | Evento compensatorio de `PagoExtractoViaDevolucionAplicado` — `ServicioDeAplicacionDevolucion` `[SI3]`. |
+| **Agregado** | OxpExtracto |
+| **Estado previo** | Confirmada o Causado. |
+| **Estado resultante** | Confirmada o Causado (restaura `saldoPorPagar()`). |
+| **Precondiciones** | Existe `CrucePagoExtractoAplicado` (tipo: devolucion) correspondiente al `correlationId` del proceso fallido `[D20]`. |
+| **Información capturada** | Referencia a Devolucion, monto restaurado, `correlationId` del proceso, motivo del fallo. |
+| **Efectos** | Elimina `CrucePagoExtractoAplicado` (tipo: devolucion). Restaura `saldoPorPagar()`. |
 
 #### PagoOxpComercioViaDevolucionAplicado
 
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | Una devolución confirmada cubre parcial o totalmente el valor por pagar de la OxpComercio. Evento de progreso — reduce `saldoPorPagar()` sin cambiar de estado. Emitido por `ServicioDeAplicacionDevolucion` como parte de la confirmación de la devolución. Puede coexistir con pagos tipo extracto, anticipo y pago directo sobre la misma OxpComercio. |
+| **Causalidad** | Efecto inter-agregado — `ServicioDeAplicacionDevolucion` (Rama Comercio-A). |
 | **Agregado** | OxpComercio |
-| **Estado previo** | Causada. |
-| **Estado resultante** | Causada (reduce `saldoPorPagar()`). Si `saldoPorPagar()` = 0: emite `OxpComercioPagada`. |
-| **Precondiciones** | Devolucion en confirmación referenciando esta OxpComercio. `saldoPorPagar()` suficiente para el monto cubierto. Coordinado por `ServicioDeAplicacionDevolucion`. |
+| **Estado previo** | Confirmada o Causada. |
+| **Estado resultante** | Confirmada o Causada (reduce `saldoPorPagar()`). Si `saldoPorPagar()` = 0 en Causada: emite `OxpComercioPagada`. Si `saldoPorPagar()` = 0 en Confirmada: `OxpComercioPagada` se emitirá como derivado por transición al causarse. |
+| **Precondiciones** | OxpComercio en estado Confirmada o posterior. Devolucion en confirmación referenciando esta OxpComercio. `saldoPorPagar()` suficiente para el monto cubierto. Coordinado por `ServicioDeAplicacionDevolucion`. |
 | **Información capturada** | Referencia a Devolucion, monto cubierto por devolución, fecha. |
 | **Efectos** | Crea entidad `PagoAplicado` (tipo: devolucion). Reduce `saldoPorPagar()`. |
+
+#### PagoOxpComercioViaDevolucionRevertido
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | Evento compensatorio de `PagoOxpComercioViaDevolucionAplicado`. Revierte el `PagoAplicado` (tipo: devolucion) cuando el proceso de aplicación de devolución falló permanentemente. Restaura `saldoPorPagar()`. Solo emitido por compensación del `ServicioDeAplicacionDevolucion` `[SI3]` — nunca por operación de negocio directa. Se emite junto con `DevolucionRevertida` → stream Devolucion. |
+| **Causalidad** | Evento compensatorio de `PagoOxpComercioViaDevolucionAplicado` — `ServicioDeAplicacionDevolucion` `[SI3]`. |
+| **Agregado** | OxpComercio |
+| **Estado previo** | Confirmada, Causada o Pagada (si `OxpComercioPagada` fue derivado de este pago). |
+| **Estado resultante** | Confirmada o Causada (restaura `saldoPorPagar()`). Si estaba en Pagada por efecto derivado de este pago, retorna al estado previo a Pagada. |
+| **Precondiciones** | Existe `PagoAplicado` (tipo: devolucion) correspondiente al `correlationId` del proceso fallido `[D20]`. |
+| **Información capturada** | Referencia a Devolucion, monto restaurado, `correlationId` del proceso, motivo del fallo. |
+| **Efectos** | Elimina `PagoAplicado` (tipo: devolucion). Restaura `saldoPorPagar()`. |
 
 #### ExtractoPagado
 
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | El extracto ha sido completamente pagado. `saldoPorPagar()` = 0. |
+| **Causalidad** | Derivado por transición — emitido cuando `saldoPorPagar()` = 0. |
 | **Agregado** | OxpExtracto |
 | **Estado previo** | Causado. |
 | **Estado resultante** | Pagado (estado terminal). |
@@ -1492,12 +1684,26 @@ Completada)    └──────────────┬─────�
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | La devolución ha sido validada y el crédito ha sido aplicado contra el agregado OXP origen. Coordinado por `ServicioDeAplicacionDevolucion`. Los efectos dependen del tipo de OXP. |
+| **Causalidad** | Efecto inter-agregado — `ServicioDeAplicacionDevolucion`. |
 | **Agregado** | Devolucion |
 | **Estado previo** | Pendiente. |
 | **Estado resultante** | Confirmada. |
 | **Precondiciones** | Devolucion en estado Pendiente. Agregado OXP origen existe y cumple precondiciones según tipo (ver `DevolucionRadicada`). |
 | **Información capturada** | Resultado de la aplicación según tipo de OXP: monto aplicado, referencia a Anticipo creado (si aplica, solo Comercio), fecha de confirmación. |
-| **Efectos** | **Comercio:** Si `saldoPorPagar(OXP) > 0`: emite `PagoOxpComercioViaDevolucionAplicado` → stream OxpComercio. Si `saldoPorPagar(OXP) = 0`: crea nuevo Anticipo (valorTotal = valorNeto(devolucion), dimensión pago resuelta → estado Pagado, `saldoPorRegularizar()` pendiente). **Extracto:** Emite `PagoExtractoViaDevolucionAplicado` → stream OxpExtracto. **Anticipo:** Emite `AnticipoReversado` → stream Anticipo (crea `CrucePagoAplicado` tipo reversa y `CruceRegularizacionAplicada` tipo reversa, saldos → 0, estado → Reversado). |
+| **Efectos** | **Comercio — Rama A** (`saldoPorPagar > 0`, `devolucion ≤ saldoPorPagar`): emite `PagoOxpComercioViaDevolucionAplicado` → stream OxpComercio. **Comercio — Rama B** (`saldoPorPagar = 0`): crea nuevo Anticipo (valorTotal = valorNeto(devolucion), dimensión pago resuelta → estado Pagado, `saldoPorRegularizar()` pendiente). **Comercio — Rama C** (`saldoPorPagar > 0`, `devolucion > saldoPorPagar`): emite `PagoOxpComercioViaDevolucionAplicado` por `saldoPorPagar` → stream OxpComercio + crea nuevo Anticipo por excedente (`valorNeto(devolucion) - saldoPorPagar`), estado Pagado, `saldoPorRegularizar()` pendiente. **Extracto:** Emite `PagoExtractoViaDevolucionAplicado` → stream OxpExtracto. **Anticipo:** Emite `AnticipoReversado` → stream Anticipo (crea `CrucePagoAplicado` tipo reversa y `CruceRegularizacionAplicada` tipo reversa, saldos → 0, estado → Reversado). |
+
+#### DevolucionRevertida
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | Evento compensatorio de `DevolucionConfirmada`. Revierte la confirmación de la devolución cuando el efecto posterior en el agregado OXP origen falló permanentemente. Solo emitido por compensación del `ServicioDeAplicacionDevolucion` `[SI3]` — nunca por operación de negocio directa. Se emite junto con el evento compensatorio del efecto fallido (`PagoOxpComercioViaDevolucionRevertido` o `PagoExtractoViaDevolucionRevertido`). |
+| **Causalidad** | Evento compensatorio de `DevolucionConfirmada` — `ServicioDeAplicacionDevolucion` `[SI3]`. |
+| **Agregado** | Devolucion |
+| **Estado previo** | Confirmada. |
+| **Estado resultante** | Pendiente (devolución disponible para nuevo intento de confirmación). |
+| **Precondiciones** | Devolucion en estado Confirmada. Proceso de aplicación fallido permanentemente (`correlationId` `[D20]`). |
+| **Información capturada** | `correlationId` del proceso fallido, motivo del fallo, fecha de reversión. |
+| **Efectos** | Devolución retorna a Pendiente. Disponible para nuevo intento de confirmación por `ServicioDeAplicacionDevolucion`. |
 
 #### DevolucionCausada
 
@@ -1640,9 +1846,9 @@ Las invariantes son restricciones estructurales que deben ser verdaderas en todo
 | I12 | **Consistencia de estado del Anticipo:** Un anticipo en estado Vigente tiene `saldoPorPagar()` > 0 y `saldoPorRegularizar()` > 0. Un anticipo en estado Pagado tiene `saldoPorPagar()` = 0 y `saldoPorRegularizar()` > 0. Un anticipo en estado Regularizado tiene `saldoPorRegularizar()` = 0 y `saldoPorPagar()` > 0. Un anticipo en estado Cerrado tiene `saldoPorPagar()` = 0 y `saldoPorRegularizar()` = 0. Un anticipo en estado Reversado tiene `saldoPorPagar()` = 0 y `saldoPorRegularizar()` = 0, resueltos vía cruces tipo `reversa` (`CrucePagoAplicado` tipo reversa + `CruceRegularizacionAplicada` tipo reversa). Estado terminal por reversión total — no admite más cruces ni regularizaciones. Nota: un anticipo creado por `ServicioDeAplicacionDevolucion` nace con `CrucePagoAplicado` (tipo devolucion) como parte de su registro inicial, transicionando inmediatamente a Pagado. | Anticipo | — |
 | I13 | **Saldos no negativos de OxpComercio:** `saldoPorPagar()` ≥ 0. La suma de los `PagoAplicado`.valor no puede superar `valorNeto()`. | OxpComercio | — |
 | I14 | **Saldos no negativos de OxpExtracto:** `saldoPorPagar()` ≥ 0. La suma de los `CrucePagoExtractoAplicado`.valor no puede superar `valorTotalExtracto()`. | OxpExtracto | — |
-| I15 | **Consistencia de estado de pago:** OxpComercio en estado Causada tiene `saldoPorPagar()` > 0. OxpComercio en estado Pagada tiene `saldoPorPagar()` = 0. OxpExtracto en estado Causado tiene `saldoPorPagar()` > 0. OxpExtracto en estado Pagado tiene `saldoPorPagar()` = 0. ⚠️ Pendiente: escenario donde anticipo cubre 100% antes de causación. | OxpComercio, OxpExtracto | — |
-| I16 | **Causalidad de pago:** Pagos (`PagoAplicado`) solo se aplican a OxpComercio en estado Causada. Pagos (`CrucePagoExtractoAplicado`) solo se aplican a OxpExtracto en estado Causado. ⚠️ **Provisional (restricción SincoA&F):** esta regla refleja la integración actual con SincoA&F. Con el futuro sistema de Tesorería, el pago podría desacoplarse de la causación (Tesorería recibe OXPs confirmadas y confirma pagos independientemente de la causación contable). En particular, `PagoAplicado` tipo anticipo podría aplicarse antes de Causada (la regularización ocurre en Pendiente/Confirmada), pero requiere resolver: (1) desincronización si `valorNeto()` cambia entre regularización y causación, (2) reserva de saldo en el anticipo cuando múltiples OxpComercio referencian el mismo anticipo. | OxpComercio, OxpExtracto | — |
-| I17 | **Consistencia de devolución:** Restricciones por tipo de OXP. **Comercio:** `valorNeto(Devolucion)` ≤ `valorNeto(OxpComercio)`. La suma de todas las devoluciones sobre una misma OxpComercio no puede superar el `valorNeto()` original. Cuando `saldoPorPagar(OXP) > 0`: `valorNeto(devolucion) ≤ saldoPorPagar(OXP)`. ⚠️ Pendiente: escenario donde devolución > saldoPorPagar (nota débito no definida). **Extracto:** `valorNeto(devolucion)` ≤ `saldoPorPagar(OxpExtracto)` cuando saldo > 0. **Anticipo:** solo reversa total (`valorNeto(devolucion)` = valorTotal del anticipo). Anticipo en estado Vigente sin cruces de pago ni regularización. Mismo tercero obligatorio en todos los tipos. | Devolucion, OxpComercio, OxpExtracto, Anticipo | — |
+| I15 | **Consistencia de estado de pago:** OxpComercio en estado Confirmada tiene `saldoPorPagar()` ≥ 0 (puede reducirse por regularización de anticipo). OxpComercio en estado Causada tiene `saldoPorPagar()` ≥ 0 — si al causarse `saldoPorPagar()` = 0 (anticipo cubrió 100% en Confirmada), `OxpComercioPagada` se emite como derivado por transición. OxpComercio en estado Pagada tiene `saldoPorPagar()` = 0. OxpExtracto en estado Confirmada tiene `saldoPorPagar()` ≥ 0 (puede reducirse por devolución). OxpExtracto en estado Causado tiene `saldoPorPagar()` ≥ 0 — si al causarse `saldoPorPagar()` = 0 (devolución cubrió 100% en Confirmada), `ExtractoPagado` se emite como derivado por transición. OxpExtracto en estado Pagado tiene `saldoPorPagar()` = 0. | OxpComercio, OxpExtracto | — |
+| I16 | **Origen del pago determina estado mínimo.** Pagos de origen interno — coordinados por domain services (`ServicioDeRegularizacion`, `ServicioDeAplicacionDevolucion`) — se aplican desde estado **Confirmada**: `PagoOxpComercioViaAnticipoAplicado`, `PagoOxpComercioViaDevolucionAplicado` (OxpComercio) y `PagoExtractoViaDevolucionAplicado` (OxpExtracto). Confirmada es el estado más temprano donde `valorNeto()` es estable — la FSM no permite correcciones posteriores. Pagos de origen externo — confirmados por SincoA&F — se aplican desde estado **Causada** (OxpComercio: `PagoAplicado` tipo pago_directo, pago_extracto) o **Causado** (OxpExtracto: `CrucePagoExtractoAplicado` tipo pago_sincoa). Los pagos externos requieren causación porque dependen de la integración contable con SincoA&F. **Nota:** la distinción interno/externo está condicionada al sistema de pagos actual (SincoA&F). Con un futuro sistema de Tesorería independiente, los pagos externos podrían desacoplarse de la causación contable, unificando el estado mínimo a Confirmada para todos los tipos de pago. | OxpComercio, OxpExtracto | — |
+| I17 | **Consistencia de devolución:** Restricciones por tipo de OXP. **Comercio:** `valorNeto(Devolucion)` ≤ `valorNeto(OxpComercio)`. La suma de todas las devoluciones sobre una misma OxpComercio no puede superar el `valorNeto()` original. Cuando `saldoPorPagar(OXP) > 0` y `valorNeto(devolucion) ≤ saldoPorPagar`: crédito directo (Rama A). Cuando `saldoPorPagar(OXP) > 0` y `valorNeto(devolucion) > saldoPorPagar`: bifurcación — crédito por `saldoPorPagar` + Anticipo por excedente (Rama C). **Extracto:** `valorNeto(devolucion)` ≤ `saldoPorPagar(OxpExtracto)` cuando saldo > 0. **Anticipo:** solo reversa total (`valorNeto(devolucion)` = valorTotal del anticipo). Anticipo en estado Vigente sin cruces de pago ni regularización. Mismo tercero obligatorio en todos los tipos. | Devolucion, OxpComercio, OxpExtracto, Anticipo | — |
 
 ---
 
@@ -1686,6 +1892,7 @@ Registro de las decisiones tomadas durante la definición del modelo de dominio.
 | D17 | **`saldoPorPagar` como comportamiento calculado en OxpComercio y OxpExtracto.** | Sigue el patrón de saldos derivados del Anticipo (D10, D16). Valor derivado, no almacenado. Se reduce mediante pagos parciales rastreados por entidades internas (`PagoAplicado` en OxpComercio, `CrucePagoExtractoAplicado` en OxpExtracto). Evento de transición a estado terminal cuando saldo = 0. | POO: saldo derivado evita redundancia. Event sourcing: replay reconstruye entidades de pago, los saldos se derivan. Consistencia con el patrón del Anticipo. |
 | D18 | **Compensada eliminada como estado de OxpComercio.** | La vinculación con extracto (conciliación) es un pago aplicado que reduce `saldoPorPagar()`, no un cambio de estado. Pagada es el único estado terminal financiero. Permite pagos mixtos (extracto + anticipo + pago directo) sobre la misma OxpComercio. Reemplaza el modelo anterior donde Compensada era un estado terminal. | DDD: el estado debe reflejar la realidad del negocio. La obligación no "se compensa" — recibe pagos parciales hasta liquidarse. |
 | D19 | **Devolucion con valores positivos (magnitud del crédito).** La naturaleza contable (nota crédito vs factura) no se representa con el signo de los valores — la determina el tipo del agregado. La traducción contable interpreta Devolucion como nota crédito. | Consistente con D8 (OXP no conoce el dominio contable). Evita el problema de `valorNeto()` negativo que invalidó D12 en v2.1. Cada agregado tiene valores positivos; la semántica contable la resuelve la frontera. |
+| D20 | **Control de concurrencia, idempotencia y trazabilidad delegados a la plataforma (Marten + Wolverine).** `expectedVersion` (control de concurrencia): garantizada por Marten a nivel del event store. `idempotencyKey` (deduplicación de mensajes): garantizada por Wolverine vía inbox/outbox pattern. `correlationId` (trazabilidad de procesos): propagado automáticamente por Wolverine en la cadena de mensajes. Este documento no especifica estos mecanismos por evento ni por comando — son garantías transversales de la plataforma de persistencia y mensajería. | Estos mecanismos son patrones de infraestructura (optimistic concurrency control, idempotent consumer, correlation identifier), no comportamiento de dominio. Especificarlos por evento duplicaría lo que la plataforma ya resuelve y contaminaría el modelo con concerns de infraestructura. | Event sourcing (Marten): concurrencia a nivel de stream. EDA (Wolverine): at-least-once delivery con deduplicación automática. |
 
 ---
 
@@ -1718,3 +1925,4 @@ Premisas que provienen del negocio, la regulación o la fiscalidad y que condici
 | 2.2 | Febrero 2026 | **Devolucion como agregado independiente** (D12 resuelta). Devolución extraída de OxpComercio como cuarto agregado raíz (D2 actualizada). Espejo parcial o completo de la OxpComercio que reversa, con valores positivos representando magnitud del crédito (D19 nueva). `TipoOxpComercio` eliminado de OxpComercio. `DevolucionAsociada` eliminado — funcionalidad trasladada a `DevolucionRadicada`. Nuevo `ServicioDeAplicacionDevolucion` (domain service): coordina Devolucion, OxpComercio y opcionalmente Anticipo. Dos ramas: si `saldoPorPagar(OXP) > 0` reduce saldo vía `PagoOxpComercioViaDevolucionAplicado`; si `saldoPorPagar(OXP) = 0` crea Anticipo (estado Pagado, pendiente regularización). Crédito aplicado en la confirmación (no en causación). `PagoAplicado` ahora tiene 4 tipos: extracto, anticipo, pago_directo, devolucion. Estados Devolucion: Pendiente → Confirmada → Causada ■. 3 eventos nuevos: `DevolucionRadicada`, `DevolucionConfirmada`, `DevolucionCausada`. 1 evento nuevo en OxpComercio: `PagoOxpComercioViaDevolucionAplicado`. I13/I15 ⚠️ de devolución resueltos. Nueva invariante I17 (consistencia de devolución). 40 eventos (OxpComercio: 12, OxpExtracto: 17, Anticipo: 8, Devolucion: 3). 17 invariantes. **Correcciones post-inspección:** `OxpComercioPagada` y `AnticipoPagado` actualizados con devolución como fuente de pago. `CrucePagoAplicado` del Anticipo: nuevo tipo `devolucion` para anticipo nacido de devolución. `DevolucionRadicada`: precondición reforzada con acumulado I17. `DevolucionConfirmada` y `ServicioDeAplicacionDevolucion`: precondición explícita de OxpComercio en Causada o Pagada. Template de evento, I2, I4, I8, I9, I12 actualizados con Devolucion. `OxpComercioDevuelta`: eliminada referencia obsoleta a "tipo = Compra". D1: 4 agregados. Value Objects compartidos: `MedioDePago` aplica a 3 de 4 agregados. Referencia a `Justificaciones/ModelarAgregados.md`: "múltiples agregados". **⚠️ Pendientes:** (1) Escenario donde devolución > saldoPorPagar en OXP parcialmente pagada (nota débito no definida). (2) Reembolso del excedente de devolución (posible integración CXC). |
 | 2.3 | Febrero 2026 | **Devolucion extendida a OxpExtracto y Anticipo.** Devolucion ya no referencia únicamente OxpComercio — ahora referencia uno de tres tipos de OXP (Comercio, Extracto, Anticipo) vía referencia a OXP origen (tipo + ID). Nueva entidad interna `ConceptoDeDevolucion` con atributos condicionales por tipo: Comercio (código, cantidad, DesgloseFiscal), Extracto (tipoComponente, referenciaComponente), Anticipo (motivoReversa). `ServicioDeAplicacionDevolucion` extendido con 3 ramas: Comercio (sin cambios), Extracto (reduce saldoPorPagar vía `PagoExtractoViaDevolucionAplicado`), Anticipo (reversa total vía `AnticipoReversado`). **OxpExtracto:** 2 eventos nuevos (`PartidaCubiertaPorDevolucion`, `PagoExtractoViaDevolucionAplicado`). Nueva entidad `CoberturaDevolucion`. `CrucePagoExtractoAplicado` con tipos `pago_sincoa` y `devolucion`. Estado de partida `devolucion`. `ServicioDeConciliacion` extendido con flujo de partidas de retorno. **Anticipo:** Nuevo estado terminal Reversado (desde Vigente, sin cruces previos). Nuevo evento `AnticipoReversado`. Cruces tipo `reversa` en `CrucePagoAplicado` y `CruceRegularizacionAplicada` — llevan ambos saldos a 0 (patrón consistente: estado terminal = saldos resueltos). Diagrama BC actualizado: Devolucion referencia OxpComercio (espejo de), OxpExtracto (ajuste sobre) y Anticipo (reversa). I3, I4, I8, I12, I17 actualizadas. 43 eventos (OxpComercio: 12, OxpExtracto: 19, Anticipo: 9, Devolucion: 3). 17 invariantes. **⚠️ Pendientes:** (1) Momento de regularización de anticipos. (2) Anticipo A2 — proveedor devuelve dinero (requiere dominio CXC). (3) `lineasParaTraduccion()` para Devolucion tipo Anticipo — hereda distribución del anticipo, capturada en radicación. |
 | 2.4 | Febrero 2026 | **Refinamiento del modelo de dominio — 8 hallazgos aplicados (H1–H8).** **H1 — Entidades polimórficas en Devolucion:** `ConceptoDeDevolucion` (entidad única con atributos condicionales) reemplazado por tres entidades polimórficas con contrato común (`descripcion`, `valor: ValorMonetario`): `ConceptoDevuelto` (Comercio — código, cantidad, DesgloseFiscal), `CargoFinancieroDevuelto` (Extracto — referenciaCargoFinanciero) y `ReversaTotal` (Anticipo — motivoReversa). Tabla de comportamiento calculado reestructurada con columnas por tipo (Comercio, Extracto, Anticipo). `lineasParaTraduccion()` con descripción específica por tipo. 3 diagramas de composición independientes (1 reescrito, 2 nuevos). Sección 6 reescrita con 3 subsecciones: `ConceptoDevuelto`, `CargoFinancieroDevuelto`, `ReversaTotal`. Escenario E1b eliminado — partida de retorno siempre es Devolucion tipo Comercio (E1). E2 redefinido: cargo financiero devuelto contra extracto anterior. `DevolucionRadicada` actualizado con entidades específicas por tipo. D12 reescrita: tres entidades polimórficas con contrato común. I2, I10 actualizadas. **H2 — Strategy en ServicioDeAplicacionDevolucion:** `[SI2]` — sugerencia de implementación con tabla beneficio/costo para las 3 ramas del servicio. **H3 — InstruccionDistribucion como lista paralela:** D6 expandida con análisis beneficio/costo: la separación habilita cadena de resolución pero requiere sincronización encapsulada por el agregado. **H4 — FSM de PartidaExtracto:** nueva sub-sección 4.2.1 con máquina de estados interna (6 estados, 6 transiciones, diagrama ASCII). **H5 — OxpComercioExteriorRadicada eliminado:** consolidado como efecto condicional de `OxpComercioRadicada` (compra del exterior o sujeto no obligado a facturar → alerta DIAN para Documento Soporte en Adquisiciones). **H6 — Causalidad entre eventos:** nueva convención en Sección 2 con tres tipos: evento derivado por transición (mismo agregado, mismo append), derivado por configuración (mismo agregado, condicional), efecto inter-agregado (domain service, consistencia eventual). Tabla con ejemplos. **H7 — Exclusión de ajustes en valorTotalExtracto():** justificación añadida — `AjustePorDiferenciaCambio` y `AjustePorTolerancia` son cálculos internos de conciliación, no montos cobrados por el banco. **H8 — Entidades espejo:** patrón formalizado con tabla (`Vinculacion`↔`PagoAplicado`, `CoberturaAnticipo`↔`CrucePagoAplicado`, `CoberturaDevolucion`↔ref en Devolucion) y convención: cada agregado es dueño de su entidad espejo, ninguno consulta la del otro. **Nuevas convenciones:** `[SI##]` (sugerencias de implementación — recomendaciones técnicas que complementan definiciones del dominio), causalidad entre eventos, entidades espejo. `[SI1]` — sealed interfaces para entidades internas con discriminador de tipo (`PagoAplicado`, `CrucePagoAplicado`, `CrucePagoExtractoAplicado`, `CruceRegularizacionAplicada`). 42 eventos (OxpComercio: 11, OxpExtracto: 19, Anticipo: 9, Devolucion: 3). 17 invariantes. **⚠️ Pendientes:** (1) Momento de regularización de anticipos. (2) Anticipo A2 — proveedor devuelve dinero (requiere dominio CXC). |
+| 2.5 | Febrero 2026 | **Fase 1 de auditoría — 18 hallazgos de severidad Alta resueltos (9 bloques).** **D20 — Control de concurrencia, idempotencia y trazabilidad delegados a la plataforma (Marten + Wolverine):** `expectedVersion` (control de concurrencia), `idempotencyKey` (deduplicación de mensajes), `correlationId` (trazabilidad de procesos) — garantías transversales de infraestructura, no especificadas por evento ni por comando. **Protocolos de proceso** en los 3 domain services: `correlationId`, compensación por paso con evento compensatorio, persistencia en stream propio. **ServicioDeRegularizacion completamente especificado:** trigger, comando, flujo principal, precondiciones, escenario 1:N, tabla de compensación bilateral, protocolo de proceso, momento de la regularización (Confirmada o posterior). **I15 actualizada:** OxpExtracto en Confirmada con `saldoPorPagar()` ≥ 0 (reducible por devolución); si devolución cubre 100% en Confirmada, `ExtractoPagado` se emite como derivado por transición al causarse. **I16 reescrita:** principio de origen del pago — pagos internos (domain services) desde Confirmada, pagos externos (SincoA&F) desde Causada/Causado. Nota sobre futuro sistema de Tesorería. **Excedente devolución resuelto (I17):** bifurcación Rama Comercio-C — crédito por saldoPorPagar + Anticipo por excedente. **6 eventos compensatorios nuevos:** `PagoOxpComercioViaAnticipoRevertido`, `PagoOxpComercioViaDevolucionRevertido` (OxpComercio), `PagoExtractoViaDevolucionRevertido` (OxpExtracto), `RegularizacionRevertida` (Anticipo), `DevolucionRevertida` (Devolucion). **Composición:** `lineasParaTraduccion()` en Anticipo, `SoporteDocumental` en OxpExtracto. **Consistencia:** estado Confirmado → Confirmada en OxpExtracto (género unificado con los demás agregados). Convención single emitter: domain services operan vía comandos a agregados, no escriben directamente en streams ajenos. Definicion_Alcance.md actualizado: Compensada marcada como eliminada (D18), devolución con valor positivo (D19). 48 eventos (OxpComercio: 13, OxpExtracto: 21, Anticipo: 10, Devolucion: 4). 17 invariantes. Decisión D20 nueva. **⚠️ Pendientes:** (1) Anticipo A2 — proveedor devuelve dinero (requiere dominio CXC). |

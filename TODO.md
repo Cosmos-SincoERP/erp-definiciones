@@ -10,3 +10,5 @@
 9. Re-definir los datos del agregado OXP Comercio y OXP Extracto.
 10. Incluir la OXP de proveedores. 
 11. Los abonos y devoluciones en el extracto. 
+12. Revisar evento OXPComercioPagada y OXPExtractoPagada, porque esta tan definida como una confirmación del sistema contable externo. (Depronto esta mal interpretado con respecto a que el sistema contable externo debe confirmar el recibido para cumplir este estado o si fuera con EDA puede ser que ellos leen un broker).
+13. Reconsiderar el estado de Causada/Causado en todos los agregados.
