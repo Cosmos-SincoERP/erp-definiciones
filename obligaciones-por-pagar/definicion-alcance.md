@@ -1,4 +1,4 @@
-# Sistema OXP - Definición de Alcance
+# Definición de Alcance — Obligaciones por Pagar
 
 ## Tabla de contenido
 
@@ -67,10 +67,13 @@ El diseño debe contemplar escalabilidad para compañías con mayor volumen y la
 | **OXP de Extracto** | Obligación por pagar consolidada que agrupa las OXP de comercio de un período, incluyendo las devoluciones y los cargos adicionales aplicables según el medio de pago. |
 | **Pagada (OXP de Extracto)** | Estado que indica que el sistema contable externo (SincoA&F) ha confirmado la ejecución del pago financiero correspondiente al extracto. |
 | **Radicación** | Fase operativa inicial mediante la cual una evidencia económica (soporte documental, extracto bancario, cargo financiero o devolución) es incorporada al dominio OXP como una obligación por pagar en estado pendiente. La radicación puede iniciar con información parcial y contempla la completitud progresiva de datos y soportes requeridos. |
-| **Anticipo** | Obligación por pagar que no cuenta con los soportes correspondientes pero se debe entregar el dinero al comercio/proveedor. Se registra en cuentas específicas y posteriormente se reclasifica a las cuentas definitivas cuando se completa la regularización. El sistema mantiene trazabilidad del anticipo desde su creación hasta su regularización, permitiendo el seguimiento de saldos pendientes. Se aplican políticas de plazo configurables para alertar sobre anticipos que excedan el tiempo permitido sin regularizar. Aplica para ambos medios de pago. |
-| **Regularización de Anticipos** | Proceso operativo mediante el cual una OXP registrada como anticipo se completa con los soportes documentales correspondientes y se prepara para su cierre definitivo. La regularización ocurre en el sistema OXP y genera la información estructurada necesaria para la amortización contable. No implica un registro contable directo en OXP. |
+| **Anticipo** | Obligación por pagar que puede o no contar con soportes preliminares (ej: cuenta de cobro) y requiere la entrega de dinero al comercio/proveedor. Tiene ciclo de vida independiente con dos dimensiones de resolución: (1) **pago** — cómo se cubrió el desembolso (vinculación a extracto, pago directo o devolución), y (2) **regularización** — contra qué OXP de Comercio se justifica el gasto. Estados: Vigente (ambos saldos pendientes) → Pagado (desembolso cubierto) / Regularizado (justificación completa) → Cerrado (ambos resueltos). También puede cancelarse completamente mediante reversa total si aún no tiene pagos ni regularizaciones aplicadas (estado Reversado). Un anticipo también puede nacer automáticamente por excedente de devolución, en cuyo caso inicia directamente en estado Pagado. Se aplican políticas de plazo configurables para alertar sobre anticipos que excedan el tiempo permitido sin regularizar. Aplica para ambos medios de pago. |
+| **Regularización de Anticipos** | Proceso coordinado mediante el cual un anticipo se cruza contra una o más OXP de Comercio confirmadas del mismo tercero. Cada regularización reduce el saldo por regularizar del anticipo y aplica un pago sobre la OXP de Comercio destino. La regularización solo puede realizarse contra OXP de Comercio en estado Confirmada o posterior, donde el valor neto ya es estable. Un anticipo puede regularizarse contra múltiples OXP de Comercio en operaciones independientes (1:N). La regularización genera la información estructurada necesaria para la amortización contable. |
 | **Amortización del Anticipo** | Efecto contable mediante el cual el saldo del anticipo se reclasifica total o parcialmente a las cuentas de gasto o costo definitivas. La amortización es ejecutada por el sistema contable externo (SincoA&F) a partir de la información estructurada entregada por OXP. Equivale al concepto internacional de *Down Payment Clearing* (SAP). |
-| **Devolución** | Reintegro de dinero del comercio hacia la compañía por una compra devuelta. Se registra con valor positivo representando la magnitud del crédito (ver D19 en Modelo de Dominio); la naturaleza contable (nota crédito) la determina el tipo del agregado, no el signo. Debe registrarse y queda relacionada en la OXP de extracto. La devolución puede aparecer en un período diferente al de la OXP de comercio original. |
+| **Devolución** | Reintegro de dinero del comercio hacia la compañía. Se registra con valor positivo representando la magnitud del crédito; la naturaleza contable (nota crédito) la determina el tipo, no el signo. Tiene ciclo de vida independiente (Pendiente → Confirmada → Causada) y se clasifica en 3 tipos según el OXP origen: (1) **Comercio** — devuelve conceptos de gasto de una OXP de Comercio; el crédito se aplica contra el saldo pendiente de pago, y si lo excede, genera un anticipo por el excedente. (2) **Extracto** — devuelve cargos financieros cobrados en un extracto anterior. (3) **Anticipo** — reversa total de un anticipo sin pagos ni regularizaciones. La devolución puede aparecer en un período diferente al del OXP original. |
+| **Reversa de Anticipo** | Cancelación total de un anticipo que aún no tiene pagos ni regularizaciones aplicadas. Se formaliza mediante una devolución tipo Anticipo. Solo aplica cuando el anticipo está en estado Vigente sin cruces previos. El anticipo pasa a estado terminal Reversado. |
+| **Excedente de Devolución** | Cuando el valor de una devolución excede el saldo pendiente de pago de la OXP de Comercio origen, el sistema genera automáticamente un anticipo por la diferencia. Este anticipo nace en estado Pagado (ya cubierto por la devolución) y pendiente de regularización. |
+| **Pago Directo** | Pago de una OXP de Comercio confirmado por el sistema contable externo (SincoA&F) para formas de pago diferentes a tarjeta de crédito. Aplica únicamente sobre OXP en estado Causada. Complementa el flujo estándar de pago vía extracto bancario. |
 | **Nota Crédito** | Documento contable que representa una devolución o ajuste a favor de la compañía. Se genera al registrar una devolución. |
 | **Documento Soporte Electrónico** | Documento requerido por el ente regulador para respaldar compras que no generan factura electrónica, como por ejemplo compras en el exterior o proveedores informales. |
 | **TRM (Tasa Representativa del Mercado)** | Tasa de cambio oficial publicada por el Banco de la República de Colombia. Utilizada para valorar transacciones en moneda extranjera. |
@@ -129,17 +132,17 @@ Cualquier usuario puede acceder a vistas de monitoreo (OXP pendientes, confirmad
 
 ### Flujos del proceso
 
-El sistema OXP maneja dos flujos diferenciados que convergen en la conciliación:
+El sistema OXP maneja cuatro flujos con ciclos de vida independientes:
 
-**Nota conceptual:** Los diagramas siguientes representan las **fases del ciclo de vida** de una Obligación por Pagar dentro del dominio OXP, no una secuencia de pasos operativos ni un workflow de tareas de usuario. Cada fase describe una etapa de evolución de la obligación que habilita capacidades del sistema y transiciones de estado. El sistema OXP gobierna la obligación desde su incorporación (radicación) hasta su cierre (pago/recarga), actuando como sistema de dominio integral y no como un subproceso aislado.
+**Nota conceptual:** Los diagramas siguientes representan las **fases del ciclo de vida** de cada tipo de obligación dentro del dominio OXP, no una secuencia de pasos operativos ni un workflow de tareas de usuario. Cada fase describe una etapa de evolución de la obligación que habilita capacidades del sistema y transiciones de estado. El sistema OXP gobierna la obligación desde su incorporación (radicación) hasta su cierre, actuando como sistema de dominio integral y no como un subproceso aislado.
 
 ```
 ┌─────────────────────────────────────────────────────────────────────────────────┐
 │                           FLUJO OXP DE COMERCIO                                  │
 │                                                                                  │
 │  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐   │
-│  │ 1. Radica-   │    │ 2. Confir-   │    │ 3. Causa-    │    │ 4. Compen-   │   │
-│  │    ción      │───▶│    mación    │───▶│    ción      │───▶│    sada      │   │
+│  │ 1. Radica-   │    │ 2. Confir-   │    │ 3. Causa-    │    │ 4. Pagada    │   │
+│  │    ción      │───▶│    mación    │───▶│    ción      │───▶│              │   │
 │  └──────────────┘    └──────────────┘    └──────────────┘    └──────┬───────┘   │
 │                                                                      │           │
 └──────────────────────────────────────────────────────────────────────┼───────────┘
@@ -155,11 +158,36 @@ El sistema OXP maneja dos flujos diferenciados que convergen en la conciliación
 │  └──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘    └──────────────┘ │
 │                                                                                                    │
 └────────────────────────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           FLUJO ANTICIPO                                         │
+│                                                                                  │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐    ┌──────────────┐   │
+│  │ 1. Registro  │    │ 2. Pago      │    │ 3. Regulari- │    │ 4. Cerrado   │   │
+│  │   (Vigente)  │───▶│              │───▶│   zación     │───▶│              │   │
+│  └──────┬───────┘    └──────────────┘    └──────────────┘    └──────────────┘   │
+│         │                                                                        │
+│         └──── Reversa total ───▶ Reversado                                       │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           FLUJO DEVOLUCIÓN                                       │
+│                                                                                  │
+│  ┌──────────────┐    ┌──────────────┐    ┌──────────────┐                       │
+│  │ 1. Radica-   │    │ 2. Confir-   │    │ 3. Causa-    │                       │
+│  │    ción      │───▶│    mación    │───▶│    ción      │                       │
+│  └──────────────┘    └──────────────┘    └──────────────┘                       │
+│                                                                                  │
+└─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**OXP de Comercio:** Se radica, confirma y causa de forma independiente. Posteriormente, cuando se carga el extracto y se completa la conciliación, la OXP de Comercio pasa a estado **compensada** al vincularse a la OXP de Extracto.
+**OXP de Comercio:** Se radica, confirma y causa de forma independiente. El pago se registra cuando se vincula a una OXP de Extracto (conciliación), se regulariza un anticipo contra ella, se confirma un pago directo (SincoA&F), o se aplica una devolución. La OXP pasa a Pagada cuando su saldo pendiente de pago llega a cero.
 
-**OXP de Extracto:** Se radica, se concilia al 100% (vinculando las OXP de Comercio), se confirma, se causa contablemente, y finalmente se registra el pago cuando el sistema contable (SincoA&F) lo confirma.
+**OXP de Extracto:** Se radica, se concilia al 100% (vinculando OXP de Comercio, cubriendo con anticipos/devoluciones, o marcando partidas en disputa), se confirma, se causa contablemente, y finalmente se registra el pago cuando SincoA&F lo confirma.
+
+**Anticipo:** Se registra en estado Vigente con dos dimensiones de resolución independientes: pago (vinculación a extracto o pago directo) y regularización (cruce contra OXP de Comercio). Cuando ambas dimensiones se resuelven, pasa a Cerrado. Puede cancelarse completamente mediante reversa total si aún no tiene cruces.
+
+**Devolución:** Se radica referenciando un OXP origen (Comercio, Extracto o Anticipo), se confirma (aplicando el crédito sobre el origen), y se causa contablemente.
 
 ---
 
@@ -167,16 +195,20 @@ El sistema OXP maneja dos flujos diferenciados que convergen en la conciliación
 
 Las **etapas** son las fases del ciclo de vida de la obligación; cada una agrupa las actividades que se realizan en ella. Los **estados** son las condiciones de cada OXP en un momento dado (cómo está). Al completar una etapa, la OXP transiciona de estado.
 
-| Etapa (fase) | Estado resultante OXP Comercio | Estado resultante OXP Extracto |
-|-------------------|-------------------------------|-------------------------------|
-| Radicación | Pendiente | Pendiente |
-| Confirmación | Confirmada | — |
-| Rechazo por Confirmador | Devuelta | — |
-| Causación | Causada | — |
-| Conciliación | Causada (con pagos aplicados vía extracto) | Conciliada (100%) |
-| Confirmación (Extracto) | — | Confirmada |
-| Causación (Extracto) | — | Causada |
-| Pago | — | Pagada |
+| Etapa (fase) | OXP Comercio | OXP Extracto | Anticipo | Devolución |
+|-------------------|---|---|---|---|
+| Radicación / Registro | Pendiente | Pendiente | Vigente | Pendiente |
+| Confirmación | Confirmada | — | — | Confirmada |
+| Rechazo por Confirmador | Devuelta | — | — | — |
+| Causación | Causada | — | — | Causada |
+| Conciliación | Pagos aplicados vía extracto | Conciliada (100%) | — | — |
+| Confirmación (Extracto) | — | Confirmada | — | — |
+| Causación (Extracto) | — | Causada | — | — |
+| Pago / Vinculación | Pagada (saldo = 0) | Pagada | Pagado | — |
+| Regularización | Pago aplicado vía anticipo | — | Regularizado | — |
+| Cierre | — | — | Cerrado (ambos saldos = 0) | — |
+| Reversa | — | — | Reversado | — |
+| Pago directo (SincoA&F) | Pagada (saldo = 0) | — | — | — |
 
 **Nota de configuración:** Según la configuración de la empresa, la causación puede ejecutarse de dos formas: (1) automáticamente como consecuencia directa de la confirmación, o (2) como una acción independiente realizada por un usuario sobre las OXP ya confirmadas.
 
@@ -194,8 +226,8 @@ Las **etapas** son las fases del ciclo de vida de la obligación; cada una agrup
 | **Proceso - OXP de Extracto** | El solicitante o radicador carga el extracto en el sistema. Se extraen las transacciones y cargos adicionales (4x1000, cuota de manejo, intereses si aplica). |
 | **Salida - OXP de Comercio** | OXP de Comercio creada en estado pendiente. |
 | **Salida - OXP de Extracto** | OXP de Extracto creada con el detalle de transacciones y cargos del período. |
-| **Variante - Anticipo** | Si no se cuenta con el soporte, se crea la OXP de Comercio como Anticipo para su posterior regularización. |
-| **Variante - Devolución** | Si la transacción es una devolución, se registra y se asocia a la OXP de comercio original cuando esta se encuentre disponible. Si la OXP original no está disponible (por ejemplo, por aparecer en un período diferente), la devolución se registra y queda pendiente de asociación hasta que pueda relacionarse posteriormente. |
+| **Variante - Anticipo** | Si no se cuenta con el soporte, se crea un Anticipo en estado Vigente con dos saldos independientes: saldo por pagar (desembolso) y saldo por regularizar (justificación). También puede nacer automáticamente por excedente de devolución [R32], en cuyo caso inicia en estado Pagado. |
+| **Variante - Devolución** | Si la transacción es una devolución, se radica como Devolución en estado Pendiente, referenciando el OXP origen. Según el tipo: (1) Comercio — referencia OXP de Comercio y registra conceptos devueltos. (2) Extracto — referencia OXP de Extracto anterior y registra cargos financieros devueltos. (3) Anticipo — referencia un anticipo para reversa total [R34]. La devolución puede aparecer en un período diferente al del OXP original. |
 | **Variante - Moneda Extranjera** | Para compras del exterior, la OXP de Comercio se radica con la TRM del día de la transacción. El sistema siempre almacena el valor original de la compra en la moneda de origen y el valor convertido a la moneda funcional del país donde opera el sistema. |
 | **Variante - Distribución de Costos (Split)** | Durante la radicación (o al regularizar un anticipo), el usuario puede realizar una distribución porcentual o por valor del costo entre diferentes centros de costo o cuentas contables. Una OXP de Comercio puede generar N registros de causación de costo. El sistema valida que la suma de las distribuciones sea igual al 100% del valor de la OXP. |
 
@@ -210,12 +242,14 @@ Las **etapas** son las fases del ciclo de vida de la obligación; cada una agrup
 | **Proceso** | El sistema realiza una conciliación automática entre las transacciones del extracto y las OXP de comercio registradas. Para las partidas que no logra conciliar automáticamente, el usuario puede completar la conciliación manualmente. |
 | **Criterios de conciliación automática** | El sistema utiliza una combinación de criterios: (1) **Comercio:** detección asistida por un agente inteligente que sugiere asociaciones basadas en el contexto histórico de transacciones y las descripciones del extracto; el usuario puede también realizar la relación manualmente. Una vez establecida la asociación, el sistema la persiste para aplicarla automáticamente en futuras conciliaciones. (2) **Valor:** comparación del monto radicado considerando variaciones por impuestos. (3) **Fecha:** correspondencia con la fecha de la transacción. |
 | **Tipos de vinculación soportados** | El sistema soporta dos tipos de vinculación: (1) **1:1 (Simple):** una OXP de Comercio se vincula con una partida del extracto; (2) **N:1 (Agrupación):** múltiples OXP de Comercio se vinculan contra una sola partida del extracto, para casos donde una compra tiene varios registros o documentos de soporte pero el banco la procesa como un solo cobro. La suma de las OXP debe coincidir con la partida del extracto dentro de la tolerancia definida en R10. *Las relaciones 1:N y N:M no aplican porque no representan escenarios reales de negocio.* |
-| **Estados de conciliación** | **Inicio:** proceso no iniciado. **Parcialmente conciliado:** algunas partidas vinculadas, otras pendientes. **Conciliado:** 100% de las partidas del extracto conciliadas (incluyendo partidas en disputa que se contabilizan como tal). |
+| **Cobertura por Anticipo** | Una partida del extracto puede cubrirse con un anticipo existente del mismo tercero, en lugar de vincularse a una OXP de Comercio. La partida queda resuelta y el anticipo registra el pago correspondiente (reduce su saldo por pagar). |
+| **Cobertura por Devolución** | Una partida del extracto que corresponde a un crédito bancario puede cubrirse con una devolución registrada en el sistema. La partida queda resuelta. |
+| **Estados de conciliación** | **Inicio:** proceso no iniciado. **Parcialmente conciliada:** algunas partidas resueltas, otras pendientes. **Conciliada:** 100% de las partidas del extracto resueltas. Una partida se considera resuelta cuando está vinculada a OXP de Comercio, cubierta por anticipo, cubierta por devolución, marcada en disputa, o descartada. |
 | **Regla de avance** | El extracto debe estar en estado "Conciliado" (100%) antes de pasar a la etapa de confirmación. |
 | **Manejo de Diferencia en Cambio** | Para cada OXP de Comercio en moneda extranjera, si existe diferencia entre el valor radicado (TRM del día de la transacción) y el valor en el extracto (TRM del día de corte), el sistema genera automáticamente un **concepto de ajuste por diferencia en cambio** sobre la OXP de Extracto. Se genera un concepto de ajuste por cada OXP de Comercio en moneda extranjera. Esto permite el cruce exacto sin crear nuevas OXP. |
 | **Alerta de plazo** | El sistema alerta cuando la conciliación no está completada dentro del plazo configurado previo a la fecha de pago (por defecto 3 días). Este plazo es configurable en las preferencias de cada tarjeta. |
-| **Salida - Conciliación exitosa** | OXP de Comercio con pagos aplicados vía extracto (ver D18 — Compensada eliminada, la vinculación es un pago que reduce `saldoPorPagar()`), vinculadas a la OXP de Extracto en estado **Conciliada**. Para cada OXP de Comercio en moneda extranjera con diferencia de cambio, se incluyen los conceptos de ajuste correspondientes sobre la OXP de Extracto. |
-| **Salida - Partidas sin conciliar** | El sistema notifica al usuario las transacciones del extracto sin OXP de comercio asociada. El usuario decide entre: (a) gestionar la solicitud de radicación de las OXP faltantes, (b) generar Anticipos, o (c) marcar como **Partida en Disputa** (para errores bancarios, fraudes potenciales o transacciones no reconocidas). |
+| **Salida - Conciliación exitosa** | OXP de Comercio con pagos aplicados vía extracto (la vinculación reduce el saldo pendiente de pago de la OXP de Comercio), OXP de Extracto en estado **Conciliada**. Para cada OXP de Comercio en moneda extranjera con diferencia de cambio, se incluyen los conceptos de ajuste correspondientes sobre la OXP de Extracto. |
+| **Salida - Partidas sin conciliar** | El sistema notifica al usuario las transacciones del extracto sin OXP de comercio asociada. El usuario decide entre: (a) gestionar la solicitud de radicación de las OXP faltantes, (b) generar Anticipos, (c) cubrir con anticipo existente, (d) cubrir con devolución registrada, o (e) marcar como **Partida en Disputa** (para errores bancarios, fraudes potenciales o transacciones no reconocidas). |
 | **Salida - Partida en Disputa** | La marca de "Partida en Disputa" permite alcanzar el 100% de conciliación operativa sin generar anticipos. Posteriormente, la partida en disputa puede resolverse de dos formas: (1) **Descartada:** cuando el banco realiza el reverso, la partida se compensa contra la línea de "Reverso Bancario" en un extracto futuro y cierra su ciclo; (2) **Reclasificación Contable:** cuando se identifica el gasto real y se radica la OXP de Comercio correspondiente, el sistema vincula la partida en disputa del extracto original con la nueva OXP mediante reclasificación contable, sin generar documentos duplicados ni nueva deuda. |
 
 ---
@@ -240,9 +274,36 @@ Las **etapas** son las fases del ciclo de vida de la obligación; cada una agrup
 |---------|-------------|
 | **Disparador** | OXP de Extracto causada. |
 | **Entrada** | OXP de Extracto confirmada y causada. |
-| **Proceso - OXP de Comercio** | Se considera **compensada** en el momento que se vincula dentro de una OXP de Extracto. Este estado es operativo; no representa un desembolso financiero, pero sí es el insumo que OXP entrega a SincoA&F para registrar los cruces contables correspondientes. |
-| **Proceso - OXP de Extracto** | El sistema contable externo (SincoA&F) gestiona la ejecución del pago (tarjeta de crédito) o la recarga (tarjeta débito prepago). El sistema OXP **únicamente monitorea** y registra el estado de pago consultando a SincoA&F. |
-| **Salida** | OXP de Extracto marcada como **pagada** una vez SincoA&F confirma la ejecución del pago financiero. Ciclo cerrado. |
+| **Proceso - OXP de Comercio** | La OXP de Comercio recibe pagos que reducen su saldo pendiente: vía vinculación con extracto, regularización de anticipo, aplicación de devolución o pago directo (SincoA&F para formas de pago diferentes a tarjeta de crédito). Cuando el saldo llega a cero, la OXP pasa a **Pagada**. |
+| **Proceso - OXP de Extracto** | El sistema contable externo (SincoA&F) gestiona la ejecución del pago (tarjeta de crédito) o la recarga (tarjeta débito prepago). El sistema OXP **únicamente monitorea** y registra el estado de pago consultando a SincoA&F. Las devoluciones de cargos financieros también reducen el saldo del extracto. |
+| **Salida** | OXP de Extracto marcada como **Pagada** una vez su saldo pendiente de pago llega a cero. Ciclo cerrado. |
+
+---
+
+### Etapa 5: Regularización de Anticipos
+
+| Aspecto | Descripción |
+|---------|-------------|
+| **Disparador** | Anticipo con saldo por regularizar mayor a cero y OXP de Comercio confirmada del mismo tercero disponible. |
+| **Entrada** | Anticipo + OXP de Comercio destino (en estado Confirmada o posterior). |
+| **Proceso** | El usuario selecciona un anticipo y una OXP de Comercio confirmada o posterior del mismo tercero. El sistema cruza ambos: reduce el saldo por regularizar del anticipo y aplica un pago sobre la OXP de Comercio. La OXP de Comercio destino debe estar en estado Confirmada o posterior, donde el valor neto ya es estable [R30]. |
+| **Variante - 1:N** | Un anticipo puede regularizarse contra múltiples OXP de Comercio en operaciones independientes (no necesariamente en una sola operación) [R29]. |
+| **Variante - Amortización** | Al completarse la regularización, el sistema genera la información estructurada necesaria para que SincoA&F ejecute la amortización contable (reclasificación de cuentas de anticipo a cuentas definitivas de gasto/costo). |
+| **Salida** | Anticipo con saldo por regularizar reducido. Si llega a cero: estado Regularizado (o Cerrado si el saldo por pagar también es cero). OXP de Comercio con pago aplicado por el valor regularizado. |
+
+---
+
+### Etapa 6: Devoluciones
+
+| Aspecto | Descripción |
+|---------|-------------|
+| **Disparador** | Comercio realiza un reintegro de dinero a la compañía. |
+| **Entrada** | Referencia al OXP origen (Comercio, Extracto o Anticipo) y datos de la devolución. |
+| **Proceso - Tipo Comercio** | Se registran los conceptos devueltos (espejo de los conceptos de gasto originales). Al confirmarse, el sistema aplica el crédito contra el saldo pendiente de pago de la OXP de Comercio origen. Si el crédito excede el saldo pendiente, el sistema genera automáticamente un anticipo por la diferencia (excedente de devolución) [R32]. El valor acumulado de todas las devoluciones no puede exceder el valor neto de la OXP origen [R31]. |
+| **Proceso - Tipo Extracto** | Se registran cargos financieros devueltos (ej: reversa de cobro indebido de 4x1000). Al confirmarse, el sistema reduce el saldo pendiente de pago de la OXP de Extracto origen [R33]. |
+| **Proceso - Tipo Anticipo** | Se registra una reversa total del anticipo. Solo aplica cuando el anticipo está en estado Vigente sin cruces previos. El valor de la devolución debe ser exactamente igual al valor total del anticipo [R34]. Al confirmarse, el anticipo pasa a estado Reversado (terminal). |
+| **Causación** | Al causarse la devolución, se genera una nota crédito en el sistema contable [R16]. |
+| **Salida** | Devolución en estado Causada. Crédito aplicado sobre el OXP origen (o anticipo generado por excedente). |
 
 ---
 
@@ -367,7 +428,7 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 
 | ID | Regla | Configurable |
 |----|-------|--------------|
-| R11 | Las OXP pueden confirmarse manualmente por un usuario o automáticamente según configuración de la empresa. La confirmación aplica a ambos tipos de OXP pero con estados previos diferentes: (1) **OXP de Comercio:** la confirmación valida la operación de radicación y dispara la causación; posteriormente pasa a estado compensada cuando se vincula a una OXP de Extracto. (2) **OXP de Extracto:** la confirmación se habilita únicamente cuando la conciliación está completada (100%), y posteriormente se monitorea el pago. | Sí (por empresa) |
+| R11 | Las OXP pueden confirmarse manualmente por un usuario o automáticamente según configuración de la empresa. La confirmación aplica a ambos tipos de OXP pero con estados previos diferentes: (1) **OXP de Comercio:** la confirmación valida la operación de radicación y habilita la causación; los pagos (vía extracto, anticipo, devolución o pago directo) reducen progresivamente el saldo pendiente. (2) **OXP de Extracto:** la confirmación se habilita únicamente cuando la conciliación está completada (100%), y posteriormente se monitorea el pago. | Sí (por empresa) |
 | R11b | **Rechazo por Confirmador:** Si el confirmador no aprueba una OXP de Comercio, esta pasa a estado **"Devuelta"** y retorna a la bandeja del radicador. El confirmador debe registrar obligatoriamente un **"Motivo de Rechazo"**. El radicador puede corregir la OXP y reenviarla a confirmación, o descartarla según corresponda. | No |
 | R12 | Al confirmar una OXP, se genera automáticamente la integración con el sistema contable. La forma en que se ejecuta la causación (automática al confirmar o mediante acción de un usuario sobre OXP confirmadas) es configurable por empresa, tal como se describe en la Etapa de Confirmación y Causación. | Sí (por empresa) |
 | R13 | Se genera una causación individual por cada OXP de comercio. | No |
@@ -381,8 +442,8 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 
 | ID | Regla | Configurable |
 |----|-------|--------------|
-| R17 | Una OXP de comercio se considera **compensada** (estado operativo) cuando se vincula dentro de una OXP de Extracto. Este estado indica que la obligación individual está cubierta por el extracto del período. No representa un pago financiero, pero la información de esta compensación (cuenta, tercero, naturaleza) es la base que OXP traduce y entrega a SincoA&F para su registro contable. | No |
-| R18 | Una OXP de extracto se considera **pagada** únicamente cuando el sistema contable externo (SincoA&F) confirma la ejecución del pago financiero. El sistema OXP no ejecuta pagos; solo registra y monitorea su estado. | No |
+| R17 | Una OXP de Comercio recibe pagos de múltiples orígenes que reducen su saldo pendiente: vinculación con extracto (conciliación), regularización de anticipo, aplicación de devolución, o pago directo (SincoA&F). Cuando el saldo llega a cero, la OXP pasa a estado **Pagada**. La información de cada pago (cuenta, tercero, naturaleza) es la base que OXP traduce y entrega a SincoA&F para su registro contable. | No |
+| R18 | Una OXP de Extracto se considera **Pagada** cuando su saldo pendiente de pago llega a cero. El saldo se reduce por confirmación de pago de SincoA&F y por devoluciones de cargos financieros. El sistema OXP no ejecuta pagos; solo registra y monitorea su estado. | No |
 
 ---
 
@@ -416,6 +477,35 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 
 ---
 
+### Reglas de anticipos
+
+| ID | Regla | Configurable |
+|----|-------|--------------|
+| R28 | **Reversa de Anticipo:** Un anticipo solo puede reversarse cuando está en estado Vigente y no tiene pagos ni regularizaciones aplicadas. La reversa es total — no existen reversas parciales. Al reversarse, el anticipo pasa a estado terminal Reversado. | No |
+| R29 | **Regularización 1:N:** Un anticipo puede regularizarse contra múltiples OXP de Comercio del mismo tercero en operaciones independientes. Cada regularización reduce el saldo por regularizar del anticipo y aplica un pago sobre la OXP de Comercio destino. | No |
+| R30 | **Estado mínimo para regularización:** La regularización solo puede realizarse contra OXP de Comercio en estado Confirmada o posterior, donde el valor neto ya es estable y no puede ser modificado. | No |
+
+---
+
+### Reglas de devoluciones
+
+| ID | Regla | Configurable |
+|----|-------|--------------|
+| R31 | **Límite de devolución:** El valor acumulado de todas las devoluciones sobre una OXP de Comercio no puede exceder el valor neto de la OXP. | No |
+| R32 | **Excedente de devolución:** Cuando una devolución sobre OXP de Comercio excede el saldo pendiente de pago (pero no el valor neto acumulado), el sistema genera automáticamente un anticipo por la diferencia. Este anticipo nace en estado Pagado y pendiente de regularización. | No |
+| R33 | **Devolución tipo Extracto:** Una devolución de cargo financiero solo puede registrarse cuando la OXP de Extracto origen tiene saldo pendiente de pago mayor a cero. | No |
+| R34 | **Devolución tipo Anticipo:** Solo aplica como reversa total — el valor de la devolución debe ser exactamente igual al valor total del anticipo, y el anticipo debe cumplir las condiciones de R28. | No |
+
+---
+
+### Reglas de pago directo
+
+| ID | Regla | Configurable |
+|----|-------|--------------|
+| R35 | **Pago directo:** Un pago confirmado por SincoA&F para formas de pago diferentes a tarjeta de crédito solo puede aplicarse sobre OXP de Comercio en estado Causada. Reduce el saldo pendiente de pago de la OXP. | No |
+
+---
+
 ## Sección 7: Qué está dentro y fuera del alcance
 
 ### Dentro del alcance
@@ -424,8 +514,11 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 |------|-------------|
 | **Medios de pago** | Tarjetas de crédito corporativas y tarjetas de débito prepago. |
 | **Radicación** | Registro de obligaciones al sistema con sus soportes documentales (XML, PDF, imágenes, CSV, etc...). Extracción automática de datos desde facturas electrónicas colombianas vía SincoRE. |
-| **Gestión de anticipos** | Creación de OXP sin soporte documental y posterior reclasificación al regularizar. |
-| **Gestión de devoluciones** | Registro de devoluciones, asociación con OXP original y generación del concepto para nota crédito. |
+| **Ciclo de vida de anticipos** | Creación, pago (vinculación a extracto o pago directo), regularización contra OXP de Comercio, cierre y reversa total. Trazabilidad completa con dos dimensiones de saldo independientes. Generación de información para amortización contable. |
+| **Ciclo de vida de devoluciones** | Radicación, confirmación y causación de devoluciones de 3 tipos: comercio (conceptos de gasto), extracto (cargos financieros) y anticipo (reversa total). Aplicación automática de crédito sobre el OXP origen. |
+| **Excedente de devolución** | Generación automática de anticipo cuando la devolución excede el saldo pendiente de pago de una OXP de Comercio. |
+| **Pago directo** | Registro de pagos confirmados por SincoA&F para formas de pago diferentes a tarjeta de crédito. |
+| **Regularización de anticipos** | Cruce coordinado de anticipos contra OXP de Comercio confirmadas del mismo tercero, con soporte 1:N. |
 | **Carga de extractos** | Carga manual de extractos bancarios en formato PDF o CSV. Extracción de transacciones y cargos adicionales. |
 | **Conciliación** | Cruce automático y asistido entre OXP de comercio y extractos bancarios. Aprendizaje de relaciones comercio-descripción. |
 | **Confirmación** | Flujo de confirmación manual o automático según configuración por empresa. |
@@ -566,3 +659,4 @@ Esta arquitectura de servicios desacoplados con responsabilidades claras permite
 |---------|-------|-------------|
 | 1.0 | Enero 2026 | Versión inicial del documento de definición de alcance |
 | 1.1 | Febrero 2026 | Alineación con Modelo de Dominio v2.4. **Compensada** eliminada del glosario y referencias (absorbida por Pagada, ver D18). **Devolución** corregida: valor positivo representando magnitud del crédito (ver D19). Tabla de estados y salida de conciliación actualizadas. |
+| 1.2 | Marzo 2026 | Alineación con Modelo de Dominio v2.5. Glosario ampliado: Anticipo con ciclo de vida completo, Devolución con 3 tipos, nuevos términos (Reversa de Anticipo, Pago Directo, Excedente de Devolución). Flujo principal extendido con Etapa 5 (Regularización) y Etapa 6 (Devoluciones). Diagrama actualizado con 4 flujos. 8 nuevas reglas de negocio (R28–R35): anticipos, devoluciones y pago directo. Alcance actualizado con capacidades de ciclo de vida independiente de anticipos y devoluciones. |
