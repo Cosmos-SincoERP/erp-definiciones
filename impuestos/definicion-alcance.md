@@ -79,6 +79,8 @@ Los términos de esta sección son **globales** — aplican independiente de la 
 | 20 | **Entidad fiscal emisora** | Parte de la transacción que origina el hecho económico a efectos tributarios. En el caso más común coincide con la empresa operadora, pero en escenarios como facturación a nombre de terceros (ej: inmobiliario, donde la emisora fiscal es el propietario) o mandante por proyecto (ej: construcción, donde la emisora fiscal es el dueño del proyecto), puede ser una entidad diferente. Es el sub-dominio consumidor quien determina qué entidad ocupa este rol según su contexto de negocio. Equivale a "First Party" (Oracle Fusion Tax) o "Legal Entity" (Dynamics 365). |
 | 21 | **Entidad fiscal contraparte** | Parte opuesta de la transacción a efectos tributarios. En la dirección de gastos es el proveedor; en la de ingresos es el cliente. El motor de cálculo resuelve los perfiles tributarios de ambas entidades fiscales (emisora y contraparte) para determinar qué tributos aplican. Equivale a "Third Party" (Oracle Fusion Tax) o "Counterparty" (Dynamics 365). |
 | 22 | **Contenido fiscal** | Conjunto de tributos, tarifas, bases mínimas, reglas de aplicación, dependencias y vigencias que el sistema provee como parte del producto para cada jurisdicción soportada. El contenido fiscal viene precargado para que el cliente inicie operación sin configurar el estándar fiscal del país — solo configura lo propio de su empresa (perfil tributario, excepciones). Cuando la normativa cambia, el contenido fiscal se actualiza sin intervención del cliente. Equivale a "Tax Content" (Avalara, Vertex, ONESOURCE). |
+| 23 | **Efecto fiscal** | Clasificación del hecho económico registrado desde la perspectiva tributaria: gravamen o desgravamen. Determina cómo se interpreta el registro tributario al consolidar períodos — los gravámenes suman y los desgravámenes restan proporcionalmente. |
+| 24 | **Desgravamen** | Efecto fiscal que revierte total o parcialmente los tributos de un gravamen previo. Se origina por notas crédito, devoluciones u otras transacciones de ajuste del sub-dominio consumidor. El desglose fiscal del desgravamen se deriva proporcionalmente del desglose del gravamen original — el motor de cálculo no participa. Cada desgravamen referencia exactamente una transacción origen. |
 
 ---
 
@@ -131,6 +133,15 @@ Los términos de esta sección son **globales** — aplican independiente de la 
 5. Cuando la **transacción se confirma** en el sub-dominio consumidor, este notifica al sistema de impuestos con el desglose definitivo (original o ajustado).
 6. El sistema de impuestos **crea el registro tributario** como hecho definitivo, conservando como mínimo: el cálculo original del motor y el desglose confirmado. Si hubo ajustes manuales, el registro tributario lo indica para distinguir un cálculo automático de uno intervenido por el usuario.
 7. El sub-dominio consumidor **almacena su propia copia** del desglose confirmado para operar de forma autónoma.
+
+#### Variante: desgravamen (notas crédito, devoluciones)
+
+Cuando la transacción del consumidor revierte total o parcialmente una transacción previa (nota crédito, devolución), el flujo difiere en el cálculo pero no en la confirmación:
+
+1. El sub-dominio consumidor envía la solicitud indicando el efecto fiscal como **desgravamen** y la referencia a la transacción origen.
+2. El sistema **no invoca al motor de cálculo**. En su lugar, localiza el registro tributario del gravamen original y calcula el desglose fiscal del desgravamen como **prorrateo proporcional** del desglose del gravamen, basado en los montos del desgravamen respecto a los del gravamen.
+3. El desglose prorrateado se propone al consumidor como referencia. El consumidor puede confirmarlo tal cual o ajustarlo manualmente (intervención manual).
+4. La confirmación y creación del registro tributario sigue los pasos 5-7 del flujo principal.
 
 ### Flujo 3 — Cumplimiento fiscal (Responsable de cumplimiento fiscal)
 
@@ -249,6 +260,7 @@ Este frente se subdivide en cuatro aspectos del proceso de cálculo: la vigencia
 | **R24** | **Contenido mínimo del registro:** El registro tributario conserva como mínimo: el desglose confirmado, la identificación de la transacción origen, la fecha de la transacción, la jurisdicción, los perfiles tributarios usados y la configuración vigente aplicada. Si hubo intervención manual (tributos excluidos o incluidos por el usuario), el registro conserva adicionalmente el cálculo original del motor — tributos aplicados y descartados con motivo de exclusión — para permitir auditar la divergencia entre lo que el motor determinó y lo que el usuario confirmó. | No |
 | **R25** | **Copia autónoma en el consumidor:** El sub-dominio consumidor almacena su propia copia del desglose confirmado para operar de forma autónoma. El registro tributario centralizado y la copia del consumidor coexisten sin dependencia operativa. | No |
 | **R36** | **Registro vinculado a transacción origen:** Cada registro tributario referencia la transacción origen mediante el `transaccionId` proporcionado por el sub-dominio consumidor. Los desgravámenes (devoluciones, notas crédito) son transacciones independientes del consumidor que generan su propio registro tributario a través del mismo flujo de confirmación — la relación entre transacciones es responsabilidad del consumidor. Las anulaciones de transacciones no confirmadas no generan registro tributario. | No |
+| **R39** | **Prorrateo proporcional en desgravámenes:** El desglose fiscal de un desgravamen se deriva proporcionalmente del desglose del gravamen original. Para cada línea del gravamen, el valor del desgravamen se calcula como: valor original × (monto del concepto en el desgravamen ÷ monto del concepto en el gravamen). Las tarifas, bases gravables y tributos son los mismos del gravamen original — no se recalculan con configuración vigente al momento del desgravamen. | No |
 
 ### 6.5 Cumplimiento fiscal
 
@@ -405,4 +417,4 @@ La Fase 1 se considera operativa cuando:
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
-| 1.0 | Marzo 2026 | Versión inicial: 9 secciones, 22 términos en glosario, 6 actores, 3 flujos, 38 reglas de negocio, 17 áreas dentro del alcance, 13 áreas fuera del alcance, estrategia de implementación por fases (F1 Núcleo+Soporte, F2 Derivadas). |
+| 1.0 | Marzo 2026 | Versión inicial: 9 secciones, 24 términos en glosario, 6 actores, 3 flujos, 39 reglas de negocio, 17 áreas dentro del alcance, 13 áreas fuera del alcance, estrategia de implementación por fases (F1 Núcleo+Soporte, F2 Derivadas). |
