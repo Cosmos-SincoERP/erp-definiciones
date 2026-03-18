@@ -9,7 +9,8 @@
 5. [Integraciones](#sección-5-integraciones)
 6. [Reglas de negocio](#sección-6-reglas-de-negocio)
 7. [Qué está dentro y fuera del alcance](#sección-7-qué-está-dentro-y-fuera-del-alcance)
-8. [Beneficios esperados](#sección-8-beneficios-esperados)
+8. [Estrategia de implementación por fases](#sección-8-estrategia-de-implementación-por-fases)
+9. [Beneficios esperados](#sección-9-beneficios-esperados)
 
 
 
@@ -19,16 +20,24 @@
 
 OXP se define como un sistema de dominio que gobierna el ciclo de vida operativo completo de las Obligaciones por Pagar, incorporando, estructurando y gestionando la información asociada a los hechos económicos de egreso que dan origen a dichas obligaciones (compras, gastos y costos), desde su radicación hasta su cierre operativo, y habilitando su correcta traducción hacia los procesos contables y financieros externos.
 
+OXP gestiona tres tipos de obligaciones por ciclo de vida:
+
+- **OXP de Comercio:** Obligación por pagar originada por un hecho económico de egreso (compra, gasto o costo). Independiente del medio de pago — puede pagarse vía extracto bancario (tarjeta de crédito/débito), pago directo desde Tesorería (crédito a proveedor, transferencia, contado) o pagos mixtos.
+- **OXP de Extracto:** Obligación consolidada que agrupa OXP de Comercio de un período, ligada a un producto financiero (tarjeta de crédito o débito). Incluye devoluciones y cargos financieros aplicables.
+- **OXP de Caja Menor** *(F2):* Obligación de menor cuantía operada bajo esquema de fondo fijo con rendición y reembolso.
+
 ### Contexto actual
 
-La compañía realiza compras a través de dos medios de pago corporativos:
+La compañía genera obligaciones por pagar desde múltiples orígenes:
 
-- **Tarjetas de crédito corporativas:** Utilizadas para compras generales de la operación.
-- **Tarjetas de débito prepago:** Asignadas a empleados para compras menores como insumos en obras (tornillos, materiales), suministros para estaciones de trabajo (agua, café), y gastos de representación (almuerzos de negocios, transporte para capacitaciones o reuniones con clientes).
+- **Compras con tarjeta de crédito corporativa:** Compras generales de la operación, pagadas mediante extracto bancario.
+- **Compras con tarjeta de débito prepago:** Insumos en obras, suministros, gastos de representación, pagadas mediante extracto bancario.
+- **Facturas de proveedores a crédito:** Compras de bienes y servicios con plazo de pago acordado, pagadas vía Tesorería.
+- **Pagos de contado:** Servicios públicos, pagos inmediatos, pagados vía Tesorería.
 
-Estas transacciones generan obligaciones por pagar (OXP) que deben ser radicadas con sus soportes documentales, conciliadas con los extractos bancarios y causadas contablemente.
+Todas estas transacciones generan obligaciones por pagar (OXP) que deben ser radicadas con sus soportes documentales y causadas contablemente. Las que se asocian a productos financieros (tarjetas) adicionalmente requieren conciliación contra el extracto bancario.
 
-Actualmente el proceso se gestiona de forma manual mediante archivos de Excel, donde los usuarios concilian las transacciones contra el extracto de la entidad bancaria y posteriormente registran la causación en el sistema contable.
+Actualmente, el proceso de tarjetas corporativas — que es el más desgastante — se gestiona de forma manual mediante archivos de Excel, donde los usuarios concilian las transacciones contra el extracto de la entidad bancaria y posteriormente registran la causación en el sistema contable.
 
 ### Problema actual
 
@@ -49,10 +58,11 @@ La gestión manual presenta los siguientes desafíos:
 ### Implementación inicial
 
 El sistema se implementará inicialmente en una compañía piloto que maneja:
-- 2 tarjetas de crédito corporativas
-- Aproximadamente 100 transacciones mensuales (50 por tarjeta)
+- 2 tarjetas de crédito corporativas (~100 transacciones mensuales)
+- ~1000 facturas de proveedores a crédito mensuales
+- ~50 pagos de contado mensuales (arriendos, servicios públicos)
 
-El diseño debe contemplar escalabilidad para compañías con mayor volumen y la incorporación de tarjetas de débito prepago.
+El diseño contempla escalabilidad para compañías con mayor volumen de transacciones y la incorporación progresiva de todos los tipos de OXP definidos en las fases de implementación (Sección 8).
 
 **Nota:** El sistema se diseña inicialmente para Colombia, con arquitectura extensible para soportar otros países en el futuro.
 
@@ -63,10 +73,10 @@ El diseño debe contemplar escalabilidad para compañías con mayor volumen y la
 | Término | Definición |
 |---------|------------|
 | **OXP** | Obligación por Pagar. Registro que representa un compromiso de pago de la compañía. |
-| **OXP de Comercio** | Obligación por pagar originada por una compra individual realizada con tarjeta de crédito corporativa o tarjeta de débito prepago en un comercio. |
+| **OXP de Comercio** | Obligación por pagar originada por un hecho económico de egreso (compra, gasto o costo). Independiente del medio de pago: puede originarse en compra con tarjeta (crédito o débito), factura de proveedor a crédito, pago de contado u otro medio. La forma de pago se resuelve automáticamente durante la radicación (por los datos extraídos del soporte, por el contexto del tercero/concepto, o por asignación del usuario) y determina el flujo de resolución financiera dentro del sistema (vía extracto bancario o pago directo desde Tesorería). |
 | **OXP de Extracto** | Obligación por pagar consolidada que agrupa las OXP de comercio de un período, incluyendo las devoluciones y los cargos adicionales aplicables según el medio de pago. |
 | **Pagada (OXP de Extracto)** | Estado que indica que el sistema contable externo (SincoA&F) ha confirmado la ejecución del pago financiero correspondiente al extracto. |
-| **Radicación** | Fase operativa inicial mediante la cual una evidencia económica (soporte documental, extracto bancario, cargo financiero o devolución) es incorporada al dominio OXP como una obligación por pagar en estado pendiente. La radicación puede iniciar con información parcial y contempla la completitud progresiva de datos y soportes requeridos. |
+| **Radicación** | Fase operativa inicial que comprende tres momentos: (1) **extracción** — obtención de datos estructurados desde el soporte documental, delegada a servicios de infraestructura transversal, (2) **clasificación** — determinación inteligente del origen de la obligación (directa o de sub-dominio de gestión) y resolución de las referencias fiscales (clasificacionTributaria, conceptoPago), (3) **registro** — incorporación al dominio OXP como obligación por pagar en estado pendiente. La extracción es un servicio de infraestructura transversal; la clasificación y el registro son responsabilidad del dominio OXP. La radicación puede iniciar con información parcial y contempla la completitud progresiva de datos y soportes requeridos. |
 | **Anticipo** | Obligación por pagar que puede o no contar con soportes preliminares (ej: cuenta de cobro) y requiere la entrega de dinero al comercio/proveedor. Tiene ciclo de vida independiente con dos dimensiones de resolución: (1) **pago** — cómo se cubrió el desembolso (vinculación a extracto, pago directo o devolución), y (2) **regularización** — contra qué OXP de Comercio se justifica el gasto. Estados: Vigente (ambos saldos pendientes) → Pagado (desembolso cubierto) / Regularizado (justificación completa) → Cerrado (ambos resueltos). También puede cancelarse completamente mediante reversa total si aún no tiene pagos ni regularizaciones aplicadas (estado Reversado). Un anticipo también puede nacer automáticamente por excedente de devolución, en cuyo caso inicia directamente en estado Pagado. Se aplican políticas de plazo configurables para alertar sobre anticipos que excedan el tiempo permitido sin regularizar. Aplica para ambos medios de pago. |
 | **Regularización de Anticipos** | Proceso coordinado mediante el cual un anticipo se cruza contra una o más OXP de Comercio confirmadas del mismo tercero. Cada regularización reduce el saldo por regularizar del anticipo y aplica un pago sobre la OXP de Comercio destino. La regularización solo puede realizarse contra OXP de Comercio en estado Confirmada o posterior, donde el valor neto ya es estable. Un anticipo puede regularizarse contra múltiples OXP de Comercio en operaciones independientes (1:N). La regularización genera la información estructurada necesaria para la amortización contable. |
 | **Amortización del Anticipo** | Efecto contable mediante el cual el saldo del anticipo se reclasifica total o parcialmente a las cuentas de gasto o costo definitivas. La amortización es ejecutada por el sistema contable externo (SincoA&F) a partir de la información estructurada entregada por OXP. Equivale al concepto internacional de *Down Payment Clearing* (SAP). |
@@ -117,6 +127,7 @@ Cualquier usuario puede acceder a vistas de monitoreo (OXP pendientes, confirmad
 | **SincoRE (Recepción Electrónica)** | Transforma facturas electrónicas en información estructurada y la expone mediante API para consumo del sistema OXP. |
 | **Sistema Contable** | Recibe automáticamente las causaciones de las OXP una vez estas son confirmadas. |
 | **Sistema de Tesorería** | Gestiona los pagos de las OXP de extracto (tarjetas de crédito) y las recargas (tarjetas débito prepago). |
+| **Servicio de extracción de datos** | Servicio transversal de infraestructura que interpreta soportes documentales no electrónicos (PDF, imágenes) para extraer datos estructurados (tercero, valor, conceptos, tributos). Análogo a SincoRE para documentos que no son factura electrónica. Otros sub-dominios (CXC, etc.) podrán consumir el mismo servicio. |
 
 ### Formatos de entrada soportados
 
@@ -219,6 +230,7 @@ Las **etapas** son las fases del ciclo de vida de la obligación; cada una agrup
 
 | Aspecto | Descripción |
 |---------|-------------|
+| **Canales de entrada** | Los soportes documentales llegan por múltiples canales agnósticos al origen de la obligación: (1) factura electrónica XML vía SincoRE, (2) PDF e imágenes interpretados por servicio de extracción de datos, (3) CSV estructurado (extractos bancarios), (4) carga manual por usuario. Todos los canales entregan datos extraídos sin determinar si la obligación es directa o de sub-dominio de gestión — esa clasificación es responsabilidad de OXP. |
 | **Disparador - OXP de Comercio** | Empleado realiza una compra con tarjeta de crédito o débito prepago. |
 | **Disparador - OXP de Extracto** | La entidad bancaria emite el extracto del período. |
 | **Entrada - OXP de Comercio** | Soporte documental (factura XML, PDF, imagen) con datos de la transacción. |
@@ -232,6 +244,8 @@ Las **etapas** son las fases del ciclo de vida de la obligación; cada una agrup
 | **Variante - Moneda Extranjera (OXP de Comercio)** | Para compras del exterior, la OXP de Comercio se radica con la TRM del día de la transacción. El sistema siempre almacena el valor original de la compra en la moneda de origen y el valor convertido a la moneda funcional del país donde opera el sistema. |
 | **Variante - Moneda Extranjera (OXP de Extracto)** | Un extracto bancario puede contener partidas en una o varias monedas. Si todas las partidas están en la misma moneda, el extracto opera en esa moneda (aplicando `ValorMonetario` con TRM y equivalente en moneda funcional si es moneda extranjera, igual que OxpComercio). Cuando el extracto contiene partidas en **monedas mixtas** (ej: tarjetas con facturación segmentada por moneda), el sistema convierte las partidas en moneda extranjera a moneda funcional usando la TRM informada por la entidad bancaria en el extracto. Cada partida conserva su valor original, moneda de origen y TRM para trazabilidad. En este caso, el OxpExtracto opera en moneda funcional desde la radicación `[R05d]`. |
 | **Variante - Distribución de Costos (Split)** | Durante la radicación (o al regularizar un anticipo), el usuario puede realizar una distribución porcentual o por valor del costo entre diferentes centros de costo o cuentas contables. Una OXP de Comercio puede generar N registros de causación de costo. El sistema valida que la suma de las distribuciones sea igual al 100% del valor de la OXP. |
+| **Variante - Clasificación inteligente de origen** | Al radicar una OXP de Comercio, el sistema determina si la obligación es directa (gasto sin sub-dominio de gestión) o pertenece a un sub-dominio de gestión (Compras, Arrendamiento, etc.). La clasificación es automática y asistida — el sistema sugiere el origen más probable y el usuario siempre puede corregir la sugerencia. Si es directa, las referencias fiscales se resuelven desde el catálogo de gasto directo de OXP. Si es de gestión, el sub-dominio origen aporta las referencias fiscales ya resueltas desde su catálogo. |
+| **Variante - Tributos declarados por el proveedor** | Cuando el soporte documental incluye tributos declarados por el proveedor (desglose fiscal en factura electrónica o en soporte extraído), estos se registran como referencia del proveedor. El sub-dominio de Impuestos calcula los tributos según las reglas fiscales propias de la empresa. Si hay discrepancia entre lo declarado por el proveedor y lo calculado por Impuestos, el sistema genera una alerta para revisión del usuario. |
 
 ---
 
@@ -409,6 +423,8 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 | R05b | **Valoración en Moneda Extranjera:** Las OXP de Comercio originadas en compras del exterior se radican con la TRM del día de la transacción. El sistema siempre almacena el valor original de la compra en la moneda de origen y el valor convertido a la moneda funcional del país donde opera el sistema. | No |
 | R05c | **Distribución de Costos (Split):** Durante la radicación (o al regularizar un anticipo), el usuario puede distribuir el costo de una OXP de Comercio entre múltiples centros de costo o cuentas contables, ya sea porcentualmente o por valor. La suma de las distribuciones debe ser igual al 100% del valor de la OXP. Una OXP de Comercio puede generar N registros de causación de costo. | No |
 | R05d | **Moneda operativa del extracto:** Un OxpExtracto opera en una sola moneda. Si todas las partidas del extracto están en la misma moneda (COP, USD u otra), el extracto opera en esa moneda — aplicando `ValorMonetario` (con TRM y equivalente en moneda funcional) si es moneda extranjera. Cuando el extracto contiene partidas en **monedas mixtas**, las partidas en moneda extranjera se convierten a moneda funcional usando la TRM informada por la entidad bancaria, y el extracto opera en moneda funcional. En ambos casos, cada partida conserva su valor original, moneda de origen y TRM para trazabilidad. Los cálculos derivados (`valorTotalExtracto()`, `saldoPorPagar()`) operan en la moneda del extracto. La ejecución del pago y cualquier diferencia de cambio al momento del desembolso son responsabilidad del dominio de Tesorería. | No |
+| R36 | **Clasificación inteligente de origen:** Al radicar una OXP de Comercio, el sistema determina el origen de la obligación (directa o sub-dominio de gestión) y resuelve las referencias fiscales (clasificacionTributaria, conceptoPago). La clasificación es automática y asistida — el usuario siempre puede corregir la sugerencia. | Sí (mecanismo de clasificación configurable) |
+| R37 | **Validación de tributos del proveedor:** Cuando el soporte documental incluye tributos declarados por el proveedor, estos se registran como referencia y se validan contra el cálculo del sub-dominio de Impuestos. Si hay discrepancia, el sistema genera alerta para revisión. | No |
 
 ---
 
@@ -513,24 +529,29 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 
 ### Dentro del alcance
 
-| Área | Descripción |
-|------|-------------|
-| **Medios de pago** | Tarjetas de crédito corporativas y tarjetas de débito prepago. |
-| **Radicación** | Registro de obligaciones al sistema con sus soportes documentales (XML, PDF, imágenes, CSV, etc...). Extracción automática de datos desde facturas electrónicas colombianas vía SincoRE. |
-| **Ciclo de vida de anticipos** | Creación, pago (vinculación a extracto o pago directo), regularización contra OXP de Comercio, cierre y reversa total. Trazabilidad completa con dos dimensiones de saldo independientes. Generación de información para amortización contable. |
-| **Ciclo de vida de devoluciones** | Radicación, confirmación y causación de devoluciones de 3 tipos: comercio (conceptos de gasto), extracto (cargos financieros) y anticipo (reversa total). Aplicación automática de crédito sobre el OXP origen. |
-| **Excedente de devolución** | Generación automática de anticipo cuando la devolución excede el saldo pendiente de pago de una OXP de Comercio. |
-| **Pago directo** | Registro de pagos confirmados por SincoA&F para formas de pago diferentes a tarjeta de crédito. |
-| **Regularización de anticipos** | Cruce coordinado de anticipos contra OXP de Comercio confirmadas del mismo tercero, con soporte 1:N. |
-| **Carga de extractos** | Carga manual de extractos bancarios en formato PDF o CSV. Extracción de transacciones y cargos adicionales. |
-| **Conciliación** | Cruce automático y asistido entre OXP de comercio y extractos bancarios. Aprendizaje de relaciones comercio-descripción. |
-| **Confirmación** | Flujo de confirmación manual o automático según configuración por empresa. |
-| **Causación** | Generación automática de causaciones individuales por OXP de comercio y OXP de extracto hacia SincoA&F. |
-| **Monitoreo de pago** | Consulta del estado de pago de OXP de extracto desde SincoA&F. |
-| **Integración con SincoADPRO** | Ratificación de compras que requieren formalización en este módulo. |
-| **Alertas** | Notificaciones de plazos de conciliación, montos que exceden límites configurados, y anticipos pendientes de regularización que superen el plazo establecido. |
-| **Vistas de monitoreo** | Consultas del estado de OXP (pendientes, confirmadas, causadas) según permisos de usuario. |
-| **Configuraciones por empresa** | Preferencias de confirmación automática, tolerancias de conciliación, límites de monto, plazos de alerta. |
+> Las fases F1 y F2 se definen en la Sección 8. La pertenencia al dominio no cambia — la columna indica el objetivo de implementación.
+
+| Área | Descripción | Fase |
+|------|-------------|:----:|
+| **Medios de pago** | Gestión de las características y propiedades de los medios de pago: tarjetas de crédito corporativas, tarjetas de débito prepago, crédito a proveedor (plazos, condiciones de pago) y contado. Modelado como componente independiente dentro del BC de OXP — en el futuro se extraerá a un sub-dominio de configuraciones transversales cuando otros sub-dominios lo requieran. | F1 |
+| **OXP de Comercio** | Ciclo de vida completo de obligaciones por hecho económico de egreso, independiente del medio de pago. Ciclo: radicación → confirmación → causación → pago. | F1 |
+| **OXP de Extracto** | Ciclo de vida completo de obligaciones consolidadas por producto financiero (tarjetas). Ciclo: radicación → conciliación → confirmación → causación → pago. | F1 |
+| **OXP de Caja Menor** | Obligaciones de menor cuantía con esquema de fondo fijo, rendición y reembolso. | F2 |
+| **Radicación** | Registro de obligaciones al sistema con sus soportes documentales (XML, PDF, imágenes, CSV). Extracción automática de datos: vía SincoRE para facturas electrónicas XML, vía servicio de extracción para PDF e imágenes. Clasificación inteligente del origen de la obligación (directa o de sub-dominio de gestión) y resolución de referencias fiscales. Validación de tributos declarados en el soporte contra cálculo propio de Impuestos. | F1 |
+| **Ciclo de vida de anticipos** | Creación, pago (vinculación a extracto o pago directo), regularización contra OXP de Comercio, cierre y reversa total. Trazabilidad completa con dos dimensiones de saldo independientes. Generación de información para amortización contable. | F1 |
+| **Ciclo de vida de devoluciones** | Radicación, confirmación y causación de devoluciones de 3 tipos: comercio (conceptos de gasto), extracto (cargos financieros) y anticipo (reversa total). Aplicación automática de crédito sobre el OXP origen. | F1 |
+| **Excedente de devolución** | Generación automática de anticipo cuando la devolución excede el saldo pendiente de pago de una OXP de Comercio. | F1 |
+| **Pago directo** | Registro de pagos confirmados por SincoA&F para formas de pago diferentes a tarjeta de crédito. | F1 |
+| **Regularización de anticipos** | Cruce coordinado de anticipos contra OXP de Comercio confirmadas del mismo tercero, con soporte 1:N. | F1 |
+| **Carga de extractos** | Carga manual de extractos bancarios en formato PDF o CSV. Extracción de transacciones y cargos adicionales. | F1 |
+| **Conciliación** | Cruce automático y asistido entre OXP de comercio y extractos bancarios. Aprendizaje de relaciones comercio-descripción. | F1 |
+| **Confirmación** | Flujo de confirmación manual o automático según configuración por empresa. | F1 |
+| **Causación** | Generación automática de causaciones individuales por OXP de comercio y OXP de extracto hacia SincoA&F. | F1 |
+| **Monitoreo de pago** | Consulta del estado de pago de OXP de extracto desde SincoA&F. | F1 |
+| **Integración con SincoADPRO** | Ratificación de compras que requieren formalización en este módulo. | F1 |
+| **Alertas** | Notificaciones de plazos de conciliación, montos que exceden límites configurados, y anticipos pendientes de regularización que superen el plazo establecido. | F1 |
+| **Vistas de monitoreo** | Consultas del estado de OXP (pendientes, confirmadas, causadas) según permisos de usuario. | F1 |
+| **Configuraciones por empresa** | Preferencias de confirmación automática, tolerancias de conciliación, límites de monto, plazos de alerta. | F1 |
 
 ---
 
@@ -540,8 +561,6 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 |------|-------------|-------------|
 | **Procesamiento de pagos** | El sistema OXP no ejecuta pagos ni recargas. | Esta responsabilidad es de SincoA&F y el módulo de tesorería existente. |
 | **Integración directa con tesorería** | No se integrará con un sistema de tesorería independiente en la primera fase. | SincoA&F gestiona el procesamiento de pago a partir de la causación. |
-| **Otros medios de pago** | Pagos en efectivo, transferencias bancarias, cheques u otros medios diferentes a tarjetas de crédito y débito prepago. | Podrían considerarse en fases futuras. |
-| **Gestión de tarjetas** | Alta, baja o modificación de tarjetas corporativas. | Responsabilidad del módulo de Tesorería - Medios de pago. |
 | **Gestión de comercios/proveedores** | Alta, baja o modificación de terceros. | Responsabilidad del servicio transversal de Gestión de Terceros. |
 | **Gestión de usuarios** | Creación de usuarios y asignación de permisos. | Se asume integración con sistema de gestión de identidad existente. |
 
@@ -554,9 +573,10 @@ El sistema OXP será el primer módulo de la nueva arquitectura del ERP. Para su
 | Dependencia | Descripción | Impacto en el sistema OXP |
 |-------------|-------------|---------------------------|
 | **Gestión de Terceros** | Servicio transversal que centraliza la información de comercios, proveedores y entidades externas. Incluye identificación tributaria, razón social, datos de contacto y clasificación. | El sistema OXP consumirá este servicio para identificar comercios/proveedores en las transacciones. |
-| **Tesorería - Medios de pago** | Componente que gestiona los datos maestros de tarjetas de crédito y débito prepago (número, tipo, fecha de corte, fecha de pago, límites, entidad bancaria). | El sistema OXP consumirá este servicio para obtener la información de las tarjetas. |
+| **Tesorería - Medios de pago** | Componente que gestiona los datos maestros de tarjetas de crédito y débito prepago (número, tipo, fecha de corte, fecha de pago, límites, entidad bancaria). | Por ahora OXP gestiona el catálogo de medios de pago internamente como componente independiente dentro de su BC. Cuando se construya el sub-dominio de configuraciones transversales, este catálogo se extraerá para consumo de otros sub-dominios. |
 | **Sistema de cálculo de impuestos** | Sistema transversal que determina los impuestos aplicables a las transacciones según la normativa colombiana. | El sistema OXP consumirá este servicio para obtener los valores de impuestos en las OXP. |
 | **Reglas de traducción contable** | Lógica que convierte los conceptos de OXP (comercio, extracto, anticipos, devoluciones, cargos) en asientos contables para SincoA&F. | El sistema OXP aplicará estas reglas al generar las causaciones. |
+| **Servicio de extracción de datos** | Servicio transversal de infraestructura que interpreta documentos no electrónicos (PDF, imágenes) para extraer datos estructurados. Complementa a SincoRE que cubre facturas electrónicas XML. | El sistema OXP consumirá este servicio para obtener datos de soportes no electrónicos. Otros sub-dominios (CXC, etc.) podrán consumir el mismo servicio. |
 
 Cada una de estas dependencias requiere su propia definición de alcance independiente.
 
@@ -593,7 +613,53 @@ Esta arquitectura de servicios desacoplados con responsabilidades claras permite
 
 ---
 
-## Sección 8: Beneficios esperados
+## Sección 8: Estrategia de implementación por fases
+
+El dominio OXP conserva una visión integral que abarca todos los tipos de obligaciones por pagar descritos en este documento. Su implementación se organiza por fases alineadas con la complejidad del ciclo de vida:
+
+### Fase 1 (F1) — OXP de Comercio y Extracto
+
+Cubre el ciclo de vida completo de las obligaciones individuales y consolidadas:
+
+| Capacidad | Descripción |
+|-----------|-------------|
+| OXP de Comercio | Obligaciones por hecho económico de egreso, independiente del medio de pago. Ciclo: radicación → confirmación → causación → pago. |
+| OXP de Extracto | Obligaciones consolidadas por producto financiero (tarjetas). Ciclo: radicación → conciliación → confirmación → causación → pago. |
+| Anticipos | Ciclo de vida completo con dos dimensiones de resolución (pago + regularización). |
+| Devoluciones | Tres tipos: comercio, extracto, anticipo. Ciclo de vida independiente. |
+| Clasificación inteligente de origen | Determinación automática del origen (directa o sub-dominio de gestión) y resolución de referencias fiscales. |
+| Integración con Impuestos | Solicitud de cálculo (síncrona) y confirmación (asíncrona). |
+| Catálogo de gasto directo | Configuración de conceptos para obligaciones directas de OXP. |
+| Medios de pago | Gestión de características y propiedades de los medios de pago (tarjetas, crédito, contado). Componente independiente dentro del BC. |
+| Conciliación | Cruce automático y asistido entre OXP de Comercio y extractos bancarios. |
+| Causación y traducción contable | Generación de información estructurada para el sistema contable. |
+
+### Fase 2 (F2) — Ampliación de tipos y orígenes
+
+Capacidades que extienden el dominio sin redefinir el núcleo de la Fase 1:
+
+| Capacidad | Descripción |
+|-----------|-------------|
+| OXP de Caja Menor | Obligaciones de menor cuantía con esquema de fondo fijo, rendición y reembolso. Nuevo agregado con ciclo de vida propio. |
+| Viáticos / Gastos de viaje | *Evaluación pendiente:* determinar si es un sub-dominio de gestión que envía obligaciones a OXP (como Compras o Arrendamiento) o si requiere un tipo de OXP propio. |
+| Obligaciones recurrentes | *Evaluación pendiente:* generación automática periódica desde sub-dominios de gestión (Arrendamiento, suscripciones). Probablemente fluyan como OXP de Comercio con subDominioOrigen. |
+
+### Criterio de éxito de la Fase 1
+
+La Fase 1 se considera operativa cuando:
+
+1. Una OXP de Comercio puede radicarse desde cualquier canal de entrada (XML, PDF, carga manual) con clasificación inteligente del origen.
+2. El sistema resuelve referencias fiscales y solicita cálculo tributario al sub-dominio de Impuestos.
+3. Las OXP de Comercio asociadas a tarjeta se concilian contra el extracto bancario con asistencia automática.
+4. Las OXP de Comercio de otros medios de pago (crédito, contado) se resuelven vía pago directo.
+5. Los anticipos se gestionan con ciclo de vida completo (pago + regularización + cierre).
+6. Las devoluciones de los tres tipos se procesan con aplicación automática de crédito.
+7. Se generan las causaciones individuales hacia el sistema contable.
+8. Existe trazabilidad completa desde la radicación hasta el cierre.
+
+---
+
+## Sección 9: Beneficios esperados
 
 ### Beneficios operativos
 
@@ -663,3 +729,4 @@ Esta arquitectura de servicios desacoplados con responsabilidades claras permite
 | 1.0 | Enero 2026 | Versión inicial del documento de definición de alcance |
 | 1.1 | Febrero 2026 | Alineación con Modelo de Dominio v2.4. **Compensada** eliminada del glosario y referencias (absorbida por Pagada, ver D18). **Devolución** corregida: valor positivo representando magnitud del crédito (ver D19). Tabla de estados y salida de conciliación actualizadas. |
 | 1.2 | Marzo 2026 | Alineación con Modelo de Dominio v2.5. Glosario ampliado: Anticipo con ciclo de vida completo, Devolución con 3 tipos, nuevos términos (Reversa de Anticipo, Pago Directo, Excedente de Devolución). Flujo principal extendido con Etapa 5 (Regularización) y Etapa 6 (Devoluciones). Diagrama actualizado con 4 flujos. 8 nuevas reglas de negocio (R28–R35): anticipos, devoluciones y pago directo. Alcance actualizado con capacidades de ciclo de vida independiente de anticipos y devoluciones. |
+| 1.3 | Marzo 2026 | **Ampliación de alcance, integración fiscal y fases de implementación.** OXP de Comercio redefinida como independiente del medio de pago (no solo tarjetas). Contexto actual ampliado con facturas de proveedores a crédito (~1000/mes) y pagos de contado (~50/mes). Tres tipos de OXP por ciclo de vida documentados (Comercio, Extracto, Caja Menor). Medios de pago ampliado: gestión de características y propiedades de tarjetas, crédito y contado — componente independiente dentro del BC, extraíble a futuro. "Gestión de tarjetas" y "Otros medios de pago" eliminados de fuera del alcance. Dependencia "Tesorería - Medios de pago" actualizada con nota de gestión interna temporal. Nueva Sección 8: Estrategia de implementación por fases (F1: Comercio + Extracto, F2: Caja Menor + evaluaciones pendientes). Criterios de éxito de F1. Tabla de alcance con columna Fase (F1/F2). Sección de beneficios renumerada a Sección 9. **Integración fiscal:** Glosario de Radicación ampliado (extracción + clasificación + registro). Nuevo actor externo: Servicio de extracción de datos. Canales de entrada agnósticos en Etapa 1. Nuevas variantes: clasificación inteligente de origen y tributos declarados por el proveedor. Nuevas reglas R36 (clasificación inteligente de origen) y R37 (validación de tributos del proveedor). Radicación ampliada en tabla de alcance (extracción, clasificación, validación de tributos). Nueva dependencia: Servicio de extracción de datos. |
