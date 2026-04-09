@@ -13,6 +13,7 @@
 9. [Decisiones de arquitectura y diseño](#9-decisiones)
 10. [Premisas de negocio](#10-premisas)
 11. [Pendientes por definir](#11-pendientes)
+12. [Catálogo de permisos atómicos](#12-permisos)
 
 ---
 
@@ -258,6 +259,30 @@ Lista explícita de lo que está fuera del alcance del modelo de dominio.
 | # | Pendiente | Contexto | Trigger de activación |
 |---|-----------|----------|----------------------|
 | PD1 | ... | ... | ... |
+
+---
+
+## 12. Catálogo de permisos atómicos del dominio
+
+Cada bounded context declara los recursos que protege y las acciones que expone como permisos atómicos. La plataforma de seguridad del ERP consume este catálogo para integrarlo a su modelo de autorización (roles, políticas, relaciones).
+
+**Lo que define este catálogo:**
+- **Recursos protegidos** — agregados o entidades del dominio que requieren control de acceso.
+- **Acciones por recurso** — operaciones de negocio que se pueden proteger, identificadas con la convención `accion_recurso`.
+- **Restricciones de contexto** — dimensiones que limitan el acceso más allá de la acción (ej: empresa, unidad organizacional).
+
+**Lo que NO define este catálogo:**
+- Roles (responsabilidad de la plataforma de seguridad).
+- Asignación de usuarios a permisos.
+- Mecanismo de autenticación o enforcement.
+
+**Convención de naming:** `accion_recurso` en snake_case (ej: `resolver_borrador`, `cerrar_periodo`). Compatible con OAuth scopes, policy engines (OPA, Cedar) y motores ReBAC (SpiceDB, OpenFGA).
+
+| Recurso | Acción | Identificador |
+|---------|--------|---------------|
+| ... | ... | `accion_recurso` |
+
+**Restricción de contexto:** [Describir las dimensiones que limitan el acceso — ej: empresa, unidad organizacional, tipo de documento].
 
 ---
 

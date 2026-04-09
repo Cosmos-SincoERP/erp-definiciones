@@ -9,11 +9,14 @@ Definición de los sub-dominios de un ERP mediante documentos de diseño convers
 | Carpeta | Sub-dominio | Estado |
 |---------|-------------|--------|
 | `obligaciones-por-pagar/` | Obligaciones por Pagar | En refinamiento (Fase 2) |
+| `impuestos/` | Impuestos | Modelo v1.3 completo |
+| `contabilidad/` | Contabilidad (Nivel 1: Motor de Traducción + Nivel 2: Sistema contable) | Alcance v1.0, Modelo v1.0 — Listo para desarrollo (F1) |
+| `terceros/` | Terceros | Definición inicial |
+| `estructura-organizacional/` | Estructura Organizacional | Definición inicial |
+| `plataforma/` | Datos base del ERP | Definición inicial |
 | *(pendiente)* | Facturación | No iniciado |
-| *(pendiente)* | Contabilidad | No iniciado |
 | *(pendiente)* | Tesorería | No iniciado |
 | *(pendiente)* | Emisión y Recepción Electrónica | No iniciado |
-| *(pendiente)* | Impuestos | No iniciado |
 
 ## Artefactos por sub-dominio
 
