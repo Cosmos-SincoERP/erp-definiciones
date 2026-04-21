@@ -1,8 +1,8 @@
 # Audit Full — Reporte de Auditoría Completa
 
 **Fecha:** 2026-03-16
-**Modelo auditado:** `impuestos/modelo-dominio.md` v1.3
-**Alcance cruzado:** `impuestos/definicion-alcance.md` v1.1 (glosario, 22 términos)
+**Modelo auditado:** `dominio/impuestos/modelo-dominio.md` v1.3
+**Alcance cruzado:** `dominio/impuestos/definicion-alcance.md` v1.1 (glosario, 22 términos)
 **Nota:** Los agregados de cumplimiento fiscal (HomologacionFiscal, FormatoFiscal, EntregableFiscal, CertificadoTributario) se auditan estructuralmente pero los hallazgos funcionales se anotan como diferidos a segunda fase, conforme a la decisión del usuario.
 
 ---

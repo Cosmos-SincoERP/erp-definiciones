@@ -2,8 +2,8 @@ Ejecuta una auditoría sobre el modelo de dominio especificado en `$ARGUMENTS`.
 
 **Formato de `$ARGUMENTS`:** `<archivo> [skill]`
 
-- Si solo se pasa el archivo (ej: `obligaciones-por-pagar/modelo-dominio.md`), ejecutar la auditoría completa (`/audit-full`): las 10 skills en secuencia lógica según lo definido en la skill `audit-full`.
-- Si se pasa archivo + nombre de skill (ej: `obligaciones-por-pagar/modelo-dominio.md glossary`), ejecutar solo esa skill individual. Los nombres válidos de skill son:
+- Si solo se pasa el archivo (ej: `dominio/obligaciones-por-pagar/modelo-dominio.md`), ejecutar la auditoría completa (`/audit-full`): las 10 skills en secuencia lógica según lo definido en la skill `audit-full`.
+- Si se pasa archivo + nombre de skill (ej: `dominio/obligaciones-por-pagar/modelo-dominio.md glossary`), ejecutar solo esa skill individual. Los nombres válidos de skill son:
   - `glossary` → `/audit-structure-glossary`
   - `composition` → `/audit-structure-composition`
   - `state-machines` → `/audit-structure-state-machines`

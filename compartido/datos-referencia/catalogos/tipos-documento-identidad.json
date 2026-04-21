@@ -1,0 +1,57 @@
+[
+  { "codigo": "CC", "descripcion": "Cédula de Ciudadanía", "paisCodigo": "CO", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "CE", "descripcion": "Cédula de Extranjería", "paisCodigo": "CO", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "TI", "descripcion": "Tarjeta de Identidad", "paisCodigo": "CO", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "NIT", "descripcion": "Número de Identificación Tributaria", "paisCodigo": "CO", "aplicaA": "personaJuridica", "activo": true },
+  { "codigo": "PA-CO", "descripcion": "Pasaporte", "paisCodigo": "CO", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "RC", "descripcion": "Registro Civil", "paisCodigo": "CO", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "PPT", "descripcion": "Permiso por Protección Temporal", "paisCodigo": "CO", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "PEP", "descripcion": "Permiso Especial de Permanencia", "paisCodigo": "CO", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "DIE", "descripcion": "Documento de Identificación Extranjero", "paisCodigo": "CO", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "NUIP", "descripcion": "Número Único de Identificación Personal", "paisCodigo": "CO", "aplicaA": "personaNatural", "activo": true },
+
+  { "codigo": "CIE-DO", "descripcion": "Cédula de Identidad y Electoral", "paisCodigo": "DO", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "RNC", "descripcion": "Registro Nacional del Contribuyente", "paisCodigo": "DO", "aplicaA": "personaJuridica", "activo": true },
+  { "codigo": "PA-DO", "descripcion": "Pasaporte", "paisCodigo": "DO", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "CRM-DO", "descripcion": "Carné de Residente o Migrante", "paisCodigo": "DO", "aplicaA": "personaNatural", "activo": true },
+
+  { "codigo": "CIP", "descripcion": "Cédula de Identidad Personal", "paisCodigo": "PA", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "RUC-PA", "descripcion": "Registro Único de Contribuyente", "paisCodigo": "PA", "aplicaA": "personaJuridica", "activo": true },
+  { "codigo": "PA-PA", "descripcion": "Pasaporte", "paisCodigo": "PA", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "CE-PA", "descripcion": "Carné de Extranjería", "paisCodigo": "PA", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "NT-PA", "descripcion": "Número Tributario (persona natural)", "paisCodigo": "PA", "aplicaA": "personaNatural", "activo": true },
+
+  { "codigo": "CURP", "descripcion": "Clave Única de Registro de Población", "paisCodigo": "MX", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "RFC", "descripcion": "Registro Federal de Contribuyentes", "paisCodigo": "MX", "aplicaA": "ambos", "activo": true },
+  { "codigo": "INE", "descripcion": "Credencial para Votar (INE)", "paisCodigo": "MX", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "PA-MX", "descripcion": "Pasaporte", "paisCodigo": "MX", "aplicaA": "personaNatural", "activo": true },
+
+  { "codigo": "RUN", "descripcion": "Rol Único Nacional", "paisCodigo": "CL", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "RUT-CL", "descripcion": "Rol Único Tributario", "paisCodigo": "CL", "aplicaA": "ambos", "activo": true },
+  { "codigo": "PA-CL", "descripcion": "Pasaporte", "paisCodigo": "CL", "aplicaA": "personaNatural", "activo": true },
+
+  { "codigo": "DNI-PE", "descripcion": "Documento Nacional de Identidad", "paisCodigo": "PE", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "RUC-PE", "descripcion": "Registro Único de Contribuyentes", "paisCodigo": "PE", "aplicaA": "ambos", "activo": true },
+  { "codigo": "CE-PE", "descripcion": "Carné de Extranjería", "paisCodigo": "PE", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "PA-PE", "descripcion": "Pasaporte", "paisCodigo": "PE", "aplicaA": "personaNatural", "activo": true },
+
+  { "codigo": "CI-EC", "descripcion": "Cédula de Identidad", "paisCodigo": "EC", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "RUC-EC", "descripcion": "Registro Único de Contribuyentes", "paisCodigo": "EC", "aplicaA": "ambos", "activo": true },
+  { "codigo": "PA-EC", "descripcion": "Pasaporte", "paisCodigo": "EC", "aplicaA": "personaNatural", "activo": true },
+
+  { "codigo": "DNI-AR", "descripcion": "Documento Nacional de Identidad", "paisCodigo": "AR", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "CUIT", "descripcion": "Clave Única de Identificación Tributaria", "paisCodigo": "AR", "aplicaA": "ambos", "activo": true },
+  { "codigo": "CUIL", "descripcion": "Código Único de Identificación Laboral", "paisCodigo": "AR", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "PA-AR", "descripcion": "Pasaporte", "paisCodigo": "AR", "aplicaA": "personaNatural", "activo": true },
+
+  { "codigo": "CPF", "descripcion": "Cadastro de Pessoas Físicas", "paisCodigo": "BR", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "CNPJ", "descripcion": "Cadastro Nacional da Pessoa Jurídica", "paisCodigo": "BR", "aplicaA": "personaJuridica", "activo": true },
+  { "codigo": "RG", "descripcion": "Registro General (Cédula de Identidad)", "paisCodigo": "BR", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "PA-BR", "descripcion": "Pasaporte", "paisCodigo": "BR", "aplicaA": "personaNatural", "activo": true },
+
+  { "codigo": "PASAPORTE", "descripcion": "Pasaporte (genérico internacional)", "paisCodigo": null, "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "TIN", "descripcion": "Tax Identification Number (genérico)", "paisCodigo": null, "aplicaA": "ambos", "activo": true },
+  { "codigo": "EIN", "descripcion": "Employer Identification Number (EE.UU.)", "paisCodigo": "US", "aplicaA": "personaJuridica", "activo": true },
+  { "codigo": "SSN", "descripcion": "Social Security Number (EE.UU.)", "paisCodigo": "US", "aplicaA": "personaNatural", "activo": true },
+  { "codigo": "ITIN", "descripcion": "Individual Taxpayer Identification Number (EE.UU.)", "paisCodigo": "US", "aplicaA": "personaNatural", "activo": true }
+]

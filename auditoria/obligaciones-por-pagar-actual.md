@@ -1,7 +1,7 @@
 # Audit Full — Reporte de Auditoría Completa
 
 **Fecha:** 2026-03-18
-**Modelo auditado:** `obligaciones-por-pagar/modelo-dominio.md` (v2.8, ~2186 líneas, 5 agregados, 51 eventos, 17 invariantes, 24 decisiones)
+**Modelo auditado:** `dominio/obligaciones-por-pagar/modelo-dominio.md` (v2.8, ~2186 líneas, 5 agregados, 51 eventos, 17 invariantes, 24 decisiones)
 
 ---
 

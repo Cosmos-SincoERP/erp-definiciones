@@ -8,15 +8,15 @@ Definición de los sub-dominios de un ERP mediante documentos de diseño convers
 
 | Carpeta | Sub-dominio | Estado |
 |---------|-------------|--------|
-| `obligaciones-por-pagar/` | Obligaciones por Pagar | En refinamiento (Fase 2) |
-| `impuestos/` | Impuestos | Modelo v1.3 completo |
-| `contabilidad/` | Contabilidad (Nivel 1: Motor de Traducción + Nivel 2: Sistema contable) | Alcance v1.0, Modelo v1.0 — Listo para desarrollo (F1) |
-| `terceros/` | Terceros | Definición inicial |
-| `estructura-organizacional/` | Estructura Organizacional | Definición inicial |
-| `plataforma/` | Datos base del ERP | Definición inicial |
-| *(pendiente)* | Facturación | No iniciado |
+| `dominio/obligaciones-por-pagar/` | Obligaciones por Pagar | En refinamiento (Fase 2) |
+| `dominio/impuestos/` | Impuestos | Modelo v1.3 completo |
+| `dominio/contabilidad/` | Contabilidad (Nivel 1: Motor de Traducción + Nivel 2: Sistema contable) | Alcance v1.0, Modelo v1.0 — Listo para desarrollo (F1) |
+| `dominio/terceros/` | Terceros | Alcance v1.0, Modelo v1.0 — Listo para desarrollo |
+| `dominio/estructura-organizacional/` | Estructura Organizacional | Definición inicial |
+| `compartido/datos-referencia/` | Datos de Referencia (catálogos base del ERP) | Alcance v1.0, Especificación v1.0 — Listo para desarrollo |
 | *(pendiente)* | Tesorería | No iniciado |
-| *(pendiente)* | Emisión y Recepción Electrónica | No iniciado |
+| *(pendiente)* | Emisión Electrónica | No iniciado |
+| *(pendiente)* | Recepción Electrónica | No iniciado |
 
 ## Artefactos por sub-dominio
 
@@ -41,18 +41,21 @@ Skills especializadas para generar EventCatalog desde el modelo de dominio. No i
 
 | Directorio | Propósito |
 |------------|-----------|
-| `obligaciones-por-pagar/` | Sub-dominio OXP: alcance y modelo de dominio. |
-| `plantillas/` | Plantillas base para crear nuevos sub-dominios. Actualizar al incorporar nuevas secciones. |
+| `dominio/` | Bounded contexts de negocio. Cada sub-dominio con su alcance y modelo. |
+| `compartido/` | Servicios compartidos del application plane que no son dominio de negocio. |
+| `integraciones/entre-dominios/` | Contratos de integración entre sub-dominios propios. |
+| `integraciones/externas/` | Conectores y contratos con sistemas de terceros. |
+| `plataforma-saas/` | Control plane (futuro): tenant management, identity, billing, admin. |
+| `plantillas/` | Plantillas base para crear nuevos sub-dominios y servicios. |
 | `guias-de-modelado/` | Criterios generales de modelado (aplican a todos los sub-dominios). |
-| `integraciones/` | Contratos de eventos entre sub-dominios (Fase 3). |
 | `fuentes/` | Material de referencia externo (PDFs, papers). |
 | `auditoria/` | Reportes generados por las skills de auditoría. |
 
 ## Convenciones
 
 - **Idioma:** Español Colombia, tanto en documentos como en conversación.
-- **Naming:** kebab-case para carpetas y archivos (ej: `obligaciones-por-pagar/modelo-dominio.md`).
-- **Estructura:** Una carpeta por sub-dominio con sus artefactos dentro.
+- **Naming:** kebab-case para carpetas y archivos (ej: `dominio/obligaciones-por-pagar/modelo-dominio.md`).
+- **Estructura:** Una carpeta por sub-dominio dentro de `dominio/` con sus artefactos dentro.
 - **Plantillas:** Al crear un nuevo sub-dominio, usar como base las plantillas en `plantillas/`.
 - **Edición:** Nunca aplicar cambios sin confirmación del usuario. Presentar el cambio, esperar aprobación, luego aplicar.
 - **Skills y commands:** Seguir EXACTAMENTE las especificaciones de `.claude/commands/` y `.claude/skills/`.

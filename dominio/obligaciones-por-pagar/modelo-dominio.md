@@ -47,7 +47,7 @@ Las reglas de negocio se referencian como `[R##]` y su texto completo vive en `d
 - **Estados OxpExtracto:** Pendiente, Parcialmente Conciliada, Conciliada, Confirmada, Causada, Pagada.
 - **Género de estados:** Los agregados OXP (OxpComercio, OxpExtracto) usan femenino porque representan "la obligación por pagar". Devolucion usa femenino ("la devolución"). Anticipo usa masculino ("el anticipo").
 - **Estados Anticipo:** Vigente, Pagado, Regularizado, Cerrado, Reversado.
-- **Referencias cruzadas a otros sub-dominios:** `[D##-Xxx]` refiere a una decisión del sub-dominio indicado. Ej: `[D9-Imp]` refiere a la decisión D9 del modelo de Impuestos (`impuestos/modelo-dominio.md`).
+- **Referencias cruzadas a otros sub-dominios:** `[D##-Xxx]` refiere a una decisión del sub-dominio indicado. Ej: `[D9-Imp]` refiere a la decisión D9 del modelo de Impuestos (`dominio/impuestos/modelo-dominio.md`).
 
 ### Template de evento
 

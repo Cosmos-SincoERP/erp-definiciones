@@ -1613,7 +1613,7 @@ Cada plantilla define roles con naturaleza fija (débito/crédito) que son conoc
 | Numeración fiscal por resolución | Responsabilidad del sub-dominio emisor del documento (CXC, Facturación). | `definicion-alcance.md`, Sección 7 |
 | Procesamiento de pagos | Responsabilidad de Tesorería / SincoA&F. | `definicion-alcance.md`, Sección 7 |
 | Reportes de información fiscal | Responsabilidad del sub-dominio de Impuestos. | `definicion-alcance.md`, Sección 7 |
-| Datos base del ERP | Catálogos de países, monedas, tipos de documento. Responsabilidad de la plataforma. | `definicion-alcance.md`, Sección 7 |
+| Datos base del ERP | Catálogos de países, monedas, tipos de documento. Responsabilidad del servicio de datos de referencia (`compartido/datos-referencia/`). | `definicion-alcance.md`, Sección 7 |
 | Detalle de adaptadores por destino | Los adaptadores (SincoA&F, Siigo, Alegra) se documentan como implementaciones del Servicio de Entrega, no como modelo de dominio. | [DD5] |
 | Estructura de los reportes contables | El auxiliar contable y saldos contables son proyecciones documentadas en su propio anexo. | `anexo-proyecciones-contables.md` |
 

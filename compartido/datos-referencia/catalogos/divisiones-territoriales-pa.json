@@ -1,0 +1,796 @@
+[
+  {
+    "_comentario": "=== Provincias y Comarcas de Panamá ==="
+  },
+  {
+    "codigo": "1",
+    "nombre": "Bocas del Toro",
+    "paisCodigo": "PA",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "2",
+    "nombre": "Coclé",
+    "paisCodigo": "PA",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "3",
+    "nombre": "Colón",
+    "paisCodigo": "PA",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "4",
+    "nombre": "Chiriquí",
+    "paisCodigo": "PA",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "5",
+    "nombre": "Darién",
+    "paisCodigo": "PA",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "6",
+    "nombre": "Herrera",
+    "paisCodigo": "PA",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "7",
+    "nombre": "Los Santos",
+    "paisCodigo": "PA",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "8",
+    "nombre": "Panamá",
+    "paisCodigo": "PA",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "9",
+    "nombre": "Veraguas",
+    "paisCodigo": "PA",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "10",
+    "nombre": "Panamá Oeste",
+    "paisCodigo": "PA",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "11",
+    "nombre": "Comarca Guna Yala",
+    "paisCodigo": "PA",
+    "nivel": "comarca",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "12",
+    "nombre": "Comarca Emberá-Wounaan",
+    "paisCodigo": "PA",
+    "nivel": "comarca",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "13",
+    "nombre": "Comarca Ngäbe-Buglé",
+    "paisCodigo": "PA",
+    "nivel": "comarca",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Bocas del Toro ==="
+  },
+  {
+    "codigo": "1-01",
+    "nombre": "Bocas del Toro",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "1",
+    "activo": true
+  },
+  {
+    "codigo": "1-02",
+    "nombre": "Changuinola",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "1",
+    "activo": true
+  },
+  {
+    "codigo": "1-03",
+    "nombre": "Chiriquí Grande",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "1",
+    "activo": true
+  },
+  {
+    "codigo": "1-04",
+    "nombre": "Almirante",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "1",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Coclé ==="
+  },
+  {
+    "codigo": "2-01",
+    "nombre": "Aguadulce",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "2",
+    "activo": true
+  },
+  {
+    "codigo": "2-02",
+    "nombre": "Antón",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "2",
+    "activo": true
+  },
+  {
+    "codigo": "2-03",
+    "nombre": "La Pintada",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "2",
+    "activo": true
+  },
+  {
+    "codigo": "2-04",
+    "nombre": "Natá",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "2",
+    "activo": true
+  },
+  {
+    "codigo": "2-05",
+    "nombre": "Olá",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "2",
+    "activo": true
+  },
+  {
+    "codigo": "2-06",
+    "nombre": "Penonomé",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "2",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Colón ==="
+  },
+  {
+    "codigo": "3-01",
+    "nombre": "Colón",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "3",
+    "activo": true
+  },
+  {
+    "codigo": "3-02",
+    "nombre": "Chagres",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "3",
+    "activo": true
+  },
+  {
+    "codigo": "3-03",
+    "nombre": "Donoso",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "3",
+    "activo": true
+  },
+  {
+    "codigo": "3-04",
+    "nombre": "Portobelo",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "3",
+    "activo": true
+  },
+  {
+    "codigo": "3-05",
+    "nombre": "Santa Isabel",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "3",
+    "activo": true
+  },
+  {
+    "codigo": "3-06",
+    "nombre": "Omar Torrijos Herrera",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "3",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Chiriquí ==="
+  },
+  {
+    "codigo": "4-01",
+    "nombre": "Alanje",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-02",
+    "nombre": "Barú",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-03",
+    "nombre": "Boquerón",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-04",
+    "nombre": "Boquete",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-05",
+    "nombre": "Bugaba",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-06",
+    "nombre": "David",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-07",
+    "nombre": "Dolega",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-08",
+    "nombre": "Gualaca",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-09",
+    "nombre": "Remedios",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-10",
+    "nombre": "Renacimiento",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-11",
+    "nombre": "San Félix",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-12",
+    "nombre": "San Lorenzo",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-13",
+    "nombre": "Tierras Altas",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "codigo": "4-14",
+    "nombre": "Tolé",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "4",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Darién ==="
+  },
+  {
+    "codigo": "5-01",
+    "nombre": "Chepigana",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "5",
+    "activo": true
+  },
+  {
+    "codigo": "5-02",
+    "nombre": "Pinogana",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "5",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Herrera ==="
+  },
+  {
+    "codigo": "6-01",
+    "nombre": "Chitré",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "6",
+    "activo": true
+  },
+  {
+    "codigo": "6-02",
+    "nombre": "Las Minas",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "6",
+    "activo": true
+  },
+  {
+    "codigo": "6-03",
+    "nombre": "Los Pozos",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "6",
+    "activo": true
+  },
+  {
+    "codigo": "6-04",
+    "nombre": "Ocú",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "6",
+    "activo": true
+  },
+  {
+    "codigo": "6-05",
+    "nombre": "Parita",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "6",
+    "activo": true
+  },
+  {
+    "codigo": "6-06",
+    "nombre": "Pesé",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "6",
+    "activo": true
+  },
+  {
+    "codigo": "6-07",
+    "nombre": "Santa María",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "6",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Los Santos ==="
+  },
+  {
+    "codigo": "7-01",
+    "nombre": "Las Tablas",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "7",
+    "activo": true
+  },
+  {
+    "codigo": "7-02",
+    "nombre": "Guararé",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "7",
+    "activo": true
+  },
+  {
+    "codigo": "7-03",
+    "nombre": "Los Santos",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "7",
+    "activo": true
+  },
+  {
+    "codigo": "7-04",
+    "nombre": "Macaracas",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "7",
+    "activo": true
+  },
+  {
+    "codigo": "7-05",
+    "nombre": "Pedasí",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "7",
+    "activo": true
+  },
+  {
+    "codigo": "7-06",
+    "nombre": "Pocrí",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "7",
+    "activo": true
+  },
+  {
+    "codigo": "7-07",
+    "nombre": "Tonosí",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "7",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Panamá ==="
+  },
+  {
+    "codigo": "8-01",
+    "nombre": "Panamá",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "8",
+    "activo": true
+  },
+  {
+    "codigo": "8-02",
+    "nombre": "Balboa",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "8",
+    "activo": true
+  },
+  {
+    "codigo": "8-03",
+    "nombre": "Chepo",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "8",
+    "activo": true
+  },
+  {
+    "codigo": "8-04",
+    "nombre": "Chimán",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "8",
+    "activo": true
+  },
+  {
+    "codigo": "8-05",
+    "nombre": "San Miguelito",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "8",
+    "activo": true
+  },
+  {
+    "codigo": "8-06",
+    "nombre": "Taboga",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "8",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Veraguas ==="
+  },
+  {
+    "codigo": "9-01",
+    "nombre": "Atalaya",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "9",
+    "activo": true
+  },
+  {
+    "codigo": "9-02",
+    "nombre": "Calobre",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "9",
+    "activo": true
+  },
+  {
+    "codigo": "9-03",
+    "nombre": "Cañazas",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "9",
+    "activo": true
+  },
+  {
+    "codigo": "9-04",
+    "nombre": "La Mesa",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "9",
+    "activo": true
+  },
+  {
+    "codigo": "9-05",
+    "nombre": "Las Palmas",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "9",
+    "activo": true
+  },
+  {
+    "codigo": "9-06",
+    "nombre": "Montijo",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "9",
+    "activo": true
+  },
+  {
+    "codigo": "9-07",
+    "nombre": "Río de Jesús",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "9",
+    "activo": true
+  },
+  {
+    "codigo": "9-08",
+    "nombre": "San Francisco",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "9",
+    "activo": true
+  },
+  {
+    "codigo": "9-09",
+    "nombre": "Santa Fe",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "9",
+    "activo": true
+  },
+  {
+    "codigo": "9-10",
+    "nombre": "Santiago",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "9",
+    "activo": true
+  },
+  {
+    "codigo": "9-11",
+    "nombre": "Soná",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "9",
+    "activo": true
+  },
+  {
+    "codigo": "9-12",
+    "nombre": "Mariato",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "9",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Panamá Oeste ==="
+  },
+  {
+    "codigo": "10-01",
+    "nombre": "Arraiján",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "10",
+    "activo": true
+  },
+  {
+    "codigo": "10-02",
+    "nombre": "Capira",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "10",
+    "activo": true
+  },
+  {
+    "codigo": "10-03",
+    "nombre": "Chame",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "10",
+    "activo": true
+  },
+  {
+    "codigo": "10-04",
+    "nombre": "La Chorrera",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "10",
+    "activo": true
+  },
+  {
+    "codigo": "10-05",
+    "nombre": "San Carlos",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "10",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Comarca Guna Yala ==="
+  },
+  {
+    "codigo": "11-01",
+    "nombre": "Guna Yala",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "11",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Comarca Emberá-Wounaan ==="
+  },
+  {
+    "codigo": "12-01",
+    "nombre": "Cémaco",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "12",
+    "activo": true
+  },
+  {
+    "codigo": "12-02",
+    "nombre": "Sambú",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "12",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Distritos de Comarca Ngäbe-Buglé ==="
+  },
+  {
+    "codigo": "13-01",
+    "nombre": "Kankintú",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13-02",
+    "nombre": "Kusapín",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13-03",
+    "nombre": "Besikó",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13-04",
+    "nombre": "Mironó",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13-05",
+    "nombre": "Müna",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13-06",
+    "nombre": "Nole Duima",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13-07",
+    "nombre": "Ñürüm",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13-08",
+    "nombre": "Jirondai",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13-09",
+    "nombre": "Santa Catalina",
+    "paisCodigo": "PA",
+    "nivel": "distrito",
+    "codigoSuperior": "13",
+    "activo": true
+  }
+]

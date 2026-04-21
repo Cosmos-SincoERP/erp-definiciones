@@ -7,7 +7,7 @@
 3. [Bounded Context y Agregados](#3-bounded-context)
 4. [Máquinas de estado](#4-máquinas-de-estado)
 5. [Catálogo de eventos](#5-catálogo-de-eventos)
-6. [Tipos de concepto](#6-tipos-de-concepto)
+6. [Catálogos del dominio](#6-catálogos-del-dominio)
 7. [Invariantes del dominio](#7-invariantes)
 8. [Qué NO contiene este documento](#8-exclusiones)
 9. [Decisiones de arquitectura y diseño](#9-decisiones)
@@ -206,15 +206,13 @@ Organizados por tema funcional (no por agregado).
 
 ---
 
-## 6. Tipos de concepto
+## 6. Catálogos del dominio
 
-Componentes del dominio con su clasificación y comportamiento contable.
+Catálogos propios del sub-dominio que tipifican o clasifican elementos del modelo. Excluye catálogos externos (gestionados por el servicio de Datos de Referencia) y atributos dinámicos que pertenecen a los agregados.
 
-| Tipo | Clasificación | Aparición | Distribución | Traducción contable |
-|------|--------------|-----------|-------------|---------------------|
-| ... | ... | ... | ... | ... |
+Cada sub-dominio adapta la estructura según la naturaleza de sus catálogos (enumeraciones, tipos con comportamiento, clasificaciones con reglas asociadas, etc.).
 
-*(Subsección detallada por cada tipo)*
+*(Subsección por cada catálogo, con sus valores y reglas aplicables.)*
 
 ---
 

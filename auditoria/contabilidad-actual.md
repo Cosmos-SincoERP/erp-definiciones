@@ -1,8 +1,8 @@
 # Reporte de Auditoría Consolidado — Contabilidad
 
 **Fecha de consolidación:** 2026-04-08
-**Modelo auditado:** `contabilidad/modelo-dominio.md` (v1.0 entregada)
-**Alcance de referencia:** `contabilidad/definicion-alcance.md` (v1.0 entregada)
+**Modelo auditado:** `dominio/contabilidad/modelo-dominio.md` (v1.0 entregada)
+**Alcance de referencia:** `dominio/contabilidad/definicion-alcance.md` (v1.0 entregada)
 
 ---
 
