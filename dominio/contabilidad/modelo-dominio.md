@@ -688,14 +688,26 @@ Catálogo interno: TipoDeCuenta (no es agregado — diccionario preconfigurado d
 
 | Paso | Acción | Evento emitido | Stream destino |
 |------|--------|---------------|----------------|
-| 1 | Validar unicidad de referenciaOrigen [R16]. Si ya existe un borrador con la misma referencia y está en PENDIENTE, se aplica R14 (reemplazo). Si ya no está en PENDIENTE, se rechaza con respuesta explícita al consumidor. | — (si reemplazo: BorradorReemplazado; si rechazo: respuesta al consumidor) | — |
-| 2 | Identificar tipoTransaccion → seleccionar PlantillaDeAsiento | — (si no existe plantilla, error — no se crea borrador) | — |
+| 1 | Validar unicidad de referenciaOrigen [R16]. Si ya existe un borrador con la misma referencia y está en PENDIENTE, se aplica R14 (reemplazo). Si ya no está en PENDIENTE, el motor rechaza el hecho económico con motivo estructurado y notifica al consumidor. | — (si reemplazo: BorradorReemplazado; si rechazo: notificación al consumidor con motivo, sin evento de dominio) | — |
+| 2 | Identificar tipoTransaccion → seleccionar PlantillaDeAsiento. Validar que cada tipoComponente recibido en las líneas tenga al menos un RolPartida que lo cubra en la plantilla [I27]. | — (si no existe plantilla o hay líneas sin rol, no se crea borrador y se notifica al consumidor con motivo estructurado) | — |
 | 3 | Para cada rol de la plantilla, resolver cuenta auxiliar mediante cadena: Nivel A (ReglaDeDerivacion) → Nivel C (Aprendizaje) → Nivel B (inferencia sobre PlanDeCuentas) [DD2]. En cada nivel, si la cuenta resuelta no está activa en el PUC, se descarta y se continúa al siguiente nivel [I24]. | — | — |
 | 4 | Generar contrapartida: tercero y unidad organizacional se asignan automáticamente del contexto de la transacción. La cuenta auxiliar se resuelve por la cadena como cualquier otro rol. [R01] | — | — |
 | 5 | Crear borrador con partidas resueltas o pendientes | BorradorCreado | borrador-contable-{id} |
 | 6 | Si todas las cuentas resueltas y balancea → BorradorResuelto (derivado por transición) | BorradorResuelto | borrador-contable-{id} |
 
-**Nota sobre compensación:** El ServicioDeTraduccion opera en un solo stream (`borrador-contable-{id}`). Los pasos 1-4 son consultas sin efecto lateral. Los pasos 5-6 son un solo append atómico. No requiere tabla de compensación porque no coordina escrituras en múltiples streams. Si el tipo de transacción no tiene plantilla configurada (paso 2), no se crea borrador y se informa el error.
+**Rechazos previos al borrador (motivos estructurados):**
+
+Cuando el motor rechaza un hecho económico antes de crear el borrador (pasos 1 y 2), notifica al consumidor con un motivo estructurado. Estos rechazos no son eventos de dominio, no se persisten en stream propio del motor y no aparecen en la consola de contabilización — corresponden a fallos del contrato de entrada o a defectos de configuración del producto que se resuelven fuera del ciclo contable.
+
+| Código | Cuándo ocurre | Información en la notificación | Quién resuelve |
+|--------|---------------|---------------------------------|------------------|
+| `REFERENCIA_ORIGEN_DUPLICADA_NO_REEMPLAZABLE` | Paso 1 — ya existe un borrador con la misma `referenciaOrigen` que no está en PENDIENTE [R14][R16]. | `referenciaOrigen`, estado actual del borrador existente, `referenciaDestino` si ya fue contabilizado. | Consumidor (idempotencia: reconoce que el hecho ya fue procesado). |
+| `TIPO_TRANSACCION_SIN_PLANTILLA` | Paso 2 — no existe `PlantillaDeAsiento` para el `tipoTransaccion` recibido. | `referenciaOrigen`, `tipoTransaccion` recibido. | Equipo de producto (corregir catálogo de plantillas). |
+| `LINEA_SIN_ROL_EN_PLANTILLA` | Paso 2 — al menos una línea trae un `tipoComponente` no cubierto por ningún `RolPartida.tipoComponenteAsociado` de la plantilla [I27]. | `referenciaOrigen`, `tipoTransaccion`, lista de `tipoComponente` no cubiertos. | Equipo de producto (ampliar plantilla) o consumidor (corregir contrato si envió un `tipoComponente` erróneo). |
+
+La durabilidad del hecho económico mientras se resuelve la causa del rechazo es responsabilidad del consumidor emisor, que conserva el hecho en su propia bandeja de eventos hasta confirmar que fue procesado. El detalle del mecanismo técnico de notificación y reproceso está en [SI7].
+
+**Nota sobre compensación:** El ServicioDeTraduccion opera en un solo stream (`borrador-contable-{id}`). Los pasos 1-4 son consultas sin efecto lateral. Los pasos 5-6 son un solo append atómico. No requiere tabla de compensación porque no coordina escrituras en múltiples streams. Los rechazos de los pasos 1 y 2 no crean borrador — se notifican al consumidor con uno de los motivos estructurados de la tabla anterior.
 
 **Nota sobre la línea de traducción:** La línea de traducción es el contrato de entrada al motor — viene de fuera del bounded context. Su estructura está documentada en `anexo-ejemplo-plantilla-de-asiento.md`. No se modela como artefacto interno porque el ServicioDeTraduccion la consume y la transforma en un BorradorContable.
 
@@ -900,6 +912,16 @@ Los domain services que coordinan escrituras en múltiples streams (ServicioDeCo
 #### [SI6] Optimistic concurrency en EntregaContable
 
 Se recomienda optimistic concurrency sobre la versión del stream de `entrega-contable-{id}` para garantizar que EntregaAceptada y EntregaRechazada no se apliquen sobre un stream cuya versión cambió.
+
+#### [SI7] Tratamiento técnico de rechazos previos al borrador
+
+Los rechazos del ServicioDeTraduccion en pasos 1 y 2 (motivos estructurados `REFERENCIA_ORIGEN_DUPLICADA_NO_REEMPLAZABLE`, `TIPO_TRANSACCION_SIN_PLANTILLA`, `LINEA_SIN_ROL_EN_PLANTILLA`) no son eventos de dominio. Se sugiere materializarlos sobre la infraestructura de mensajería con tres elementos:
+
+1. **Respuesta negativa al bus (NACK) con dead-letter queue (DLQ):** el mensaje rechazado se redirige automáticamente a una cola de mensajes no procesados, con política de retención auditable (al menos 30 días sugeridos). Permite reproceso manual reinyectando los mensajes una vez corregido el defecto (plantilla ampliada, regla creada, etc.).
+2. **Logs estructurados:** cada rechazo deja un registro con `referenciaOrigen`, `motivoCodigo`, `motivoDetalle`, `tipoTransaccion`, `subDominioOrigen`, `empresa`, `fechaRecepcion` y payload completo recibido. Soporta investigación forense fuera de la ventana del bus.
+3. **Métricas y alertas:** la tasa de rechazos por motivo se publica como métrica operacional. Un spike de `LINEA_SIN_ROL_EN_PLANTILLA` o `TIPO_TRANSACCION_SIN_PLANTILLA` debe disparar alerta al equipo de producto, ya que corresponde a defectos de configuración del catálogo de plantillas.
+
+La durabilidad del hecho económico mientras se resuelve el rechazo es responsabilidad del consumidor emisor mediante outbox pattern: cada sub-dominio consumidor conserva sus hechos económicos hasta confirmar procesamiento exitoso por el motor. La combinación outbox del consumidor + DLQ del bus garantiza que ningún hecho económico se pierda — sin necesidad de stream propio del motor para rechazos pre-borrador.
 
 ---
 
@@ -1595,6 +1617,7 @@ Cada plantilla define roles con naturaleza fija (débito/crédito) que son conoc
 | I24 | Si una cuenta se inactiva en el PUC, los aprendizajes y reglas que la referencian permanecen registrados pero no se aplican a nuevos borradores. Los borradores ya resueltos con esa cuenta no se afectan. | Aprendizaje, ReglaDeDerivacion | Eventual | [R39] [R07] |
 | I25 | El sistema contable de destino no puede cambiarse mientras existan entregas en estado ENVIADO o borradores en PENDIENTE que fueron rechazados por el destino actual. Se valida como precondición al modificar SistemaContableDestino mediante consulta a EntregaContable y BorradorContable. | SistemaContableDestino, EntregaContable, BorradorContable | Eventual | [R42] |
 | I26 | No pueden existir dos asientos contables con la misma referenciaOrigen en N2 (excepto el par original/inverso por anulación). Se valida como precondición en el ServicioDeContabilizacion paso 3 antes de emitir AsientoContabilizado. | AsientoContable | Eventual | [R24] |
+| I27 | Toda línea de traducción recibida debe corresponder a al menos un RolPartida en la plantilla del tipoTransaccion. Si una o más líneas traen un tipoComponente no cubierto por ningún rol, el motor rechaza el hecho económico completo antes de crear el borrador y notifica al consumidor con motivo estructurado. La validación se aplica en el paso 2 del ServicioDeTraduccion. | ServicioDeTraduccion, PlantillaDeAsiento | Local | [DD2] [R45] |
 
 **Clasificación:**
 - **Local:** Se valida dentro de un solo agregado, en la misma transacción.
@@ -1707,3 +1730,4 @@ Cada bounded context declara los recursos que protege y las acciones que expone 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
 | 1.0 | Abril 2026 | Versión inicial. 12 secciones. 12 agregados (7 N1 + 5 N2), 55 eventos, 26 invariantes (18 Local + 8 Eventual), 10 decisiones (D1-D10), 7 premisas (P1-P7), 3 pendientes (PD1-PD3), 6 sugerencias de implementación (SI1-SI6), 17 permisos atómicos, 3 domain services. Resultado de: construcción iterativa del modelo, 3 auditorías (V1: 36 hallazgos, V2: 31 hallazgos, V3: 84 hallazgos — 49 aplicados, 35 descartados), 3 rondas de revisión. Reporte consolidado de auditoría en `auditoria/contabilidad-actual.md`. |
+| 1.1 | Mayo 2026 | Validación contractual del motor de traducción y formalización de rechazos previos al borrador. Cambios: (1) Paso 1 del ServicioDeTraduccion ajustado: el rechazo por referenciaOrigen no reemplazable se notifica al consumidor con motivo estructurado (sin evento de dominio). (2) Paso 2 del ServicioDeTraduccion ampliado: se valida que cada tipoComponente recibido tenga al menos un RolPartida en la plantilla. (3) Nueva invariante I27 (Local) — total ahora 27 invariantes (19 Local + 8 Eventual). (4) Tabla de motivos estructurados de rechazo previo al borrador (`REFERENCIA_ORIGEN_DUPLICADA_NO_REEMPLAZABLE`, `TIPO_TRANSACCION_SIN_PLANTILLA`, `LINEA_SIN_ROL_EN_PLANTILLA`) documentada en el ServicioDeTraduccion. (5) Nueva sugerencia de implementación SI7 — total ahora 7 sugerencias. (6) D5 sin cambios — el motor permanece como servicio sin estado; los rechazos pre-borrador se canalizan por mensajería (DLQ + logs + métricas) y la durabilidad la garantiza el outbox del consumidor emisor. Acompaña actualización de `definicion-alcance.md` v1.1 con la nueva regla R45. |
