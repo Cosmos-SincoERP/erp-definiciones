@@ -1,0 +1,1605 @@
+[
+  {
+    "_comentario": "=== Provincias de República Dominicana ==="
+  },
+  {
+    "codigo": "01",
+    "nombre": "Distrito Nacional",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "02",
+    "nombre": "Azua",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "03",
+    "nombre": "Baoruco",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "04",
+    "nombre": "Barahona",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "05",
+    "nombre": "Dajabón",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "06",
+    "nombre": "Duarte",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "07",
+    "nombre": "Elías Piña",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "08",
+    "nombre": "El Seibo",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "09",
+    "nombre": "Espaillat",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "10",
+    "nombre": "Independencia",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "11",
+    "nombre": "La Altagracia",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "12",
+    "nombre": "La Romana",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "13",
+    "nombre": "La Vega",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "14",
+    "nombre": "María Trinidad Sánchez",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "15",
+    "nombre": "Monte Cristi",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "16",
+    "nombre": "Pedernales",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "17",
+    "nombre": "Peravia",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "18",
+    "nombre": "Puerto Plata",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "19",
+    "nombre": "Hermanas Mirabal",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "20",
+    "nombre": "Samaná",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "21",
+    "nombre": "San Cristóbal",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "22",
+    "nombre": "San Juan",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "23",
+    "nombre": "San Pedro de Macorís",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "24",
+    "nombre": "Sánchez Ramírez",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "25",
+    "nombre": "Santiago",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "26",
+    "nombre": "Santiago Rodríguez",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "27",
+    "nombre": "Valverde",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "28",
+    "nombre": "Monseñor Nouel",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "29",
+    "nombre": "Monte Plata",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "30",
+    "nombre": "Hato Mayor",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "31",
+    "nombre": "San José de Ocoa",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "32",
+    "nombre": "Santo Domingo",
+    "paisCodigo": "DO",
+    "nivel": "provincia",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios del Distrito Nacional ==="
+  },
+  {
+    "codigo": "0101",
+    "nombre": "Santo Domingo de Guzmán",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "01",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Azua ==="
+  },
+  {
+    "codigo": "0201",
+    "nombre": "Azua de Compostela",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "02",
+    "activo": true
+  },
+  {
+    "codigo": "0202",
+    "nombre": "Estebanía",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "02",
+    "activo": true
+  },
+  {
+    "codigo": "0203",
+    "nombre": "Guayabal",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "02",
+    "activo": true
+  },
+  {
+    "codigo": "0204",
+    "nombre": "Las Charcas",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "02",
+    "activo": true
+  },
+  {
+    "codigo": "0205",
+    "nombre": "Las Yayas de Viajama",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "02",
+    "activo": true
+  },
+  {
+    "codigo": "0206",
+    "nombre": "Padre Las Casas",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "02",
+    "activo": true
+  },
+  {
+    "codigo": "0207",
+    "nombre": "Peralta",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "02",
+    "activo": true
+  },
+  {
+    "codigo": "0208",
+    "nombre": "Pueblo Viejo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "02",
+    "activo": true
+  },
+  {
+    "codigo": "0209",
+    "nombre": "Sabana Yegua",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "02",
+    "activo": true
+  },
+  {
+    "codigo": "0210",
+    "nombre": "Tábara Arriba",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "02",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Baoruco ==="
+  },
+  {
+    "codigo": "0301",
+    "nombre": "Neiba",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "03",
+    "activo": true
+  },
+  {
+    "codigo": "0302",
+    "nombre": "Galván",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "03",
+    "activo": true
+  },
+  {
+    "codigo": "0303",
+    "nombre": "Los Ríos",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "03",
+    "activo": true
+  },
+  {
+    "codigo": "0304",
+    "nombre": "Tamayo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "03",
+    "activo": true
+  },
+  {
+    "codigo": "0305",
+    "nombre": "Villa Jaragua",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "03",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Barahona ==="
+  },
+  {
+    "codigo": "0401",
+    "nombre": "Barahona",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "04",
+    "activo": true
+  },
+  {
+    "codigo": "0402",
+    "nombre": "Cabral",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "04",
+    "activo": true
+  },
+  {
+    "codigo": "0403",
+    "nombre": "El Peñón",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "04",
+    "activo": true
+  },
+  {
+    "codigo": "0404",
+    "nombre": "Enriquillo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "04",
+    "activo": true
+  },
+  {
+    "codigo": "0405",
+    "nombre": "Fundación",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "04",
+    "activo": true
+  },
+  {
+    "codigo": "0406",
+    "nombre": "Jaquimeyes",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "04",
+    "activo": true
+  },
+  {
+    "codigo": "0407",
+    "nombre": "La Ciénaga",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "04",
+    "activo": true
+  },
+  {
+    "codigo": "0408",
+    "nombre": "Las Salinas",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "04",
+    "activo": true
+  },
+  {
+    "codigo": "0409",
+    "nombre": "Paraíso",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "04",
+    "activo": true
+  },
+  {
+    "codigo": "0410",
+    "nombre": "Polo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "04",
+    "activo": true
+  },
+  {
+    "codigo": "0411",
+    "nombre": "Vicente Noble",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "04",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Dajabón ==="
+  },
+  {
+    "codigo": "0501",
+    "nombre": "Dajabón",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "0502",
+    "nombre": "El Pino",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "0503",
+    "nombre": "Loma de Cabrera",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "0504",
+    "nombre": "Partido",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "0505",
+    "nombre": "Restauración",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Duarte ==="
+  },
+  {
+    "codigo": "0601",
+    "nombre": "San Francisco de Macorís",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "06",
+    "activo": true
+  },
+  {
+    "codigo": "0602",
+    "nombre": "Arenoso",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "06",
+    "activo": true
+  },
+  {
+    "codigo": "0603",
+    "nombre": "Castillo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "06",
+    "activo": true
+  },
+  {
+    "codigo": "0604",
+    "nombre": "Eugenio María de Hostos",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "06",
+    "activo": true
+  },
+  {
+    "codigo": "0605",
+    "nombre": "Las Guáranas",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "06",
+    "activo": true
+  },
+  {
+    "codigo": "0606",
+    "nombre": "Pimentel",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "06",
+    "activo": true
+  },
+  {
+    "codigo": "0607",
+    "nombre": "Villa Riva",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "06",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Elías Piña ==="
+  },
+  {
+    "codigo": "0701",
+    "nombre": "Comendador",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "07",
+    "activo": true
+  },
+  {
+    "codigo": "0702",
+    "nombre": "Bánica",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "07",
+    "activo": true
+  },
+  {
+    "codigo": "0703",
+    "nombre": "El Llano",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "07",
+    "activo": true
+  },
+  {
+    "codigo": "0704",
+    "nombre": "Hondo Valle",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "07",
+    "activo": true
+  },
+  {
+    "codigo": "0705",
+    "nombre": "Juan Santiago",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "07",
+    "activo": true
+  },
+  {
+    "codigo": "0706",
+    "nombre": "Pedro Santana",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "07",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de El Seibo ==="
+  },
+  {
+    "codigo": "0801",
+    "nombre": "El Seibo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "0802",
+    "nombre": "Miches",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Espaillat ==="
+  },
+  {
+    "codigo": "0901",
+    "nombre": "Moca",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "09",
+    "activo": true
+  },
+  {
+    "codigo": "0902",
+    "nombre": "Cayetano Germosén",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "09",
+    "activo": true
+  },
+  {
+    "codigo": "0903",
+    "nombre": "Gaspar Hernández",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "09",
+    "activo": true
+  },
+  {
+    "codigo": "0904",
+    "nombre": "Jamao al Norte",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "09",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Independencia ==="
+  },
+  {
+    "codigo": "1001",
+    "nombre": "Jimaní",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "10",
+    "activo": true
+  },
+  {
+    "codigo": "1002",
+    "nombre": "Cristóbal",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "10",
+    "activo": true
+  },
+  {
+    "codigo": "1003",
+    "nombre": "Duvergé",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "10",
+    "activo": true
+  },
+  {
+    "codigo": "1004",
+    "nombre": "La Descubierta",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "10",
+    "activo": true
+  },
+  {
+    "codigo": "1005",
+    "nombre": "Mella",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "10",
+    "activo": true
+  },
+  {
+    "codigo": "1006",
+    "nombre": "Postrer Río",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "10",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de La Altagracia ==="
+  },
+  {
+    "codigo": "1101",
+    "nombre": "Higüey",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "11",
+    "activo": true
+  },
+  {
+    "codigo": "1102",
+    "nombre": "San Rafael del Yuma",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "11",
+    "activo": true
+  },
+  {
+    "codigo": "1103",
+    "nombre": "Bávaro",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "11",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de La Romana ==="
+  },
+  {
+    "codigo": "1201",
+    "nombre": "La Romana",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "12",
+    "activo": true
+  },
+  {
+    "codigo": "1202",
+    "nombre": "Guaymate",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "12",
+    "activo": true
+  },
+  {
+    "codigo": "1203",
+    "nombre": "Villa Hermosa",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "12",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de La Vega ==="
+  },
+  {
+    "codigo": "1301",
+    "nombre": "La Vega",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "1302",
+    "nombre": "Constanza",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "1303",
+    "nombre": "Jarabacoa",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "1304",
+    "nombre": "Jima Abajo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de María Trinidad Sánchez ==="
+  },
+  {
+    "codigo": "1401",
+    "nombre": "Nagua",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "14",
+    "activo": true
+  },
+  {
+    "codigo": "1402",
+    "nombre": "Cabrera",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "14",
+    "activo": true
+  },
+  {
+    "codigo": "1403",
+    "nombre": "El Factor",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "14",
+    "activo": true
+  },
+  {
+    "codigo": "1404",
+    "nombre": "Río San Juan",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "14",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Monte Cristi ==="
+  },
+  {
+    "codigo": "1501",
+    "nombre": "Monte Cristi",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "1502",
+    "nombre": "Castañuelas",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "1503",
+    "nombre": "Guayubín",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "1504",
+    "nombre": "Las Matas de Santa Cruz",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "1505",
+    "nombre": "Pepillo Salcedo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "1506",
+    "nombre": "Villa Vásquez",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Pedernales ==="
+  },
+  {
+    "codigo": "1601",
+    "nombre": "Pedernales",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "16",
+    "activo": true
+  },
+  {
+    "codigo": "1602",
+    "nombre": "Oviedo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "16",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Peravia ==="
+  },
+  {
+    "codigo": "1701",
+    "nombre": "Baní",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "1702",
+    "nombre": "Nizao",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Puerto Plata ==="
+  },
+  {
+    "codigo": "1801",
+    "nombre": "Puerto Plata",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "1802",
+    "nombre": "Altamira",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "1803",
+    "nombre": "Guananico",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "1804",
+    "nombre": "Imbert",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "1805",
+    "nombre": "Los Hidalgos",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "1806",
+    "nombre": "Luperón",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "1807",
+    "nombre": "Sosúa",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "1808",
+    "nombre": "Villa Isabela",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "1809",
+    "nombre": "Villa Montellano",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Hermanas Mirabal ==="
+  },
+  {
+    "codigo": "1901",
+    "nombre": "Salcedo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "1902",
+    "nombre": "Tenares",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "1903",
+    "nombre": "Villa Tapia",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Samaná ==="
+  },
+  {
+    "codigo": "2001",
+    "nombre": "Samaná",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "2002",
+    "nombre": "Las Terrenas",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "2003",
+    "nombre": "Sánchez",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de San Cristóbal ==="
+  },
+  {
+    "codigo": "2101",
+    "nombre": "San Cristóbal",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "21",
+    "activo": true
+  },
+  {
+    "codigo": "2102",
+    "nombre": "Bajos de Haina",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "21",
+    "activo": true
+  },
+  {
+    "codigo": "2103",
+    "nombre": "Cambita Garabitos",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "21",
+    "activo": true
+  },
+  {
+    "codigo": "2104",
+    "nombre": "Los Cacaos",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "21",
+    "activo": true
+  },
+  {
+    "codigo": "2105",
+    "nombre": "Sabana Grande de Palenque",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "21",
+    "activo": true
+  },
+  {
+    "codigo": "2106",
+    "nombre": "San Gregorio de Nigua",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "21",
+    "activo": true
+  },
+  {
+    "codigo": "2107",
+    "nombre": "Villa Altagracia",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "21",
+    "activo": true
+  },
+  {
+    "codigo": "2108",
+    "nombre": "Yaguate",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "21",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de San Juan ==="
+  },
+  {
+    "codigo": "2201",
+    "nombre": "San Juan de la Maguana",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "22",
+    "activo": true
+  },
+  {
+    "codigo": "2202",
+    "nombre": "Bohechío",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "22",
+    "activo": true
+  },
+  {
+    "codigo": "2203",
+    "nombre": "El Cercado",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "22",
+    "activo": true
+  },
+  {
+    "codigo": "2204",
+    "nombre": "Juan de Herrera",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "22",
+    "activo": true
+  },
+  {
+    "codigo": "2205",
+    "nombre": "Las Matas de Farfán",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "22",
+    "activo": true
+  },
+  {
+    "codigo": "2206",
+    "nombre": "Vallejuelo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "22",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de San Pedro de Macorís ==="
+  },
+  {
+    "codigo": "2301",
+    "nombre": "San Pedro de Macorís",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "2302",
+    "nombre": "Consuelo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "2303",
+    "nombre": "Guayacanes",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "2304",
+    "nombre": "Quisqueya",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "2305",
+    "nombre": "Ramón Santana",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "2306",
+    "nombre": "San José de Los Llanos",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Sánchez Ramírez ==="
+  },
+  {
+    "codigo": "2401",
+    "nombre": "Cotuí",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "24",
+    "activo": true
+  },
+  {
+    "codigo": "2402",
+    "nombre": "Cevicos",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "24",
+    "activo": true
+  },
+  {
+    "codigo": "2403",
+    "nombre": "Fantino",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "24",
+    "activo": true
+  },
+  {
+    "codigo": "2404",
+    "nombre": "La Mata",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "24",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Santiago ==="
+  },
+  {
+    "codigo": "2501",
+    "nombre": "Santiago de los Caballeros",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "2502",
+    "nombre": "Bisonó",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "2503",
+    "nombre": "Jánico",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "2504",
+    "nombre": "Licey al Medio",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "2505",
+    "nombre": "Puñal",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "2506",
+    "nombre": "Sabana Iglesia",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "2507",
+    "nombre": "San José de las Matas",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "2508",
+    "nombre": "Tamboril",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "2509",
+    "nombre": "Villa González",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Santiago Rodríguez ==="
+  },
+  {
+    "codigo": "2601",
+    "nombre": "San Ignacio de Sabaneta",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "26",
+    "activo": true
+  },
+  {
+    "codigo": "2602",
+    "nombre": "Monción",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "26",
+    "activo": true
+  },
+  {
+    "codigo": "2603",
+    "nombre": "Villa Los Almácigos",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "26",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Valverde ==="
+  },
+  {
+    "codigo": "2701",
+    "nombre": "Mao",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "2702",
+    "nombre": "Esperanza",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "2703",
+    "nombre": "Laguna Salada",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Monseñor Nouel ==="
+  },
+  {
+    "codigo": "2801",
+    "nombre": "Bonao",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "28",
+    "activo": true
+  },
+  {
+    "codigo": "2802",
+    "nombre": "Maimón",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "28",
+    "activo": true
+  },
+  {
+    "codigo": "2803",
+    "nombre": "Piedra Blanca",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "28",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Monte Plata ==="
+  },
+  {
+    "codigo": "2901",
+    "nombre": "Monte Plata",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "29",
+    "activo": true
+  },
+  {
+    "codigo": "2902",
+    "nombre": "Bayaguana",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "29",
+    "activo": true
+  },
+  {
+    "codigo": "2903",
+    "nombre": "Peralvillo",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "29",
+    "activo": true
+  },
+  {
+    "codigo": "2904",
+    "nombre": "Sabana Grande de Boyá",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "29",
+    "activo": true
+  },
+  {
+    "codigo": "2905",
+    "nombre": "Yamasá",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "29",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Hato Mayor ==="
+  },
+  {
+    "codigo": "3001",
+    "nombre": "Hato Mayor del Rey",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "30",
+    "activo": true
+  },
+  {
+    "codigo": "3002",
+    "nombre": "El Valle",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "30",
+    "activo": true
+  },
+  {
+    "codigo": "3003",
+    "nombre": "Sabana de la Mar",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "30",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de San José de Ocoa ==="
+  },
+  {
+    "codigo": "3101",
+    "nombre": "San José de Ocoa",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "31",
+    "activo": true
+  },
+  {
+    "codigo": "3102",
+    "nombre": "Rancho Arriba",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "31",
+    "activo": true
+  },
+  {
+    "codigo": "3103",
+    "nombre": "Sabana Larga",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "31",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Santo Domingo ==="
+  },
+  {
+    "codigo": "3201",
+    "nombre": "Santo Domingo Este",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "32",
+    "activo": true
+  },
+  {
+    "codigo": "3202",
+    "nombre": "Santo Domingo Norte",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "32",
+    "activo": true
+  },
+  {
+    "codigo": "3203",
+    "nombre": "Santo Domingo Oeste",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "32",
+    "activo": true
+  },
+  {
+    "codigo": "3204",
+    "nombre": "Boca Chica",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "32",
+    "activo": true
+  },
+  {
+    "codigo": "3205",
+    "nombre": "Los Alcarrizos",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "32",
+    "activo": true
+  },
+  {
+    "codigo": "3206",
+    "nombre": "Pedro Brand",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "32",
+    "activo": true
+  },
+  {
+    "codigo": "3207",
+    "nombre": "San Antonio de Guerra",
+    "paisCodigo": "DO",
+    "nivel": "municipio",
+    "codigoSuperior": "32",
+    "activo": true
+  }
+]

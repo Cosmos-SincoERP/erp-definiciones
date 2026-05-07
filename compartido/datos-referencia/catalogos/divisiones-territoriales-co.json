@@ -1,0 +1,9341 @@
+[
+  {
+    "codigo": "05",
+    "nombre": "Antioquia",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "08",
+    "nombre": "Atlántico",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "11",
+    "nombre": "Bogotá D.C.",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "13",
+    "nombre": "Bolívar",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "15",
+    "nombre": "Boyacá",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "17",
+    "nombre": "Caldas",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "18",
+    "nombre": "Caquetá",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "19",
+    "nombre": "Cauca",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "20",
+    "nombre": "Cesar",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "23",
+    "nombre": "Córdoba",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "25",
+    "nombre": "Cundinamarca",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "27",
+    "nombre": "Chocó",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "41",
+    "nombre": "Huila",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "44",
+    "nombre": "La Guajira",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "47",
+    "nombre": "Magdalena",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "50",
+    "nombre": "Meta",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "52",
+    "nombre": "Nariño",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "54",
+    "nombre": "Norte de Santander",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "63",
+    "nombre": "Quindío",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "66",
+    "nombre": "Risaralda",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "68",
+    "nombre": "Santander",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "70",
+    "nombre": "Sucre",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "73",
+    "nombre": "Tolima",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "76",
+    "nombre": "Valle del Cauca",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "81",
+    "nombre": "Arauca",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "85",
+    "nombre": "Casanare",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "86",
+    "nombre": "Putumayo",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "88",
+    "nombre": "San Andrés, Providencia y Santa Catalina",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "91",
+    "nombre": "Amazonas",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "94",
+    "nombre": "Guainía",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "95",
+    "nombre": "Guaviare",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "97",
+    "nombre": "Vaupés",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "codigo": "99",
+    "nombre": "Vichada",
+    "paisCodigo": "CO",
+    "nivel": "departamento",
+    "codigoSuperior": null,
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Antioquia ==="
+  },
+  {
+    "codigo": "05001",
+    "nombre": "Medellín",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05002",
+    "nombre": "Abejorral",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05004",
+    "nombre": "Abriaquí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05021",
+    "nombre": "Alejandría",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05030",
+    "nombre": "Amagá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05031",
+    "nombre": "Amalfi",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05034",
+    "nombre": "Andes",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05036",
+    "nombre": "Angelópolis",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05038",
+    "nombre": "Angostura",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05040",
+    "nombre": "Anorí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05042",
+    "nombre": "Santa Fe de Antioquia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05044",
+    "nombre": "Anzá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05045",
+    "nombre": "Apartadó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05051",
+    "nombre": "Arboletes",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05055",
+    "nombre": "Argelia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05059",
+    "nombre": "Armenia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05079",
+    "nombre": "Barbosa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05086",
+    "nombre": "Belmira",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05088",
+    "nombre": "Bello",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05091",
+    "nombre": "Betania",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05093",
+    "nombre": "Betulia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05101",
+    "nombre": "Ciudad Bolívar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05107",
+    "nombre": "Briceño",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05113",
+    "nombre": "Buriticá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05120",
+    "nombre": "Cáceres",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05125",
+    "nombre": "Caicedo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05129",
+    "nombre": "Caldas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05134",
+    "nombre": "Campamento",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05138",
+    "nombre": "Cañasgordas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05142",
+    "nombre": "Caracolí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05145",
+    "nombre": "Caramanta",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05147",
+    "nombre": "Carepa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05148",
+    "nombre": "El Carmen de Viboral",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05150",
+    "nombre": "Carolina del Príncipe",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05154",
+    "nombre": "Caucasia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05172",
+    "nombre": "Chigorodó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05190",
+    "nombre": "Cisneros",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05197",
+    "nombre": "Cocorná",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05206",
+    "nombre": "Concepción",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05209",
+    "nombre": "Concordia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05212",
+    "nombre": "Copacabana",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05234",
+    "nombre": "Dabeiba",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05237",
+    "nombre": "Donmatías",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05240",
+    "nombre": "Ebéjico",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05250",
+    "nombre": "El Bagre",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05264",
+    "nombre": "Entrerríos",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05266",
+    "nombre": "Envigado",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05282",
+    "nombre": "Fredonia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05284",
+    "nombre": "Frontino",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05306",
+    "nombre": "Giraldo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05308",
+    "nombre": "Girardota",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05310",
+    "nombre": "Gómez Plata",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05313",
+    "nombre": "Granada",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05315",
+    "nombre": "Guadalupe",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05318",
+    "nombre": "Guarne",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05321",
+    "nombre": "Guatapé",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05347",
+    "nombre": "Heliconia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05353",
+    "nombre": "Hispania",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05360",
+    "nombre": "Itagüí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05361",
+    "nombre": "Ituango",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05364",
+    "nombre": "Jardín",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05368",
+    "nombre": "Jericó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05376",
+    "nombre": "La Ceja",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05380",
+    "nombre": "La Estrella",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05390",
+    "nombre": "La Pintada",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05400",
+    "nombre": "La Unión",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05411",
+    "nombre": "Liborina",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05425",
+    "nombre": "Maceo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05440",
+    "nombre": "Marinilla",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05467",
+    "nombre": "Montebello",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05475",
+    "nombre": "Murindó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05480",
+    "nombre": "Mutatá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05483",
+    "nombre": "Nariño",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05490",
+    "nombre": "Necoclí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05495",
+    "nombre": "Nechí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05501",
+    "nombre": "Olaya",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05541",
+    "nombre": "Peñol",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05543",
+    "nombre": "Peque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05576",
+    "nombre": "Pueblorrico",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05579",
+    "nombre": "Puerto Berrío",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05585",
+    "nombre": "Puerto Nare",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05591",
+    "nombre": "Puerto Triunfo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05604",
+    "nombre": "Remedios",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05607",
+    "nombre": "Retiro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05615",
+    "nombre": "Rionegro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05628",
+    "nombre": "Sabanalarga",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05631",
+    "nombre": "Sabaneta",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05642",
+    "nombre": "Salgar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05647",
+    "nombre": "San Andrés de Cuerquia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05649",
+    "nombre": "San Carlos",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05652",
+    "nombre": "San Francisco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05656",
+    "nombre": "San Jerónimo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05658",
+    "nombre": "San José de la Montaña",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05659",
+    "nombre": "San Juan de Urabá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05660",
+    "nombre": "San Luis",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05664",
+    "nombre": "San Pedro de los Milagros",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05665",
+    "nombre": "San Pedro de Urabá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05667",
+    "nombre": "San Rafael",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05670",
+    "nombre": "San Roque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05674",
+    "nombre": "San Vicente Ferrer",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05679",
+    "nombre": "Santa Bárbara",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05686",
+    "nombre": "Santa Rosa de Osos",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05690",
+    "nombre": "Santo Domingo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05697",
+    "nombre": "El Santuario",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05736",
+    "nombre": "Segovia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05756",
+    "nombre": "Sonsón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05761",
+    "nombre": "Sopetrán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05789",
+    "nombre": "Támesis",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05790",
+    "nombre": "Tarazá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05792",
+    "nombre": "Tarso",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05809",
+    "nombre": "Titiribí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05819",
+    "nombre": "Toledo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05837",
+    "nombre": "Turbo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05842",
+    "nombre": "Uramita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05847",
+    "nombre": "Urrao",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05854",
+    "nombre": "Valdivia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05856",
+    "nombre": "Valparaíso",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05858",
+    "nombre": "Vegachí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05861",
+    "nombre": "Venecia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05873",
+    "nombre": "Vigía del Fuerte",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05885",
+    "nombre": "Yalí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05887",
+    "nombre": "Yarumal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05890",
+    "nombre": "Yolombó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05893",
+    "nombre": "Yondó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "codigo": "05895",
+    "nombre": "Zaragoza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "05",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Atlántico ==="
+  },
+  {
+    "codigo": "08001",
+    "nombre": "Barranquilla",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08078",
+    "nombre": "Baranoa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08137",
+    "nombre": "Campo de la Cruz",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08141",
+    "nombre": "Candelaria",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08296",
+    "nombre": "Galapa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08372",
+    "nombre": "Juan de Acosta",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08421",
+    "nombre": "Luruaco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08433",
+    "nombre": "Malambo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08436",
+    "nombre": "Manatí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08520",
+    "nombre": "Palmar de Varela",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08549",
+    "nombre": "Piojó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08558",
+    "nombre": "Polonuevo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08560",
+    "nombre": "Ponedera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08573",
+    "nombre": "Puerto Colombia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08606",
+    "nombre": "Repelón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08634",
+    "nombre": "Sabanagrande",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08638",
+    "nombre": "Sabanalarga",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08675",
+    "nombre": "Santa Lucía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08685",
+    "nombre": "Santo Tomás",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08758",
+    "nombre": "Soledad",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08770",
+    "nombre": "Suan",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08832",
+    "nombre": "Tubará",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "codigo": "08849",
+    "nombre": "Usiacurí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "08",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Bogotá D.C. ==="
+  },
+  {
+    "codigo": "11001",
+    "nombre": "Bogotá D.C.",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "11",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Bolívar ==="
+  },
+  {
+    "codigo": "13001",
+    "nombre": "Cartagena de Indias",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13006",
+    "nombre": "Achí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13030",
+    "nombre": "Altos del Rosario",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13042",
+    "nombre": "Arenal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13052",
+    "nombre": "Arjona",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13062",
+    "nombre": "Arroyohondo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13074",
+    "nombre": "Barranco de Loba",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13140",
+    "nombre": "Calamar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13160",
+    "nombre": "Cantagallo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13188",
+    "nombre": "Cicuco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13212",
+    "nombre": "Córdoba",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13222",
+    "nombre": "Clemencia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13244",
+    "nombre": "El Carmen de Bolívar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13248",
+    "nombre": "El Guamo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13268",
+    "nombre": "El Peñón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13300",
+    "nombre": "Hatillo de Loba",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13430",
+    "nombre": "Magangué",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13433",
+    "nombre": "Mahates",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13440",
+    "nombre": "Margarita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13442",
+    "nombre": "María la Baja",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13458",
+    "nombre": "Montecristo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13468",
+    "nombre": "Momil",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13473",
+    "nombre": "Morales",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13490",
+    "nombre": "Norosí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13549",
+    "nombre": "Pinillos",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13580",
+    "nombre": "Regidor",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13600",
+    "nombre": "Río Viejo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13620",
+    "nombre": "San Cristóbal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13647",
+    "nombre": "San Estanislao",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13650",
+    "nombre": "San Fernando",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13654",
+    "nombre": "San Jacinto",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13655",
+    "nombre": "San Jacinto del Cauca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13657",
+    "nombre": "San Juan Nepomuceno",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13667",
+    "nombre": "San Martín de Loba",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13670",
+    "nombre": "San Pablo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13673",
+    "nombre": "Santa Catalina",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13683",
+    "nombre": "Santa Rosa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13688",
+    "nombre": "Santa Rosa del Sur",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13744",
+    "nombre": "Simití",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13760",
+    "nombre": "Soplaviento",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13780",
+    "nombre": "Talaigua Nuevo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13810",
+    "nombre": "Tiquisio",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13836",
+    "nombre": "Turbaco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13838",
+    "nombre": "Turbaná",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13873",
+    "nombre": "Villanueva",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "codigo": "13894",
+    "nombre": "Zambrano",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "13",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Boyacá ==="
+  },
+  {
+    "codigo": "15001",
+    "nombre": "Tunja",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15022",
+    "nombre": "Almeida",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15047",
+    "nombre": "Aquitania",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15051",
+    "nombre": "Arcabuco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15087",
+    "nombre": "Belén",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15090",
+    "nombre": "Berbeo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15092",
+    "nombre": "Betéitiva",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15097",
+    "nombre": "Boavita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15104",
+    "nombre": "Boyacá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15106",
+    "nombre": "Briceño",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15109",
+    "nombre": "Buenavista",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15114",
+    "nombre": "Busbanzá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15131",
+    "nombre": "Caldas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15135",
+    "nombre": "Campohermoso",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15162",
+    "nombre": "Cerinza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15172",
+    "nombre": "Chinavita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15176",
+    "nombre": "Chiquinquirá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15180",
+    "nombre": "Chiscas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15183",
+    "nombre": "Chita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15185",
+    "nombre": "Chitaraque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15187",
+    "nombre": "Chivatá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15189",
+    "nombre": "Ciénega",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15204",
+    "nombre": "Cómbita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15212",
+    "nombre": "Coper",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15215",
+    "nombre": "Corrales",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15218",
+    "nombre": "Covarachía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15223",
+    "nombre": "Cubará",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15224",
+    "nombre": "Cucaita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15226",
+    "nombre": "Cuítiva",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15232",
+    "nombre": "Chíquiza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15236",
+    "nombre": "Chivor",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15238",
+    "nombre": "Duitama",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15244",
+    "nombre": "El Cocuy",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15248",
+    "nombre": "El Espino",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15272",
+    "nombre": "Firavitoba",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15276",
+    "nombre": "Floresta",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15293",
+    "nombre": "Gachantivá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15296",
+    "nombre": "Gámeza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15299",
+    "nombre": "Garagoa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15317",
+    "nombre": "Guacamayas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15322",
+    "nombre": "Guateque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15325",
+    "nombre": "Guayatá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15332",
+    "nombre": "Güicán de la Sierra",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15362",
+    "nombre": "Iza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15367",
+    "nombre": "Jenesano",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15368",
+    "nombre": "Jericó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15377",
+    "nombre": "Labranzagrande",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15380",
+    "nombre": "La Capilla",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15401",
+    "nombre": "La Victoria",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15403",
+    "nombre": "La Uvita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15407",
+    "nombre": "Villa de Leyva",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15425",
+    "nombre": "Macanal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15442",
+    "nombre": "Maripí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15455",
+    "nombre": "Miraflores",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15464",
+    "nombre": "Mongua",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15466",
+    "nombre": "Monguí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15469",
+    "nombre": "Moniquirá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15476",
+    "nombre": "Motavita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15480",
+    "nombre": "Muzo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15491",
+    "nombre": "Nobsa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15494",
+    "nombre": "Nuevo Colón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15500",
+    "nombre": "Oicatá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15507",
+    "nombre": "Otanche",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15511",
+    "nombre": "Pachavita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15514",
+    "nombre": "Páez",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15516",
+    "nombre": "Paipa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15518",
+    "nombre": "Pajarito",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15522",
+    "nombre": "Panqueba",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15531",
+    "nombre": "Pauna",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15533",
+    "nombre": "Paya",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15537",
+    "nombre": "Paz de Río",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15542",
+    "nombre": "Pesca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15550",
+    "nombre": "Pisba",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15572",
+    "nombre": "Puerto Boyacá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15580",
+    "nombre": "Quípama",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15599",
+    "nombre": "Ramiriquí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15600",
+    "nombre": "Ráquira",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15621",
+    "nombre": "Rondón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15632",
+    "nombre": "Saboyá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15638",
+    "nombre": "Sáchica",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15646",
+    "nombre": "Samacá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15660",
+    "nombre": "San Eduardo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15664",
+    "nombre": "San José de Pare",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15667",
+    "nombre": "San Luis de Gaceno",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15673",
+    "nombre": "San Mateo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15676",
+    "nombre": "San Miguel de Sema",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15681",
+    "nombre": "San Pablo de Borbur",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15686",
+    "nombre": "Santana",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15690",
+    "nombre": "Santa María",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15693",
+    "nombre": "Santa Rosa de Viterbo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15696",
+    "nombre": "Santa Sofía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15720",
+    "nombre": "Sativanorte",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15723",
+    "nombre": "Sativasur",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15740",
+    "nombre": "Siachoque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15753",
+    "nombre": "Soatá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15755",
+    "nombre": "Socotá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15757",
+    "nombre": "Socha",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15759",
+    "nombre": "Sogamoso",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15761",
+    "nombre": "Somondoco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15762",
+    "nombre": "Sora",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15763",
+    "nombre": "Sotaquirá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15764",
+    "nombre": "Soracá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15774",
+    "nombre": "Susacón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15776",
+    "nombre": "Sutamarchán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15778",
+    "nombre": "Sutatenza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15790",
+    "nombre": "Tasco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15798",
+    "nombre": "Tenza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15804",
+    "nombre": "Tibaná",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15806",
+    "nombre": "Tibasosa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15808",
+    "nombre": "Tinjacá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15810",
+    "nombre": "Tipacoque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15814",
+    "nombre": "Toca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15816",
+    "nombre": "Togüí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15820",
+    "nombre": "Tópaga",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15822",
+    "nombre": "Tota",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15832",
+    "nombre": "Tununguá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15835",
+    "nombre": "Turmequé",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15837",
+    "nombre": "Tuta",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15839",
+    "nombre": "Tutazá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15842",
+    "nombre": "Úmbita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15861",
+    "nombre": "Ventaquemada",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15879",
+    "nombre": "Viracachá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "codigo": "15897",
+    "nombre": "Zetaquira",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "15",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Caldas ==="
+  },
+  {
+    "codigo": "17001",
+    "nombre": "Manizales",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17013",
+    "nombre": "Aguadas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17042",
+    "nombre": "Anserma",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17050",
+    "nombre": "Aranzazu",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17088",
+    "nombre": "Belalcázar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17174",
+    "nombre": "Chinchiná",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17272",
+    "nombre": "Filadelfia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17380",
+    "nombre": "La Dorada",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17388",
+    "nombre": "La Merced",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17433",
+    "nombre": "Manzanares",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17442",
+    "nombre": "Marmato",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17444",
+    "nombre": "Marquetalia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17446",
+    "nombre": "Marulanda",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17486",
+    "nombre": "Neira",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17495",
+    "nombre": "Norcasia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17513",
+    "nombre": "Pácora",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17524",
+    "nombre": "Palestina",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17541",
+    "nombre": "Pensilvania",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17614",
+    "nombre": "Riosucio",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17616",
+    "nombre": "Risaralda",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17653",
+    "nombre": "Salamina",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17662",
+    "nombre": "Samaná",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17665",
+    "nombre": "San José",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17777",
+    "nombre": "Supía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17867",
+    "nombre": "Victoria",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17873",
+    "nombre": "Villamaría",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "codigo": "17877",
+    "nombre": "Viterbo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "17",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Caquetá ==="
+  },
+  {
+    "codigo": "18001",
+    "nombre": "Florencia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18029",
+    "nombre": "Albania",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18094",
+    "nombre": "Belén de los Andaquíes",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18150",
+    "nombre": "Cartagena del Chairá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18205",
+    "nombre": "Curillo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18247",
+    "nombre": "El Doncello",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18256",
+    "nombre": "El Paujil",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18410",
+    "nombre": "La Montañita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18460",
+    "nombre": "Milán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18479",
+    "nombre": "Morelia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18592",
+    "nombre": "Puerto Rico",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18610",
+    "nombre": "San José del Fragua",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18753",
+    "nombre": "San Vicente del Caguán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18756",
+    "nombre": "Solano",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18785",
+    "nombre": "Solita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "codigo": "18860",
+    "nombre": "Valparaíso",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "18",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Cauca ==="
+  },
+  {
+    "codigo": "19001",
+    "nombre": "Popayán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19022",
+    "nombre": "Almaguer",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19050",
+    "nombre": "Argelia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19075",
+    "nombre": "Balboa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19100",
+    "nombre": "Bolívar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19110",
+    "nombre": "Buenos Aires",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19130",
+    "nombre": "Cajibío",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19137",
+    "nombre": "Caldono",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19142",
+    "nombre": "Caloto",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19212",
+    "nombre": "Corinto",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19256",
+    "nombre": "El Tambo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19290",
+    "nombre": "Florencia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19300",
+    "nombre": "Guachené",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19318",
+    "nombre": "Guapí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19355",
+    "nombre": "Inzá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19364",
+    "nombre": "Jambaló",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19392",
+    "nombre": "La Sierra",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19397",
+    "nombre": "La Vega",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19418",
+    "nombre": "López de Micay",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19450",
+    "nombre": "Mercaderes",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19455",
+    "nombre": "Miranda",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19473",
+    "nombre": "Morales",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19513",
+    "nombre": "Padilla",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19517",
+    "nombre": "Páez",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19532",
+    "nombre": "Patía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19533",
+    "nombre": "Piamonte",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19548",
+    "nombre": "Piendamó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19573",
+    "nombre": "Puerto Tejada",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19585",
+    "nombre": "Puracé",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19622",
+    "nombre": "Rosas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19693",
+    "nombre": "San Sebastián",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19698",
+    "nombre": "Santander de Quilichao",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19701",
+    "nombre": "Santa Rosa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19743",
+    "nombre": "Silvia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19760",
+    "nombre": "Sotara",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19780",
+    "nombre": "Suárez",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19785",
+    "nombre": "Sucre",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19807",
+    "nombre": "Timbío",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19809",
+    "nombre": "Timbiquí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19821",
+    "nombre": "Toribío",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19824",
+    "nombre": "Totoró",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "codigo": "19845",
+    "nombre": "Villa Rica",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "19",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Cesar ==="
+  },
+  {
+    "codigo": "20001",
+    "nombre": "Valledupar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20011",
+    "nombre": "Aguachica",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20013",
+    "nombre": "Agustín Codazzi",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20032",
+    "nombre": "Astrea",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20045",
+    "nombre": "Becerril",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20060",
+    "nombre": "Bosconia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20175",
+    "nombre": "Chimichagua",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20178",
+    "nombre": "Chiriguaná",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20228",
+    "nombre": "Curumaní",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20238",
+    "nombre": "El Copey",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20250",
+    "nombre": "El Paso",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20295",
+    "nombre": "Gamarra",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20310",
+    "nombre": "González",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20383",
+    "nombre": "La Gloria",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20400",
+    "nombre": "La Jagua de Ibirico",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20443",
+    "nombre": "Manaure Balcón del Cesar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20517",
+    "nombre": "Pailitas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20550",
+    "nombre": "Pelaya",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20570",
+    "nombre": "Pueblo Bello",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20614",
+    "nombre": "Río de Oro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20621",
+    "nombre": "La Paz",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20710",
+    "nombre": "San Alberto",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20750",
+    "nombre": "San Diego",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20770",
+    "nombre": "San Martín",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "codigo": "20787",
+    "nombre": "Tamalameque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "20",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Córdoba ==="
+  },
+  {
+    "codigo": "23001",
+    "nombre": "Montería",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23068",
+    "nombre": "Ayapel",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23079",
+    "nombre": "Buenavista",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23090",
+    "nombre": "Canalete",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23162",
+    "nombre": "Cereté",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23168",
+    "nombre": "Chimá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23182",
+    "nombre": "Chinú",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23189",
+    "nombre": "Ciénaga de Oro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23300",
+    "nombre": "Cotorra",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23350",
+    "nombre": "La Apartada",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23417",
+    "nombre": "Lorica",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23419",
+    "nombre": "Los Córdobas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23464",
+    "nombre": "Momil",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23466",
+    "nombre": "Montelíbano",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23500",
+    "nombre": "Moñitos",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23555",
+    "nombre": "Planeta Rica",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23570",
+    "nombre": "Pueblo Nuevo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23574",
+    "nombre": "Puerto Escondido",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23580",
+    "nombre": "Puerto Libertador",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23586",
+    "nombre": "Purísima de la Concepción",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23660",
+    "nombre": "Sahagún",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23670",
+    "nombre": "San Andrés de Sotavento",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23672",
+    "nombre": "San Antero",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23675",
+    "nombre": "San Bernardo del Viento",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23678",
+    "nombre": "San Carlos",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23682",
+    "nombre": "San José de Uré",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23686",
+    "nombre": "San Pelayo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23807",
+    "nombre": "Tierralta",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23815",
+    "nombre": "Tuchín",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "codigo": "23855",
+    "nombre": "Valencia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "23",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Cundinamarca ==="
+  },
+  {
+    "codigo": "25001",
+    "nombre": "Agua de Dios",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25019",
+    "nombre": "Albán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25035",
+    "nombre": "Anapoima",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25040",
+    "nombre": "Anolaima",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25053",
+    "nombre": "Arbeláez",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25086",
+    "nombre": "Beltrán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25095",
+    "nombre": "Bituima",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25099",
+    "nombre": "Bojacá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25120",
+    "nombre": "Cabrera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25123",
+    "nombre": "Cachipay",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25126",
+    "nombre": "Cajicá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25148",
+    "nombre": "Caparrapí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25151",
+    "nombre": "Cáqueza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25154",
+    "nombre": "Carmen de Carupa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25168",
+    "nombre": "Chaguaní",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25175",
+    "nombre": "Chía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25178",
+    "nombre": "Chipaque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25181",
+    "nombre": "Choachí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25183",
+    "nombre": "Chocontá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25200",
+    "nombre": "Cogua",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25214",
+    "nombre": "Cota",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25224",
+    "nombre": "Cucunubá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25245",
+    "nombre": "El Colegio",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25258",
+    "nombre": "El Peñón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25260",
+    "nombre": "El Rosal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25269",
+    "nombre": "Facatativá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25279",
+    "nombre": "Fómeque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25281",
+    "nombre": "Fosca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25286",
+    "nombre": "Funza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25288",
+    "nombre": "Fúquene",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25290",
+    "nombre": "Fusagasugá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25293",
+    "nombre": "Gachalá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25295",
+    "nombre": "Gachancipá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25297",
+    "nombre": "Gachetá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25299",
+    "nombre": "Gama",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25307",
+    "nombre": "Girardot",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25312",
+    "nombre": "Granada",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25317",
+    "nombre": "Guachetá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25320",
+    "nombre": "Guaduas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25322",
+    "nombre": "Guasca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25324",
+    "nombre": "Guataquí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25326",
+    "nombre": "Guatavita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25328",
+    "nombre": "Guayabal de Síquima",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25335",
+    "nombre": "Guayabetal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25339",
+    "nombre": "Gutiérrez",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25368",
+    "nombre": "Jerusalén",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25372",
+    "nombre": "Junín",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25377",
+    "nombre": "La Calera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25386",
+    "nombre": "La Mesa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25394",
+    "nombre": "La Palma",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25398",
+    "nombre": "La Peña",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25402",
+    "nombre": "La Vega",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25407",
+    "nombre": "Lenguazaque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25426",
+    "nombre": "Machetá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25430",
+    "nombre": "Madrid",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25436",
+    "nombre": "Manta",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25438",
+    "nombre": "Medina",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25473",
+    "nombre": "Mosquera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25483",
+    "nombre": "Nariño",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25486",
+    "nombre": "Nemocón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25488",
+    "nombre": "Nilo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25489",
+    "nombre": "Nimaima",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25491",
+    "nombre": "Nocaima",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25506",
+    "nombre": "Venecia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25513",
+    "nombre": "Pacho",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25518",
+    "nombre": "Paime",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25524",
+    "nombre": "Pandi",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25530",
+    "nombre": "Paratebueno",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25535",
+    "nombre": "Pasca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25572",
+    "nombre": "Puerto Salgar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25580",
+    "nombre": "Pulí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25592",
+    "nombre": "Quebradanegra",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25594",
+    "nombre": "Quetame",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25596",
+    "nombre": "Quipile",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25599",
+    "nombre": "Apulo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25612",
+    "nombre": "Ricaurte",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25645",
+    "nombre": "San Antonio del Tequendama",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25649",
+    "nombre": "San Bernardo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25653",
+    "nombre": "San Cayetano",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25658",
+    "nombre": "San Francisco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25662",
+    "nombre": "San Juan de Rioseco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25718",
+    "nombre": "Sasaima",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25736",
+    "nombre": "Sesquilé",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25740",
+    "nombre": "Sibaté",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25743",
+    "nombre": "Silvania",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25745",
+    "nombre": "Simijaca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25754",
+    "nombre": "Soacha",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25758",
+    "nombre": "Sopó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25769",
+    "nombre": "Subachoque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25772",
+    "nombre": "Suesca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25777",
+    "nombre": "Supatá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25779",
+    "nombre": "Susa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25781",
+    "nombre": "Sutatausa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25785",
+    "nombre": "Tabio",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25793",
+    "nombre": "Tausa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25797",
+    "nombre": "Tena",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25799",
+    "nombre": "Tenjo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25805",
+    "nombre": "Tibacuy",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25807",
+    "nombre": "Tibirita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25815",
+    "nombre": "Tocaima",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25817",
+    "nombre": "Tocancipá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25823",
+    "nombre": "Topaipí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25839",
+    "nombre": "Ubalá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25841",
+    "nombre": "Ubaque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25843",
+    "nombre": "Villa de San Diego de Ubaté",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25845",
+    "nombre": "Une",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25851",
+    "nombre": "Útica",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25862",
+    "nombre": "Vergara",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25867",
+    "nombre": "Vianí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25871",
+    "nombre": "Villagómez",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25873",
+    "nombre": "Villapinzón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25875",
+    "nombre": "Villeta",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25878",
+    "nombre": "Viotá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25885",
+    "nombre": "Yacopí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25898",
+    "nombre": "Zipacón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "codigo": "25899",
+    "nombre": "Zipaquirá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "25",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Chocó ==="
+  },
+  {
+    "codigo": "27001",
+    "nombre": "Quibdó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27006",
+    "nombre": "Acandí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27025",
+    "nombre": "Alto Baudó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27050",
+    "nombre": "Atrato",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27073",
+    "nombre": "Bagadó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27075",
+    "nombre": "Bahía Solano",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27077",
+    "nombre": "Bajo Baudó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27099",
+    "nombre": "Bojayá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27135",
+    "nombre": "El Cantón del San Pablo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27150",
+    "nombre": "Carmen del Darién",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27160",
+    "nombre": "Cértegui",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27205",
+    "nombre": "Condoto",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27245",
+    "nombre": "El Carmen de Atrato",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27250",
+    "nombre": "El Litoral del San Juan",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27361",
+    "nombre": "Istmina",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27372",
+    "nombre": "Juradó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27413",
+    "nombre": "Lloró",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27425",
+    "nombre": "Medio Atrato",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27430",
+    "nombre": "Medio Baudó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27450",
+    "nombre": "Medio San Juan",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27491",
+    "nombre": "Nóvita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27495",
+    "nombre": "Nuquí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27580",
+    "nombre": "Río Iró",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27600",
+    "nombre": "Río Quito",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27615",
+    "nombre": "Riosucio",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27660",
+    "nombre": "San José del Palmar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27745",
+    "nombre": "Sipí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27787",
+    "nombre": "Tadó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27800",
+    "nombre": "Unguía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "codigo": "27810",
+    "nombre": "Unión Panamericana",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "27",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Huila ==="
+  },
+  {
+    "codigo": "41001",
+    "nombre": "Neiva",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41006",
+    "nombre": "Acevedo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41013",
+    "nombre": "Agrado",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41016",
+    "nombre": "Aipe",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41020",
+    "nombre": "Algeciras",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41026",
+    "nombre": "Altamira",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41078",
+    "nombre": "Baraya",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41132",
+    "nombre": "Campoalegre",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41206",
+    "nombre": "Colombia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41244",
+    "nombre": "Elías",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41298",
+    "nombre": "Garzón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41306",
+    "nombre": "Gigante",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41319",
+    "nombre": "Guadalupe",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41349",
+    "nombre": "Hobo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41357",
+    "nombre": "Íquira",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41359",
+    "nombre": "Isnos",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41378",
+    "nombre": "La Argentina",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41396",
+    "nombre": "La Plata",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41483",
+    "nombre": "Nátaga",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41503",
+    "nombre": "Oporapa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41518",
+    "nombre": "Paicol",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41524",
+    "nombre": "Palermo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41530",
+    "nombre": "Palestina",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41548",
+    "nombre": "Pital",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41551",
+    "nombre": "Pitalito",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41615",
+    "nombre": "Rivera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41660",
+    "nombre": "Saladoblanco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41668",
+    "nombre": "San Agustín",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41676",
+    "nombre": "Santa María",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41770",
+    "nombre": "Suaza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41791",
+    "nombre": "Tarqui",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41797",
+    "nombre": "Tesalia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41799",
+    "nombre": "Tello",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41801",
+    "nombre": "Teruel",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41807",
+    "nombre": "Timaná",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41872",
+    "nombre": "Villavieja",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "codigo": "41885",
+    "nombre": "Yaguará",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "41",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de La Guajira ==="
+  },
+  {
+    "codigo": "44001",
+    "nombre": "Riohacha",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44035",
+    "nombre": "Albania",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44078",
+    "nombre": "Barrancas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44090",
+    "nombre": "Dibulla",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44098",
+    "nombre": "Distracción",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44110",
+    "nombre": "El Molino",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44279",
+    "nombre": "Fonseca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44378",
+    "nombre": "Hatonuevo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44420",
+    "nombre": "La Jagua del Pilar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44430",
+    "nombre": "Maicao",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44560",
+    "nombre": "Manaure",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44650",
+    "nombre": "San Juan del Cesar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44847",
+    "nombre": "Uribia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44855",
+    "nombre": "Urumita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "codigo": "44874",
+    "nombre": "Villanueva",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "44",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Magdalena ==="
+  },
+  {
+    "codigo": "47001",
+    "nombre": "Santa Marta",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47030",
+    "nombre": "Algarrobo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47053",
+    "nombre": "Aracataca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47058",
+    "nombre": "Ariguaní",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47161",
+    "nombre": "Cerro de San Antonio",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47170",
+    "nombre": "Chibolo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47189",
+    "nombre": "Ciénaga",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47205",
+    "nombre": "Concordia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47245",
+    "nombre": "El Banco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47258",
+    "nombre": "El Piñón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47268",
+    "nombre": "El Retén",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47288",
+    "nombre": "Fundación",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47318",
+    "nombre": "Guamal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47460",
+    "nombre": "Nueva Granada",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47541",
+    "nombre": "Pedraza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47545",
+    "nombre": "Pijiño del Carmen",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47551",
+    "nombre": "Pivijay",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47555",
+    "nombre": "Plato",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47570",
+    "nombre": "Puebloviejo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47605",
+    "nombre": "Remolino",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47660",
+    "nombre": "Sabanas de San Ángel",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47675",
+    "nombre": "Salamina",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47692",
+    "nombre": "San Sebastián de Buenavista",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47703",
+    "nombre": "San Zenón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47707",
+    "nombre": "Santa Ana",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47720",
+    "nombre": "Santa Bárbara de Pinto",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47745",
+    "nombre": "Sitionuevo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47798",
+    "nombre": "Tenerife",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47960",
+    "nombre": "Zapayán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "codigo": "47980",
+    "nombre": "Zona Bananera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "47",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Meta ==="
+  },
+  {
+    "codigo": "50001",
+    "nombre": "Villavicencio",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50006",
+    "nombre": "Acacías",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50110",
+    "nombre": "Barranca de Upía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50124",
+    "nombre": "Cabuyaro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50150",
+    "nombre": "Castilla la Nueva",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50223",
+    "nombre": "Cubarral",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50226",
+    "nombre": "Cumaral",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50245",
+    "nombre": "El Calvario",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50251",
+    "nombre": "El Castillo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50270",
+    "nombre": "El Dorado",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50287",
+    "nombre": "Fuente de Oro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50313",
+    "nombre": "Granada",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50318",
+    "nombre": "Guamal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50325",
+    "nombre": "Mapiripán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50330",
+    "nombre": "Mesetas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50350",
+    "nombre": "La Macarena",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50370",
+    "nombre": "La Uribe",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50400",
+    "nombre": "Lejanías",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50450",
+    "nombre": "Puerto Concordia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50568",
+    "nombre": "Puerto Gaitán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50573",
+    "nombre": "Puerto López",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50577",
+    "nombre": "Puerto Lleras",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50590",
+    "nombre": "Puerto Rico",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50606",
+    "nombre": "Restrepo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50680",
+    "nombre": "San Carlos de Guaroa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50683",
+    "nombre": "San Juan de Arama",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50686",
+    "nombre": "San Juanito",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50689",
+    "nombre": "San Martín",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "codigo": "50711",
+    "nombre": "Vistahermosa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "50",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Nariño ==="
+  },
+  {
+    "codigo": "52001",
+    "nombre": "Pasto",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52019",
+    "nombre": "Albán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52022",
+    "nombre": "Aldana",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52036",
+    "nombre": "Ancuyá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52051",
+    "nombre": "Arboleda",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52079",
+    "nombre": "Barbacoas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52083",
+    "nombre": "Belén",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52110",
+    "nombre": "Buesaco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52203",
+    "nombre": "Colón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52207",
+    "nombre": "Consacá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52210",
+    "nombre": "Contadero",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52215",
+    "nombre": "Córdoba",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52224",
+    "nombre": "Cuaspud",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52227",
+    "nombre": "Cumbal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52233",
+    "nombre": "Cumbitara",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52240",
+    "nombre": "Chachagüí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52250",
+    "nombre": "El Charco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52254",
+    "nombre": "El Peñol",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52256",
+    "nombre": "El Rosario",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52258",
+    "nombre": "El Tablón de Gómez",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52260",
+    "nombre": "El Tambo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52286",
+    "nombre": "Funes",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52287",
+    "nombre": "Francisco Pizarro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52317",
+    "nombre": "Guachucal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52320",
+    "nombre": "Guaitarilla",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52323",
+    "nombre": "Gualmatán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52352",
+    "nombre": "Iles",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52354",
+    "nombre": "Imués",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52356",
+    "nombre": "Ipiales",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52378",
+    "nombre": "La Cruz",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52381",
+    "nombre": "La Florida",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52385",
+    "nombre": "La Llanada",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52390",
+    "nombre": "La Tola",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52399",
+    "nombre": "La Unión",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52405",
+    "nombre": "Leiva",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52411",
+    "nombre": "Linares",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52418",
+    "nombre": "Los Andes",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52427",
+    "nombre": "Magüí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52435",
+    "nombre": "Mallama",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52473",
+    "nombre": "Mosquera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52480",
+    "nombre": "Nariño",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52490",
+    "nombre": "Olaya Herrera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52506",
+    "nombre": "Ospina",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52520",
+    "nombre": "Policarpa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52540",
+    "nombre": "Potosí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52560",
+    "nombre": "Providencia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52565",
+    "nombre": "Puerres",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52573",
+    "nombre": "Pupiales",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52585",
+    "nombre": "Ricaurte",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52612",
+    "nombre": "Roberto Payán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52621",
+    "nombre": "Samaniego",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52678",
+    "nombre": "San Bernardo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52683",
+    "nombre": "San Lorenzo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52685",
+    "nombre": "San Pablo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52687",
+    "nombre": "San Pedro de Cartago",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52693",
+    "nombre": "Sandoná",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52694",
+    "nombre": "Santa Bárbara",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52696",
+    "nombre": "Santacruz",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52699",
+    "nombre": "Sapuyes",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52720",
+    "nombre": "Taminango",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52786",
+    "nombre": "Tangua",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52788",
+    "nombre": "San Andrés de Tumaco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52835",
+    "nombre": "Túquerres",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "codigo": "52838",
+    "nombre": "Yacuanquer",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "52",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Norte de Santander ==="
+  },
+  {
+    "codigo": "54001",
+    "nombre": "Cúcuta",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54003",
+    "nombre": "Ábrego",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54051",
+    "nombre": "Arboledas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54099",
+    "nombre": "Bochalema",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54109",
+    "nombre": "Bucarasica",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54125",
+    "nombre": "Cácota",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54128",
+    "nombre": "Cáchira",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54172",
+    "nombre": "Chinácota",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54174",
+    "nombre": "Chitagá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54206",
+    "nombre": "Convención",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54223",
+    "nombre": "Cucutilla",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54239",
+    "nombre": "Durania",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54245",
+    "nombre": "El Carmen",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54250",
+    "nombre": "El Tarra",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54261",
+    "nombre": "El Zulia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54313",
+    "nombre": "Gramalote",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54344",
+    "nombre": "Hacarí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54347",
+    "nombre": "Herrán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54377",
+    "nombre": "Labateca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54385",
+    "nombre": "La Esperanza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54398",
+    "nombre": "La Playa de Belén",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54405",
+    "nombre": "Los Patios",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54418",
+    "nombre": "Lourdes",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54480",
+    "nombre": "Mutiscua",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54498",
+    "nombre": "Ocaña",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54518",
+    "nombre": "Pamplona",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54520",
+    "nombre": "Pamplonita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54553",
+    "nombre": "Puerto Santander",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54599",
+    "nombre": "Ragonvalia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54660",
+    "nombre": "Salazar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54670",
+    "nombre": "San Calixto",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54673",
+    "nombre": "San Cayetano",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54680",
+    "nombre": "Santiago",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54720",
+    "nombre": "Sardinata",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54743",
+    "nombre": "Silos",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54800",
+    "nombre": "Teorama",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54810",
+    "nombre": "Tibú",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54820",
+    "nombre": "Toledo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54871",
+    "nombre": "Villa Caro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "codigo": "54874",
+    "nombre": "Villa del Rosario",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "54",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Quindío ==="
+  },
+  {
+    "codigo": "63001",
+    "nombre": "Armenia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "63",
+    "activo": true
+  },
+  {
+    "codigo": "63111",
+    "nombre": "Buenavista",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "63",
+    "activo": true
+  },
+  {
+    "codigo": "63130",
+    "nombre": "Calarcá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "63",
+    "activo": true
+  },
+  {
+    "codigo": "63190",
+    "nombre": "Circasia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "63",
+    "activo": true
+  },
+  {
+    "codigo": "63212",
+    "nombre": "Córdoba",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "63",
+    "activo": true
+  },
+  {
+    "codigo": "63272",
+    "nombre": "Filandia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "63",
+    "activo": true
+  },
+  {
+    "codigo": "63302",
+    "nombre": "Génova",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "63",
+    "activo": true
+  },
+  {
+    "codigo": "63401",
+    "nombre": "La Tebaida",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "63",
+    "activo": true
+  },
+  {
+    "codigo": "63470",
+    "nombre": "Montenegro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "63",
+    "activo": true
+  },
+  {
+    "codigo": "63548",
+    "nombre": "Pijao",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "63",
+    "activo": true
+  },
+  {
+    "codigo": "63594",
+    "nombre": "Quimbaya",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "63",
+    "activo": true
+  },
+  {
+    "codigo": "63690",
+    "nombre": "Salento",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "63",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Risaralda ==="
+  },
+  {
+    "codigo": "66001",
+    "nombre": "Pereira",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66045",
+    "nombre": "Apía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66075",
+    "nombre": "Balboa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66088",
+    "nombre": "Belén de Umbría",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66170",
+    "nombre": "Dosquebradas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66318",
+    "nombre": "Guática",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66383",
+    "nombre": "La Celia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66400",
+    "nombre": "La Virginia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66440",
+    "nombre": "Marsella",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66456",
+    "nombre": "Mistrató",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66572",
+    "nombre": "Pueblo Rico",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66594",
+    "nombre": "Quinchía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66682",
+    "nombre": "Santa Rosa de Cabal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "codigo": "66687",
+    "nombre": "Santuario",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "66",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Santander ==="
+  },
+  {
+    "codigo": "68001",
+    "nombre": "Bucaramanga",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68013",
+    "nombre": "Aguada",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68020",
+    "nombre": "Albania",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68051",
+    "nombre": "Aratoca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68077",
+    "nombre": "Barbosa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68079",
+    "nombre": "Barichara",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68081",
+    "nombre": "Barrancabermeja",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68092",
+    "nombre": "Betulia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68101",
+    "nombre": "Bolívar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68121",
+    "nombre": "Cabrera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68132",
+    "nombre": "California",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68147",
+    "nombre": "Capitanejo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68152",
+    "nombre": "Carcasí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68160",
+    "nombre": "Cepitá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68162",
+    "nombre": "Cerrito",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68167",
+    "nombre": "Charalá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68169",
+    "nombre": "Charta",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68176",
+    "nombre": "Chima",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68179",
+    "nombre": "Chipatá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68190",
+    "nombre": "Cimitarra",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68207",
+    "nombre": "Concepción",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68209",
+    "nombre": "Confines",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68211",
+    "nombre": "Contratación",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68217",
+    "nombre": "Coromoro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68229",
+    "nombre": "Curití",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68235",
+    "nombre": "El Carmen de Chucurí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68245",
+    "nombre": "El Guacamayo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68250",
+    "nombre": "El Peñón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68255",
+    "nombre": "El Playón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68264",
+    "nombre": "Encino",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68266",
+    "nombre": "Enciso",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68271",
+    "nombre": "Florián",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68276",
+    "nombre": "Floridablanca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68296",
+    "nombre": "Galán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68298",
+    "nombre": "Gámbita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68307",
+    "nombre": "Girón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68318",
+    "nombre": "Guaca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68320",
+    "nombre": "Guadalupe",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68322",
+    "nombre": "Guapotá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68324",
+    "nombre": "Guavatá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68327",
+    "nombre": "Güepsa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68344",
+    "nombre": "Hato",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68368",
+    "nombre": "Jesús María",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68370",
+    "nombre": "Jordán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68377",
+    "nombre": "La Belleza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68385",
+    "nombre": "Landázuri",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68397",
+    "nombre": "La Paz",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68406",
+    "nombre": "Lebríja",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68418",
+    "nombre": "Los Santos",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68425",
+    "nombre": "Macaravita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68432",
+    "nombre": "Málaga",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68444",
+    "nombre": "Matanza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68464",
+    "nombre": "Mogotes",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68468",
+    "nombre": "Molagavita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68498",
+    "nombre": "Ocamonte",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68500",
+    "nombre": "Oiba",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68502",
+    "nombre": "Onzaga",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68522",
+    "nombre": "Palmar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68524",
+    "nombre": "Palmas del Socorro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68533",
+    "nombre": "Páramo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68547",
+    "nombre": "Piedecuesta",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68549",
+    "nombre": "Pinchote",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68572",
+    "nombre": "Puente Nacional",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68573",
+    "nombre": "Puerto Parra",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68575",
+    "nombre": "Puerto Wilches",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68615",
+    "nombre": "Rionegro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68655",
+    "nombre": "Sabana de Torres",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68669",
+    "nombre": "San Andrés",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68673",
+    "nombre": "San Benito",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68679",
+    "nombre": "San Gil",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68682",
+    "nombre": "San Joaquín",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68684",
+    "nombre": "San José de Miranda",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68686",
+    "nombre": "San Miguel",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68689",
+    "nombre": "San Vicente de Chucurí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68705",
+    "nombre": "Santa Bárbara",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68720",
+    "nombre": "Santa Helena del Opón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68745",
+    "nombre": "Simacota",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68755",
+    "nombre": "Socorro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68770",
+    "nombre": "Suaita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68773",
+    "nombre": "Sucre",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68780",
+    "nombre": "Suratá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68820",
+    "nombre": "Tona",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68855",
+    "nombre": "Valle de San José",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68861",
+    "nombre": "Vélez",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68867",
+    "nombre": "Vetas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68872",
+    "nombre": "Villanueva",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "codigo": "68895",
+    "nombre": "Zapatoca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "68",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Sucre ==="
+  },
+  {
+    "codigo": "70001",
+    "nombre": "Sincelejo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70110",
+    "nombre": "Buenavista",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70124",
+    "nombre": "Caimito",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70204",
+    "nombre": "Colosó",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70215",
+    "nombre": "Corozal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70221",
+    "nombre": "Coveñas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70230",
+    "nombre": "Chalán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70233",
+    "nombre": "El Roble",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70235",
+    "nombre": "Galeras",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70265",
+    "nombre": "Guaranda",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70400",
+    "nombre": "La Unión",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70418",
+    "nombre": "Los Palmitos",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70429",
+    "nombre": "Majagual",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70473",
+    "nombre": "Morroa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70508",
+    "nombre": "Ovejas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70523",
+    "nombre": "Palmito",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70670",
+    "nombre": "Sampués",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70678",
+    "nombre": "San Benito Abad",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70702",
+    "nombre": "San Juan de Betulia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70708",
+    "nombre": "San Marcos",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70713",
+    "nombre": "San Onofre",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70717",
+    "nombre": "San Pedro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70742",
+    "nombre": "San Luis de Sincé",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70771",
+    "nombre": "Sucre",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70820",
+    "nombre": "Santiago de Tolú",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "codigo": "70823",
+    "nombre": "Tolú Viejo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "70",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Tolima ==="
+  },
+  {
+    "codigo": "73001",
+    "nombre": "Ibagué",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73024",
+    "nombre": "Alpujarra",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73026",
+    "nombre": "Alvarado",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73030",
+    "nombre": "Ambalema",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73043",
+    "nombre": "Anzoátegui",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73055",
+    "nombre": "Armero",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73067",
+    "nombre": "Ataco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73124",
+    "nombre": "Cajamarca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73148",
+    "nombre": "Carmen de Apicalá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73152",
+    "nombre": "Casabianca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73168",
+    "nombre": "Chaparral",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73200",
+    "nombre": "Coello",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73217",
+    "nombre": "Coyaima",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73226",
+    "nombre": "Cunday",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73236",
+    "nombre": "Dolores",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73268",
+    "nombre": "Espinal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73270",
+    "nombre": "Falan",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73275",
+    "nombre": "Flandes",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73283",
+    "nombre": "Fresno",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73319",
+    "nombre": "Guamo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73347",
+    "nombre": "Herveo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73349",
+    "nombre": "Honda",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73352",
+    "nombre": "Icononzo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73408",
+    "nombre": "Lérida",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73411",
+    "nombre": "Líbano",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73443",
+    "nombre": "San Sebastián de Mariquita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73449",
+    "nombre": "Melgar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73461",
+    "nombre": "Murillo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73483",
+    "nombre": "Natagaima",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73504",
+    "nombre": "Ortega",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73520",
+    "nombre": "Palocabildo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73547",
+    "nombre": "Piedras",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73555",
+    "nombre": "Planadas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73563",
+    "nombre": "Prado",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73585",
+    "nombre": "Purificación",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73616",
+    "nombre": "Rioblanco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73622",
+    "nombre": "Roncesvalles",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73624",
+    "nombre": "Rovira",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73671",
+    "nombre": "Saldaña",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73675",
+    "nombre": "San Antonio",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73678",
+    "nombre": "San Luis",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73686",
+    "nombre": "Santa Isabel",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73770",
+    "nombre": "Suárez",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73854",
+    "nombre": "Valle de San Juan",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73861",
+    "nombre": "Venadillo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73870",
+    "nombre": "Villahermosa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "codigo": "73873",
+    "nombre": "Villarrica",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "73",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Valle del Cauca ==="
+  },
+  {
+    "codigo": "76001",
+    "nombre": "Cali",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76020",
+    "nombre": "Alcalá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76036",
+    "nombre": "Andalucía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76041",
+    "nombre": "Ansermanuevo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76054",
+    "nombre": "Argelia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76100",
+    "nombre": "Bolívar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76109",
+    "nombre": "Buenaventura",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76111",
+    "nombre": "Guadalajara de Buga",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76113",
+    "nombre": "Bugalagrande",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76122",
+    "nombre": "Caicedonia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76126",
+    "nombre": "Calima",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76130",
+    "nombre": "Candelaria",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76147",
+    "nombre": "Cartago",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76233",
+    "nombre": "Dagua",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76243",
+    "nombre": "El Águila",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76246",
+    "nombre": "El Cairo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76248",
+    "nombre": "El Cerrito",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76250",
+    "nombre": "El Dovio",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76275",
+    "nombre": "Florida",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76306",
+    "nombre": "Ginebra",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76318",
+    "nombre": "Guacarí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76364",
+    "nombre": "Jamundí",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76377",
+    "nombre": "La Cumbre",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76400",
+    "nombre": "La Unión",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76403",
+    "nombre": "La Victoria",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76497",
+    "nombre": "Obando",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76520",
+    "nombre": "Palmira",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76563",
+    "nombre": "Pradera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76606",
+    "nombre": "Restrepo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76616",
+    "nombre": "Riofrío",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76622",
+    "nombre": "Roldanillo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76670",
+    "nombre": "San Pedro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76736",
+    "nombre": "Sevilla",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76823",
+    "nombre": "Toro",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76828",
+    "nombre": "Trujillo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76834",
+    "nombre": "Tuluá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76845",
+    "nombre": "Ulloa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76863",
+    "nombre": "Versalles",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76869",
+    "nombre": "Vijes",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76890",
+    "nombre": "Yotoco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76892",
+    "nombre": "Yumbo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "codigo": "76895",
+    "nombre": "Zarzal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "76",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Arauca ==="
+  },
+  {
+    "codigo": "81001",
+    "nombre": "Arauca",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "81",
+    "activo": true
+  },
+  {
+    "codigo": "81065",
+    "nombre": "Arauquita",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "81",
+    "activo": true
+  },
+  {
+    "codigo": "81220",
+    "nombre": "Cravo Norte",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "81",
+    "activo": true
+  },
+  {
+    "codigo": "81300",
+    "nombre": "Fortul",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "81",
+    "activo": true
+  },
+  {
+    "codigo": "81591",
+    "nombre": "Puerto Rondón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "81",
+    "activo": true
+  },
+  {
+    "codigo": "81736",
+    "nombre": "Saravena",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "81",
+    "activo": true
+  },
+  {
+    "codigo": "81794",
+    "nombre": "Tame",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "81",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Casanare ==="
+  },
+  {
+    "codigo": "85001",
+    "nombre": "Yopal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85010",
+    "nombre": "Aguazul",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85015",
+    "nombre": "Chámeza",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85125",
+    "nombre": "Hato Corozal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85136",
+    "nombre": "La Salina",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85139",
+    "nombre": "Maní",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85162",
+    "nombre": "Monterrey",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85225",
+    "nombre": "Nunchía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85230",
+    "nombre": "Orocué",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85250",
+    "nombre": "Paz de Ariporo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85263",
+    "nombre": "Pore",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85279",
+    "nombre": "Recetor",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85300",
+    "nombre": "Sabanalarga",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85315",
+    "nombre": "Sácama",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85325",
+    "nombre": "San Luis de Palenque",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85400",
+    "nombre": "Támara",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85410",
+    "nombre": "Tauramena",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85430",
+    "nombre": "Trinidad",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "codigo": "85440",
+    "nombre": "Villanueva",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "85",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Putumayo ==="
+  },
+  {
+    "codigo": "86001",
+    "nombre": "Mocoa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "codigo": "86219",
+    "nombre": "Colón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "codigo": "86320",
+    "nombre": "Orito",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "codigo": "86565",
+    "nombre": "Valle del Guamuez",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "codigo": "86568",
+    "nombre": "Puerto Asís",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "codigo": "86569",
+    "nombre": "Puerto Caicedo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "codigo": "86571",
+    "nombre": "Puerto Guzmán",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "codigo": "86573",
+    "nombre": "Puerto Leguízamo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "codigo": "86749",
+    "nombre": "Sibundoy",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "codigo": "86755",
+    "nombre": "San Francisco",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "codigo": "86757",
+    "nombre": "San Miguel",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "codigo": "86760",
+    "nombre": "Santiago",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "codigo": "86885",
+    "nombre": "Villagarzón",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "86",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de San Andrés, Providencia y Santa Catalina ==="
+  },
+  {
+    "codigo": "88001",
+    "nombre": "San Andrés",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "88",
+    "activo": true
+  },
+  {
+    "codigo": "88564",
+    "nombre": "Providencia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "88",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Amazonas ==="
+  },
+  {
+    "codigo": "91001",
+    "nombre": "Leticia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "91",
+    "activo": true
+  },
+  {
+    "codigo": "91263",
+    "nombre": "El Encanto",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "91",
+    "activo": true
+  },
+  {
+    "codigo": "91405",
+    "nombre": "La Chorrera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "91",
+    "activo": true
+  },
+  {
+    "codigo": "91407",
+    "nombre": "La Pedrera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "91",
+    "activo": true
+  },
+  {
+    "codigo": "91430",
+    "nombre": "La Victoria",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "91",
+    "activo": true
+  },
+  {
+    "codigo": "91460",
+    "nombre": "Mirití-Paraná",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "91",
+    "activo": true
+  },
+  {
+    "codigo": "91530",
+    "nombre": "Puerto Alegría",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "91",
+    "activo": true
+  },
+  {
+    "codigo": "91536",
+    "nombre": "Puerto Arica",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "91",
+    "activo": true
+  },
+  {
+    "codigo": "91540",
+    "nombre": "Puerto Nariño",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "91",
+    "activo": true
+  },
+  {
+    "codigo": "91669",
+    "nombre": "Puerto Santander",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "91",
+    "activo": true
+  },
+  {
+    "codigo": "91798",
+    "nombre": "Tarapacá",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "91",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Guainía ==="
+  },
+  {
+    "codigo": "94001",
+    "nombre": "Inírida",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "94",
+    "activo": true
+  },
+  {
+    "codigo": "94343",
+    "nombre": "Barranco Minas",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "94",
+    "activo": true
+  },
+  {
+    "codigo": "94663",
+    "nombre": "Mapiripana",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "94",
+    "activo": true
+  },
+  {
+    "codigo": "94883",
+    "nombre": "San Felipe",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "94",
+    "activo": true
+  },
+  {
+    "codigo": "94884",
+    "nombre": "Puerto Colombia",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "94",
+    "activo": true
+  },
+  {
+    "codigo": "94885",
+    "nombre": "La Guadalupe",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "94",
+    "activo": true
+  },
+  {
+    "codigo": "94886",
+    "nombre": "Cacahual",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "94",
+    "activo": true
+  },
+  {
+    "codigo": "94887",
+    "nombre": "Pana Pana",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "94",
+    "activo": true
+  },
+  {
+    "codigo": "94888",
+    "nombre": "Morichal",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "94",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Guaviare ==="
+  },
+  {
+    "codigo": "95001",
+    "nombre": "San José del Guaviare",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "95",
+    "activo": true
+  },
+  {
+    "codigo": "95015",
+    "nombre": "Calamar",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "95",
+    "activo": true
+  },
+  {
+    "codigo": "95025",
+    "nombre": "El Retorno",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "95",
+    "activo": true
+  },
+  {
+    "codigo": "95200",
+    "nombre": "Miraflores",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "95",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Vaupés ==="
+  },
+  {
+    "codigo": "97001",
+    "nombre": "Mitú",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "97",
+    "activo": true
+  },
+  {
+    "codigo": "97161",
+    "nombre": "Carurú",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "97",
+    "activo": true
+  },
+  {
+    "codigo": "97511",
+    "nombre": "Pacoa",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "97",
+    "activo": true
+  },
+  {
+    "codigo": "97666",
+    "nombre": "Taraira",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "97",
+    "activo": true
+  },
+  {
+    "codigo": "97777",
+    "nombre": "Papunaua",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "97",
+    "activo": true
+  },
+  {
+    "codigo": "97889",
+    "nombre": "Yavaraté",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "97",
+    "activo": true
+  },
+  {
+    "_comentario": "=== Municipios de Vichada ==="
+  },
+  {
+    "codigo": "99001",
+    "nombre": "Puerto Carreño",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "99",
+    "activo": true
+  },
+  {
+    "codigo": "99524",
+    "nombre": "La Primavera",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "99",
+    "activo": true
+  },
+  {
+    "codigo": "99624",
+    "nombre": "Santa Rosalía",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "99",
+    "activo": true
+  },
+  {
+    "codigo": "99773",
+    "nombre": "Cumaribo",
+    "paisCodigo": "CO",
+    "nivel": "municipio",
+    "codigoSuperior": "99",
+    "activo": true
+  }
+]
