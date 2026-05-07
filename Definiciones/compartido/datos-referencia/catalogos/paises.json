@@ -1,0 +1,1367 @@
+[
+  {
+    "codigo": "AF",
+    "nombre": "Afganistán",
+    "monedaPrincipal": "AFN",
+    "indicativoTelefonico": "+93",
+    "activo": true
+  },
+  {
+    "codigo": "AL",
+    "nombre": "Albania",
+    "monedaPrincipal": "ALL",
+    "indicativoTelefonico": "+355",
+    "activo": true
+  },
+  {
+    "codigo": "DE",
+    "nombre": "Alemania",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+49",
+    "activo": true
+  },
+  {
+    "codigo": "AD",
+    "nombre": "Andorra",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+376",
+    "activo": true
+  },
+  {
+    "codigo": "AO",
+    "nombre": "Angola",
+    "monedaPrincipal": "AOA",
+    "indicativoTelefonico": "+244",
+    "activo": true
+  },
+  {
+    "codigo": "AG",
+    "nombre": "Antigua y Barbuda",
+    "monedaPrincipal": "XCD",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "SA",
+    "nombre": "Arabia Saudita",
+    "monedaPrincipal": "SAR",
+    "indicativoTelefonico": "+966",
+    "activo": true
+  },
+  {
+    "codigo": "DZ",
+    "nombre": "Argelia",
+    "monedaPrincipal": "DZD",
+    "indicativoTelefonico": "+213",
+    "activo": true
+  },
+  {
+    "codigo": "AR",
+    "nombre": "Argentina",
+    "monedaPrincipal": "ARS",
+    "indicativoTelefonico": "+54",
+    "activo": true
+  },
+  {
+    "codigo": "AM",
+    "nombre": "Armenia",
+    "monedaPrincipal": "AMD",
+    "indicativoTelefonico": "+374",
+    "activo": true
+  },
+  {
+    "codigo": "AU",
+    "nombre": "Australia",
+    "monedaPrincipal": "AUD",
+    "indicativoTelefonico": "+61",
+    "activo": true
+  },
+  {
+    "codigo": "AT",
+    "nombre": "Austria",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+43",
+    "activo": true
+  },
+  {
+    "codigo": "AZ",
+    "nombre": "Azerbaiyán",
+    "monedaPrincipal": "AZN",
+    "indicativoTelefonico": "+994",
+    "activo": true
+  },
+  {
+    "codigo": "BS",
+    "nombre": "Bahamas",
+    "monedaPrincipal": "BSD",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "BD",
+    "nombre": "Bangladés",
+    "monedaPrincipal": "BDT",
+    "indicativoTelefonico": "+880",
+    "activo": true
+  },
+  {
+    "codigo": "BB",
+    "nombre": "Barbados",
+    "monedaPrincipal": "BBD",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "BH",
+    "nombre": "Baréin",
+    "monedaPrincipal": "BHD",
+    "indicativoTelefonico": "+973",
+    "activo": true
+  },
+  {
+    "codigo": "BE",
+    "nombre": "Bélgica",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+32",
+    "activo": true
+  },
+  {
+    "codigo": "BZ",
+    "nombre": "Belice",
+    "monedaPrincipal": "BZD",
+    "indicativoTelefonico": "+501",
+    "activo": true
+  },
+  {
+    "codigo": "BJ",
+    "nombre": "Benín",
+    "monedaPrincipal": "XOF",
+    "indicativoTelefonico": "+229",
+    "activo": true
+  },
+  {
+    "codigo": "BY",
+    "nombre": "Bielorrusia",
+    "monedaPrincipal": "BYN",
+    "indicativoTelefonico": "+375",
+    "activo": true
+  },
+  {
+    "codigo": "MM",
+    "nombre": "Birmania (Myanmar)",
+    "monedaPrincipal": "MMK",
+    "indicativoTelefonico": "+95",
+    "activo": true
+  },
+  {
+    "codigo": "BO",
+    "nombre": "Bolivia",
+    "monedaPrincipal": "BOB",
+    "indicativoTelefonico": "+591",
+    "activo": true
+  },
+  {
+    "codigo": "BA",
+    "nombre": "Bosnia y Herzegovina",
+    "monedaPrincipal": "BAM",
+    "indicativoTelefonico": "+387",
+    "activo": true
+  },
+  {
+    "codigo": "BW",
+    "nombre": "Botsuana",
+    "monedaPrincipal": "BWP",
+    "indicativoTelefonico": "+267",
+    "activo": true
+  },
+  {
+    "codigo": "BR",
+    "nombre": "Brasil",
+    "monedaPrincipal": "BRL",
+    "indicativoTelefonico": "+55",
+    "activo": true
+  },
+  {
+    "codigo": "BN",
+    "nombre": "Brunéi",
+    "monedaPrincipal": "BND",
+    "indicativoTelefonico": "+673",
+    "activo": true
+  },
+  {
+    "codigo": "BG",
+    "nombre": "Bulgaria",
+    "monedaPrincipal": "BGN",
+    "indicativoTelefonico": "+359",
+    "activo": true
+  },
+  {
+    "codigo": "BF",
+    "nombre": "Burkina Faso",
+    "monedaPrincipal": "XOF",
+    "indicativoTelefonico": "+226",
+    "activo": true
+  },
+  {
+    "codigo": "BI",
+    "nombre": "Burundi",
+    "monedaPrincipal": "BIF",
+    "indicativoTelefonico": "+257",
+    "activo": true
+  },
+  {
+    "codigo": "BT",
+    "nombre": "Bután",
+    "monedaPrincipal": "BTN",
+    "indicativoTelefonico": "+975",
+    "activo": true
+  },
+  {
+    "codigo": "CV",
+    "nombre": "Cabo Verde",
+    "monedaPrincipal": "CVE",
+    "indicativoTelefonico": "+238",
+    "activo": true
+  },
+  {
+    "codigo": "KH",
+    "nombre": "Camboya",
+    "monedaPrincipal": "KHR",
+    "indicativoTelefonico": "+855",
+    "activo": true
+  },
+  {
+    "codigo": "CM",
+    "nombre": "Camerún",
+    "monedaPrincipal": "XAF",
+    "indicativoTelefonico": "+237",
+    "activo": true
+  },
+  {
+    "codigo": "CA",
+    "nombre": "Canadá",
+    "monedaPrincipal": "CAD",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "QA",
+    "nombre": "Catar",
+    "monedaPrincipal": "QAR",
+    "indicativoTelefonico": "+974",
+    "activo": true
+  },
+  {
+    "codigo": "TD",
+    "nombre": "Chad",
+    "monedaPrincipal": "XAF",
+    "indicativoTelefonico": "+235",
+    "activo": true
+  },
+  {
+    "codigo": "CL",
+    "nombre": "Chile",
+    "monedaPrincipal": "CLP",
+    "indicativoTelefonico": "+56",
+    "activo": true
+  },
+  {
+    "codigo": "CN",
+    "nombre": "China",
+    "monedaPrincipal": "CNY",
+    "indicativoTelefonico": "+86",
+    "activo": true
+  },
+  {
+    "codigo": "CY",
+    "nombre": "Chipre",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+357",
+    "activo": true
+  },
+  {
+    "codigo": "VA",
+    "nombre": "Ciudad del Vaticano",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+379",
+    "activo": true
+  },
+  {
+    "codigo": "CO",
+    "nombre": "Colombia",
+    "monedaPrincipal": "COP",
+    "indicativoTelefonico": "+57",
+    "activo": true
+  },
+  {
+    "codigo": "KM",
+    "nombre": "Comoras",
+    "monedaPrincipal": "KMF",
+    "indicativoTelefonico": "+269",
+    "activo": true
+  },
+  {
+    "codigo": "KP",
+    "nombre": "Corea del Norte",
+    "monedaPrincipal": "KPW",
+    "indicativoTelefonico": "+850",
+    "activo": true
+  },
+  {
+    "codigo": "KR",
+    "nombre": "Corea del Sur",
+    "monedaPrincipal": "KRW",
+    "indicativoTelefonico": "+82",
+    "activo": true
+  },
+  {
+    "codigo": "CI",
+    "nombre": "Costa de Marfil",
+    "monedaPrincipal": "XOF",
+    "indicativoTelefonico": "+225",
+    "activo": true
+  },
+  {
+    "codigo": "CR",
+    "nombre": "Costa Rica",
+    "monedaPrincipal": "CRC",
+    "indicativoTelefonico": "+506",
+    "activo": true
+  },
+  {
+    "codigo": "HR",
+    "nombre": "Croacia",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+385",
+    "activo": true
+  },
+  {
+    "codigo": "CU",
+    "nombre": "Cuba",
+    "monedaPrincipal": "CUP",
+    "indicativoTelefonico": "+53",
+    "activo": true
+  },
+  {
+    "codigo": "DK",
+    "nombre": "Dinamarca",
+    "monedaPrincipal": "DKK",
+    "indicativoTelefonico": "+45",
+    "activo": true
+  },
+  {
+    "codigo": "DM",
+    "nombre": "Dominica",
+    "monedaPrincipal": "XCD",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "EC",
+    "nombre": "Ecuador",
+    "monedaPrincipal": "USD",
+    "indicativoTelefonico": "+593",
+    "activo": true
+  },
+  {
+    "codigo": "EG",
+    "nombre": "Egipto",
+    "monedaPrincipal": "EGP",
+    "indicativoTelefonico": "+20",
+    "activo": true
+  },
+  {
+    "codigo": "SV",
+    "nombre": "El Salvador",
+    "monedaPrincipal": "USD",
+    "indicativoTelefonico": "+503",
+    "activo": true
+  },
+  {
+    "codigo": "AE",
+    "nombre": "Emiratos Árabes Unidos",
+    "monedaPrincipal": "AED",
+    "indicativoTelefonico": "+971",
+    "activo": true
+  },
+  {
+    "codigo": "ER",
+    "nombre": "Eritrea",
+    "monedaPrincipal": "ERN",
+    "indicativoTelefonico": "+291",
+    "activo": true
+  },
+  {
+    "codigo": "SK",
+    "nombre": "Eslovaquia",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+421",
+    "activo": true
+  },
+  {
+    "codigo": "SI",
+    "nombre": "Eslovenia",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+386",
+    "activo": true
+  },
+  {
+    "codigo": "ES",
+    "nombre": "España",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+34",
+    "activo": true
+  },
+  {
+    "codigo": "US",
+    "nombre": "Estados Unidos",
+    "monedaPrincipal": "USD",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "EE",
+    "nombre": "Estonia",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+372",
+    "activo": true
+  },
+  {
+    "codigo": "SZ",
+    "nombre": "Esuatini",
+    "monedaPrincipal": "SZL",
+    "indicativoTelefonico": "+268",
+    "activo": true
+  },
+  {
+    "codigo": "ET",
+    "nombre": "Etiopía",
+    "monedaPrincipal": "ETB",
+    "indicativoTelefonico": "+251",
+    "activo": true
+  },
+  {
+    "codigo": "PH",
+    "nombre": "Filipinas",
+    "monedaPrincipal": "PHP",
+    "indicativoTelefonico": "+63",
+    "activo": true
+  },
+  {
+    "codigo": "FI",
+    "nombre": "Finlandia",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+358",
+    "activo": true
+  },
+  {
+    "codigo": "FJ",
+    "nombre": "Fiyi",
+    "monedaPrincipal": "FJD",
+    "indicativoTelefonico": "+679",
+    "activo": true
+  },
+  {
+    "codigo": "FR",
+    "nombre": "Francia",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+33",
+    "activo": true
+  },
+  {
+    "codigo": "GA",
+    "nombre": "Gabón",
+    "monedaPrincipal": "XAF",
+    "indicativoTelefonico": "+241",
+    "activo": true
+  },
+  {
+    "codigo": "GM",
+    "nombre": "Gambia",
+    "monedaPrincipal": "GMD",
+    "indicativoTelefonico": "+220",
+    "activo": true
+  },
+  {
+    "codigo": "GE",
+    "nombre": "Georgia",
+    "monedaPrincipal": "GEL",
+    "indicativoTelefonico": "+995",
+    "activo": true
+  },
+  {
+    "codigo": "GH",
+    "nombre": "Ghana",
+    "monedaPrincipal": "GHS",
+    "indicativoTelefonico": "+233",
+    "activo": true
+  },
+  {
+    "codigo": "GD",
+    "nombre": "Granada",
+    "monedaPrincipal": "XCD",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "GR",
+    "nombre": "Grecia",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+30",
+    "activo": true
+  },
+  {
+    "codigo": "GT",
+    "nombre": "Guatemala",
+    "monedaPrincipal": "GTQ",
+    "indicativoTelefonico": "+502",
+    "activo": true
+  },
+  {
+    "codigo": "GN",
+    "nombre": "Guinea",
+    "monedaPrincipal": "GNF",
+    "indicativoTelefonico": "+224",
+    "activo": true
+  },
+  {
+    "codigo": "GW",
+    "nombre": "Guinea-Bisáu",
+    "monedaPrincipal": "XOF",
+    "indicativoTelefonico": "+245",
+    "activo": true
+  },
+  {
+    "codigo": "GQ",
+    "nombre": "Guinea Ecuatorial",
+    "monedaPrincipal": "XAF",
+    "indicativoTelefonico": "+240",
+    "activo": true
+  },
+  {
+    "codigo": "GY",
+    "nombre": "Guyana",
+    "monedaPrincipal": "GYD",
+    "indicativoTelefonico": "+592",
+    "activo": true
+  },
+  {
+    "codigo": "HT",
+    "nombre": "Haití",
+    "monedaPrincipal": "HTG",
+    "indicativoTelefonico": "+509",
+    "activo": true
+  },
+  {
+    "codigo": "HN",
+    "nombre": "Honduras",
+    "monedaPrincipal": "HNL",
+    "indicativoTelefonico": "+504",
+    "activo": true
+  },
+  {
+    "codigo": "HU",
+    "nombre": "Hungría",
+    "monedaPrincipal": "HUF",
+    "indicativoTelefonico": "+36",
+    "activo": true
+  },
+  {
+    "codigo": "IN",
+    "nombre": "India",
+    "monedaPrincipal": "INR",
+    "indicativoTelefonico": "+91",
+    "activo": true
+  },
+  {
+    "codigo": "ID",
+    "nombre": "Indonesia",
+    "monedaPrincipal": "IDR",
+    "indicativoTelefonico": "+62",
+    "activo": true
+  },
+  {
+    "codigo": "IQ",
+    "nombre": "Irak",
+    "monedaPrincipal": "IQD",
+    "indicativoTelefonico": "+964",
+    "activo": true
+  },
+  {
+    "codigo": "IR",
+    "nombre": "Irán",
+    "monedaPrincipal": "IRR",
+    "indicativoTelefonico": "+98",
+    "activo": true
+  },
+  {
+    "codigo": "IE",
+    "nombre": "Irlanda",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+353",
+    "activo": true
+  },
+  {
+    "codigo": "IS",
+    "nombre": "Islandia",
+    "monedaPrincipal": "ISK",
+    "indicativoTelefonico": "+354",
+    "activo": true
+  },
+  {
+    "codigo": "MH",
+    "nombre": "Islas Marshall",
+    "monedaPrincipal": "USD",
+    "indicativoTelefonico": "+692",
+    "activo": true
+  },
+  {
+    "codigo": "SB",
+    "nombre": "Islas Salomón",
+    "monedaPrincipal": "SBD",
+    "indicativoTelefonico": "+677",
+    "activo": true
+  },
+  {
+    "codigo": "IL",
+    "nombre": "Israel",
+    "monedaPrincipal": "ILS",
+    "indicativoTelefonico": "+972",
+    "activo": true
+  },
+  {
+    "codigo": "IT",
+    "nombre": "Italia",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+39",
+    "activo": true
+  },
+  {
+    "codigo": "JM",
+    "nombre": "Jamaica",
+    "monedaPrincipal": "JMD",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "JP",
+    "nombre": "Japón",
+    "monedaPrincipal": "JPY",
+    "indicativoTelefonico": "+81",
+    "activo": true
+  },
+  {
+    "codigo": "JO",
+    "nombre": "Jordania",
+    "monedaPrincipal": "JOD",
+    "indicativoTelefonico": "+962",
+    "activo": true
+  },
+  {
+    "codigo": "KZ",
+    "nombre": "Kazajistán",
+    "monedaPrincipal": "KZT",
+    "indicativoTelefonico": "+7",
+    "activo": true
+  },
+  {
+    "codigo": "KE",
+    "nombre": "Kenia",
+    "monedaPrincipal": "KES",
+    "indicativoTelefonico": "+254",
+    "activo": true
+  },
+  {
+    "codigo": "KG",
+    "nombre": "Kirguistán",
+    "monedaPrincipal": "KGS",
+    "indicativoTelefonico": "+996",
+    "activo": true
+  },
+  {
+    "codigo": "KI",
+    "nombre": "Kiribati",
+    "monedaPrincipal": "AUD",
+    "indicativoTelefonico": "+686",
+    "activo": true
+  },
+  {
+    "codigo": "KW",
+    "nombre": "Kuwait",
+    "monedaPrincipal": "KWD",
+    "indicativoTelefonico": "+965",
+    "activo": true
+  },
+  {
+    "codigo": "LA",
+    "nombre": "Laos",
+    "monedaPrincipal": "LAK",
+    "indicativoTelefonico": "+856",
+    "activo": true
+  },
+  {
+    "codigo": "LS",
+    "nombre": "Lesoto",
+    "monedaPrincipal": "LSL",
+    "indicativoTelefonico": "+266",
+    "activo": true
+  },
+  {
+    "codigo": "LV",
+    "nombre": "Letonia",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+371",
+    "activo": true
+  },
+  {
+    "codigo": "LB",
+    "nombre": "Líbano",
+    "monedaPrincipal": "LBP",
+    "indicativoTelefonico": "+961",
+    "activo": true
+  },
+  {
+    "codigo": "LR",
+    "nombre": "Liberia",
+    "monedaPrincipal": "LRD",
+    "indicativoTelefonico": "+231",
+    "activo": true
+  },
+  {
+    "codigo": "LY",
+    "nombre": "Libia",
+    "monedaPrincipal": "LYD",
+    "indicativoTelefonico": "+218",
+    "activo": true
+  },
+  {
+    "codigo": "LI",
+    "nombre": "Liechtenstein",
+    "monedaPrincipal": "CHF",
+    "indicativoTelefonico": "+423",
+    "activo": true
+  },
+  {
+    "codigo": "LT",
+    "nombre": "Lituania",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+370",
+    "activo": true
+  },
+  {
+    "codigo": "LU",
+    "nombre": "Luxemburgo",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+352",
+    "activo": true
+  },
+  {
+    "codigo": "MK",
+    "nombre": "Macedonia del Norte",
+    "monedaPrincipal": "MKD",
+    "indicativoTelefonico": "+389",
+    "activo": true
+  },
+  {
+    "codigo": "MG",
+    "nombre": "Madagascar",
+    "monedaPrincipal": "MGA",
+    "indicativoTelefonico": "+261",
+    "activo": true
+  },
+  {
+    "codigo": "MY",
+    "nombre": "Malasia",
+    "monedaPrincipal": "MYR",
+    "indicativoTelefonico": "+60",
+    "activo": true
+  },
+  {
+    "codigo": "MW",
+    "nombre": "Malaui",
+    "monedaPrincipal": "MWK",
+    "indicativoTelefonico": "+265",
+    "activo": true
+  },
+  {
+    "codigo": "MV",
+    "nombre": "Maldivas",
+    "monedaPrincipal": "MVR",
+    "indicativoTelefonico": "+960",
+    "activo": true
+  },
+  {
+    "codigo": "ML",
+    "nombre": "Malí",
+    "monedaPrincipal": "XOF",
+    "indicativoTelefonico": "+223",
+    "activo": true
+  },
+  {
+    "codigo": "MT",
+    "nombre": "Malta",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+356",
+    "activo": true
+  },
+  {
+    "codigo": "MA",
+    "nombre": "Marruecos",
+    "monedaPrincipal": "MAD",
+    "indicativoTelefonico": "+212",
+    "activo": true
+  },
+  {
+    "codigo": "MU",
+    "nombre": "Mauricio",
+    "monedaPrincipal": "MUR",
+    "indicativoTelefonico": "+230",
+    "activo": true
+  },
+  {
+    "codigo": "MR",
+    "nombre": "Mauritania",
+    "monedaPrincipal": "MRU",
+    "indicativoTelefonico": "+222",
+    "activo": true
+  },
+  {
+    "codigo": "MX",
+    "nombre": "México",
+    "monedaPrincipal": "MXN",
+    "indicativoTelefonico": "+52",
+    "activo": true
+  },
+  {
+    "codigo": "FM",
+    "nombre": "Micronesia",
+    "monedaPrincipal": "USD",
+    "indicativoTelefonico": "+691",
+    "activo": true
+  },
+  {
+    "codigo": "MD",
+    "nombre": "Moldavia",
+    "monedaPrincipal": "MDL",
+    "indicativoTelefonico": "+373",
+    "activo": true
+  },
+  {
+    "codigo": "MC",
+    "nombre": "Mónaco",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+377",
+    "activo": true
+  },
+  {
+    "codigo": "MN",
+    "nombre": "Mongolia",
+    "monedaPrincipal": "MNT",
+    "indicativoTelefonico": "+976",
+    "activo": true
+  },
+  {
+    "codigo": "ME",
+    "nombre": "Montenegro",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+382",
+    "activo": true
+  },
+  {
+    "codigo": "MZ",
+    "nombre": "Mozambique",
+    "monedaPrincipal": "MZN",
+    "indicativoTelefonico": "+258",
+    "activo": true
+  },
+  {
+    "codigo": "NA",
+    "nombre": "Namibia",
+    "monedaPrincipal": "NAD",
+    "indicativoTelefonico": "+264",
+    "activo": true
+  },
+  {
+    "codigo": "NR",
+    "nombre": "Nauru",
+    "monedaPrincipal": "AUD",
+    "indicativoTelefonico": "+674",
+    "activo": true
+  },
+  {
+    "codigo": "NP",
+    "nombre": "Nepal",
+    "monedaPrincipal": "NPR",
+    "indicativoTelefonico": "+977",
+    "activo": true
+  },
+  {
+    "codigo": "NI",
+    "nombre": "Nicaragua",
+    "monedaPrincipal": "NIO",
+    "indicativoTelefonico": "+505",
+    "activo": true
+  },
+  {
+    "codigo": "NE",
+    "nombre": "Níger",
+    "monedaPrincipal": "XOF",
+    "indicativoTelefonico": "+227",
+    "activo": true
+  },
+  {
+    "codigo": "NG",
+    "nombre": "Nigeria",
+    "monedaPrincipal": "NGN",
+    "indicativoTelefonico": "+234",
+    "activo": true
+  },
+  {
+    "codigo": "NO",
+    "nombre": "Noruega",
+    "monedaPrincipal": "NOK",
+    "indicativoTelefonico": "+47",
+    "activo": true
+  },
+  {
+    "codigo": "NZ",
+    "nombre": "Nueva Zelanda",
+    "monedaPrincipal": "NZD",
+    "indicativoTelefonico": "+64",
+    "activo": true
+  },
+  {
+    "codigo": "OM",
+    "nombre": "Omán",
+    "monedaPrincipal": "OMR",
+    "indicativoTelefonico": "+968",
+    "activo": true
+  },
+  {
+    "codigo": "NL",
+    "nombre": "Países Bajos",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+31",
+    "activo": true
+  },
+  {
+    "codigo": "PK",
+    "nombre": "Pakistán",
+    "monedaPrincipal": "PKR",
+    "indicativoTelefonico": "+92",
+    "activo": true
+  },
+  {
+    "codigo": "PW",
+    "nombre": "Palaos",
+    "monedaPrincipal": "USD",
+    "indicativoTelefonico": "+680",
+    "activo": true
+  },
+  {
+    "codigo": "PS",
+    "nombre": "Palestina",
+    "monedaPrincipal": "ILS",
+    "indicativoTelefonico": "+970",
+    "activo": true
+  },
+  {
+    "codigo": "PA",
+    "nombre": "Panamá",
+    "monedaPrincipal": "PAB",
+    "indicativoTelefonico": "+507",
+    "activo": true
+  },
+  {
+    "codigo": "PG",
+    "nombre": "Papúa Nueva Guinea",
+    "monedaPrincipal": "PGK",
+    "indicativoTelefonico": "+675",
+    "activo": true
+  },
+  {
+    "codigo": "PY",
+    "nombre": "Paraguay",
+    "monedaPrincipal": "PYG",
+    "indicativoTelefonico": "+595",
+    "activo": true
+  },
+  {
+    "codigo": "PE",
+    "nombre": "Perú",
+    "monedaPrincipal": "PEN",
+    "indicativoTelefonico": "+51",
+    "activo": true
+  },
+  {
+    "codigo": "PL",
+    "nombre": "Polonia",
+    "monedaPrincipal": "PLN",
+    "indicativoTelefonico": "+48",
+    "activo": true
+  },
+  {
+    "codigo": "PT",
+    "nombre": "Portugal",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+351",
+    "activo": true
+  },
+  {
+    "codigo": "GB",
+    "nombre": "Reino Unido",
+    "monedaPrincipal": "GBP",
+    "indicativoTelefonico": "+44",
+    "activo": true
+  },
+  {
+    "codigo": "CF",
+    "nombre": "República Centroafricana",
+    "monedaPrincipal": "XAF",
+    "indicativoTelefonico": "+236",
+    "activo": true
+  },
+  {
+    "codigo": "CZ",
+    "nombre": "República Checa",
+    "monedaPrincipal": "CZK",
+    "indicativoTelefonico": "+420",
+    "activo": true
+  },
+  {
+    "codigo": "CG",
+    "nombre": "República del Congo",
+    "monedaPrincipal": "XAF",
+    "indicativoTelefonico": "+242",
+    "activo": true
+  },
+  {
+    "codigo": "CD",
+    "nombre": "República Democrática del Congo",
+    "monedaPrincipal": "CDF",
+    "indicativoTelefonico": "+243",
+    "activo": true
+  },
+  {
+    "codigo": "DO",
+    "nombre": "República Dominicana",
+    "monedaPrincipal": "DOP",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "RW",
+    "nombre": "Ruanda",
+    "monedaPrincipal": "RWF",
+    "indicativoTelefonico": "+250",
+    "activo": true
+  },
+  {
+    "codigo": "RO",
+    "nombre": "Rumanía",
+    "monedaPrincipal": "RON",
+    "indicativoTelefonico": "+40",
+    "activo": true
+  },
+  {
+    "codigo": "RU",
+    "nombre": "Rusia",
+    "monedaPrincipal": "RUB",
+    "indicativoTelefonico": "+7",
+    "activo": true
+  },
+  {
+    "codigo": "WS",
+    "nombre": "Samoa",
+    "monedaPrincipal": "WST",
+    "indicativoTelefonico": "+685",
+    "activo": true
+  },
+  {
+    "codigo": "KN",
+    "nombre": "San Cristóbal y Nieves",
+    "monedaPrincipal": "XCD",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "SM",
+    "nombre": "San Marino",
+    "monedaPrincipal": "EUR",
+    "indicativoTelefonico": "+378",
+    "activo": true
+  },
+  {
+    "codigo": "VC",
+    "nombre": "San Vicente y las Granadinas",
+    "monedaPrincipal": "XCD",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "LC",
+    "nombre": "Santa Lucía",
+    "monedaPrincipal": "XCD",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "ST",
+    "nombre": "Santo Tomé y Príncipe",
+    "monedaPrincipal": "STN",
+    "indicativoTelefonico": "+239",
+    "activo": true
+  },
+  {
+    "codigo": "SN",
+    "nombre": "Senegal",
+    "monedaPrincipal": "XOF",
+    "indicativoTelefonico": "+221",
+    "activo": true
+  },
+  {
+    "codigo": "RS",
+    "nombre": "Serbia",
+    "monedaPrincipal": "RSD",
+    "indicativoTelefonico": "+381",
+    "activo": true
+  },
+  {
+    "codigo": "SC",
+    "nombre": "Seychelles",
+    "monedaPrincipal": "SCR",
+    "indicativoTelefonico": "+248",
+    "activo": true
+  },
+  {
+    "codigo": "SL",
+    "nombre": "Sierra Leona",
+    "monedaPrincipal": "SLE",
+    "indicativoTelefonico": "+232",
+    "activo": true
+  },
+  {
+    "codigo": "SG",
+    "nombre": "Singapur",
+    "monedaPrincipal": "SGD",
+    "indicativoTelefonico": "+65",
+    "activo": true
+  },
+  {
+    "codigo": "SY",
+    "nombre": "Siria",
+    "monedaPrincipal": "SYP",
+    "indicativoTelefonico": "+963",
+    "activo": true
+  },
+  {
+    "codigo": "SO",
+    "nombre": "Somalia",
+    "monedaPrincipal": "SOS",
+    "indicativoTelefonico": "+252",
+    "activo": true
+  },
+  {
+    "codigo": "LK",
+    "nombre": "Sri Lanka",
+    "monedaPrincipal": "LKR",
+    "indicativoTelefonico": "+94",
+    "activo": true
+  },
+  {
+    "codigo": "ZA",
+    "nombre": "Sudáfrica",
+    "monedaPrincipal": "ZAR",
+    "indicativoTelefonico": "+27",
+    "activo": true
+  },
+  {
+    "codigo": "SD",
+    "nombre": "Sudán",
+    "monedaPrincipal": "SDG",
+    "indicativoTelefonico": "+249",
+    "activo": true
+  },
+  {
+    "codigo": "SS",
+    "nombre": "Sudán del Sur",
+    "monedaPrincipal": "SSP",
+    "indicativoTelefonico": "+211",
+    "activo": true
+  },
+  {
+    "codigo": "SE",
+    "nombre": "Suecia",
+    "monedaPrincipal": "SEK",
+    "indicativoTelefonico": "+46",
+    "activo": true
+  },
+  {
+    "codigo": "CH",
+    "nombre": "Suiza",
+    "monedaPrincipal": "CHF",
+    "indicativoTelefonico": "+41",
+    "activo": true
+  },
+  {
+    "codigo": "SR",
+    "nombre": "Surinam",
+    "monedaPrincipal": "SRD",
+    "indicativoTelefonico": "+597",
+    "activo": true
+  },
+  {
+    "codigo": "TH",
+    "nombre": "Tailandia",
+    "monedaPrincipal": "THB",
+    "indicativoTelefonico": "+66",
+    "activo": true
+  },
+  {
+    "codigo": "TZ",
+    "nombre": "Tanzania",
+    "monedaPrincipal": "TZS",
+    "indicativoTelefonico": "+255",
+    "activo": true
+  },
+  {
+    "codigo": "TJ",
+    "nombre": "Tayikistán",
+    "monedaPrincipal": "TJS",
+    "indicativoTelefonico": "+992",
+    "activo": true
+  },
+  {
+    "codigo": "TL",
+    "nombre": "Timor Oriental",
+    "monedaPrincipal": "USD",
+    "indicativoTelefonico": "+670",
+    "activo": true
+  },
+  {
+    "codigo": "TG",
+    "nombre": "Togo",
+    "monedaPrincipal": "XOF",
+    "indicativoTelefonico": "+228",
+    "activo": true
+  },
+  {
+    "codigo": "TO",
+    "nombre": "Tonga",
+    "monedaPrincipal": "TOP",
+    "indicativoTelefonico": "+676",
+    "activo": true
+  },
+  {
+    "codigo": "TT",
+    "nombre": "Trinidad y Tobago",
+    "monedaPrincipal": "TTD",
+    "indicativoTelefonico": "+1",
+    "activo": true
+  },
+  {
+    "codigo": "TN",
+    "nombre": "Túnez",
+    "monedaPrincipal": "TND",
+    "indicativoTelefonico": "+216",
+    "activo": true
+  },
+  {
+    "codigo": "TM",
+    "nombre": "Turkmenistán",
+    "monedaPrincipal": "TMT",
+    "indicativoTelefonico": "+993",
+    "activo": true
+  },
+  {
+    "codigo": "TR",
+    "nombre": "Turquía",
+    "monedaPrincipal": "TRY",
+    "indicativoTelefonico": "+90",
+    "activo": true
+  },
+  {
+    "codigo": "TV",
+    "nombre": "Tuvalu",
+    "monedaPrincipal": "AUD",
+    "indicativoTelefonico": "+688",
+    "activo": true
+  },
+  {
+    "codigo": "UA",
+    "nombre": "Ucrania",
+    "monedaPrincipal": "UAH",
+    "indicativoTelefonico": "+380",
+    "activo": true
+  },
+  {
+    "codigo": "UG",
+    "nombre": "Uganda",
+    "monedaPrincipal": "UGX",
+    "indicativoTelefonico": "+256",
+    "activo": true
+  },
+  {
+    "codigo": "UY",
+    "nombre": "Uruguay",
+    "monedaPrincipal": "UYU",
+    "indicativoTelefonico": "+598",
+    "activo": true
+  },
+  {
+    "codigo": "UZ",
+    "nombre": "Uzbekistán",
+    "monedaPrincipal": "UZS",
+    "indicativoTelefonico": "+998",
+    "activo": true
+  },
+  {
+    "codigo": "VU",
+    "nombre": "Vanuatu",
+    "monedaPrincipal": "VUV",
+    "indicativoTelefonico": "+678",
+    "activo": true
+  },
+  {
+    "codigo": "VE",
+    "nombre": "Venezuela",
+    "monedaPrincipal": "VES",
+    "indicativoTelefonico": "+58",
+    "activo": true
+  },
+  {
+    "codigo": "VN",
+    "nombre": "Vietnam",
+    "monedaPrincipal": "VND",
+    "indicativoTelefonico": "+84",
+    "activo": true
+  },
+  {
+    "codigo": "YE",
+    "nombre": "Yemen",
+    "monedaPrincipal": "YER",
+    "indicativoTelefonico": "+967",
+    "activo": true
+  },
+  {
+    "codigo": "DJ",
+    "nombre": "Yibuti",
+    "monedaPrincipal": "DJF",
+    "indicativoTelefonico": "+253",
+    "activo": true
+  },
+  {
+    "codigo": "ZM",
+    "nombre": "Zambia",
+    "monedaPrincipal": "ZMW",
+    "indicativoTelefonico": "+260",
+    "activo": true
+  },
+  {
+    "codigo": "ZW",
+    "nombre": "Zimbabue",
+    "monedaPrincipal": "ZWL",
+    "indicativoTelefonico": "+263",
+    "activo": true
+  }
+]
