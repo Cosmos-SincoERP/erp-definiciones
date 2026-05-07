@@ -1,0 +1,70 @@
+services:
+  cosmos.datosreferenciadatabase:
+    container_name: cosmos.datosreferencia_database
+    restart: always
+    environment:
+      POSTGRES_USER: Cosmos.DatosReferenciaUser
+      POSTGRES_PASSWORD: Cosmos.DatosReferenciaPassword
+      POSTGRES_DB: cosmos.datosreferenciadb
+    ports:
+      - "5432:5432"
+  cosmos.datosreferenciacomandos-api:
+    container_name: cosmos.datosreferencia_comandos_api
+    restart: always
+    ports:
+      - "8081:8080"
+    depends_on:
+      - cosmos.datosreferenciadatabase
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__MartenEventStore=Host=cosmos.datosreferenciadatabase;Port=5432;Database=cosmos.datosreferenciadb;Username=Cosmos.DatosReferenciaUser;Password=Cosmos.DatosReferenciaPassword
+      - ConnectionStrings__RabbitMQ=amqp://host.docker.internal:5672
+      - OpenTelemetryEndpoint=http://cosmos.datosreferencia-aspire-dashboard:18889
+  cosmos.datosreferenciacomandos-mcp-server:
+    container_name: cosmos.datosreferencia_comandos_mcp_server
+    restart: always
+    ports:
+      - "7081:8080"
+    depends_on:
+      - cosmos.datosreferenciadatabase
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__MartenEventStore=Host=cosmos.datosreferenciadatabase;Port=5432;Database=cosmos.datosreferenciadb;Username=Cosmos.DatosReferenciaUser;Password=Cosmos.DatosReferenciaPassword
+      - ConnectionStrings__RabbitMQ=amqp://host.docker.internal:5672
+      - OpenTelemetryEndpoint=http://cosmos.datosreferencia-aspire-dashboard:18889
+  cosmos.datosreferenciaconsultas-api:
+    container_name: cosmos.datosreferencia_consultas_api
+    restart: always
+    ports:
+      - "8091:8080"
+    depends_on:
+      - cosmos.datosreferenciadatabase
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__MartenEventStore=Host=cosmos.datosreferenciadatabase;Port=5432;Database=cosmos.datosreferenciadb;Username=Cosmos.DatosReferenciaUser;Password=Cosmos.DatosReferenciaPassword
+      - OpenTelemetryEndpoint=http://cosmos.datosreferencia-aspire-dashboard:18889
+  cosmos.datosreferenciaconsultas-mcp-server:
+    container_name: cosmos.datosreferencia_consultas_mcp_server
+    restart: always
+    ports:
+      - "7091:8080"
+    depends_on:
+      - cosmos.datosreferenciadatabase
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - ConnectionStrings__MartenEventStore=Host=cosmos.datosreferenciadatabase;Port=5432;Database=cosmos.datosreferenciadb;Username=Cosmos.DatosReferenciaUser;Password=Cosmos.DatosReferenciaPassword
+      - OpenTelemetryEndpoint=http://cosmos.datosreferencia-aspire-dashboard:18889
+  cosmos.datosreferencia-aspire-dashboard:
+    container_name: cosmos.datosreferencia_aspire_dashboard
+    ports:
+      - "18888:18888"
+      - "4317:18889"
+    environment:
+      - ASPIRE_DASHBOARD_UNSECURED_ALLOW_ANONYMOUS=true
+      - Dashboard:Otlp:AuthMode=Unsecured
+      - Dashboard:Frontend:AuthMode=Unsecured
+    restart: unless-stopped

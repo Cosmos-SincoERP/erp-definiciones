@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+    <ItemGroup>
+        <PackageReference Include="Cosmos.EventDriven.Abstractions" Version="0.0.8"/>
+        <PackageReference Include="Cosmos.EventSourcing.Abstractions" Version="0.0.12"/>
+        <PackageReference Include="Cosmos.Types" Version="1.0.1"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Cosmos.DatosReferencia.Contratos\Cosmos.DatosReferencia.Contratos.csproj"/>
+    </ItemGroup>
+
+</Project>

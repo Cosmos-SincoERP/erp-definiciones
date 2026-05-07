@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <UserSecretsId>dotnet-Cosmos.DatosReferencia-Proyecciones-f2f4f2d1-50b2-4903-9ffd-09d911b518cc</UserSecretsId>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="9.0.0"/>
+        <PackageReference Include="Carter" Version="10.0.0"/>
+        <PackageReference Include="Cosmos.EventSourcing.CritterStack" Version="0.1.8"/>
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5"/>
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="..\.dockerignore">
+            <Link>.dockerignore</Link>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Cosmos.Infraestructure\Cosmos.Infraestructure.csproj"/>
+        <ProjectReference Include="..\Cosmos.DatosReferencia.Consultas\Cosmos.DatosReferencia.Consultas.csproj"/>
+        <ProjectReference Include="..\Cosmos.DatosReferencia.Dominio\Cosmos.DatosReferencia.Dominio.csproj"/>
+    </ItemGroup>
+
+</Project>

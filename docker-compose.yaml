@@ -1,0 +1,30 @@
+services:
+  cosmos.datosreferenciadatabase:
+    image: postgres:latest    
+    volumes:
+      - Cosmos.DatosReferenciaDb:/var/lib/postgresql
+  cosmos.datosreferenciacomandos-api:
+    image: ${DOCKER_REGISTRY-}cosmos.datosreferenciacomandosapi
+    build:
+      context: .
+      dockerfile: Cosmos.DatosReferencia.Comandos.API/Dockerfile
+  cosmos.datosreferenciacomandos-mcp-server:
+    image: ${DOCKER_REGISTRY-}cosmos.datosreferenciacomandosmcpserver
+    build:
+      context: .
+      dockerfile: Cosmos.DatosReferencia.Comandos.MCP.Server/Dockerfile
+  cosmos.datosreferenciaconsultas-api:
+    image: ${DOCKER_REGISTRY-}cosmos.datosreferenciaconsultasapi
+    build:
+      context: .
+      dockerfile: Cosmos.DatosReferencia.Consultas.API/Dockerfile
+  cosmos.datosreferenciaconsultas-mcp-server:
+    image: ${DOCKER_REGISTRY-}cosmos.datosreferenciaconsultasmcpserver
+    build:
+      context: .
+      dockerfile: Cosmos.DatosReferencia.Consultas.MCP.Server/Dockerfile
+  cosmos.datosreferencia-aspire-dashboard:
+    image: mcr.microsoft.com/dotnet/aspire-dashboard
+    
+volumes:
+  Cosmos.DatosReferenciaDb:
