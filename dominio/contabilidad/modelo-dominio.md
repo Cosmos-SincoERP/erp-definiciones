@@ -95,6 +95,7 @@ Cada evento se documenta con esta estructura:
 | N1 — Motor de Traducción | BorradorContable | Transaccional (ES) | F1 |
 | N1 — Motor de Traducción | Aprendizaje | Transaccional (ES) | F1 |
 | N1 — Motor de Traducción | PlanDeCuentas | Configuración | F1 |
+| N1 — Motor de Traducción | MarcoContable | Configuración | F1 |
 | N1 — Motor de Traducción | ReglaDeDerivacion | Configuración | F1 |
 | N1 — Motor de Traducción | PlantillaDeAsiento | Configuración | F1 |
 | N1 — Servicio de Entrega | EntregaContable | Transaccional (ES) | F1 |
@@ -274,9 +275,11 @@ Cada evento se documenta con esta estructura:
 
 ### 3.4. Agregado: PlanDeCuentas (N1, configuración)
 
-**Descripción:** Catálogo jerárquico de cuentas contables de una empresa. Necesario para que el motor de traducción resuelva cuentas durante la traducción.
+**Descripción:** Catálogo jerárquico de cuentas contables de una empresa. Necesario para que el motor de traducción resuelva cuentas durante la traducción. Cada PlanDeCuentas referencia un MarcoContable que identifica formalmente el esquema bajo el cual se diseña (NIIF, marcos locales, gerencial, consolidación, etc.).
 
 **Raíz:** PlanDeCuentas
+
+**Atributos de la raíz:** id, empresa, nombre (texto descriptivo), marcoContable (referencia al código del agregado MarcoContable, inmutable tras creación [I32]).
 
 **Ciclo de vida:** Configuración — sin FSM transaccional. El PUC se crea una vez y las cuentas se agregan, modifican o inactivan.
 
@@ -294,7 +297,7 @@ Cada evento se documenta con esta estructura:
 ┌──────────────────────────────────────────────────────────────────────┐
 │  PlanDeCuentas (Agregado)                                            │
 │                                                                      │
-│  empresa: COSMOS-SAS · nombre: PUC Colombia                         │
+│  empresa: COSMOS-SAS · nombre: PUC NIIF · marcoContable: NIIF       │
 │                                                                      │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ CuentaContable #1 (Entidad)                                    │  │
@@ -339,7 +342,57 @@ Catálogo interno: TipoDeCuenta (no es agregado — diccionario preconfigurado d
 
 ---
 
-### 3.5. Agregado: ReglaDeDerivacion (N1, configuración)
+### 3.5. Agregado: MarcoContable (N1, configuración)
+
+**Descripción:** Catálogo de marcos contables disponibles para una empresa. Cada marco identifica formalmente un esquema bajo el cual se diseña un PlanDeCuentas (NIIF, marcos locales, gerencial, consolidación, sectoriales, etc.). Vive por empresa. El producto precarga el marco NIIF al onboardear la empresa; un usuario con permiso especial puede crear marcos adicionales según las necesidades operativas.
+
+**Raíz:** MarcoContable
+
+**Atributos de la raíz:** codigo (string, único por empresa, estable, inmutable [I28][I29]), nombre (string descriptivo presentable al usuario), descripcion (string opcional con contexto del marco), estado (activo/inactivo).
+
+**Ciclo de vida:** Configuración — sin FSM transaccional. El marco se crea una vez y se modifica, desactiva o reactiva.
+
+**Stream de eventos:** `marco-contable-{empresa}-{codigo}`
+
+**Composición:** Sin entidades internas. La raíz contiene todos los atributos.
+
+**Diagrama de composición:**
+
+```
+┌──────────────────────────────────────────────────────────────────────┐
+│  MarcoContable (Agregado)                                            │
+│                                                                      │
+│  empresa: COSMOS-SAS                                                 │
+│                                                                      │
+│  codigo: NIIF                                                        │
+│  nombre: Normas Internacionales de Información Financiera           │
+│  descripcion: Marco contable principal de la empresa, donde se      │
+│                registra toda la operación bajo NIIF                  │
+│  estado: activo                                                      │
+└──────────────────────────────────────────────────────────────────────┘
+
+Marcos custom (creados por usuario con permiso especial cuando aplique):
+┌──────────────────────────────────────────────────────────────────────┐
+│  codigo: CONSOLIDACION_GRUPO  ·  nombre: Consolidación Grupo X     │
+│  codigo: FISCAL_ALTERNO       ·  nombre: PUC Fiscal Alterno         │
+│  codigo: SFC                  ·  nombre: PUC Superintendencia       │
+│                                    Financiera de Colombia           │
+└──────────────────────────────────────────────────────────────────────┘
+```
+
+**Política de catálogo:**
+
+- **Predeterminado:** el marco `NIIF` se crea automáticamente al onboardear la empresa, junto con su PUC NIIF y los libros Principal y Fiscal predeterminados.
+- **Custom:** un usuario con permiso especial puede crear marcos adicionales para casos como consolidación de grupo, fiscal alterno o sectores regulados (SFC, Supersalud, Supersolidaria).
+- **Desactivación:** desactivar un MarcoContable previene crear nuevos PUCs sobre ese marco. **No hay cascada** sobre los PUCs existentes — siguen operando normalmente [coherente con R07].
+
+**Eventos:** 4 eventos siguiendo el patrón uniforme de configuración (ver Sección 5).
+
+**Justificación detallada:** ver `anexo-marco-contable-y-arquitectura-puc.md`.
+
+---
+
+### 3.6. Agregado: ReglaDeDerivacion (N1, configuración)
 
 **Descripción:** Configuración que determina qué cuenta auxiliar corresponde a una combinación de dimensiones del hecho económico. Las reglas del Nivel A de la cadena de resolución.
 
@@ -382,7 +435,7 @@ Catálogo interno: TipoDeCuenta (no es agregado — diccionario preconfigurado d
 
 ---
 
-### 3.6. Agregado: PlantillaDeAsiento (N1, configuración)
+### 3.7. Agregado: PlantillaDeAsiento (N1, configuración)
 
 **Descripción:** Estructura universal de roles (débitos/créditos) por tipo de transacción contable. Define qué partidas genera el borrador y con qué naturaleza. Contenido incluido en el producto.
 
@@ -443,7 +496,7 @@ Catálogo interno: TipoDeCuenta (no es agregado — diccionario preconfigurado d
 
 **Nota sobre agregados N2 (3.7–3.11):** Los agregados de N2 representan la visión arquitectónica del sistema contable propio. Su especificación actual es suficiente para entender la integración con N1, pero se completa y refina cuando se inicie la construcción de F2. Varios puntos de operación avanzada (procesos automáticos de cierre, reclasificación) permanecen como pendientes (PD2, PD3).
 
-### 3.7. Agregado: AsientoContable (N2)
+### 3.8. Agregado: AsientoContable (N2)
 
 **Descripción:** Registro contable inmutable generado a partir de un borrador resuelto. Solo existe cuando N2 está activo como destino. Es la fuente de verdad contable de la empresa.
 
@@ -500,7 +553,7 @@ Catálogo interno: TipoDeCuenta (no es agregado — diccionario preconfigurado d
 
 ---
 
-### 3.8. Agregado: PeriodoContable (N2)
+### 3.9. Agregado: PeriodoContable (N2)
 
 **Descripción:** Intervalo de tiempo (mensual) en el que se agrupan los asientos contables. Tiene ciclo de vida con apertura, cierre por niveles y cierre definitivo.
 
@@ -548,9 +601,9 @@ Catálogo interno: TipoDeCuenta (no es agregado — diccionario preconfigurado d
 
 ---
 
-### 3.9. Agregado: LibroContable (N2, configuración)
+### 3.10. Agregado: LibroContable (N2, configuración)
 
-**Descripción:** Configuración que define un conjunto de registros contables bajo una normativa específica. Cada libro tiene un PUC asociado.
+**Descripción:** Configuración que define un conjunto de registros contables. Cada libro tiene un PUC asociado y un tipo que indica su rol operativo dentro de la empresa (Principal, Fiscal, Gerencial, Consolidación, etc.). El producto provee dos libros predeterminados al onboardear la empresa: **Principal** (donde se registra toda la operación bajo el PUC NIIF) y **Fiscal** (donde se registran los ajustes específicos para reportes fiscales). El analista contable puede configurar libros adicionales según las necesidades.
 
 **Raíz:** LibroContable
 
@@ -562,27 +615,39 @@ Catálogo interno: TipoDeCuenta (no es agregado — diccionario preconfigurado d
 
 | Componente | Tipo | Descripción | Atributos clave |
 |------------|------|-------------|-----------------|
-| ConfiguracionLibro | VO | Datos del libro | tipo (Principal/Local/NIIF/Gerencial), pucAsociado, estado (activo/inactivo) |
+| ConfiguracionLibro | VO | Datos del libro | tipo (texto descriptivo del rol del libro — predeterminados sugeridos por el producto: `Principal` y `Fiscal`; el analista contable puede definir tipos adicionales como `Gerencial`, `Consolidacion`, `Sectorial`, etc.), pucAsociado (referencia por id al agregado PlanDeCuentas), estado (activo/inactivo) |
 
 **Diagrama de composición:**
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
-│  LibroContable (Agregado)                                            │
+│  LibroContable (Agregado) — ejemplo: libro Principal                 │
 │                                                                      │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ ConfiguracionLibro (VO)                                        │  │
-│  │  tipo: Principal · pucAsociado: PUC Colombia                   │  │
+│  │  tipo: Principal · pucAsociado: PUC NIIF                       │  │
+│  │  estado: activo                                                │  │
+│  └────────────────────────────────────────────────────────────────┘  │
+└──────────────────────────────────────────────────────────────────────┘
+
+┌──────────────────────────────────────────────────────────────────────┐
+│  LibroContable (Agregado) — ejemplo: libro Fiscal                    │
+│                                                                      │
+│  ┌────────────────────────────────────────────────────────────────┐  │
+│  │ ConfiguracionLibro (VO)                                        │  │
+│  │  tipo: Fiscal · pucAsociado: PUC NIIF                          │  │
 │  │  estado: activo                                                │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
+En la arquitectura predeterminada moderna, ambos libros (Principal y Fiscal) apuntan al mismo PlanDeCuentas (PUC NIIF). Las diferencias entre tratamientos (NIIF vs ajustes fiscales) se modelan como asientos específicos del libro fiscal [R34], no como PUCs paralelos. Justificación detallada en `anexo-marco-contable-y-arquitectura-puc.md`.
+
 **Eventos:** Patrón uniforme de configuración (ver Sección 5).
 
 ---
 
-### 3.10. Agregado: NumeracionContable (N2, configuración)
+### 3.11. Agregado: NumeracionContable (N2, configuración)
 
 **Descripción:** Secuencias de numeración por tipo de comprobante con dimensiones de segmentación configurables.
 
@@ -634,9 +699,11 @@ Catálogo interno: TipoDeCuenta (no es agregado — diccionario preconfigurado d
 
 ---
 
-### 3.11. Agregado: EquivalenciaPuc (N2, configuración)
+### 3.12. Agregado: EquivalenciaPuc (N2, configuración)
 
 **Descripción:** Mapeo cuenta a cuenta entre dos planes de cuentas diferentes. Permite que los reportes contables reflejen un asiento registrado en un PUC con las cuentas equivalentes de otro PUC. La equivalencia se congela al momento de registrar las entradas en los reportes [R31].
+
+**Nota sobre uso (arquitectura moderna predeterminada):** En la arquitectura predeterminada de una empresa moderna (un único PlanDeCuentas con MarcoContable NIIF compartido por los libros Principal y Fiscal), `EquivalenciaPuc` no se requiere — los libros usan las mismas cuentas. Este agregado se utiliza únicamente en casos excepcionales: empresas en transición de PUC local a NIIF, sectores regulados con PUC sectorial obligatorio, grupos empresariales con consolidación entre PUCs distintos, o empresas con PUC fiscal alterno. Como `LibroContable` y `EquivalenciaPuc` son capacidades de F2 — no de F1 — la necesidad efectiva de este agregado se evaluará al construir F2 con base en los casos reales que surjan. Justificación detallada en `anexo-marco-contable-y-arquitectura-puc.md`.
 
 **Raíz:** EquivalenciaPuc
 
@@ -680,7 +747,7 @@ Catálogo interno: TipoDeCuenta (no es agregado — diccionario preconfigurado d
 
 ---
 
-### 3.12. Domain service: ServicioDeTraduccion (N1)
+### 3.13. Domain service: ServicioDeTraduccion (N1)
 
 **Trigger:** Llegada de líneas de traducción de un sub-dominio consumidor.
 
@@ -717,7 +784,7 @@ La durabilidad del hecho económico mientras se resuelve la causa del rechazo es
 
 ---
 
-### 3.13. Agregado: SistemaContableDestino (N1, configuración)
+### 3.14. Agregado: SistemaContableDestino (N1, configuración)
 
 **Descripción:** Registra qué sistema contable de destino está activo para una empresa. Cada cambio de destino queda como evento para trazabilidad. El Servicio de Entrega consulta este agregado para saber a dónde enviar los borradores resueltos. EntregaContable toma un snapshot de este agregado al momento de enviar.
 
@@ -751,7 +818,7 @@ La durabilidad del hecho económico mientras se resuelve la causa del rechazo es
 
 ---
 
-### 3.14. Agregado: EntregaContable (N1)
+### 3.15. Agregado: EntregaContable (N1)
 
 **Descripción:** Registra el proceso de entrega de un borrador resuelto al sistema contable de destino. Segunda capacidad de N1. Gestiona la comunicación con el destino, registra el resultado (aceptación o rechazo) y alimenta la consola de contabilización. Cada borrador resuelto genera una EntregaContable.
 
@@ -837,7 +904,7 @@ Cada entrega tiene su propio stream que registra el ciclo completo: envío, resu
 
 ---
 
-### 3.15. Domain service: ServicioDeAnulacion (N2)
+### 3.16. Domain service: ServicioDeAnulacion (N2)
 
 **Trigger:** El contador solicita anular un asiento contable.
 
@@ -862,7 +929,7 @@ Cada entrega tiene su propio stream que registra el ciclo completo: envío, resu
 
 ---
 
-### 3.16. Domain service: ServicioDeContabilizacion (N2)
+### 3.17. Domain service: ServicioDeContabilizacion (N2)
 
 **Trigger:** EntregaAceptada cuando el destino es N2.
 
@@ -887,7 +954,7 @@ Cada entrega tiene su propio stream que registra el ciclo completo: envío, resu
 
 ---
 
-### 3.17. Sugerencias de implementación
+### 3.18. Sugerencias de implementación
 
 #### [SI1] Concurrencia en asignación de consecutivos
 
@@ -925,7 +992,7 @@ La durabilidad del hecho económico mientras se resuelve el rechazo es responsab
 
 ---
 
-### 3.18. Relaciones entre agregados
+### 3.19. Relaciones entre agregados
 
 ```
 N1:
@@ -1096,13 +1163,14 @@ El bounded context de Contabilidad emite **55 eventos** distribuidos en 12 agreg
 | AsientoContable | N2 | Transaccional | 2 |
 | PeriodoContable | N2 | Transaccional | 6 |
 | PlanDeCuentas | N1 | Configuración | 5 |
+| MarcoContable | N1 | Configuración | 4 |
 | ReglaDeDerivacion | N1 | Configuración | 5 |
 | PlantillaDeAsiento | N1 | Configuración | 4 |
 | LibroContable | N2 | Configuración | 4 |
 | NumeracionContable | N2 | Configuración | 5 |
 | SistemaContableDestino | N1 | Configuración | 1 |
 | EquivalenciaPuc | N2 | Configuración | 4 |
-| | | **Total** | **55** |
+| | | **Total** | **59** |
 
 ---
 
@@ -1504,13 +1572,22 @@ Los eventos de configuración siguen un patrón uniforme: el agregado se crea un
 
 | # | Evento | Descripción | Información capturada | Reglas |
 |:---:|---|---|---|---|
-| 1 | `PlanDeCuentasCreado` | Se creó el PUC para una empresa. | Empresa, nombre. | — |
+| 1 | `PlanDeCuentasCreado` | Se creó el PUC para una empresa, asociado a un MarcoContable. | Empresa, nombre, marcoContable (referencia al código del MarcoContable). | [I31] [I32] |
 | 2 | `CuentaAgregada` | Se registró una nueva cuenta en el PUC. | Codigo, nombre, tipo (gasto/costo/ingreso/activo/pasivo/patrimonio/banco), nivel (maestra/auxiliar), obligatoriedadTercero, obligatoriedadUnidadOrganizacional. | [R02] [R04] |
 | 3 | `CuentaModificada` | Se actualizaron atributos de una cuenta existente. | Codigo (identifica), campos modificados. | — |
 | 4 | `CuentaInactivada` | Una cuenta dejó de estar disponible para nuevos registros. Se conserva para trazabilidad histórica. | Codigo, motivo. | [R07] |
 | 5 | `CuentaReactivada` | Una cuenta previamente inactivada volvió a estar disponible. | Codigo. | — |
 
-#### 5.3.2. ReglaDeDerivacion — 5 eventos
+#### 5.3.2. MarcoContable — 4 eventos
+
+| # | Evento | Descripción | Información capturada | Reglas |
+|:---:|---|---|---|---|
+| 1 | `MarcoContableCreado` | Se creó un marco contable para una empresa. Nace activo por defecto. El marco NIIF se crea automáticamente al onboardear la empresa; otros marcos los crea un usuario con permiso especial. | empresa, codigo, nombre, descripcion. | [I28] [I29] |
+| 2 | `MarcoContableModificado` | Se actualizaron atributos descriptivos del marco (nombre, descripción). El código no cambia. | codigo (identifica), campos modificados. | [I29] |
+| 3 | `MarcoContableDesactivado` | El marco dejó de estar disponible para crear nuevos PlanDeCuentas. Los PUCs existentes que lo referencian no se afectan. | codigo, motivo. | — |
+| 4 | `MarcoContableReactivado` | El marco previamente desactivado volvió a estar disponible. | codigo. | — |
+
+#### 5.3.3. ReglaDeDerivacion — 5 eventos
 
 | # | Evento | Descripción | Información capturada | Reglas |
 |:---:|---|---|---|---|
@@ -1520,7 +1597,7 @@ Los eventos de configuración siguen un patrón uniforme: el agregado se crea un
 | 4 | `ReglaInactivada` | Una regla dejó de aplicarse. Se conserva para trazabilidad. | combinacionDimensiones, motivo. | — |
 | 5 | `ReglaReactivada` | Una regla previamente inactivada volvió a aplicarse. | combinacionDimensiones. | — |
 
-#### 5.3.3. PlantillaDeAsiento — 4 eventos
+#### 5.3.4. PlantillaDeAsiento — 4 eventos
 
 | # | Evento | Descripción | Información capturada | Reglas |
 |:---:|---|---|---|---|
@@ -1529,16 +1606,16 @@ Los eventos de configuración siguen un patrón uniforme: el agregado se crea un
 | 3 | `RolPartidaModificado` | Se actualizaron atributos de un rol existente. | Nombre (identifica), campos modificados. | — |
 | 4 | `RolPartidaEliminado` | Se eliminó un rol de la plantilla. | Nombre. | — |
 
-#### 5.3.4. LibroContable — 4 eventos
+#### 5.3.5. LibroContable — 4 eventos
 
 | # | Evento | Descripción | Información capturada | Reglas |
 |:---:|---|---|---|---|
-| 1 | `LibroContableCreado` | Se creó un libro contable. | Tipo (Principal/Local/NIIF/Gerencial), pucAsociado. | [R32] |
+| 1 | `LibroContableCreado` | Se creó un libro contable. | Tipo (texto descriptivo del rol del libro — predeterminados sugeridos: `Principal`, `Fiscal`), pucAsociado (referencia por id al PlanDeCuentas). | [R32] [R46] |
 | 2 | `LibroModificado` | Se actualizaron atributos del libro. | Tipo (identifica), campos modificados. | — |
 | 3 | `LibroInactivado` | Un libro dejó de estar disponible. Se conserva para trazabilidad. | Tipo, motivo. | — |
 | 4 | `LibroReactivado` | Un libro previamente inactivado volvió a estar disponible. | Tipo. | — |
 
-#### 5.3.5. NumeracionContable — 5 eventos
+#### 5.3.6. NumeracionContable — 5 eventos
 
 | # | Evento | Descripción | Información capturada | Reglas |
 |:---:|---|---|---|---|
@@ -1548,13 +1625,13 @@ Los eventos de configuración siguen un patrón uniforme: el agregado se crea un
 | 4 | `SecuenciaInactivada` | Una secuencia dejó de generar consecutivos. | Dimensiones, motivo. | — |
 | 5 | `ConsecutivoAsignado` | Se asignó el siguiente consecutivo a un asiento contable. Efecto inter-agregado derivado de AsientoContabilizado. | Dimensiones, consecutivoAsignado, asientoContableId. | [I15] |
 
-#### 5.3.6. SistemaContableDestino — 1 evento
+#### 5.3.7. SistemaContableDestino — 1 evento
 
 | # | Evento | Descripción | Información capturada | Reglas |
 |:---:|---|---|---|---|
 | 1 | `SistemaContableDestinoConfigurado` | Se configuró o cambió el sistema contable de destino para una empresa. El destino activo es el último evento del stream. Precondición: no existen EntregaContable en estado ENVIADO ni borradores en PENDIENTE con rechazo previo del destino actual para la empresa [I25]. | Empresa, destino (N2/SincoA&F/Siigo/Alegra), adaptador, fechaConfiguracion. | [R13] [R42] [I25] |
 
-#### 5.3.7. EquivalenciaPuc — 4 eventos
+#### 5.3.8. EquivalenciaPuc — 4 eventos
 
 | # | Evento | Descripción | Información capturada | Reglas |
 |:---:|---|---|---|---|
@@ -1618,6 +1695,11 @@ Cada plantilla define roles con naturaleza fija (débito/crédito) que son conoc
 | I25 | El sistema contable de destino no puede cambiarse mientras existan entregas en estado ENVIADO o borradores en PENDIENTE que fueron rechazados por el destino actual. Se valida como precondición al modificar SistemaContableDestino mediante consulta a EntregaContable y BorradorContable. | SistemaContableDestino, EntregaContable, BorradorContable | Eventual | [R42] |
 | I26 | No pueden existir dos asientos contables con la misma referenciaOrigen en N2 (excepto el par original/inverso por anulación). Se valida como precondición en el ServicioDeContabilizacion paso 3 antes de emitir AsientoContabilizado. | AsientoContable | Eventual | [R24] |
 | I27 | Toda línea de traducción recibida debe corresponder a al menos un RolPartida en la plantilla del tipoTransaccion. Si una o más líneas traen un tipoComponente no cubierto por ningún rol, el motor rechaza el hecho económico completo antes de crear el borrador y notifica al consumidor con motivo estructurado. La validación se aplica en el paso 2 del ServicioDeTraduccion. | ServicioDeTraduccion, PlantillaDeAsiento | Local | [DD2] [R45] |
+| I28 | El código de un MarcoContable es único por empresa. No pueden coexistir dos marcos con el mismo código dentro del catálogo de una empresa. | MarcoContable | Local | [R46] |
+| I29 | El código de un MarcoContable es inmutable tras la creación del marco. Solo nombre y descripción admiten modificación posterior. | MarcoContable | Local | [R46] |
+| I30 | Una empresa no puede tener dos PlanDeCuentas referenciando el mismo MarcoContable. Cada marco activo en la empresa puede asociarse a lo sumo a un PUC. | PlanDeCuentas, MarcoContable | Eventual | [R46] |
+| I31 | El MarcoContable referenciado por un PlanDeCuentas debe estar activo al momento de crear el PUC. La creación de un PUC sobre un marco desactivado se rechaza. | PlanDeCuentas, MarcoContable | Eventual | [R46] |
+| I32 | El MarcoContable referenciado por un PlanDeCuentas es inmutable tras la creación del PUC. Cambiar el marco semánticamente cambia la naturaleza del PUC; en ese caso se crea un PUC nuevo. | PlanDeCuentas | Local | [R46] |
 
 **Clasificación:**
 - **Local:** Se valida dentro de un solo agregado, en la misma transacción.
@@ -1657,7 +1739,8 @@ Las decisiones previas (DD1-DD11) están documentadas en `anexo-decisiones-de-di
 | D7 | La re-emisión del hecho económico por el consumidor solo se permite cuando el borrador está en estado PENDIENTE. N1 reemplaza toda la información del borrador existente con los nuevos datos (partidas, datos de transacción, documento fuente, tercero, moneda, fecha — toda la información que el consumidor envía en las líneas de traducción). Si el borrador ya fue resuelto, entregado o descartado, la re-emisión se rechaza. La corrección post-entrega se resuelve con un nuevo hecho económico del consumidor (devolución, nota crédito) — N1 no soporta reemplazo de borradores ya entregados. | [R14] [R15] [I8] |
 | D8 | Los cambios en configuración (reglas de derivación, plan de cuentas, plantillas de asiento, aprendizajes) aplican solo a borradores nuevos — nunca retroactivamente. Los borradores existentes conservan la resolución con la que fueron traducidos. La alternativa descartada (re-evaluar borradores pendientes con la nueva configuración) se rechazó porque: (1) un borrador que el contador ya intervino perdería sus resoluciones manuales, (2) el volumen de re-evaluación sería impredecible, y (3) cambiar silenciosamente un borrador pendiente viola la confianza del operador. Si una cuenta se inactiva, los aprendizajes y reglas que la referencian permanecen registrados pero no se aplican a nuevos borradores — los borradores ya resueltos no se afectan. | [R37] [R38] [R39] [I23] [I24] |
 | D9 | N1 tiene autoridad plena sobre el borrador — el contador puede modificar cualquier campo en estado PENDIENTE sin bloqueo ni matriz de restricción. Los campos se categorizan según su impacto [R43]: corrección contable natural (cuenta, tercero, unidad organizacional) y campos que afectan el hecho económico (valor, moneda, documento fuente, partidas). Cuando el contador modifica campos que afectan el hecho económico, el sistema advierte que la mejor práctica es solicitar al consumidor la re-emisión o un nuevo hecho [R44] — la advertencia no bloquea. Esta postura reconoce que el consumidor puede haber finalizado su ciclo de vida y no puede re-emitir, por lo que crear un bloqueo generaría un cuello de botella en la contabilización. La protección se garantiza por: (1) el borrador de consumidor no puede descartarse [R09], (2) re-emisión disponible en PENDIENTE [R14], (3) advertencia del sistema [R44], (4) cada modificación queda como evento individual (ES) con trazabilidad completa. Alternativa descartada: matriz de campos editables por sub-estado o bloqueo de campos sensibles. | [R09] [R14] [R43] [R44] [D2] |
-| D10 | Los agregados de N2 (Secciones 3.7–3.11) se especifican a nivel suficiente para entender la integración con N1. Su refinamiento completo se ejecuta al iniciar la construcción de F2. Varios puntos de operación avanzada (procesos automáticos de cierre, reclasificación) permanecen como pendientes (PD2, PD3). | Sección 8 del alcance |
+| D10 | Los agregados de N2 (Secciones 3.8–3.12) se especifican a nivel suficiente para entender la integración con N1. Su refinamiento completo se ejecuta al iniciar la construcción de F2. Varios puntos de operación avanzada (procesos automáticos de cierre, reclasificación) permanecen como pendientes (PD2, PD3). | Sección 8 del alcance |
+| D11 | Arquitectura PUC único + libros paralelos como caso típico moderno. Una empresa típica al onboardear opera con un PlanDeCuentas (PUC NIIF) y dos libros predeterminados (Principal y Fiscal) sobre el mismo PUC. Las diferencias entre tratamientos (NIIF vs ajustes fiscales) se modelan como asientos específicos del libro [R34], no como PUCs paralelos. El agregado MarcoContable identifica formalmente el PUC mediante un código estructurado (NIIF predeterminado + custom bajo demanda). El atributo `tipo` del LibroContable es texto libre con predeterminados Principal/Fiscal — el analista contable puede crear libros con tipos adicionales (Gerencial, Consolidación, sectoriales) según necesite la empresa. EquivalenciaPuc permanece para casos excepcionales (transición a NIIF, sectores regulados con PUC sectorial obligatorio, grupos empresariales con consolidación). Decisión basada en investigación de seis ERPs modernos (SAP S/4HANA, Oracle Fusion, Dynamics 365, NetSuite, Workday, Sage) que convergen hacia "Chart of Accounts único + ledgers paralelos sobre el mismo COA". | [R34] [R46] `anexo-marco-contable-y-arquitectura-puc.md` |
 
 ---
 
@@ -1669,7 +1752,7 @@ Las decisiones previas (DD1-DD11) están documentadas en `anexo-decisiones-de-di
 | P2 | Solo un sistema contable de destino activo por empresa. | El Servicio de Entrega envía a un solo destino. No hay entrega simultánea a múltiples destinos. [DD5] |
 | P3 | El Motor de Traducción no valida periodos del sistema contable de destino. | N1 siempre traduce. El destino decide si acepta o rechaza. [DD7] |
 | P4 | La elección del sistema contable de destino es una decisión de administración del sistema, no de operación contable. | No es responsabilidad del analista contable ni del contador. No aparece en los flujos de configuración contable. |
-| P5 | Los libros contables (Principal, Local, NIIF) vienen preestablecidos en el producto. | El analista contable puede agregar libros adicionales pero los principales ya existen. |
+| P5 | Los libros contables Principal y Fiscal vienen preestablecidos en el producto al onboardear la empresa, ambos asociados al PlanDeCuentas con MarcoContable NIIF predeterminado. | El analista contable puede agregar libros adicionales (Gerencial, Consolidación, sectoriales u otros tipos custom) según las necesidades de la empresa. Justificación detallada en `anexo-marco-contable-y-arquitectura-puc.md`. |
 | P6 | Las plantillas de asiento y reglas de derivación vienen preestablecidas en el producto. | El analista contable solo agrega excepciones, no construye desde cero. |
 | P7 | El histórico contable no debe distorsionarse por cambios posteriores en la configuración de equivalencia entre PUCs. | La invariante I22 garantiza esta premisa congelando la equivalencia al momento de registrar. [R31] |
 
@@ -1731,3 +1814,4 @@ Cada bounded context declara los recursos que protege y las acciones que expone 
 |---------|-------|-------------|
 | 1.0 | Abril 2026 | Versión inicial. 12 secciones. 12 agregados (7 N1 + 5 N2), 55 eventos, 26 invariantes (18 Local + 8 Eventual), 10 decisiones (D1-D10), 7 premisas (P1-P7), 3 pendientes (PD1-PD3), 6 sugerencias de implementación (SI1-SI6), 17 permisos atómicos, 3 domain services. Resultado de: construcción iterativa del modelo, 3 auditorías (V1: 36 hallazgos, V2: 31 hallazgos, V3: 84 hallazgos — 49 aplicados, 35 descartados), 3 rondas de revisión. Reporte consolidado de auditoría en `auditoria/contabilidad-actual.md`. |
 | 1.1 | Mayo 2026 | Validación contractual del motor de traducción y formalización de rechazos previos al borrador. Cambios: (1) Paso 1 del ServicioDeTraduccion ajustado: el rechazo por referenciaOrigen no reemplazable se notifica al consumidor con motivo estructurado (sin evento de dominio). (2) Paso 2 del ServicioDeTraduccion ampliado: se valida que cada tipoComponente recibido tenga al menos un RolPartida en la plantilla. (3) Nueva invariante I27 (Local) — total ahora 27 invariantes (19 Local + 8 Eventual). (4) Tabla de motivos estructurados de rechazo previo al borrador (`REFERENCIA_ORIGEN_DUPLICADA_NO_REEMPLAZABLE`, `TIPO_TRANSACCION_SIN_PLANTILLA`, `LINEA_SIN_ROL_EN_PLANTILLA`) documentada en el ServicioDeTraduccion. (5) Nueva sugerencia de implementación SI7 — total ahora 7 sugerencias. (6) D5 sin cambios — el motor permanece como servicio sin estado; los rechazos pre-borrador se canalizan por mensajería (DLQ + logs + métricas) y la durabilidad la garantiza el outbox del consumidor emisor. Acompaña actualización de `definicion-alcance.md` v1.1 con la nueva regla R45. |
+| 1.2 | Mayo 2026 | Arquitectura PUC + Libro + Marco contable y replanteamiento de libros predeterminados. Cambios: (1) Nuevo agregado `MarcoContable` (N1, configuración) en sección 3.5 — total ahora 13 agregados (8 N1 + 5 N2). (2) Atributo `marcoContable` agregado a `PlanDeCuentas` como referencia inmutable al código del marco; payload de `PlanDeCuentasCreado` actualizado. (3) Nuevos eventos del MarcoContable (`MarcoContableCreado`, `MarcoContableModificado`, `MarcoContableDesactivado`, `MarcoContableReactivado`) — total ahora 59 eventos. (4) Atributo `tipo` del `LibroContable` cambia de enum cerrado (Principal/Local/NIIF/Gerencial) a texto libre con predeterminados sugeridos `Principal` y `Fiscal`. Payload de `LibroContableCreado` actualizado. (5) Nuevas invariantes I28-I32 sobre MarcoContable y la asociación PlanDeCuentas → MarcoContable — total ahora 32 invariantes (22 Local + 10 Eventual). (6) Nueva decisión D11 — arquitectura PUC único + libros paralelos como caso típico moderno. (7) Premisa P5 actualizada — libros predeterminados Principal y Fiscal sobre PUC NIIF. (8) Renumeración de las secciones 3.5-3.18 (3.6-3.19) por la inserción de MarcoContable como sección 3.5. (9) `EquivalenciaPuc` sin cambios estructurales — se agrega nota informativa sobre uso excepcional. (10) Nuevo anexo `anexo-marco-contable-y-arquitectura-puc.md` con investigación de seis ERPs modernos y justificación de la arquitectura. Acompaña actualización de `definicion-alcance.md` v1.2 con nueva regla R46, glosario actualizado y nuevo término "Marco contable". |

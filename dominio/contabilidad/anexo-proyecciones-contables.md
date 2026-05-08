@@ -34,7 +34,7 @@ Registra cada partida individual de cada asiento contabilizado, con la equivalen
 |-------|-------------|
 | `comprobante` | Identificador del comprobante contable (ej: CP-202603-0047) |
 | `fecha` | Fecha del hecho económico |
-| `libroOrigen` | Libro en el que se registró el asiento (Principal, NIIF, Local) |
+| `libroOrigen` | Libro en el que se registró el asiento (Principal, Fiscal u otros tipos custom de la empresa) |
 | `libroPresentacion` | Libro para el cual se materializa esta entrada. Un asiento del libro Principal genera entradas para todos los libros cuyos PUCs tengan equivalencia configurada. |
 | `cuenta` | Cuenta auxiliar resuelta para el PUC del libro de presentación. Congelada al momento de contabilizar — cambios futuros de equivalencia no afectan entradas históricas. |
 | `tercero` | Identificación del tercero (tipo y número) |
@@ -172,13 +172,13 @@ Se evaluaron dos diseños para identificar a qué libro pertenece cada entrada e
 Cada entrada se identifica por el PUC al que pertenece la cuenta. Como múltiples libros pueden compartir el mismo PUC, la relación libro → PUC se resuelve al momento de consultar.
 
 ```
-Ejemplo: Principal y Local comparten PUC Colombia.
+Ejemplo: Principal y Fiscal comparten PUC NIIF.
 
-  Entrada: { puc_destino: 'PUC Colombia', cuenta: 5110-05-002, ... }
+  Entrada: { puc_destino: 'PUC NIIF', cuenta: 5110-05-002, ... }
 
   Consulta "libro Principal" → buscar qué PUC usa Principal
-                              → PUC Colombia
-                              → WHERE puc_destino = 'PUC Colombia'
+                              → PUC NIIF
+                              → WHERE puc_destino = 'PUC NIIF'
 ```
 
 **Problema:** La proyección no está lista para consumir. Cada consulta requiere un paso previo de interpretación (resolver libro → PUC) antes de poder filtrar. En ES/CQRS, una proyección se optimiza para la lectura — debe responder directamente sin transformaciones intermedias. Si la proyección necesita un intérprete, no está cumpliendo su propósito.
@@ -188,13 +188,13 @@ Ejemplo: Principal y Local comparten PUC Colombia.
 Cada entrada se identifica directamente por el libro para el cual fue materializada. Si dos libros comparten el mismo PUC, se generan entradas para ambos (con las mismas cuentas y montos).
 
 ```
-Ejemplo: Principal y Local comparten PUC Colombia.
+Ejemplo: Principal y Fiscal comparten PUC NIIF.
 
   Entrada 1: { libro_presentacion: 'Principal', cuenta: 5110-05-002, ... }
-  Entrada 2: { libro_presentacion: 'Local',     cuenta: 5110-05-002, ... }
+  Entrada 2: { libro_presentacion: 'Fiscal',    cuenta: 5110-05-002, ... }
 
   Consulta "libro Principal" → WHERE libro_presentacion = 'Principal'
-  Consulta "libro Local"     → WHERE libro_presentacion = 'Local'
+  Consulta "libro Fiscal"    → WHERE libro_presentacion = 'Fiscal'
 ```
 
 **Ventaja:** Consulta directa. Sin lookups, sin intérpretes. El sistema resolvió la lógica de equivalencia y asignación de libros al momento de escribir la proyección, no al momento de leerla.
@@ -206,7 +206,7 @@ Ejemplo: Principal y Local comparten PUC Colombia.
 | Consulta directa por libro | No — requiere lookup libro → PUC | **Sí** |
 | Duplicación cuando libros comparten PUC | No | Sí (entradas idénticas con distinto libro) |
 | Lógica de resolución | En cada lectura | **Una sola vez al escribir** |
-| Independencia ante cambios de configuración | Si Principal y Local se separan a PUCs diferentes, las consultas cambian | **Las entradas históricas quedan correctas** — cada una ya tiene su libro asignado |
+| Independencia ante cambios de configuración | Si Principal y Fiscal se separan a PUCs diferentes, las consultas cambian | **Las entradas históricas quedan correctas** — cada una ya tiene su libro asignado |
 | Principio ES/CQRS | Viola: proyección que necesita intérprete | **Cumple: proyección lista para consumir** |
 
 ### Decisión
