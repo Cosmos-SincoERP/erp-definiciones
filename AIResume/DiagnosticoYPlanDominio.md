@@ -11,11 +11,11 @@
 
 | Estado | Cantidad |
 |---|---|
-| ✅ Implementados y verificados | 1 (entidad `Moneda` + VO `CodigoMoneda` con sus tests) |
-| 🔄 Parcialmente implementados | 1 (entidad `Moneda` sin persistencia, queries, ni comandos expuestos) |
+| ✅ Implementados y verificados | Entidad `Moneda` + VO `CodigoMoneda` + tests · ítem #1 F1 (decisiones archivadas) · ítem #2 (Agregar Moneda con port `IDomainStore` y `TestDomainStore`) |
+| 🔄 Parcialmente implementados | `Moneda` con persistencia operativa pero sin queries (#3, #4), endpoints REST (#5, #6) ni comandos de Modificar/Inactivar/Activar (#7, #8, #9) |
 | ⬜ Pendientes | 4 catálogos (Pais, DivisionTerritorial, TipoDocumentoIdentidad, TasaDeCambio) + seed + endpoints + sync TRM |
 | 🔁 Regresiones detectadas | N/A (instrucción explícita: ignorar plan previo) |
-| ❓ Gold-plating sin respaldo en documentación | 3 (MCP servers, wiring ES, método `Moneda.Modificar` sin consumidor) |
+| ❓ Gold-plating sin respaldo en documentación | 2 (MCP servers — decisión F1 los mantiene vacíos como rail futuro; método `Moneda.Modificar` sin consumidor) |
 | **Total ítems del plan** | **30** |
 
 ### Naturaleza crítica del bounded context
@@ -25,8 +25,8 @@ Este servicio **no es Event Sourcing**. La sección 1.2 del alcance declara expl
 La memoria de proyecto `feedback_modelado_crud` lo confirma: **CRUD sobre Marten**.
 
 El modelo actual de `Moneda` ya respeta esto (record plano, no hereda `AggregateRoot`).
-El wiring de `Comandos.API` no — está orientado a ES (`UsarWolverineParaComandos`, `IEventStore`, Outbox + RabbitMQ).
-Este mismatch arquitectónico se trata en el ítem #1 del plan (bloqueante transversal).
+El wiring de `Comandos.API` está orientado a ES (`UsarWolverineParaComandos`, `IEventStore`, Outbox + RabbitMQ).
+**Decisión F1 (2026-05-21):** ese wiring se mantiene **inerte** — los handlers CRUD usarán `IDocumentSession` por la sesión que Marten expone igual; el stack ES queda cableado para una eventual migración futura. Ver `feedback_wiring_comandos_api.md` y el ítem #1 abajo para el detalle de las 5 sub-decisiones.
 
 ---
 
@@ -117,7 +117,7 @@ Este mismatch arquitectónico se trata en el ítem #1 del plan (bloqueante trans
 
 ---
 
-### 1. Decidir wiring CRUD y refactorizar `Comandos.API` `[F1]` `[Con decisión de diseño]`
+### 1. Decidir wiring CRUD y refactorizar `Comandos.API` `[F1]` `[Con decisión de diseño]` ✅
 
 **Explicación**
 El wiring actual de `Cosmos.DatosReferencia.Comandos.API/Program.cs` está orientado a Event Sourcing (`UsarWolverineParaComandos`, `AgregarMartenEventStore`, Outbox/Inbox, RabbitMQ). La memoria de proyecto (`feedback_modelado_crud`) y el alcance (Sección 1.2) establecen que este bounded context es **CRUD sobre Marten**, no ES. El modelo actual de `Moneda` ya respeta esto (record plano, no hereda `AggregateRoot`). Sin resolver este mismatch, no se puede inyectar `IDocumentSession` en los command handlers ni en los query handlers.
@@ -129,27 +129,46 @@ El wiring actual de `Cosmos.DatosReferencia.Comandos.API/Program.cs` está orien
 > "Datos de Referencia se modela CRUD sobre Marten, no Event Sourcing — D1=B; nada de agregados/eventos/handlers ES en este bounded context."
 > — Memoria del proyecto `feedback_modelado_crud`
 
-**Decisión requerida**
-- ¿Refactorizar `Comandos.API` a wiring de documentos Marten (`IDocumentSession` + `IDocumentStore`) eliminando `UsarWolverineParaComandos`/Outbox/RabbitMQ?
-- ¿O mantener el wiring ES como infraestructura inerte y solo usar `IDocumentSession` por la sesión que Marten expone igual en ambos casos?
-- ¿`Wolverine` continúa como mediator de comandos CRUD, o se reemplaza por handlers directos Carter → handler → Marten?
-- ¿Los proyectos MCP.Server (gold-plating) se eliminan, se dejan vacíos o se implementan?
+**Decisión aplicada (2026-05-21)**
 
-**Una vez decidido, implementar**
-- Ajustar `Cosmos.DatosReferencia.Comandos.API/Program.cs` para registrar el modo elegido (CRUD documentos).
-- Definir el contrato `ICommandRouter`/handler que usarán todos los ítems siguientes.
-- Reemplazar `AcceptanceTest.ResetAllData()` por `documentStore.Advanced.Clean.DeleteAllDocumentsAsync()` o equivalente CRUD.
-- Confirmar que `Cosmos.EventSourcing.CritterStack.Commands` se reemplaza por wiring CRUD.
+Cinco decisiones tomadas en `AskUserQuestion` de la fase de plan. Quedan archivadas en la memoria del proyecto `feedback_wiring_comandos_api.md` como fuente de verdad para los ítems #2 al #30.
 
-**Lo mínimo para que el test pase**
-No es un ítem TDD directo — es una decisión arquitectónica que define el host de los handlers para todos los ítems siguientes. Una vez aplicada, el siguiente ítem (#2) escribe el primer test contra el wiring nuevo y debe poder compilar.
+| # | Decisión | Resultado |
+|---|---|---|
+| Q1 | Wiring base de `Program.cs` | **Inerte como está.** Idéntico a `Cosmos.Terceros` (`UsarWolverineParaComandos` + RabbitMQ + Outbox + Inbox + Marten event store + Wolverine command router). Sin cambios. |
+| Q2 | Pipeline de comandos | **Carter → `ICommandRouter` Wolverine → handler.** Misma forma que el `RegistrarTerceroEndpoint` de Cosmos.Terceros. |
+| Q3 | Ubicación de los handlers | **`Cosmos.DatosReferencia.Dominio/[Catalogo]/CommandHandlers/`.** Refinado en #2 con patrón **port + adapter** (réplica de `ObligacionesPorPagar.Radicacion`): handlers dependen del port `IDomainStore` (en Dominio); el adapter `DomainStore` con `IDocumentSession` vive en proyecto separado `Cosmos.DatosReferencia.Dominio.Store/`. **La divergencia con CLAUDE.md desaparece** — el Dominio queda 100% puro. |
+| Q4 | Proyectos MCP.Server | **Mantener vacíos** como rail futuro. |
+| Q5 | Persistencia | **Documento Marten** (`session.Store(entidad)` + `SaveChangesAsync`). Las entidades son `record` planos sin `AggregateRoot`, sin eventos, sin `Apply()`. Cargar con `session.LoadAsync<T>(id, ct)`. |
+
+**Diferencia operativa concreta vs Cosmos.Terceros (ES puro):**
+
+| Aspecto | Cosmos.Terceros | Cosmos.DatosReferencia |
+|---|---|---|
+| Entidad raíz | `class Tercero : AggregateRoot` | `record Moneda(...)` plano |
+| Persistir creación | `eventStore.StartStream(tercero)` | `session.Store(moneda)` |
+| Persistir mutación | método del agregado emite evento | `session.Store(moneda with { ... })` |
+| Cargar | `eventStore.LoadAsync<Tercero>(id, ct)` | `session.LoadAsync<Moneda>(codigo, ct)` |
+| Eventos | `TerceroEvents.*` records | no existen |
+| Inyección | `IEventStore` | `IDomainStore` (port en Dominio; adapter en `Dominio.Store/` delega a `IDocumentSession`) |
+
+**Archivos modificados en este ítem:** ninguno en el repo. F1 es decisión registrada en memoria, no cambio de código.
+
+- `Program.cs` queda inerte (Q1=A).
+- `Cosmos.DatosReferencia.Dominio.csproj` agregará la referencia a Marten cuando el ítem #2 introduzca el primer handler.
+- `ApiFactory.cs` mantiene `ResetAllData()` a propósito — funciona para CRUD documental y deja la puerta abierta a una migración a ES en el futuro.
+- Proyectos MCP.Server intactos.
+
+**Activaciones pendientes (para el ítem #2):** ✅ **resueltas en #2**
+- ~~Agregar Marten a `Cosmos.DatosReferencia.Dominio.csproj`.~~ → No fue necesario. El patrón port + adapter de Radicacion mantiene Marten **fuera** del Dominio.
+- ~~Decidir scaffolding de tests del dominio.~~ → `TestDomainStore` fake in-memory (réplica de Radicacion). Sin clase base por ahora.
 
 **Habilita:** todos los ítems siguientes (2 al 30).
 **Depende de:** nada.
 
 ---
 
-### 2. `Moneda` — Persistir documento Marten al agregar `[F1]` `[Directamente implementable]`
+### 2. `Moneda` — Persistir documento Marten al agregar `[F1]` `[Directamente implementable]` ✅
 
 **Explicación**
 La entidad `Moneda` existe y valida sus invariantes en el dominio. No hay handler/comando que la persista en Marten. Sin esto, ningún endpoint puede crear monedas y ningún test de integración puede usarlas como prerequisito.
@@ -181,6 +200,22 @@ La entidad `Moneda` existe y valida sus invariantes en el dominio. No hay handle
 
 **Habilita:** #3, #4, #5, #6, #7 (todas las operaciones que requieren leer/escribir monedas), #13 (Pais necesita validar V2 contra monedas persistidas), #29 (TasaDeCambio V8 igual).
 **Depende de:** ítem 1.
+
+**Implementación aplicada (2026-05-21)**
+
+Patrón port + adapter replicado de `ObligacionesPorPagar.Radicacion.Dominio.Store`:
+
+- **Port en Dominio:** `Cosmos.DatosReferencia.Dominio/Compartidos/Store/IDomainStore.cs` con tres métodos (`AnyAsync`, `FirstOrDefaultAsync`, `SaveAsync`). Cero dependencia Marten.
+- **Adapter en proyecto nuevo:** `Cosmos.DatosReferencia.Dominio.Store/` (Marten 8.23.0). Implementa `IDomainStore` delegando a `IDocumentSession`.
+- **Wiring DI:** `services.AgregarDomainStore()` en `Comandos.API/Program.cs`. AcceptanceTests lo hereda transitivamente vía Comandos.API.
+- **Handler:** `Dominio/Monedas/CommandHandlers/AgregarMonedaHandler.cs` recibe `IDomainStore`. Orden Fail Fast: construir `CodigoMoneda` (valida ISO) → `AnyAsync` (unicidad) → `new Moneda(...)` (valida nombre/decimales) → `SaveAsync`.
+- **Comando:** `Dominio/Monedas/Commands/MonedaCommands.cs` con `abstract record MonedaCommands` + nested `Agregar(string Codigo, string Nombre, int Decimales)`.
+- **Excepción:** `Dominio/Monedas/Exceptions/AgregarMonedaException.cs`.
+- **Tests:** `Dominio.Tests/Monedas/Comandos/AgregarMonedaTests.cs` con los 3 casos del diagnóstico, usando `TestDomainStore` fake in-memory (`Dominio.Tests/Compartidos/Imitaciones/TestDomainStore.cs`).
+
+**Refinamiento de F1:** la decisión Q3 de F1 había aceptado divergir con CLAUDE.md (Marten en Dominio). El patrón port + adapter de Radicacion **restauró** la pureza de capa — el Dominio quedó sin Marten. Memoria `feedback_wiring_comandos_api.md` actualizada con el refinamiento.
+
+**Tests:** 15 dominio (12 previos + 3 nuevos) + 0 acceptance verdes.
 
 ---
 

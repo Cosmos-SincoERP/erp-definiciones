@@ -2,6 +2,7 @@ using System.Reflection;
 using Cosmos.DatosReferencia.Comandos.API;
 using Cosmos.DatosReferencia.Contratos;
 using Cosmos.DatosReferencia.Dominio;
+using Cosmos.DatosReferencia.Dominio.Store.Extensions;
 using Carter;
 using Cosmos.EventDriven.CritterStack;
 using Cosmos.EventDriven.CritterStack.RabbitMQ;
@@ -48,6 +49,7 @@ builder.Services.AgregarHealthChecks(martenConnectionString, rabbitMqConnectionS
 builder.Services.AgregarMartenEventStore();
 builder.Services.AgregarWolverineCommandRouter();
 builder.Services.AgregarWolverineEventSender();
+builder.Services.AgregarDomainStore();
 
 var app = builder.Build();
 
