@@ -290,6 +290,41 @@ El mismo primitivo con las mismas validaciones en ≥3 lugares es un Value Objec
 
 ---
 
+### VO solo cuando hay identidad de dominio
+
+Primitive Obsession justifica crear un VO; este principio es su contraparte: cuándo **no** crearlo.
+
+Un `record`/VO se justifica cuando encapsula un **valor con identidad propia del dominio** que **atraviesa boundaries** (eventos, comandos, agregados, queries, ports, proyecciones). Si la vida útil del tipo se reduce a construirlo y compararlo inmediatamente dentro de un mismo método, es una **operación disfrazada de tipo** — preferir función pura o clase estática con métodos `De(...)` / `SonEquivalentes(...)` / verbo del dominio.
+
+**Señales de VO innecesario:**
+
+| Señal | Diagnóstico |
+|---|---|
+| Un solo campo calculado en el constructor | Es una transformación, no un valor. |
+| Nunca se almacena en un agregado, evento o read model | No atraviesa boundary — el tipo no aporta type safety útil. |
+| Solo se construye para comparar y descartar (`new X(a) == new X(b)`) | Ceremonia. El cómputo subyacente es la operación real. |
+| La comparación estructural del record equivale a comparar el resultado del cómputo | El record duplica lo que la función ya garantiza. |
+
+**Patrón correcto cuando es una operación pura:**
+
+```csharp
+// ❌ VO disfrazado — construir dos veces para comparar y descartar
+public record RazonSocialCanonica(string valor) { public string Valor { get; } = Canonicalizar(valor); ... }
+if (new RazonSocialCanonica(a) == new RazonSocialCanonica(b)) { ... }
+
+// ✅ función pura del dominio
+public static class RazonSocialCanonica
+{
+    public static string De(string razonSocial) { ... }
+    public static bool SonEquivalentes(string a, string b) => De(a) == De(b);
+}
+if (RazonSocialCanonica.SonEquivalentes(a, b)) { ... }
+```
+
+**Cuándo SÍ es VO:** `Identificacion`, `CorreoElectronico`, `Telefono`, `DireccionAsignada` — tienen invariantes propias, se almacenan en agregados, aparecen en eventos, viajan por queries y proyecciones. Su identidad como tipo aporta type safety real.
+
+---
+
 ### Command Query Separation (CQS)
 
 Un método es un **comando** (muta estado, retorna void) o una **query** (retorna valor, no muta). Nunca ambas cosas.
@@ -318,6 +353,44 @@ El ID siempre se genera en el **handler** o en el **endpoint**, no en el agregad
 - El estado de los agregados muta **solo** dentro de `Apply()`, a partir de eventos ya ocurridos.
 - Los eventos son historia inmutable — nunca se modifican, nunca se eliminan.
 - Las colecciones expuestas desde agregados son `IReadOnlyList<T>` — nunca `List<T>` mutable pública.
+
+---
+
+### Extract Method y pipelines del dominio
+
+Cuando una operación del dominio consiste en **N pasos discretos nombrables** (canonicalizar, normalizar, transformar en cascada, validar por etapas), expresarla como **pipeline de métodos nombrados** es preferible a fusionarlos en un loop con `if`/`continue` o una expresión compuesta. El método principal debe leerse como **la regla del dominio**, no como su implementación.
+
+**Anti-patrón:** un `foreach`/`while` con varios filtros mezclados que mutan un acumulador.
+
+**Patrón correcto:** cada paso es un método (privado o extension method local) con el **nombre del paso del dominio**. El método principal encadena.
+
+```csharp
+// ❌ los 5 pasos de la regla SI9 enredados en un solo loop
+private static string Canonicalizar(string valor)
+{
+    var sb = new StringBuilder();
+    foreach (var c in valor.Normalize(NormalizationForm.FormD))
+    {
+        if (CharUnicodeInfo.GetUnicodeCategory(c) == UnicodeCategory.NonSpacingMark) continue;
+        if (char.IsPunctuation(c) || char.IsSymbol(c)) continue;
+        sb.Append(char.ToLowerInvariant(c));
+    }
+    return Regex.Replace(sb.ToString(), @"\s+", " ").Trim();
+}
+
+// ✅ pipeline donde cada paso se lee como la regla
+private static string Canonicalizar(string valor)
+    => valor
+        .ToLowerInvariant()
+        .SinTildes()
+        .SinPuntuacion()
+        .ConEspaciosColapsados()
+        .Trim();
+```
+
+**Trade-off aceptado:** más asignaciones intermedias a cambio de legibilidad. Para volúmenes típicos del dominio (strings, listas pequeñas, agregados con < ~100 elementos) el costo es despreciable. Si un perfilado real demuestra hot path, optimizar localmente — no profilácticamente.
+
+**Cuándo NO aplica:** loops que ya expresan UN solo paso conceptual (un único `Where` + `Select`, un fold con semántica única). Extract Method solo agrega ruido si no hay pasos discretos que nombrar.
 
 ---
 

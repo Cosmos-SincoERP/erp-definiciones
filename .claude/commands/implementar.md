@@ -50,13 +50,19 @@ Este comando **siempre opera en Plan Mode**. No editar archivos de producción h
    - **Explicación**, **Respaldo en la documentación** y **Ejemplo** — contexto del comportamiento. No es necesario releer toda la documentación del dominio.
    - **Test que define este comportamiento** — si está presente, es el test a escribir en Fase 1. No derivar qué testear: el test ya está especificado con su nombre, qué verifica, por qué falla en rojo y los casos borde obligatorios.
    - **Lo mínimo para que el test pase** — si está presente, define el alcance exacto de la implementación. No implementar nada que no esté en esta sección, aunque parezca útil o relacionado. Ese código pertenece a un ítem posterior.
+   - **Activaciones pendientes (de ítems previos)** — si la sub-sección existe, **las tareas listadas forman parte del scope obligatorio** del ítem actual. Son trabajo dejado por ítems anteriores que solo puede completarse al implementar éste (típicamente tests `[Fact(Skip = "...")]`, helpers temporales o código marcado como `// TODO(#<N>)` que apunta a este ítem). Activarlas y completarlas como parte del cierre.
 
-3. **Cargar contexto del proyecto** (en orden):
+3. **Revisar deuda hacia atrás en el código** (paso obligatorio antes de planear):
+   - Si el ítem es N: ejecutar `grep -r "TODO(#N)"` en el codebase. Cada marcador encontrado es deuda que se activa con este ítem.
+   - Si el ítem implementa un nuevo evento/comando `XxxYyy`: ejecutar `grep -r "XxxYyy"` filtrando tests con `[Fact(Skip` para detectar tests que están esperando esa pieza.
+   - Los hallazgos entran al scope del plan, incluso si no están listados en la sub-sección "Activaciones pendientes" del ítem (la sub-sección puede no estar actualizada).
+
+4. **Cargar contexto del proyecto** (en orden):
    - `CLAUDE.md` del proyecto (siempre).
    - `MEMORY.md` y memorias relevantes al área tocada.
    - `AIResume/docs/revision-codigo/historial.md` si existe (para no re-introducir condiciones ya resueltas).
 
-4. **Explorar el código en scope** (máx 3 agentes Explore en paralelo) si el área toca > 1 archivo. Identificar:
+5. **Explorar el código en scope** (máx 3 agentes Explore en paralelo) si el área toca > 1 archivo. Identificar:
    - Convenciones locales del agregado / módulo afectado.
    - Helpers existentes que puedan reusarse (DRY proactivo).
    - Tests existentes que documenten el contrato actual.
@@ -246,6 +252,21 @@ Tras aprobación:
 
    **Test relevance check:** por cada bloque de código nuevo, ¿hay al menos un test que lo cubre? Si una rama no está cubierta, agregar el test antes de continuar.
 
+   **Gate estructural de tests** (recorrer cada test recién escrito, antes de ejecutar la suite — NO confiar en que las reglas de CLAUDE.md se respeten automáticamente, verificarlas test por test):
+
+   | Heurística | Control |
+   |---|---|
+   | **Then requiere And (estado del agregado)** | Cada test que NO espera excepción debe verificar el estado del SUT tras la acción, no solo el evento emitido. En este proyecto: `Then(...)` siempre seguido de `And<Agregado, T>(agg => agg.X, esperado)`. Tests de excepción están exentos. Regla en CLAUDE.md sección "Testing Pattern". |
+   | **Excepción correcta y específica** | Tests de error: `.ThrowAsync<TipoEspecífico>()` + `.Where(ex => ex.Type == DomainExceptionType.X)` + `.WithMessage(...)`. No `Exception` genérica; no solo el tipo sin matcher de mensaje. |
+   | **Sin `[Theory]` con un solo `[InlineData]`** | Convertir a `[Fact]` con el valor hardcodeado. |
+   | **Sin tests triviales** | No probar primary constructors, herencia o literales hardcoded por sí solos (ver memoria `feedback_no_tests_triviales` si existe). El test vale por el comportamiento observable. |
+   | **Sin asserts de colección por índice/Count** | `.Count.Should().Be(N)` y `lista[0].Should()...` están prohibidos. Usar `BeEquivalentTo` o helpers tipados con la lista esperada completa. |
+   | **Mensajes de excepción con wildcards, no exactos** | `.WithMessage("*'{id}'*regla*")` en vez de strings completos — evita over-specify. |
+   | **Naming con sujeto explícito** | Si dos entidades del scope pueden ser sujeto del `Si_X` o `Debe_Y`, agregar el nombre de la entidad (`EstadoDelTercero…`, `ContactoTieneSoloCorreo…`). Regla en memoria `feedback_test_naming_sujeto_explicito` si existe. |
+   | **Tests con Skip llevan marcador TODO(#N)** | El skip debe incluir `TODO(#<N>)` apuntando al ítem que lo desbloquea, y debe haber un bullet en la sub-sección "Activaciones pendientes" del ítem N en el plan refinado. |
+
+   Si alguna fila falla en algún test, corregir antes de ejecutar la suite. CLAUDE.md describe estas reglas pero **el comando es responsable de verificarlas test por test** — no asumir que se cumplieron por inercia.
+
 3. **No introducir cambios fuera del plan aprobado.** Si durante la implementación se detecta un smell adyacente:
    - Si es trivial y está en el mismo archivo: corregirlo y mencionarlo en el resumen.
    - Si requiere cambio de API o de otro archivo: detenerse y proponerlo al usuario.
@@ -262,11 +283,21 @@ dotnet test [Proyecto].sln --no-build 2>&1 | grep -E "Passed!|Failed!"
 
 Si hay fallos: investigar y corregir antes de declarar el cierre. No reportar éxito con tests rojos.
 
+### Captura de deuda hacia adelante (paso obligatorio antes de cerrar)
+
+Durante la implementación pudiste detectar que una regla, test o pieza de código del ítem **A** que estás implementando solo puede completarse cuando se implemente un ítem **B** futuro (típicamente: una regla del ítem A menciona un estado/comportamiento que aún no existe porque vive en B). En ese caso, registra la deuda en **dos lugares** antes de cerrar:
+
+1. **En el código**: marcador `// TODO(#<N>): <descripción concreta>` donde `N` es el número del ítem que desbloqueará la deuda. Para tests, usar `[Fact(Skip = "TODO(#<N>): <descripción>")]`. El marcador debe ser **corto** — los detalles van en el plan.
+2. **En el plan**: en el ítem **B** de `AIResume/DiagnosticoYPlanDominio.md`, agregar una sub-sección **"Activaciones pendientes (de ítems previos)"** con un bullet por cada deuda: ubicación del marcador (`archivo:nombre_test` o `archivo:linea`), qué reemplazar, y referencia al ítem origen. Si la sub-sección ya existe, agregar el bullet allí.
+
+Esta captura es **obligatoria**: la sub-sección del ítem B se lee como scope obligatorio cuando ese ítem se implemente (ver Fase 1.2), cerrando el círculo.
+
 **Resumen de cierre:**
 - Listar archivos tocados.
 - Confirmar tests verdes con números: `"N dominio + M acceptance"`.
 - Mencionar cualquier estándar aplicado proactivamente más allá del literal del prompt.
 - Si quedaron smells adyacentes detectados pero fuera de scope: listarlos como observaciones sin tocar.
+- Si quedó **deuda hacia adelante** capturada (TODO(#N) + Activaciones pendientes en el ítem N): mencionarla en el resumen para que el usuario la vea explícitamente.
 
 ---
 

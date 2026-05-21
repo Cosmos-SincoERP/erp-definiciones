@@ -42,4 +42,55 @@ public class MonedaTests
             .Where(excepcion => excepcion.Type == DomainExceptionType.InvalidData)
             .WithMessage("*nombre*");
     }
+
+    [Fact]
+    public void Si_NombreYDecimalesSonValidos_Debe_RetornarMonedaConValoresActualizados()
+    {
+        var original = new Moneda(new CodigoMoneda("COP"), "Peso colombiano", 2);
+
+        var modificada = original.Modificar("Peso colombiano (nuevo)", 0);
+
+        modificada.Codigo.Valor.Should().Be("COP");
+        modificada.Nombre.Should().Be("Peso colombiano (nuevo)");
+        modificada.Decimales.Should().Be(0);
+        modificada.Activo.Should().BeTrue();
+    }
+
+    [Fact]
+    public void Si_NuevoNombreEsNuloOVacio_Debe_LanzarExcepcionInvalidData()
+    {
+        var original = new Moneda(new CodigoMoneda("COP"), "Peso colombiano", 2);
+
+        var conNulo = () => original.Modificar(null!, 2);
+        var conVacio = () => original.Modificar("", 2);
+
+        conNulo.Should().Throw<MonedaException>()
+            .Where(excepcion => excepcion.Type == DomainExceptionType.InvalidData)
+            .WithMessage("*nombre*");
+        conVacio.Should().Throw<MonedaException>()
+            .Where(excepcion => excepcion.Type == DomainExceptionType.InvalidData)
+            .WithMessage("*nombre*");
+    }
+
+    [Fact]
+    public void Si_NuevosDecimalesSonNegativos_Debe_LanzarExcepcionInvalidData()
+    {
+        var original = new Moneda(new CodigoMoneda("COP"), "Peso colombiano", 2);
+
+        var caller = () => original.Modificar("Peso colombiano", -1);
+
+        caller.Should().Throw<MonedaException>()
+            .Where(excepcion => excepcion.Type == DomainExceptionType.InvalidData)
+            .WithMessage("*-1*");
+    }
+
+    [Fact]
+    public void Si_MonedaEsInactiva_Debe_MantenerseInactivaTrasModificar()
+    {
+        var inactiva = new Moneda(new CodigoMoneda("COP"), "Peso colombiano", 2) { Activo = false };
+
+        var modificada = inactiva.Modificar("Otro nombre", 0);
+
+        modificada.Activo.Should().BeFalse();
+    }
 }

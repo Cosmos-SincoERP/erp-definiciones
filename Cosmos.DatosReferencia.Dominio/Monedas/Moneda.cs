@@ -17,4 +17,7 @@ public record Moneda(CodigoMoneda Codigo, string Nombre, int Decimales)
         : Decimales;
 
     public bool Activo { get; init; } = true;
+
+    public Moneda Modificar(string nuevoNombre, int nuevosDecimales) =>
+        new(Codigo, nuevoNombre, nuevosDecimales) { Activo = Activo };
 }
