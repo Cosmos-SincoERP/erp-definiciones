@@ -15,6 +15,10 @@ internal class TestDomainStore : IDomainStore
         where T : notnull
         => Task.FromResult(Documentos.OfType<T>().FirstOrDefault(predicate.Compile()));
 
+    public Task<IReadOnlyList<T>> WhereAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        where T : notnull
+        => Task.FromResult<IReadOnlyList<T>>(Documentos.OfType<T>().Where(predicate.Compile()).ToList());
+
     public Task SaveAsync<T>(T modelo, CancellationToken ct = default) where T : notnull
     {
         Documentos.Add(modelo);

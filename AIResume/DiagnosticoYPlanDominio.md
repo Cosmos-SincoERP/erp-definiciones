@@ -11,7 +11,7 @@
 
 | Estado | Cantidad |
 |---|---|
-| ✅ Implementados y verificados | Entidad `Moneda` + VO `CodigoMoneda` + tests · ítem #1 F1 (decisiones archivadas) · ítem #2 (Agregar Moneda con port `IDomainStore` y `TestDomainStore`) · ítem #3 (Consultar Moneda por código con read model + Marten Id por convención) |
+| ✅ Implementados y verificados | Entidad `Moneda` + VO `CodigoMoneda` + tests · ítem #1 F1 (decisiones archivadas) · ítem #2 (Agregar Moneda con port `IDomainStore` y `TestDomainStore`) · ítem #3 (Consultar Moneda por código con Marten Id por convención; sin DTO) · ítem #4 (Listar monedas activas con `WhereAsync` en el port) |
 | 🔄 Parcialmente implementados | `Moneda` con persistencia operativa pero sin queries (#3, #4), endpoints REST (#5, #6) ni comandos de Modificar/Inactivar/Activar (#7, #8, #9) |
 | ⬜ Pendientes | 4 catálogos (Pais, DivisionTerritorial, TipoDocumentoIdentidad, TasaDeCambio) + seed + endpoints + sync TRM |
 | 🔁 Regresiones detectadas | N/A (instrucción explícita: ignorar plan previo) |
@@ -253,7 +253,7 @@ La documentación define la consulta "consultar por código" como operación exp
 
 ---
 
-### 4. `Moneda` — Query: listar activas `[F1]` `[Directamente implementable]`
+### 4. `Moneda` — Query: listar activas `[F1]` `[Directamente implementable]` ✅
 
 **Explicación**
 La doc indica `Listar activas` como operación de consulta. Sin esto, los consumidores no pueden poblar dropdowns ni catálogos.
@@ -275,6 +275,15 @@ La doc indica `Listar activas` como operación de consulta. Sin esto, los consum
 
 **Habilita:** endpoint REST GET de listado.
 **Depende de:** ítem 2.
+
+**Implementación aplicada (2026-05-21)**
+
+- Handler en `Cosmos.DatosReferencia.Consultas/Monedas/QueryHandlers/ListarMonedasActivasHandler.cs` con `IQueryHandler<MonedaQueries.ListarActivas, IReadOnlyList<Moneda>>`. Una sola expresión-lambda: `=> domainStore.WhereAsync<Moneda>(moneda => moneda.Activo, ct)`. Retorna la entidad de dominio directamente (sin DTO — decisión revisada en #3).
+- Query nested en `MonedaQueries.cs`: `public record ListarActivas() : MonedaQueries;` (consistencia con `ConsultarPorCodigo`).
+- Cierra la activación pendiente desde #3: `IDomainStore.WhereAsync<T>(predicate)` agregado al port, al adapter `DomainStore` (delega a `session.Query<T>().Where(...).ToListAsync(ct)`), y al fake `TestDomainStore`. El port pasa de 3 a 4 métodos.
+- Tests en `Dominio.Tests/Monedas/Consultas/ListarMonedasActivasTests.cs` con `TestDomainStore`: happy path (mix activas/inactivas → solo activas) + edge (sin monedas → lista vacía). Aserciones `BeEquivalentTo`/`BeEmpty` sin acceso por índice ni `.Count`.
+- Sin nueva exception (lista vacía es resultado válido, no error).
+- Sin nuevos `ProjectReference` ni wiring DI — todo se apoya en lo ya cableado en #2 y #3.
 
 ---
 

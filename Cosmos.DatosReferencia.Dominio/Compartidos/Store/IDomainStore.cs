@@ -10,5 +10,8 @@ public interface IDomainStore
     Task<T?> FirstOrDefaultAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
         where T : notnull;
 
+    Task<IReadOnlyList<T>> WhereAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        where T : notnull;
+
     Task SaveAsync<T>(T modelo, CancellationToken ct = default) where T : notnull;
 }

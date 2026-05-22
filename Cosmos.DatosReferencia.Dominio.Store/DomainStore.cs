@@ -20,6 +20,13 @@ public class DomainStore(IDocumentSession session) : IDomainStore
         return session.Query<T>().FirstOrDefaultAsync(predicate, ct);
     }
 
+    public async Task<IReadOnlyList<T>> WhereAsync<T>(Expression<Func<T, bool>> predicate, CancellationToken ct = default)
+        where T : notnull
+    {
+        ArgumentNullException.ThrowIfNull(predicate);
+        return await session.Query<T>().Where(predicate).ToListAsync(ct);
+    }
+
     public async Task SaveAsync<T>(T modelo, CancellationToken ct = default) where T : notnull
     {
         session.Store(modelo);
