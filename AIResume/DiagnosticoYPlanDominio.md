@@ -245,8 +245,8 @@ La documentación define la consulta "consultar por código" como operación exp
 
 **Implementación aplicada (2026-05-21)**
 
-- Handler en `Cosmos.DatosReferencia.Consultas/Monedas/QueryHandlers/ConsultarMonedaPorCodigoHandler.cs` con `IQueryHandler<MonedaQueries.ConsultarPorCodigo, MonedaReadModel>`. Inyecta `IDomainStore` (no `IQuerySession` como decía el diagnóstico literal) — reusando el port del write side por simetría con #2.
-- Query record en `Consultas/Monedas/Queries/MonedaQueries.cs`. Read model plano (sin VOs) en `ReadModels/MonedaReadModel.cs`. Una exception por query en `Exceptions/ConsultarMonedaPorCodigoException.cs`.
+- Handler en `Cosmos.DatosReferencia.Consultas/Monedas/QueryHandlers/ConsultarMonedaPorCodigoHandler.cs` con `IQueryHandler<MonedaQueries.ConsultarPorCodigo, Moneda>`. Inyecta `IDomainStore` (no `IQuerySession` como decía el diagnóstico literal) — reusando el port del write side por simetría con #2. Retorna la entidad de Dominio directamente (sin `MonedaReadModel` DTO — descartado tras revisión: en CRUD doc la entidad ES el modelo de lectura, no hay proyección que justifique un tipo intermedio; el control de wire format JSON irá a la capa API).
+- Query record en `Consultas/Monedas/Queries/MonedaQueries.cs`. Una exception por query en `Exceptions/ConsultarMonedaPorCodigoException.cs`.
 - Tests en `Dominio.Tests/Monedas/Consultas/ConsultarMonedaPorCodigoTests.cs` con `TestDomainStore` fake (no TestContainer). 2 casos: happy path y NotFound. Total suite: **17 dominio**.
 - **`Moneda` ahora declara `public string Id { get; init; } = Codigo.Valor;`** — patrón heredado de Localizadores de Cosmos.Impuestos para que Marten descubra el Id por convención. Sin `StoreConfiguration`, sin import Marten en Dominio.
 - Wiring DI: `Consultas.API/Program.cs` ahora invoca `services.AgregarDomainStore()` con `ProjectReference` a `Dominio.Store`. `Dominio.Tests` agregó `ProjectReference` a `Consultas` para importar los tipos del read side.

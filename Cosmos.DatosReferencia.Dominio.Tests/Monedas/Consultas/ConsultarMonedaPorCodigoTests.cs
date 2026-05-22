@@ -2,7 +2,6 @@ using AwesomeAssertions;
 using Cosmos.DatosReferencia.Consultas.Monedas.Exceptions;
 using Cosmos.DatosReferencia.Consultas.Monedas.Queries;
 using Cosmos.DatosReferencia.Consultas.Monedas.QueryHandlers;
-using Cosmos.DatosReferencia.Consultas.Monedas.ReadModels;
 using Cosmos.DatosReferencia.Dominio.Compartidos.Excepciones;
 using Cosmos.DatosReferencia.Dominio.Monedas;
 using Cosmos.DatosReferencia.Dominio.Monedas.ValueObjects;
@@ -18,21 +17,14 @@ public class ConsultarMonedaPorCodigoTests
     [Fact]
     public async Task Si_MonedaExiste_Debe_RetornarMonedaConSusAtributos()
     {
-        await _domainStore.SaveAsync(
-            new Moneda(new CodigoMoneda("USD"), "Dólar estadounidense", 2),
-            TestContext.Current.CancellationToken);
+        var moneda = new Moneda(new CodigoMoneda("USD"), "Dólar estadounidense", 2);
+        await _domainStore.SaveAsync(moneda, TestContext.Current.CancellationToken);
 
         var resultado = await Handler.HandleAsync(
             new MonedaQueries.ConsultarPorCodigo("USD"),
             TestContext.Current.CancellationToken);
 
-        resultado.Should().BeEquivalentTo(new MonedaReadModel
-        {
-            Codigo = "USD",
-            Nombre = "Dólar estadounidense",
-            Decimales = 2,
-            Activo = true
-        });
+        resultado.Should().BeEquivalentTo(moneda);
     }
 
     [Fact]
