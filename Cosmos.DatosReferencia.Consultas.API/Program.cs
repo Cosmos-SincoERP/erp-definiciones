@@ -2,6 +2,7 @@
 using Cosmos.DatosReferencia.Consultas;
 using Cosmos.DatosReferencia.Consultas.API;
 using Carter;
+using Cosmos.DatosReferencia.Dominio.Store.Extensions;
 using Cosmos.EventSourcing.CritterStack;
 using Cosmos.EventSourcing.CritterStack.Queries;
 using Cosmos.Infraestructure;
@@ -34,6 +35,7 @@ builder.Services.AgregarOpenTelemetry(serviceName, openTelemetryEndpoint, isProd
 builder.Services.AgregarHealthChecks(martenConnectionString);
 builder.Services.AgregarMartenProjectionStore();
 builder.Services.AgregarWolverineQueryRouter();
+builder.Services.AgregarDomainStore();
 
 var app = builder.Build();
 

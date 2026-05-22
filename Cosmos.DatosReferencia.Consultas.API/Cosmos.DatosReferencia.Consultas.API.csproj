@@ -24,6 +24,7 @@
         <ProjectReference Include="..\Cosmos.Infraestructure\Cosmos.Infraestructure.csproj"/>
         <ProjectReference Include="..\Cosmos.DatosReferencia.Consultas\Cosmos.DatosReferencia.Consultas.csproj"/>
         <ProjectReference Include="..\Cosmos.DatosReferencia.Dominio\Cosmos.DatosReferencia.Dominio.csproj"/>
+        <ProjectReference Include="..\Cosmos.DatosReferencia.Dominio.Store\Cosmos.DatosReferencia.Dominio.Store.csproj"/>
     </ItemGroup>
 
 </Project>

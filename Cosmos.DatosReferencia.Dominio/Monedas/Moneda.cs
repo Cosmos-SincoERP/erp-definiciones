@@ -6,6 +6,8 @@ namespace Cosmos.DatosReferencia.Dominio.Monedas;
 
 public record Moneda(CodigoMoneda Codigo, string Nombre, int Decimales)
 {
+    public string Id { get; init; } = Codigo.Valor;
+
     public string Nombre { get; } = string.IsNullOrWhiteSpace(Nombre)
         ? throw new MonedaException(DomainExceptionType.InvalidData,
             "El nombre de la moneda no puede ser nulo o vacío.")

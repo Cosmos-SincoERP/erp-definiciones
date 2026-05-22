@@ -11,7 +11,7 @@
 
 | Estado | Cantidad |
 |---|---|
-| ✅ Implementados y verificados | Entidad `Moneda` + VO `CodigoMoneda` + tests · ítem #1 F1 (decisiones archivadas) · ítem #2 (Agregar Moneda con port `IDomainStore` y `TestDomainStore`) |
+| ✅ Implementados y verificados | Entidad `Moneda` + VO `CodigoMoneda` + tests · ítem #1 F1 (decisiones archivadas) · ítem #2 (Agregar Moneda con port `IDomainStore` y `TestDomainStore`) · ítem #3 (Consultar Moneda por código con read model + Marten Id por convención) |
 | 🔄 Parcialmente implementados | `Moneda` con persistencia operativa pero sin queries (#3, #4), endpoints REST (#5, #6) ni comandos de Modificar/Inactivar/Activar (#7, #8, #9) |
 | ⬜ Pendientes | 4 catálogos (Pais, DivisionTerritorial, TipoDocumentoIdentidad, TasaDeCambio) + seed + endpoints + sync TRM |
 | 🔁 Regresiones detectadas | N/A (instrucción explícita: ignorar plan previo) |
@@ -219,7 +219,7 @@ Patrón port + adapter replicado de `ObligacionesPorPagar.Radicacion.Dominio.Sto
 
 ---
 
-### 3. `Moneda` — Query: consultar por código `[F1]` `[Directamente implementable]`
+### 3. `Moneda` — Query: consultar por código `[F1]` `[Directamente implementable]` ✅
 
 **Explicación**
 La documentación define la consulta "consultar por código" como operación expuesta. Hoy no hay query handler ni endpoint.
@@ -242,6 +242,14 @@ La documentación define la consulta "consultar por código" como operación exp
 
 **Habilita:** #4 (listado), #6, #7 (validan existencia por código), endpoints REST GET de moneda.
 **Depende de:** ítem 2.
+
+**Implementación aplicada (2026-05-21)**
+
+- Handler en `Cosmos.DatosReferencia.Consultas/Monedas/QueryHandlers/ConsultarMonedaPorCodigoHandler.cs` con `IQueryHandler<MonedaQueries.ConsultarPorCodigo, MonedaReadModel>`. Inyecta `IDomainStore` (no `IQuerySession` como decía el diagnóstico literal) — reusando el port del write side por simetría con #2.
+- Query record en `Consultas/Monedas/Queries/MonedaQueries.cs`. Read model plano (sin VOs) en `ReadModels/MonedaReadModel.cs`. Una exception por query en `Exceptions/ConsultarMonedaPorCodigoException.cs`.
+- Tests en `Dominio.Tests/Monedas/Consultas/ConsultarMonedaPorCodigoTests.cs` con `TestDomainStore` fake (no TestContainer). 2 casos: happy path y NotFound. Total suite: **17 dominio**.
+- **`Moneda` ahora declara `public string Id { get; init; } = Codigo.Valor;`** — patrón heredado de Localizadores de Cosmos.Impuestos para que Marten descubra el Id por convención. Sin `StoreConfiguration`, sin import Marten en Dominio.
+- Wiring DI: `Consultas.API/Program.cs` ahora invoca `services.AgregarDomainStore()` con `ProjectReference` a `Dominio.Store`. `Dominio.Tests` agregó `ProjectReference` a `Consultas` para importar los tipos del read side.
 
 ---
 

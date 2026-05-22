@@ -28,6 +28,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\Cosmos.DatosReferencia.Dominio\Cosmos.DatosReferencia.Dominio.csproj"/>
+        <ProjectReference Include="..\Cosmos.DatosReferencia.Consultas\Cosmos.DatosReferencia.Consultas.csproj"/>
     </ItemGroup>
 
 </Project>
