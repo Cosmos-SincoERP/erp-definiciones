@@ -22,229 +22,110 @@ El contenido se organiza siguiendo la estructura de los agregados del modelo de 
 
 ## 1. Tributos — CatalogoTributario
 
-### Tributos directos
+Los datos del catálogo `catalogo-tributario-CO` (tributos, clasificaciones, tratamientos y reglas de localización) se migraron a [`datos-precargados/co-catalogo-tributario.json`](datos-precargados/co-catalogo-tributario.json) (v1.0, 2026-05-26). Allí viven las 46 entidades iniciales F1 (11 tributos + 6 clasificaciones + 18 tratamientos + 11 reglas de localización). El narrativo de revisión para consultores está en [`datos-precargados/co-catalogo-tributario.md`](datos-precargados/co-catalogo-tributario.md).
 
-| Código | Nombre | Naturaleza | Base | Nivel jurisdiccional | Factor de tarifa | Tributo padre | Definición |
-|--------|--------|:----------:|------|:--------------------:|-----------------|:-------------:|------------|
-| IVA | Impuesto al Valor Agregado | Aditivo | Ingreso | Nacional | `clasificacion` | — | Impuesto indirecto nacional sobre la prestación de servicios y venta e importación de bienes. |
-| INC | Impuesto Nacional al Consumo | Aditivo | Ingreso | Nacional | `clasificacion` | — | Impuesto indirecto que grava los sectores de vehículos, telecomunicaciones, comidas y bebidas. |
-| ICA | Impuesto de Industria y Comercio | Aditivo | Ingreso | Municipal | `actividadEconomica` | — | Impuesto generado a toda actividad comercial, de servicios o industrial, realizada de forma ocasional o permanente. Tarifa a nivel municipal. |
-| RETEFUENTE | Retención en la Fuente | Sustractivo | Ingreso | Nacional | `conceptoPago` | — | Mecanismo anticipado de recaudación del impuesto a la renta y complementarios, con el fin de garantizar y agilizar el pago. |
-| RIVA | Retención sobre el IVA | Sustractivo | IVA (padre) | Nacional | `porcentajeDePadre` | IVA | Recaudación anticipada del impuesto a las ventas efectuada por un agente retenedor. |
-| RICA | Retención sobre el ICA | Sustractivo | Ingreso | Municipal | `actividadEconomica` | — | Retención a título del impuesto de industria y comercio. Tarifa a nivel municipal. |
-| SOBRETASA_BOMBERIL | Retención Sobretasa Bomberil | Sustractivo | RICA (padre) | Municipal | `porcentajeDePadre` | RICA | Tributo municipal asignado por cada municipio. Requisito: el tercero debe ser responsable del ICA. |
+En esta sección queda únicamente el **contexto de diseño**:
 
-### Tributos de provisión (autoretenciones)
+- **Tributos directos:** 7 (IVA, INC, ICA, RETEFUENTE, RIVA, RICA, SOBRETASA_BOMBERIL). IVA, INC, ICA son `aditivo`; los demás `sustractivo`. Cuatro niveles de dependencia padre-hijo: RIVA → IVA, RICA → (independiente), SOBRETASA_BOMBERIL → RICA, AUTO_RIVA → IVA.
+- **Tributos de provisión (autorretenciones):** 4 (AUTO_RENTA, AUTO_RETEFUENTE, AUTO_RIVA, AUTO_RICA). Aplican cuando la empresa es autorretenedora — atributo del `PerfilTributario`. Direccionalidad: `ingreso` (la empresa autorretiene sobre sus propias ventas) salvo AUTO_RIVA que es `gasto` (reverse charge).
+- **`codigo` semántico inmutable:** Los códigos de Tributo y Clasificación son inmutables por referencias históricas desde `RegistroTributario` (`[I26]`). Política de modificabilidad de otros atributos diferida a `[PD12]`.
+- **Clasificaciones:** 6 categorías que agrupan bienes y servicios por tratamiento (GRAV_19, GRAV_5, EXCLUIDO, EXENTO, INC_8, NO_GRAVADO). Las tarifas específicas viven en `TarifaTributaria` — el catálogo solo define qué clasificaciones existen.
 
-| Código | Nombre | Naturaleza | Base | Nivel jurisdiccional | Factor de tarifa | Tributo padre | Definición |
-|--------|--------|:----------:|------|:--------------------:|-----------------|:-------------:|------------|
-| AUTO_RENTA | Autorretención de Renta | Sustractivo | Ingreso | Nacional | `fija` | — | Autorretención a título de renta. Aplica cuando la empresa es autorretenedora. |
-| AUTO_RETEFUENTE | Autorretención en la Fuente | Sustractivo | Ingreso | Nacional | `conceptoPago` | — | Autorretención en la fuente. Aplica cuando la empresa es autorretenedora de renta. |
-| AUTO_RIVA | Autorretención de IVA | Sustractivo | IVA (padre) | Nacional | `porcentajeDePadre` | IVA | Autorretención de IVA. Aplica cuando la empresa es agente retenedor de IVA. |
-| AUTO_RICA | Autorretención de ICA | Sustractivo | Ingreso | Municipal | `actividadEconomica` | — | Autorretención de ICA. Aplica cuando la empresa es autorretenedora de ICA. |
+### Jurisdicciones fiscales — JurisdiccionFiscal
 
-**Total:** 11 tributos (7 directos + 4 de provisión).
+Los datos del catálogo `jurisdiccion-fiscal-CO` se migraron a [`datos-precargados/co-jurisdiccion-fiscal.json`](datos-precargados/co-jurisdiccion-fiscal.json) (v1.0, 2026-05-26). Allí vive la lista completa de las 84 entradas iniciales F1 (1 nacional + 33 departamentos + 12 distritos especiales + 38 municipios) con sus códigos DIVIPOLA, vigencias y referencias normativas. El narrativo de revisión para consultores está en [`datos-precargados/co-jurisdiccion-fiscal.md`](datos-precargados/co-jurisdiccion-fiscal.md).
 
-### Clasificaciones tributarias
+En esta sección queda únicamente el **contexto de diseño** de la configuración estándar:
 
-| Código | Nombre | Tributos que aplican | Notas |
-|--------|--------|---------------------|-------|
-| GRAV_19 | Gravados 19% | IVA, RETEFUENTE, RIVA, ICA, RICA | Tarifa general — bienes y servicios gravados al 19%. |
-| GRAV_5 | Gravados 5% | IVA, RETEFUENTE, RIVA, ICA, RICA | Tarifa reducida — bienes y servicios de la canasta básica y otros. |
-| EXCLUIDO | Excluidos de IVA | RETEFUENTE, ICA, RICA | No generan IVA. Pueden tener retenciones. |
-| EXENTO | Exentos de IVA | IVA (tarifa 0%), RETEFUENTE, ICA, RICA | IVA con tarifa 0% — derecho a descontar IVA pagado. |
-| INC_8 | Gravados INC 8% | INC | Telecomunicaciones, comidas y bebidas. |
-| NO_GRAVADO | No sujeto a impuestos | — | Conceptos que no generan ningún tributo. |
+- **Códigos:** Se usan los códigos DIVIPOLA del DANE como identificador de cada jurisdicción. La codificación es estable, oficial y compartida con el catálogo `divisiones-territoriales-co.json` de Datos de Referencia vía `divisionTerritorialRef`.
+- **Regímenes territoriales especiales:** Se modelan explícitamente con `tipo: regimen-especial-territorial` y `tipoRegimen` categórico. En Colombia aplica únicamente el régimen `puerto-libre` para el Archipiélago de San Andrés, Providencia y Santa Catalina (Constitución art. 310 + Ley 47/1993). Las demás jurisdicciones son `territorial-administrativa`.
+- **Cobertura inicial F1:** La carga inicial F1 incluye nacional + departamentos + distritos especiales + capitales departamentales + ~12 municipios no capitales con recaudo ICA significativo. Los municipios menores se agregan progresivamente como `origen: personalizado` cuando el cliente los necesita.
+
+> **Nota sobre tipoRegimen:** El régimen `puerto-libre` agrupa las jurisdicciones del Archipiélago de San Andrés, Providencia y Santa Catalina, que tienen tributación especial conforme a la Constitución (art. 310) y Ley 47/1993. El IVA nacional NO aplica a transacciones donde el lugar de ejecución pertenece a este régimen — esta regla se modela como `CondicionDeAplicacion` que evalúa `lugarEjecucion.jurisdiccion.tipoRegimen = "puerto-libre"`.
 
 ### Reglas de localización
 
-| Tributo | Clasificación | Rol fiscalmente relevante | Fallback | Notas |
-|---------|--------------|--------------------------|----------|-------|
-| IVA | * (todas) | `sedeEmisora` | — | Siempre nacional. La sede de la empresa determina el país. |
-| INC | * (todas) | `sedeEmisora` | — | Siempre nacional. |
-| RETEFUENTE | * (todas) | `sedeEmisora` | — | Siempre nacional. |
-| ICA | * (todas) | `lugarEjecucion` | `sedeEmisora` | Municipal. Donde se presta el servicio o se entrega el bien. |
-| RIVA | * (todas) | `sedeEmisora` | — | Nacional. Hereda del padre (IVA). |
-| RICA | * (todas) | `lugarEjecucion` | `sedeEmisora` | Municipal. Misma resolución que ICA. |
-| SOBRETASA_BOMBERIL | * (todas) | `lugarEjecucion` | `sedeEmisora` | Municipal. Hereda del padre (RICA). |
-| AUTO_RENTA | * (todas) | `sedeEmisora` | — | Nacional. |
-| AUTO_RETEFUENTE | * (todas) | `sedeEmisora` | — | Nacional. |
-| AUTO_RIVA | * (todas) | `sedeEmisora` | — | Nacional. |
-| AUTO_RICA | * (todas) | `lugarEjecucion` | `sedeEmisora` | Municipal. |
+Las 11 reglas de localización se migraron junto con el catálogo tributario a [`datos-precargados/co-catalogo-tributario.json`](datos-precargados/co-catalogo-tributario.json) (sección `reglasLocalizacion`).
+
+**Patrón de diseño:** Tributos nacionales (IVA, INC, RETEFUENTE, RIVA, AUTO_RENTA, AUTO_RETEFUENTE, AUTO_RIVA) resuelven por `sedeEmisora` sin fallback — la sede de la empresa determina el país. Tributos municipales (ICA, RICA, SOBRETASA_BOMBERIL, AUTO_RICA) resuelven por `lugarEjecucion` con fallback a `sedeEmisora` — donde se presta el servicio o entrega el bien, y si no hay dato del lugar de ejecución, se usa la sede.
 
 ---
 
 ## 2. Tarifas — TarifaTributaria
 
-### IVA (nacional) — `tarifa-CO-IVA`
+Las tarifas tributarias se migraron a [`datos-precargados/co-tarifa-tributaria.json`](datos-precargados/co-tarifa-tributaria.json) (v1.0, 2026-05-26). Allí viven 22 streams con 124 entradas de tarifa (7 streams nacionales + 12 streams ICA municipales + sobretasa Bogotá + placeholders RICA/AUTO_RICA). El narrativo de revisión está en [`datos-precargados/co-tarifa-tributaria.md`](datos-precargados/co-tarifa-tributaria.md).
 
-| Factor (clasificación) | Tarifa | Tipo | Cuantía mínima | Vigencia desde |
-|------------------------|:------:|:----:|:--------------:|:--------------:|
-| GRAV_19 | 19% | Porcentaje | — | 2017-01-01 |
-| GRAV_5 | 5% | Porcentaje | — | 2017-01-01 |
-| EXENTO | 0% | Porcentaje | — | 2017-01-01 |
+En esta sección queda únicamente el **contexto de diseño**:
 
-### INC (nacional) — `tarifa-CO-INC`
+- **IVA, INC:** 3 + 1 = 4 entradas nacionales por clasificación tributaria.
+- **RETEFUENTE:** 49 conceptos certificados DIAN (Decreto Único 1625/2016) — compras, servicios, honorarios, arrendamientos, pagos al exterior, etc. Tarifas de 0.1% a 33%.
+- **RIVA:** 15% del IVA generado (porcentajeDePadre).
+- **AUTO_RENTA:** Tarifa base 0.55%. Tarifas sectoriales (0.40% industria, 0.80% comercio, 1.60% otros) pendientes de validación.
+- **AUTO_RETEFUENTE:** Replica tarifas RETEFUENTE; precarga inicial de 3 conceptos.
+- **AUTO_RIVA:** 100% del IVA (reverse charge en importación de servicios).
+- **ICA municipal:** Streams por código DIVIPOLA — `tarifa-CO-11001-ICA` (Bogotá), `tarifa-CO-05001-ICA` (Medellín), etc. Cobertura F1 en 12 ciudades principales. Bogotá tiene 13 entradas con tarifas oficiales del Acuerdo 65/2002; las otras 11 ciudades tienen 3–8 entradas con valores razonables pendientes de validación.
+- **RICA y AUTO_RICA:** Replican la tarifa ICA del municipio correspondiente.
+- **SOBRETASA_BOMBERIL:** Solo Bogotá precargada (8% del RICA). Otros municipios pendientes.
 
-| Factor (clasificación) | Tarifa | Tipo | Cuantía mínima | Vigencia desde |
-|------------------------|:------:|:----:|:--------------:|:--------------:|
-| INC_8 | 8% | Porcentaje | — | 2017-01-01 |
-
-### RETEFUENTE (nacional) — `tarifa-CO-RETEFUENTE`
-
-| Factor (concepto de pago) | Tarifa | Tipo | Cuantía mínima | Vigencia desde |
-|--------------------------|:------:|:----:|:--------------:|:--------------:|
-| Compras generales | 2.5% | Porcentaje | 27 UVT | 2017-01-01 |
-| Servicios generales | 4% | Porcentaje | 4 UVT | 2017-01-01 |
-| Servicios generales declarantes | 2% | Porcentaje | 4 UVT | 2017-01-01 |
-| Honorarios | 11% | Porcentaje | — | 2017-01-01 |
-| Honorarios declarantes | 10% | Porcentaje | — | 2017-01-01 |
-| Arrendamientos bienes inmuebles | 3.5% | Porcentaje | 27 UVT | 2017-01-01 |
-| Arrendamientos bienes muebles | 4% | Porcentaje | — | 2017-01-01 |
-
-> **Nota:** La tabla anterior es un extracto representativo. El catálogo completo de conceptos de pago para RETEFUENTE incluye ~50 conceptos definidos por la DIAN. Se carga como parte del contenido estándar del producto.
-
-### RIVA (nacional) — `tarifa-CO-RIVA`
-
-| Factor | Tarifa | Tipo | Notas |
-|--------|:------:|:----:|-------|
-| — (porcentaje del padre) | 15% | Porcentaje del IVA | Tarifa general de retención de IVA. |
-
-### ICA y RICA (municipal) — ejemplo Bogotá — `tarifa-CO-BOG-ICA`
-
-| Factor (actividad económica CIIU) | Tarifa | Tipo | Cuantía mínima | Vigencia desde |
-|-----------------------------------|:------:|:----:|:--------------:|:--------------:|
-| 4711 – Comercio al por menor | 11.04‰ | Por mil | Sí (varía por municipio) | 2020-01-01 |
-| 6201 – Desarrollo de software | 9.66‰ | Por mil | Sí (varía por municipio) | 2020-01-01 |
-| 7010 – Actividades de sedes principales | 11.04‰ | Por mil | Sí (varía por municipio) | 2020-01-01 |
-
-> **Nota:** Cada municipio tiene su propia tabla de tarifas de ICA/RICA por actividad económica. El contenido estándar incluye las principales ciudades donde opera el cliente. La tarifa de RICA es la misma tarifa del ICA aplicada como retención.
-
-### SOBRETASA_BOMBERIL — `tarifa-CO-{ciudad}-SOBRETASA_BOMBERIL`
-
-| Factor | Tarifa | Tipo | Notas |
-|--------|:------:|:----:|-------|
-| — (porcentaje del padre) | Varía por municipio | Porcentaje del RICA | Cada municipio define si aplica y con qué porcentaje. |
-
-### AUTO_RENTA (nacional) — `tarifa-CO-AUTO_RENTA`
-
-| Factor | Tarifa | Tipo | Cuantía mínima | Vigencia desde |
-|--------|:------:|:----:|:--------------:|:--------------:|
-| — (fija) | 0.55% | Porcentaje | — | 2017-01-01 |
+Los stream keys usan códigos DIVIPOLA del catálogo `JurisdiccionFiscal` (`tarifa-CO-11001-ICA` para Bogotá, no abreviaturas didácticas).
 
 ---
 
 ## 3. Condiciones de aplicación — CondicionDeAplicacion
 
-Las condiciones traducen las reglas del Excel fuente (`CO - Aplicacion`) al modelo del dominio. Cada caso del Excel se convierte en una o más condiciones evaluables por el motor.
+Las condiciones de aplicación se migraron a [`datos-precargados/co-condicion-de-aplicacion.json`](datos-precargados/co-condicion-de-aplicacion.json) (v1.0, 2026-05-26). Allí viven las 32 condiciones precargadas (15 RETEFUENTE + 5 RIVA + 5 RICA + 3 IVA + 4 autorretenciones). El narrativo de revisión está en [`datos-precargados/co-condicion-de-aplicacion.md`](datos-precargados/co-condicion-de-aplicacion.md).
 
-### RETEFUENTE — 8 casos
+En esta sección queda únicamente el **contexto de diseño**:
 
-| # | Entidad evaluada | Atributo evaluado | Valor esperado | Tributo afectado | Efecto | Notas |
-|---|:----------------:|-------------------|:--------------:|:----------------:|:------:|-------|
-| 1 | Emisora | perteneceRegimenSimple | `true` | RETEFUENTE | `noAplicar` | Régimen simple no practica retención. |
-| 2 | Emisora | esExentoRetefuente | `true` | RETEFUENTE | `noAplicar` | Entidad exenta de retención. |
-| 3 | Emisora | esAutorretenedora | `true` | RETEFUENTE | `noAplicar` → aplica AUTO_RETEFUENTE | Cuando el emisor es autorretenedor, no se practica retención sino autorretención. |
-| 4 | Contraparte | perteneceRegimenIVA | `false` | RETEFUENTE | `noAplicar` | Caso 2 del Excel: contraparte no pertenece al régimen de IVA. |
-| 5 | Emisora + Contraparte | esGranContribuyente (E) + esGranContribuyente (C) + esAutorretenedora (C) | `true` + `true` + `true` | RETEFUENTE | `aplicar` | Caso 5: ambos gran contribuyente, contraparte autorretenedora. |
-| 6 | Emisora + Contraparte | esGranContribuyente (E) + esGranContribuyente (C) + esAutorretenedora (C) | `true` + `true` + `false` | RETEFUENTE | `aplicar` | Caso 6: ambos gran contribuyente, contraparte NO autorretenedora. |
-| 7 | Emisora + Contraparte | esGranContribuyente (E) + esGranContribuyente (C) | `true` + `false` | RETEFUENTE | `aplicar` | Caso 7: emisor gran contribuyente, contraparte no. |
-| 8 | — | — | — | RETEFUENTE | `aplicar` (default) | Si ninguna condición de exclusión se cumple y la base supera la cuantía mínima. |
-
-> **Nota sobre la cuantía mínima:** La validación `Base mínima > al configurado` no es una condición de aplicación sino una regla de la `EntradaDeTarifa` (atributo `cuantíaMínima`). El motor la evalúa después de resolver la tarifa.
-
-### RIVA — 3 casos
-
-| # | Entidad evaluada | Atributo evaluado | Valor esperado | Tributo afectado | Efecto | Notas |
-|---|:----------------:|-------------------|:--------------:|:----------------:|:------:|-------|
-| 1 | Emisora + Contraparte | perteneceRegimenIVA (E) + esAgenteRetenedorIVA (C) | `true` + `true` | RIVA | `aplicar` | Contraparte es agente retenedor de IVA. |
-| 2 | Contraparte | esAgenteRetenedorIVA | `false` | RIVA | `noAplicar` | Contraparte NO es agente retenedor. |
-| 3 | Emisora | esAgenteRetenedorIVA | `true` | RIVA → AUTO_RIVA | `reverseCharge` | Emisora es agente retenedor → se autoliquida como AUTO_RIVA. |
-
-### RICA — 3 casos
-
-| # | Entidad evaluada | Atributo evaluado | Valor esperado | Tributo afectado | Efecto | Notas |
-|---|:----------------:|-------------------|:--------------:|:----------------:|:------:|-------|
-| 1 | Emisora + Contraparte | perteneceRegimenSimple (E) + (perteneceRegimenIVA OR esAgenteRetenedorICA OR esGranContribuyenteICA OR esAutorretenedorICA) (C) | `false` + `true` (cualquiera) | RICA | `aplicar` | Caso estándar por calidades tributarias. Requiere ciudad. |
-| 2 | — | — | — | RICA | `aplicar` (sin calidades) | Caso 2: check "no calcular por calidades tributarias" habilitado. Solo valida ciudad del centro de costo. |
-| 3 | Emisora | esGranContribuyenteBogota | `true` | RICA | `noAplicar` | Si el emisor es gran contribuyente de Bogotá y la negociación es en Bogotá, no aplica RICA. |
-
-### IVA — 1 caso
-
-| # | Entidad evaluada | Atributo evaluado | Valor esperado | Tributo afectado | Efecto |
-|---|:----------------:|-------------------|:--------------:|:----------------:|:------:|
-| 1 | Emisora | perteneceRegimenIVA | `true` | IVA | `aplicar` |
-
-> IVA aplica si el emisor pertenece al régimen de IVA. No depende de calidades del adquiriente.
+- **Patrón asimétrico:** Las reglas con perspectiva asimétrica (que solo tienen sentido normativo en una dirección) se modelan como dos condiciones independientes — una evaluando `emisora` con dirección fija, otra evaluando `contraparte` con la dirección opuesta. Las reglas bilaterales (Régimen Simple) se mantienen como una sola condición con `direccionFiscalAplicable: ambas`.
+- **Lenguaje fiscal del dominio:** `emisora` y `contraparte` como roles posicionales — no `vendedor`/`comprador` (esos roles se proyectan según dirección).
+- **Distribución por tributo:** RETEFUENTE 15 (8 exclusiones + 6 casos granC compuestos + 1 default), RIVA 5, RICA 5, IVA 3 (2 régimen IVA + 1 territorial Puerto Libre), autorretenciones 4 (una por tributo).
+- **Frontera con `Tratamiento`:** El `Tratamiento` (en `CatalogoTributario`) declara qué tributos aplican por clasificación; la `CondicionDeAplicacion` ajusta por perfil tributario del sujeto. El motor primero filtra por tratamiento y luego evalúa condiciones.
+- **Condición territorial:** `IVA-02-territorial` evalúa `lugarEjecucion.jurisdiccion.tipoRegimen = "puerto-libre"` — opera sobre la jurisdicción resuelta, no sobre atributos del perfil. Materializa la decisión `[D12]` y la invariante `[I15]`. Si en el futuro se incorporan más jurisdicciones con `tipoRegimen: puerto-libre`, esta condición las cubre automáticamente.
+- **Cuantía mínima:** NO es condición. Es atributo de `EntradaDeTarifa` (`cuantiaMinima`). El motor la evalúa después de resolver la tarifa.
+- **Autorretenciones:** Su `direccionFiscalAplicable` declarada en el `Tributo` (ingreso para AUTO_RENTA/RETEFUENTE/RICA; gasto para AUTO_RIVA) actúa como prefiltro estructural. Las condiciones aquí solo activan el tributo cuando la empresa tiene la calidad correspondiente.
 
 ### INC, ICA — sin condiciones por perfil
 
 INC e ICA no evalúan calidades tributarias del emisor ni del adquiriente. Su aplicación depende únicamente de la clasificación tributaria (INC) y de la ciudad + actividad económica (ICA).
 
-### SOBRETASA_BOMBERIL — 1 caso
-
-| # | Entidad evaluada | Atributo evaluado | Valor esperado | Tributo afectado | Efecto | Notas |
-|---|:----------------:|-------------------|:--------------:|:----------------:|:------:|-------|
-| 1 | — | — | — | SOBRETASA_BOMBERIL | `aplicar` | Aplica si existe RICA y si el adquiriente está configurado en el concepto de sobretasa bomberil (configuración por tercero específico). |
-
-### Autoretenciones
-
-| Tributo | Entidad evaluada | Atributo evaluado | Valor esperado | Efecto | Notas |
-|---------|:----------------:|-------------------|:--------------:|:------:|-------|
-| AUTO_RETEFUENTE | Emisora | esAutorretenedora | `true` | `aplicar` | Se activa en lugar de RETEFUENTE cuando el emisor es autorretenedor. |
-| AUTO_RIVA | Emisora | esAgenteRetenedorIVA | `true` | `aplicar` | Se activa en lugar de RIVA cuando el emisor es agente retenedor de IVA. |
-| AUTO_RICA | Emisora | esAutorretenedorICA | `true` | `aplicar` | Se activa en lugar de RICA. Requiere ciudad. |
-| AUTO_RENTA | Emisora | esAutorretenedorRenta | `true` | `aplicar` | Autorretención a título de renta. |
-
 ---
 
 ## 4. Atributos fiscales — CatalogoDeAtributosFiscales
 
-| Nombre | Tipo | Valores válidos | Requerido | Vigencia definición | Notas |
-|--------|:----:|----------------|:---------:|:-------------------:|-------|
-| regimenTributario | Enum | Ordinario, Simple, Especial, No responsable | Sí | 2023-01-01 → ∞ | Determina obligaciones fiscales generales. |
-| perteneceRegimenIVA | Boolean | — | Sí | 2017-01-01 → ∞ | Determina si genera IVA y si se le practica retención. |
-| esGranContribuyente | Boolean | — | Sí | 2017-01-01 → ∞ | Calificación DIAN. Afecta RETEFUENTE. |
-| esAutorretenedora | Boolean | — | Sí | 2017-01-01 → ∞ | Calificación DIAN. Activa AUTO_RETEFUENTE en lugar de RETEFUENTE. |
-| esAgenteRetenedorIVA | Boolean | — | Sí | 2017-01-01 → ∞ | Activa RIVA o AUTO_RIVA. |
-| esExentoRetefuente | Boolean | — | Sí | 2017-01-01 → ∞ | Entidad exenta de retención en la fuente. |
-| perteneceRegimenSimple | Boolean | — | Sí | 2019-01-01 → ∞ | Régimen Simple de Tributación. No practica retenciones. |
-| esAutorretenedorRenta | Boolean | — | Sí | 2017-01-01 → ∞ | Activa AUTO_RENTA. |
-| esAgenteRetenedorICA | Boolean | — | No | 2017-01-01 → ∞ | Agente retenedor de ICA en algún municipio. |
-| esAutorretenedorICA | Boolean | — | No | 2017-01-01 → ∞ | Autorretenedor de ICA. Activa AUTO_RICA. |
-| esGranContribuyenteICA | Boolean | — | No | 2017-01-01 → ∞ | Gran contribuyente de ICA (Bogotá). |
-| actividadEconomica | String | Código CIIU | Sí | 2017-01-01 → ∞ | Código de actividad económica. Usado como factor de tarifa para ICA/RICA. |
-| tipoPersona | Enum | Natural, Jurídica | Sí | 2017-01-01 → ∞ | Afecta cuentas contables de autoretenciones. |
+Las 15 definiciones de atributos fiscales se migraron a [`datos-precargados/co-catalogo-de-atributos-fiscales.json`](datos-precargados/co-catalogo-de-atributos-fiscales.json) (v1.0, 2026-05-26). Allí viven los atributos requeridos/opcionales con sus tipos, valoresValidos o catalogoReferencia, vigencias y normas asociadas. El narrativo de revisión está en [`datos-precargados/co-catalogo-de-atributos-fiscales.md`](datos-precargados/co-catalogo-de-atributos-fiscales.md).
+
+En esta sección queda únicamente el **contexto de diseño**:
+
+- **8 atributos requeridos** clasifican el régimen tributario y las calificaciones DIAN principales (gran contribuyente, autorretenedora, agente retenedor IVA, exento retefuente, régimen simple, autorretenedor renta, perteneceRegimenIVA, tipoPersona, regimenTributario).
+- **3 atributos opcionales municipales** (`esAgenteRetenedorICA`, `esAutorretenedorICA`, `esGranContribuyenteICA`) cubren calificaciones por jurisdicción municipal. Su contextualización por municipio (una empresa puede ser autorretenedora de ICA en Bogotá pero no en Medellín) es pendiente de refinamiento por consultores.
+- **3 atributos opcionales con `catalogoReferencia`** (`inscripcionZonaFranca`, `inscripcionMonopolio`, `inscripcionPuertoLibre`) referencian al `CatalogoDeRegimenesEspeciales` filtrado por `tipo`. Soportan el patrón D13 (regímenes empresariales por inscripción).
+- **Retirado:** `actividadEconomica` ya no es atributo del catálogo. Tras `[D14]`, se modela como entidad `ActividadEconomicaRegistrada` dentro del `PerfilTributario`, con multiplicidad por jurisdicción/clasificación. La precarga de códigos CIIU vive en `co-ciiu.json`.
 
 ---
 
-## 5. Formatos fiscales — FormatoFiscal
+## 5. Regímenes especiales empresariales — CatalogoDeRegimenesEspeciales
 
-### Reportes de información fiscal (autoridad: DIAN)
+Los datos del catálogo `catalogo-regimenes-CO` se migraron a [`datos-precargados/co-catalogo-de-regimenes-especiales.json`](datos-precargados/co-catalogo-de-regimenes-especiales.json) (v1.0, 2026-05-26). Allí viven las 38 entradas precargadas de la muestra significativa F1 (21 zonas francas + 16 monopolios departamentales + 1 Puerto Libre empresarial). El narrativo de revisión está en [`datos-precargados/co-catalogo-de-regimenes-especiales.md`](datos-precargados/co-catalogo-de-regimenes-especiales.md). Origen normativo y metodología completa: ver `anexo-catalogo-regimenes-especiales.md`.
 
-| Código formato | Nombre | Tipo entregable | Periodicidad | Formato salida | Notas |
-|---------------|--------|:---------------:|:------------:|:--------------:|-------|
-| F-1001 | Pagos o abonos en cuenta y retenciones practicadas | Reporte | Anual | XML, Excel (prevalidador) | Exógena — principal formato de retenciones. |
-| F-1003 | Retenciones en la fuente practicadas | Reporte | Anual | XML, Excel (prevalidador) | Exógena — detalle de retenciones. |
-| F-1005 | IVA descontable | Reporte | Anual | XML, Excel (prevalidador) | Exógena — IVA en compras. |
-| F-1006 | IVA generado | Reporte | Anual | XML, Excel (prevalidador) | Exógena — IVA en ventas. |
-| F-1007 | Ingresos recibidos | Reporte | Anual | XML, Excel (prevalidador) | Exógena — ingresos por tercero. |
-| F-1647 | Ingresos recibidos para terceros | Reporte | Anual | XML, Excel (prevalidador) | Exógena — ingresos en nombre de terceros. |
-| F-2276 | Información de rentas de trabajo y pensiones | Reporte | Anual | XML, Excel (prevalidador) | Exógena — certificados de renta. |
+En esta sección queda únicamente el **contexto de diseño**:
 
-> **Nota:** La resolución 000233 de 2026 introduce nuevos formatos (F-2856 activos digitales, F-2854 ingresos del exterior) y cambios en formatos 1001 y 1647.
+- **Tres tipos vigentes en F1 para CO:** `zona-franca`, `monopolio-sectorial`, `puerto-libre-empresa`. Los tipos `zona-economica-especial` y `regimen-especial-decreto` están en el enum (`[D13]`) pero no aplican a CO (se reservan para entradas `personalizado`).
+- **Cobertura F1:** Muestra significativa de 38 entradas. La cobertura total estimada (~155 entradas: 121 zonas francas + ~33 monopolios + 1 Puerto Libre) se completa con consultores fiscales tras revisión del catálogo. Las entradas faltantes entran vía `RegimenEspecialAgregado` con `origen: estandar`.
+- **Frontera con `JurisdiccionFiscal`:** Los regímenes aquí son **empresariales** — aplican porque la empresa está inscrita. Los regímenes **territoriales** (Puerto Libre como hecho económico) viven en `JurisdiccionFiscal` con `tipoRegimen`. Una empresa inscrita en `PL-EMP-SAI` físicamente ubicada en San Andrés activa AMBOS tratamientos; una empresa de Bogotá vendiendo a San Andrés activa solo el territorial.
+- **Códigos internos:** Los códigos `ZF-BAQ`, `ZFPE-ECOPETROL-RBC`, `MON-LIC-ANT`, etc. son códigos internos del catálogo asignados para esta precarga. Si los consultores indican usar los códigos oficiales DIAN, se renombran.
 
-### Reportes municipales
+---
 
-| Formato | Nombre | Tipo entregable | Periodicidad | Formato salida | Notas |
-|---------|--------|:---------------:|:------------:|:--------------:|-------|
-| Reporte ICA | Retenciones de ICA practicadas por municipio | Reporte | Bimestral/Mensual | Excel/PDF | Varía por municipio. ~17 ciudades principales. |
+## 6. Formatos fiscales — FormatoFiscal
 
-### Certificados tributarios
+Los formatos fiscales se migraron a [`datos-precargados/co-formato-fiscal.json`](datos-precargados/co-formato-fiscal.json) (10 formatos: 8 DIAN + 1 municipal + 1 certificado). La homologación oficial DIAN se migra a [`datos-precargados/co-homologacion-fiscal-dian.json`](datos-precargados/co-homologacion-fiscal-dian.json) (35 equivalencias).
 
-| Formato | Nombre | Tipo entregable | Periodicidad | Formato salida | Notas |
-|---------|--------|:---------------:|:------------:|:--------------:|-------|
-| Formulario 220 | Certificado de retención en la fuente | Certificado | Anual | PDF | Plazo: antes del 31 de marzo del año siguiente. Entrega individual y masiva. |
+**Contexto de diseño:**
+- **8 formatos DIAN** de información exógena (F-1001, F-1003, F-1005, F-1006, F-1007, F-1647, F-2276, F-2856) — todos anuales con corte 31-03 año siguiente. Resolución 000233 de 2026 vigente.
+- **Reporte ICA municipal** como placeholder genérico — cada municipio define su propio formato vía `origen: personalizado` cuando se activa.
+- **Formulario 220** — certificado anual de retención en la fuente entregado a terceros.
+- **35 equivalencias DIAN** cubren conceptos RETEFUENTE (bloque 5XXX), códigos IVA (`01`, `02`, etc.), rentas laborales (bloque 53XX) y códigos ICA.
 
 ---
 
@@ -253,3 +134,4 @@ INC e ICA no evalúan calidades tributarias del emisor ni del adquiriente. Su ap
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
 | 1.0 | Marzo 2026 | Versión inicial: 11 tributos, 6 clasificaciones, condiciones de aplicación completas, 13 atributos fiscales, formatos DIAN y municipales. |
+| 1.1 | Mayo 2026 | Cambio 3 — Sub-cambio 3.4: nueva Sección 5 con regímenes empresariales precargados (zonas francas, monopolios departamentales, Puerto Libre empresarial). 3 atributos fiscales nuevos en Sección 4 (`inscripcionZonaFranca`, `inscripcionMonopolio`, `inscripcionPuertoLibre`) con `catalogoReferencia`. Renumeración de Sección 5 (Formatos) a Sección 6. `[D13]` `[I16]`. |

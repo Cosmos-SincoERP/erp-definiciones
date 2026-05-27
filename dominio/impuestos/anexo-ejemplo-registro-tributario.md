@@ -4,6 +4,8 @@
 
 Este anexo muestra cómo se almacena un `RegistroTributario` como stream de eventos (ES), incluyendo: gravamen al confirmar, intervención manual, y desgravamen por devolución. Su objetivo es reducir ambigüedades de interpretación durante la implementación.
 
+> **Nota didáctica sobre códigos de jurisdicción:** En los ejemplos de este anexo se usa `subnacional: "BOG"` como abreviatura legible. En **implementación real**, el campo `subnacional` referencia `JurisdiccionFiscal.codigo` del catálogo del sub-dominio (Sección 3.7 del modelo) — para Bogotá D.C. el código es `11001` (DIVIPOLA). La invariante `[I13]` garantiza la integridad referencial de los códigos de jurisdicción enviados por el consumidor y persistidos en el registro.
+
 ---
 
 ## 1. Escenario

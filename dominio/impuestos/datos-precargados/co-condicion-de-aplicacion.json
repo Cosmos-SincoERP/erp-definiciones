@@ -1,0 +1,460 @@
+{
+  "pais": "CO",
+  "catalogo": "CondicionDeAplicacion",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Estatuto Tributario Nacional + Decreto Único Reglamentario 1625 de 2016 (DIAN — RETEFUENTE/RIVA) + estatutos tributarios municipales (RICA) + Ley 1943/2018 y Ley 2010/2019 (Régimen Simple) + Constitución art. 310 + Ley 47/1993 (Puerto Libre).",
+  "estructura": {
+    "totalCondiciones": 32,
+    "porTributo": {
+      "RETEFUENTE": 15,
+      "RIVA": 5,
+      "RICA": 5,
+      "IVA": 3,
+      "AUTO_RETEFUENTE": 1,
+      "AUTO_RIVA": 1,
+      "AUTO_RICA": 1,
+      "AUTO_RENTA": 1
+    },
+    "notaModelado": "Las reglas con perspectiva asimétrica (que solo tienen sentido normativo en una dirección) se modelan como dos condiciones independientes — una evaluando emisora con dirección fija, otra evaluando contraparte con la dirección opuesta. Las reglas bilaterales (régimen simple) se mantienen como una sola condición con direccionFiscalAplicable: ambas."
+  },
+
+  "entradas": [
+
+    {
+      "codigo": "RTF-01a",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "perteneceRegimenSimple", "operador": "igual", "valor": true }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "ambas",
+      "descripcion": "Empresa en régimen simple — no retiene ni le retienen (bilateral). Ley 2010/2019.",
+      "vigencia": { "fechaDesde": "2019-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-01b",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "perteneceRegimenSimple", "operador": "igual", "valor": true }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "ambas",
+      "descripcion": "Contraparte en régimen simple — no retiene ni le retienen (bilateral).",
+      "vigencia": { "fechaDesde": "2019-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-02a",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esExentoRetefuente", "operador": "igual", "valor": true }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Empresa vendedora exenta de retención.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-02b",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "esExentoRetefuente", "operador": "igual", "valor": true }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Proveedor exento — no se le retiene.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-03a",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esAutorretenedora", "operador": "igual", "valor": true }
+      ],
+      "efecto": "noAplicar",
+      "tributoSubstituto": "AUTO_RETEFUENTE",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Empresa vendedora autorretenedora — autorretiene en lugar de que le retengan.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-03b",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "esAutorretenedora", "operador": "igual", "valor": true }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Proveedor autorretenedor — no le retengo (él se autorretiene en su sistema).",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-04a",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "perteneceRegimenIVA", "operador": "igual", "valor": false }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Proveedor fuera del régimen IVA — no aplica retención en la fuente.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-04b",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "perteneceRegimenIVA", "operador": "igual", "valor": false }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Empresa vendedora fuera del régimen IVA — no aplica retención en la fuente.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-05a",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "emisora-y-contraparte",
+      "criterios": [
+        { "entidad": "emisora", "atributo": "esGranContribuyente", "operador": "igual", "valor": true },
+        { "entidad": "contraparte", "atributo": "esGranContribuyente", "operador": "igual", "valor": true },
+        { "entidad": "contraparte", "atributo": "esAutorretenedora", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Empresa adquiriente granC + proveedor granC + proveedor autorretenedor → retención aplica.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-05b",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "emisora-y-contraparte",
+      "criterios": [
+        { "entidad": "contraparte", "atributo": "esGranContribuyente", "operador": "igual", "valor": true },
+        { "entidad": "emisora", "atributo": "esGranContribuyente", "operador": "igual", "valor": true },
+        { "entidad": "emisora", "atributo": "esAutorretenedora", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Cliente granC + empresa granC + empresa autorretenedora → retención aplica desde ingreso.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-06a",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "emisora-y-contraparte",
+      "criterios": [
+        { "entidad": "emisora", "atributo": "esGranContribuyente", "operador": "igual", "valor": true },
+        { "entidad": "contraparte", "atributo": "esGranContribuyente", "operador": "igual", "valor": true },
+        { "entidad": "contraparte", "atributo": "esAutorretenedora", "operador": "igual", "valor": false }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Empresa adquiriente granC + proveedor granC pero NO autorretenedor → retiene normal.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-06b",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "emisora-y-contraparte",
+      "criterios": [
+        { "entidad": "contraparte", "atributo": "esGranContribuyente", "operador": "igual", "valor": true },
+        { "entidad": "emisora", "atributo": "esGranContribuyente", "operador": "igual", "valor": true },
+        { "entidad": "emisora", "atributo": "esAutorretenedora", "operador": "igual", "valor": false }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Cliente granC + empresa granC pero NO autorretenedora → cliente retiene.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-07a",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "emisora-y-contraparte",
+      "criterios": [
+        { "entidad": "emisora", "atributo": "esGranContribuyente", "operador": "igual", "valor": true },
+        { "entidad": "contraparte", "atributo": "esGranContribuyente", "operador": "igual", "valor": false }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Empresa adquiriente granC + proveedor no granC → empresa retiene al proveedor.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-07b",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "emisora-y-contraparte",
+      "criterios": [
+        { "entidad": "contraparte", "atributo": "esGranContribuyente", "operador": "igual", "valor": true },
+        { "entidad": "emisora", "atributo": "esGranContribuyente", "operador": "igual", "valor": false }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Cliente granC + empresa no granC → cliente le retiene a la empresa.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-08",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": null,
+      "criterios": [],
+      "efecto": "aplicar-default",
+      "direccionFiscalAplicable": "ambas",
+      "descripcion": "Caso default — si ninguna condición de exclusión se cumple y la base supera la cuantía mínima, RETEFUENTE aplica.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+
+    {
+      "codigo": "RIVA-01a",
+      "tributo": "RIVA",
+      "entidadEvaluada": "emisora-y-contraparte",
+      "criterios": [
+        { "entidad": "emisora", "atributo": "perteneceRegimenIVA", "operador": "igual", "valor": true },
+        { "entidad": "contraparte", "atributo": "esAgenteRetenedorIVA", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Empresa vendedora en régimen IVA + cliente agente retenedor → cliente me retiene RIVA.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RIVA-01b",
+      "tributo": "RIVA",
+      "entidadEvaluada": "emisora-y-contraparte",
+      "criterios": [
+        { "entidad": "contraparte", "atributo": "perteneceRegimenIVA", "operador": "igual", "valor": true },
+        { "entidad": "emisora", "atributo": "esAgenteRetenedorIVA", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Proveedor en régimen IVA + empresa adquiriente agente retenedor → empresa retiene RIVA al proveedor.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RIVA-02a",
+      "tributo": "RIVA",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "esAgenteRetenedorIVA", "operador": "igual", "valor": false }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Cliente no es agente retenedor → no me retiene RIVA.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RIVA-02b",
+      "tributo": "RIVA",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esAgenteRetenedorIVA", "operador": "igual", "valor": false }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Empresa adquiriente no es agente retenedor → no retengo RIVA.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RIVA-03",
+      "tributo": "RIVA",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esAgenteRetenedorIVA", "operador": "igual", "valor": true }
+      ],
+      "efecto": "reverseCharge",
+      "tributoSubstituto": "AUTO_RIVA",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Empresa adquiriente agente retenedor de IVA en importación de servicios → autoliquida IVA (AUTO_RIVA). Activa AUTO_RIVA por su propia direccionFiscalAplicable: gasto.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+
+    {
+      "codigo": "RICA-01a",
+      "tributo": "RICA",
+      "entidadEvaluada": "emisora-y-contraparte",
+      "criterios": [
+        { "entidad": "emisora", "atributo": "perteneceRegimenSimple", "operador": "igual", "valor": false },
+        { "entidad": "contraparte", "operador": "alguno-de", "atributos": ["perteneceRegimenIVA", "esAgenteRetenedorICA", "esGranContribuyenteICA", "esAutorretenedorICA"], "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Empresa adquiriente fuera de régimen simple + proveedor con calidades ICA → empresa retiene RICA al proveedor. Requiere ciudad (jurisdicción municipal).",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RICA-01b",
+      "tributo": "RICA",
+      "entidadEvaluada": "emisora-y-contraparte",
+      "criterios": [
+        { "entidad": "contraparte", "atributo": "esAgenteRetenedorICA", "operador": "igual", "valor": true },
+        { "entidad": "emisora", "operador": "alguno-de", "atributos": ["perteneceRegimenIVA", "esGranContribuyenteICA"], "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Cliente agente retenedor de ICA + empresa con calidades ICA → cliente me retiene RICA. Requiere ciudad.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RICA-02",
+      "tributo": "RICA",
+      "entidadEvaluada": null,
+      "criterios": [],
+      "efecto": "aplicar-sin-calidades",
+      "direccionFiscalAplicable": "ambas",
+      "descripcion": "Caso 'no calcular por calidades tributarias' habilitado. Solo valida ciudad (jurisdicción municipal del lugar de ejecución).",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RICA-03a",
+      "tributo": "RICA",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esGranContribuyenteICA", "operador": "igual", "valor": true },
+        { "atributo": "_ciudad", "operador": "igual", "valor": "11001" }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Empresa vendedora gran contribuyente Bogotá — no le retienen RICA (paga ICA directamente).",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RICA-03b",
+      "tributo": "RICA",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "esGranContribuyenteICA", "operador": "igual", "valor": true },
+        { "atributo": "_ciudad", "operador": "igual", "valor": "11001" }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Proveedor gran contribuyente Bogotá — no le retengo RICA.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+
+    {
+      "codigo": "IVA-01a",
+      "tributo": "IVA",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "perteneceRegimenIVA", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Empresa vendedora en régimen IVA → genera IVA en sus ventas.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "IVA-01b",
+      "tributo": "IVA",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "perteneceRegimenIVA", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Proveedor en régimen IVA → cobra IVA a la empresa adquiriente.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "IVA-02-territorial",
+      "tributo": "IVA",
+      "entidadEvaluada": null,
+      "criterios": [
+        { "atributo": "lugarEjecucion.jurisdiccion.tipoRegimen", "operador": "igual", "valor": "puerto-libre" }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "ambas",
+      "descripcion": "Régimen territorial Puerto Libre San Andrés — IVA nacional NO aplica a hechos económicos ejecutados en el archipiélago (Ley 47/1993, art. 22). Decisión [D12]/[I15].",
+      "vigencia": { "fechaDesde": "1993-02-19", "fechaHasta": null },
+      "origen": "estandar"
+    },
+
+    {
+      "codigo": "AUTO-RTF-01",
+      "tributo": "AUTO_RETEFUENTE",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esAutorretenedora", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "AUTO_RETEFUENTE activa en lugar de RETEFUENTE cuando la empresa vendedora es autorretenedora.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "AUTO-RIVA-01",
+      "tributo": "AUTO_RIVA",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esAgenteRetenedorIVA", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "AUTO_RIVA activa en lugar de RIVA cuando la empresa adquiriente es agente retenedor de IVA (reverse charge en importación de servicios).",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "AUTO-RICA-01",
+      "tributo": "AUTO_RICA",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esAutorretenedorICA", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "AUTO_RICA activa en lugar de RICA cuando la empresa vendedora es autorretenedora de ICA. Requiere ciudad (jurisdicción municipal).",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "AUTO-RENTA-01",
+      "tributo": "AUTO_RENTA",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esAutorretenedorRenta", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "AUTO_RENTA aplica cuando la empresa vendedora es autorretenedora de renta. Tarifa fija sectorial.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    }
+
+  ]
+}

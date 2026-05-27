@@ -1,0 +1,138 @@
+{
+  "pais": "DO",
+  "catalogo": "CondicionDeAplicacion",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Código Tributario (Ley 11-92) + Normas Generales DGII (NG 02-05 retención ITBIS, NG sobre Régimen Simplificado de Tributación) + Ley 8-90 (Zonas Francas exoneración ITBIS/ISR) + Ley 153-98 (CDT) + Ley 158-01 (PROPINA).",
+  "estructura": {
+    "totalCondiciones": 9,
+    "porTributo": {
+      "ITBIS": 3,
+      "RITBIS": 3,
+      "CDT": 1,
+      "PROPINA": 1,
+      "ISC": 1
+    },
+    "notaModelado": "Comparado con CO (32 condiciones), DR tiene un catálogo más compacto porque la operación fiscal dominicana es más simple — no hay tantos regímenes especiales por calidad del contribuyente. La mayoría de los tributos aplican por default si la clasificación lo indica; las condiciones aquí cubren las excepciones principales."
+  },
+  "entradas": [
+    {
+      "codigo": "ITBIS-01a",
+      "tributo": "ITBIS",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "ncf", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Empresa vendedora autorizada NCF/e-CF → genera ITBIS en sus ventas.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "ITBIS-01b",
+      "tributo": "ITBIS",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "ncf", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Proveedor autorizado NCF/e-CF → cobra ITBIS a la empresa adquiriente.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "ITBIS-02-zona-franca",
+      "tributo": "ITBIS",
+      "entidadEvaluada": "emisora-o-contraparte",
+      "criterios": [
+        { "atributo": "inscripcionParqueZonaFranca", "operador": "no-nulo" }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "ambas",
+      "descripcion": "Empresa inscrita en zona franca (Ley 8-90) — exoneración de ITBIS sobre ventas y compras vinculadas a su operación de exportación. Verificación específica por consultores: alcance exacto de la exoneración (insumos, maquinaria, ventas locales).",
+      "vigencia": { "fechaDesde": "1990-11-23", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RITBIS-01",
+      "tributo": "RITBIS",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esAgenteRetencionITBIS", "operador": "igual", "valor": true },
+        { "entidad": "contraparte", "atributo": "ncf", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Empresa adquiriente agente de retención del ITBIS + proveedor autorizado NCF → empresa retiene 30% del ITBIS al proveedor (NG 02-05).",
+      "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RITBIS-02-personas-fisicas",
+      "tributo": "RITBIS",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "tipoContribuyente", "operador": "igual", "valor": "PersonaFisica" },
+        { "atributo": "ncf", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "tarifaEspecifica": "RETENCION_PERSONAS_FISICAS",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Persona física proveedora de servicios profesionales — retención del 100% del ITBIS (NG 02-05).",
+      "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RITBIS-03",
+      "tributo": "RITBIS",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esAgenteRetencionITBIS", "operador": "igual", "valor": false }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Empresa adquiriente NO designada como agente de retención → no retiene RITBIS al proveedor.",
+      "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "CDT-01",
+      "tributo": "CDT",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "actividadEconomica.division", "operador": "igual", "valor": "61" }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "CDT aplica solo a empresas de telecomunicaciones (CNAE División 61) — 2% sobre servicios facturados.",
+      "vigencia": { "fechaDesde": "1998-05-27", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "PROPINA-01",
+      "tributo": "PROPINA",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "actividadEconomica.division", "operador": "alguno-de", "valores": ["55", "56"] }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "PROPINA Legal aplica solo a hoteles (CNAE División 55) y restaurantes/servicios de comida (División 56) — 10% obligatorio sobre el consumo.",
+      "vigencia": { "fechaDesde": "2001-10-09", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "ISC-01-clasificacion",
+      "tributo": "ISC",
+      "entidadEvaluada": null,
+      "criterios": [],
+      "efecto": "aplicar-default",
+      "direccionFiscalAplicable": "ambas",
+      "descripcion": "ISC aplica cuando el concepto tiene clasificación ISC_APLICABLE y el motor encuentra una tarifa específica en TarifaTributaria. No depende de calidades del perfil tributario.",
+      "vigencia": { "fechaDesde": "1992-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    }
+  ]
+}

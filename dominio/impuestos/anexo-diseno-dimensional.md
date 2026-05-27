@@ -37,9 +37,11 @@ Se separa la configuración fiscal en dimensiones independientes. Cada dimensió
 |-----------|----------------------|----------|:------------------:|
 | **Tributos + Clasificaciones + Tratamientos** | ¿Qué tributos existen y a qué clasificaciones aplican? | CatalogoTributario | ~50 por país |
 | **Tarifas por tributo y jurisdicción** | ¿Cuánto se cobra? | TarifaTributaria | ~500 por stream (máximo) |
-| **Condiciones por perfil** | ¿Quién está exento o tiene tratamiento especial? | CondicionDeAplicacion | ~20 por país |
+| **Condiciones por perfil y por jurisdicción** | ¿Quién está exento o tiene tratamiento especial? ¿Qué jurisdicciones tienen régimen propio? ¿Qué regímenes empresariales modifican la tributación? | CondicionDeAplicacion | ~30 por país |
+| **Jurisdicciones fiscales** | ¿Qué jurisdicciones existen y de qué naturaleza son? | JurisdiccionFiscal `[D12]` | ~30-50 por país |
+| **Regímenes especiales empresariales** | ¿En qué regímenes pueden estar inscritas las empresas (zonas francas, monopolios, AEEs)? | CatalogoDeRegimenesEspeciales `[D13]` | ~125 (CO), ~75 (DO), ~5 (PA) |
 
-El motor cruza las tres dimensiones en tiempo de cálculo mediante un pipeline de pasos simples.
+El motor cruza estas dimensiones en tiempo de cálculo mediante un pipeline de pasos simples. La dimensión de jurisdicciones fiscales se introdujo posteriormente (decisión `[D12]`) para permitir que las condiciones evalúen atributos de la jurisdicción (tipo, régimen) — esto resuelve casos como regímenes territoriales especiales (Puerto Libre, frontera fiscal) sin proliferar reglas por código municipal. La dimensión de regímenes especiales empresariales (decisión `[D13]`) cubre el caso complementario: regímenes que aplican por **inscripción** de la empresa (zonas francas, monopolios, zonas económicas especiales) y se referencian desde el perfil tributario como atributo con dominio externo (ver `DefinicionAtributo.catalogoReferencia`).
 
 ### Pipeline del motor
 
@@ -102,13 +104,21 @@ CatalogoTributario (agregado)           → stream: catalogo-tributario-{paisId}
   ├── ClasificacionTributaria (entidad)   Cómo se categorizan bienes/servicios
   └── Tratamiento (entidad)               Qué tributo aplica a qué clasificación
 
-TarifaTributaria (agregado)             → stream: tarifa-{jurisdiccionId}-{tributoId}
+TarifaTributaria (agregado)             → stream: tarifa-{jurisdiccionFiscalCodigo}-{tributoId}
   ├── EntradaDeTarifa (entidad)           Factor → tarifa (tipoTarifa: porcentaje | específica)
   └── Vigencia (VO)                       Rango temporal
 
 CondicionDeAplicacion (agregado)        → stream: condicion-{paisId}
-  ├── Condicion (entidad)                 Perfil → efecto sobre tributo
+  ├── Condicion (entidad)                 Perfil / Jurisdicción → efecto sobre tributo
   └── Vigencia (VO)                       Rango temporal
+
+JurisdiccionFiscal (agregado) `[D12]`   → stream: jurisdiccion-fiscal-{paisId}
+  ├── Jurisdiccion (entidad)              Codigo, nombre, nivel, tipo, tipoRegimen
+  └── Vigencia (VO)                       Rango temporal — preserva historia de regímenes
+
+CatalogoDeRegimenesEspeciales (agregado) `[D13]` → stream: catalogo-regimenes-{paisId}
+  ├── RegimenEspecial (entidad)           Codigo, nombre, tipo, autoridad, jurisdiccionRef (opcional)
+  └── Vigencia (VO)                       Rango temporal — preserva historia de regímenes empresariales
 ```
 
 ### Patrón `origen` (estándar/personalizado)
@@ -643,3 +653,4 @@ Paso 3: Cálculo
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
 | 1.0 | Marzo 2026 | Versión inicial: justificación del diseño dimensional, ejemplos por país, almacenamiento de streams. |
+| 1.1 | Mayo 2026 | Cambio 2: incorporación de dimensión `JurisdiccionFiscal` (decisión `[D12]`). Cambio 3 — Sub-cambio 3.5: incorporación de dimensión `CatalogoDeRegimenesEspeciales` (decisión `[D13]`) en la tabla del Modelo dimensional y en el listado de Estructura de los agregados. |

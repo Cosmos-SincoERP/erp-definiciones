@@ -1,581 +1,249 @@
 # Audit Full — Reporte de Auditoría Completa
 
-**Fecha:** 2026-03-16
-**Modelo auditado:** `dominio/impuestos/modelo-dominio.md` v1.3
-**Alcance cruzado:** `dominio/impuestos/definicion-alcance.md` v1.1 (glosario, 22 términos)
-**Nota:** Los agregados de cumplimiento fiscal (HomologacionFiscal, FormatoFiscal, EntregableFiscal, CertificadoTributario) se auditan estructuralmente pero los hallazgos funcionales se anotan como diferidos a segunda fase, conforme a la decisión del usuario.
+**Fecha:** 2026-05-13
+**Modelo auditado:** `dominio/impuestos/modelo-dominio.md` (post Cambios 1-4 hacia v2.0)
 
 ---
 
-## Plan de trabajo
+## 1. Glosario y Lenguaje Ubicuo (audit-structure-glossary)
 
-| # | Hallazgo | Severidad | Estado |
-|---|----------|-----------|--------|
-| G1 | Remanente "Contenido estándar del producto" en L170 | Baja | **Aplicado** |
-| INV1 | I10 requiere LineaDescartada[] en desgravámenes con intervención, pero LineaDescartada es exclusiva del motor | Media | **Aplicado** |
-| E1 | CertificadoTributarioReenviado — payload condicional de Destinatario | Baja | **Aplicado** |
-| SG1 | Precondición de existencia del RegistroTributario origen no documentada en desgravámenes | Media | **Aplicado** |
-| OD1 | Restricción 1:1 desgravamen-a-origen implícita en D9 | Baja | **Aplicado** |
-| SC1 | D11 existe en el modelo pero ningún changelog registra su adición | Baja | **Descartado** — el changelog es snapshot de cada versión, no se modifica retroactivamente |
-| SC2 | Desglose de eventos en L1232: "33 config + 11 transaccionales" — conteo invertido | Baja | **Descartado** — el changelog es snapshot de cada versión, no se modifica retroactivamente |
+### Hallazgos
 
----
+| # | Sev | Evidencia | Problema | Corrección mínima |
+|---|-----|-----------|----------|-------------------|
+| 1 | Alta | L1525 "**45 eventos** … 10 agregados" vs tabla L1553 "**Total** 56" | Contradicción interna del catálogo de eventos. | Reemplazar texto a "56 eventos en 12 agregados". |
+| 2 | Media | L2057 control de versiones "10 agregados, 45 eventos" | Conteos desactualizados tras los Cambios 2 y 3. | Actualizar a "12 agregados [F1] + 4 [F2] = 16; 56 eventos". |
+| 3 | Media | L376 "EntidadEvaluada (emisora/contraparte/sedeEmisora.jurisdiccion/…)" | "entidad" significa rol fiscal Y también jurisdicción — lenguaje ubicuo roto. | Renombrar a `objetoEvaluado` o aclarar nota explícita en 3.4. |
+| 4 | Media | L444 ejemplo "atributoEvaluado: tipoTransaccion" | `tipoTransaccion` no es atributo de perfil ni de jurisdicción → viola `[I15]`. | Eliminar ejemplo o extender `[I15]` con tercera fuente formal. |
+| 5 | Media | L376 + L444 | `[I15]` no contempla atributos del contexto transaccional. | Hacer `[I15]` exhaustiva con todas las fuentes válidas. |
+| 6 | Media | L788 + L841 "municipioRef" usado para departamento `05` y provincia Colón | El nombre `municipioRef` es engañoso (apunta a cualquier nivel jurisdiccional). | Renombrar a `jurisdiccionRef`. |
+| 7 | Baja | L1094 "homologacion: ref" vs L1153 `ReferenciaHomologacion` (VO) | Misma relación con dos nombres. | Uniformar a `ReferenciaHomologacion`. |
+| 8 | Baja | L454 "alternativa: …" vs L376 "tarifaAlternativa" | Inconsistencia diagrama/texto. | Uniformar a `tarifaAlternativa`. |
+| 9 | Baja | L168 "direccionFiscalAplicable (gasto/ingreso/ambas)" | `ambas` se documenta como dirección — confunde. | Aclarar como "comodín de aplicabilidad", no valor de dirección. |
+| 10 | Baja | L884 "LineaDesgloseMotor … estructura idéntica" | Sinónimo no controlado. | Unificar con atributo `proposito: confirmado | referencia | descartada`. |
 
-### 1. Glosario y Lenguaje Ubicuo
-
-**Fecha:** 2026-03-16
-
-#### Cruce con glosario canónico (22 términos)
-
-| # Alcance | Término canónico | Representación en modelo | Alineado |
-|:---------:|-----------------|-------------------------|:--------:|
-| 1 | Tributo | `Tributo` (entidad en CatalogoTributario) | ✓ |
-| 2 | Impuesto | `naturaleza: aditivo` | ✓ |
-| 3 | Retención | `naturaleza: sustractivo` | ✓ |
-| 4 | Autorretención | Tributos AUTO_* en anexos | ✓ |
-| 5 | Dirección fiscal | `direccionFiscal` en D9 y ContextoTransaccional | ✓ |
-| 6 | Base gravable | `baseGravable` (atributo en LineaDeDesglose, LineaDesgloseMotor, LineaDescartada) | ✓ |
-| 7 | Tarifa | `tarifa` (atributo), `EntradaDeTarifa` (entidad) | ✓ |
-| 8 | Cuantía mínima | `CuantiaMínima` (VO en TarifaTributaria) | ✓ |
-| 9 | Tributo padre | `tributoPadre` (atributo de Tributo) | ✓ |
-| 10 | Perfil tributario | `PerfilTributario` (agregado) | ✓ |
-| 11 | Agente de retención | Implícito en CondicionDeAplicacion | ✓ |
-| 12 | Registro tributario | `RegistroTributario` (agregado, ES) | ✓ |
-| 13 | Desglose fiscal | `LineaDeDesglose[]`, `desgloseConfirmado[]` en D9 | ✓ |
-| 14 | Régimen tributario | Ejemplo en PerfilTributario (`regimenTributario`) | ✓ |
-| 15 | Jurisdicción | `Jurisdiccion` (VO en RegistroTributario) | ✓ |
-| 16 | Certificado tributario | `CertificadoTributario` (agregado, ES) | ✓ |
-| 17 | Declaración tributaria | Diferida (PD4) | ✓ |
-| 18 | Reporte de información fiscal | `EntregableFiscal` (agregado, ES) | ✓ |
-| 19 | Clasificación tributaria | `ClasificacionTributaria` (entidad en CatalogoTributario) | ✓ |
-| 20 | Entidad fiscal emisora | `EntidadFiscalEmisora` (VO en RegistroTributario) | ✓ |
-| 21 | Entidad fiscal contraparte | `EntidadFiscalContraparte` (VO en RegistroTributario) | ✓ |
-| 22 | Contenido fiscal | Prosa en 3.16, D6 | ✓ |
-
-#### Términos con Hallazgo
-
-| Término canónico | Variantes encontradas | Secciones donde aparece | Tipo de problema |
-|-----------------|----------------------|------------------------|-----------------|
-| Contenido fiscal (#22) | "Contenido estándar del producto" (L170), "contenido fiscal que viene con el producto" (L1584) | 3.2 (ReglaDeLocalizacion), D6 | Inconsistencia |
-
-#### Hallazgos
-
-| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
-|---|-----------|-------------------------------|----------|-------------------|
-| G1 | Baja | L170: `"Contenido estándar del producto."` vs L1584: `"es contenido fiscal que viene con el producto"` | Remanente de la terminología pre-v1.3. La descripción de `ReglaDeLocalizacion` usa "contenido estándar" como sinónimo del término canónico #22 ("contenido fiscal"). La resolución del hallazgo G2 en la auditoría anterior alineó la prosa en múltiples ubicaciones pero omitió L170. | Cambiar L170 a `"Contenido fiscal del producto."` — consistente con el término canónico y con D6 (L1584). No cambiar el VO `Origen` ni su valor `estándar`. |
-
-#### Resumen
-- Alta: 0 | Media: 0 | Baja: 1
-- Total: 1 hallazgo
+**Resumen:** Alta 1 | Media 5 | Baja 4 | Total 10
 
 ---
 
-### 2. Composición de Agregados
+## 2. Composición de Agregados (audit-structure-composition)
 
-**Fecha:** 2026-03-16
+### Hallazgos
 
-#### Inventario por Agregado
+| # | Sev | Evidencia | Problema | Corrección mínima |
+|---|-----|-----------|----------|-------------------|
+| 1 | Alta | L444 "atributoEvaluado: tipoTransaccion" | Atributo referenciado pero no declarado en composición ni en `[I15]`. | Eliminar ejemplo o formalizar tercera fuente de atributos evaluables. |
+| 2 | Alta | L1317 vs L1322-1336 diagrama dependencias | El diagrama omite `JurisdiccionFiscal` y `CatalogoDeRegimenesEspeciales` que el texto sí incluye. | Actualizar el diagrama ASCII con las 7 dependencias. |
+| 3 | Media | L1090 "tipoEntregable" sin declaración | Atributo del agregado raíz `FormatoFiscal` no documentado en la composición. | Declarar formalmente `tipoEntregable` como atributo del raíz. |
+| 4 | Media | L376 identidad de `Condicion` | No declarada — eventos `*Modificada`/`*Cerrada` referencian id no definido. | Documentar tupla de identidad o id sintético explícito. |
+| 5 | Media | L676 `regimenesEspecialesVigentes()` consulta cross-aggregate | Comportamiento del agregado lee otro agregado sin documentar la dependencia. | Documentar dependencia de lectura a `CatalogoDeAtributosFiscales`. |
+| 6 | Media | L884 `LineaDesgloseMotor` duplica `LineaDeDesglose` | Dos entidades con misma estructura distintas solo por propósito. | Unificar como una entidad con `proposito`. |
+| 7 | Media | L884-885 vs L1668 `LineaDescartada` solo en gravámenes | Restricción condicional implícita. | Documentar la condición en la composición. |
+| 8 | Baja | L1233 vs L1203 estado `Fallido` omitido en header | Inconsistencia presentación FSM. | Incluir `Fallido` en la cabecera del agregado. |
+| 9 | Baja | L1094 campo `homologacion` solo en diagrama | Atributo del raíz no formalizado. | Documentar como VO `ReferenciaHomologacion`. |
+| 10 | Baja | L985 factory `crear(...)` con `calculoDeReferencia` | Input del factory no se traza al payload del evento. | Aclarar que se descompone en `LineaDesgloseMotor[]` o se descarta. |
 
-**Composición: CatalogoTributario**
-- Entidades internas: Tributo, ClasificacionTributaria, Tratamiento, ReglaDeLocalizacion
-- Value Objects: Origen
-- Comportamientos calculados: tributosAplicablesA(), clasificacionesVigentes(), resolverJurisdiccion()
-
-**Composición: TarifaTributaria**
-- Entidades internas: EntradaDeTarifa
-- Value Objects: Vigencia, CuantiaMínima, Origen
-- Comportamientos calculados: tarifaVigenteA(), validarNoSolapamiento()
-
-**Composición: CondicionDeAplicacion**
-- Entidades internas: Condicion
-- Value Objects: Vigencia, Efecto, Origen
-- Comportamientos calculados: condicionesVigentesA(), evaluar()
-
-**Composición: CatalogoDeAtributosFiscales**
-- Entidades internas: DefinicionAtributo
-- Value Objects: VigenciaDefinicion, Origen
-- Comportamientos calculados: definicionesVigentesA(), validarValor(), atributosRequeridos()
-
-**Composición: PerfilTributario**
-- Entidades internas: AtributoFiscal
-- Value Objects: Vigencia, FuenteDeAutoridad, IdentificacionFiscal
-- Comportamientos calculados: atributoVigenteA(), perfilCompletoA()
-
-**Composición: RegistroTributario (ES)**
-- Entidades internas: LineaDeDesglose, LineaDesgloseMotor, LineaDescartada
-- Value Objects: ContextoTransaccional, EntidadFiscalEmisora, EntidadFiscalContraparte, Jurisdiccion, IntervencionManual
-- Comportamientos calculados: totalImpuestos(), totalRetenciones(), valorNeto(), fueIntervenido(), crear()
-
-**Composición: HomologacionFiscal**
-- Entidades internas: Equivalencia
-- Value Objects: AutoridadFiscal, Vigencia, Origen
-- Comportamientos calculados: homologar(), equivalenciasVigentesA()
-
-**Composición: FormatoFiscal**
-- Entidades internas: SeccionFormato
-- Value Objects: AutoridadFiscal, Periodicidad, FormatoDeSalida, Vigencia, Origen
-- Comportamientos calculados: esVigenteA(), formatosDeSalida()
-
-**Composición: EntregableFiscal (ES)**
-- Entidades internas: ContenidoGenerado
-- Value Objects: AutoridadFiscal, PeriodoFiscal, ReferenciaFormato, ReferenciaHomologacion, ArchivoGenerado
-- Comportamientos calculados: puedeGenerarContenido(), esPresentable()
-
-**Composición: CertificadoTributario (ES)**
-- Entidades internas: ContenidoCertificado
-- Value Objects: Destinatario, PeriodoFiscal, ReferenciaFormato, ReferenciaHomologacion, ArchivoGenerado, AutoridadFiscal, ResultadoEnvio
-- Comportamientos calculados: puedeGenerarContenido(), esEnviable(), esReenviable()
-
-#### Cruce composición ↔ eventos
-
-Verificación completa de 10 agregados × 45 eventos:
-- Todas las entidades internas documentadas en composición son referenciadas por al menos un evento. ✓
-- Todos los datos capturados en eventos existen en la composición del agregado correspondiente. ✓
-- VOs compartidos (`Origen`, `Vigencia`, `AutoridadFiscal`) documentados consistentemente en cada agregado que los usa. ✓
-- Comportamientos calculados solo referencian componentes propios. ✓
-
-#### Inconsistencias
-
-Sin inconsistencias detectadas.
-
-#### Hallazgos
-
-Sin hallazgos.
-
-#### Resumen
-- Alta: 0 | Media: 0 | Baja: 0
-- Total: 0 hallazgos
+**Resumen:** Alta 2 | Media 5 | Baja 3 | Total 10
 
 ---
 
-### 3. Máquinas de Estado (FSM)
+## 3. Máquinas de Estado FSM (audit-structure-state-machines)
 
-**Fecha:** 2026-03-16
+### Hallazgos
 
-#### FSM por Agregado
+| # | Sev | Evidencia | Problema | Corrección mínima |
+|---|-----|-----------|----------|-------------------|
+| 1 | Media | L1499-1509 FSM Certificado + L1517 | `Fallido` no es terminal pero las transiciones de salida no están todas documentadas. | Documentar todas las salidas (Reenviado, ¿Regenerado?). |
+| 2 | Media | L1517 "corregir datos del destinatario antes de reintentar" | No hay evento que capture la corrección. | Documentar dónde se persiste la corrección. |
+| 3 | Media | L1483 vs L1183 `puedeGenerarContenido()` | Comportamiento engañoso (no distingue Generar vs Regenerar). | Separar en `puedeGenerar()` / `puedeRegenerar()`. |
+| 4 | Baja | L1499-1509 diagrama Certificado | No queda claro si Fallido → Regenerado existe. | Aclarar en el diagrama. |
+| 5 | Baja | L1472 "10 agregados de configuración" | Conteo desactualizado. | Recontar (9 + RegistroTributario). |
+| 6 | Baja | L1492 + L1518 regla "estado terminal → nuevo stream" | Regla no formalizada como invariante. | Reforzar `[I11a]`/`[I11b]` con la cláusula. |
+| 7 | Baja | L1499 diagrama Certificado | Lector podría inferir regeneración desde Borrador. | Agregar nota "Borrador no admite Regenerado". |
 
-**FSM: EntregableFiscal**
-- Estados: Borrador, Generado, Presentado ■
-- Terminales: Presentado ■
-- Transiciones:
-  - EntregableFiscalCreado: (nuevo) → Borrador
-  - EntregableFiscalGenerado: Borrador → Generado
-  - EntregableFiscalRegenerado: Generado → Borrador
-  - EntregableFiscalPresentado: Generado → Presentado ■
-- Eventos de progreso: ninguno
-
-**FSM: CertificadoTributario**
-- Estados: Borrador, Generado, Entregado ■, Fallido
-- Terminales: Entregado ■
-- Transiciones:
-  - CertificadoTributarioCreado: (nuevo) → Borrador
-  - CertificadoTributarioGenerado: Borrador → Generado
-  - CertificadoTributarioRegenerado: Generado → Borrador
-  - CertificadoTributarioEntregado: Generado → Entregado ■
-  - CertificadoTributarioFallido: Generado → Fallido
-  - CertificadoTributarioReenviado: Fallido → Generado
-- Eventos de progreso: ninguno
-
-**Sin FSM:** RegistroTributario (hecho inmutable, 1 evento), 7 agregados de configuración (ciclo CRUD sin transiciones).
-
-#### Verificación
-
-- Estados huérfanos: 0 (todos los estados tienen al menos una transición de entrada). ✓
-- Estados sumidero no intencionados: 0 (Fallido tiene salida vía Reenviado, Presentado y Entregado son terminales explícitos). ✓
-- Transiciones imposibles: 0 (precondiciones coherentes con estados origen). ✓
-- Eventos sin cobertura en FSM: 0 (todos los eventos de EntregableFiscal y CertificadoTributario están mapeados). ✓
-
-#### Hallazgos
-
-Sin hallazgos.
-
-#### Resumen
-- Alta: 0 | Media: 0 | Baja: 0
-- Total: 0 hallazgos
+**Resumen:** Alta 0 | Media 3 | Baja 4 | Total 7
 
 ---
 
-### 4. Invariantes
+## 4. Invariantes (audit-structure-invariants)
 
-**Fecha:** 2026-03-16
+### Hallazgos
 
-#### Clasificación de Invariantes
+| # | Sev | Evidencia | Problema | Corrección mínima |
+|---|-----|-----------|----------|-------------------|
+| 1 | Alta | L1820 `[I15]` + L444 ejemplo `tipoTransaccion` | Invariante no cubre el ejemplo del modelo. | Eliminar ejemplo o ampliar `[I15]`. |
+| 2 | Alta | L1818 `[I13]` + L1301 | Sin compensación si jurisdicción se cierra entre simulación y confirmación. | Snapshot de jurisdicción en `ContextoTransaccional` o política explícita de rechazo. |
+| 3 | Media | L1806 `[I2]` padre activo | Enforcement no especificado (cascade vs guard). | Documentar precondición de `TributoDesactivado` y/o cascade. |
+| 4 | Media | L1807 `[I3]` unicidad de tratamiento | Enforcement no documentado más allá de la precedencia. | Documentar guard explícito al definir tratamiento. |
+| 5 | Media | Implícita-3 identidad de `Condicion` | Sin invariante formal sobre la tupla de identidad. Bloquea implementación. | Formalizar tupla de identidad como invariante. |
+| 6 | Media | Implícita-4 `tarifaAlternativa` válida | Sin invariante que garantice referencia vigente. | Agregar invariante eventual con motivo de rechazo. |
+| 7 | Media | L1820 `[I15]` "deben revisarse" | Sin mecanismo de detección/compensación. | Documentar proyección o restricción de migración. |
+| 8 | Media | Implícita-5 `tipoRegimen` consistente con `tipo` | Sin invariante (obligatorio si `tipo=regimen-especial-territorial`). | Formalizar como invariante local. |
+| 9 | Baja | L1815/L1816 `[I11a]`/`[I11b]` | No documentan enforcement (guard de comando). | Agregar "Enforcement: guard en comando". |
+| 10 | Baja | Implícita-6 `ActividadEconomicaRegistrada.jurisdiccion → JurisdiccionFiscal` | Validación implícita no formalizada como invariante. | Formalizar como `[I18]` análoga a `[I13]`. |
 
-| ID | Invariante (resumen) | Tipo | Agregado(s) involucrado(s) | Enforcement documentado | Gap |
-|----|---------------------|------|---------------------------|------------------------|-----|
-| I1 | No solapamiento vigencias por factor/origen | Local | TarifaTributaria | `validarNoSolapamiento()` precondición | — |
-| I2 | Dependencia tributo padre debe existir y estar activo | Local | CatalogoTributario | Validación interna | — |
-| I3 | Unicidad de tratamiento por (tributo × clasificación × origen) | Local | CatalogoTributario | `tributosAplicablesA()` precedencia | — |
-| I4 | Unicidad de equivalencia por (valorInterno + tributo + origen) | Local | HomologacionFiscal | `homologar()` precedencia | — |
-| I5 | Atributo fiscal validado contra catálogo | Eventual | PerfilTributario, CatalogoDeAtributosFiscales | Validación en escritura + degradación elegante | — |
-| I6 | Condición referencia atributo existente | Eventual | CondicionDeAplicacion, CatalogoDeAtributosFiscales | Validación en escritura + expiración por vigencia | — |
-| I7 | Unicidad de catálogo por país | Eventual | CatalogoTributario, CatalogoDeAtributosFiscales, CondicionDeAplicacion | Validación al crear + proyección eventual | — |
-| I8 | Homologación completa para generación | Eventual | EntregableFiscal, CertificadoTributario, HomologacionFiscal | Precondición de generación | — |
-| I9 | Inmutabilidad del registro tributario | Local | RegistroTributario | Modelo de 1 evento | — |
-| I10 | Consistencia de intervención manual | Local | RegistroTributario | Factory method `crear()` | **Gap detectado** |
-| I11a | Progresión de estados EntregableFiscal | Local | EntregableFiscal | FSM enforcement | — |
-| I11b | Progresión de estados CertificadoTributario | Local | CertificadoTributario | FSM enforcement | — |
-| I12 | Unicidad perfil por entidad y país | Eventual | PerfilTributario | Validación al crear + proyección eventual | — |
-
-#### Hallazgos
-
-| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
-|---|-----------|-------------------------------|----------|-------------------|
-| INV1 | Media | I10 (L~1496): `"el registro debe contener LineaDesgloseMotor[] y LineaDescartada[]"` vs L596: `"LineaDescartada: Solo presente en el cálculo original del motor."` | I10 exige `LineaDescartada[]` como parte del cálculo de referencia cuando hay intervención. Pero `LineaDescartada` es exclusiva del motor (L596) — en desgravámenes el cálculo de referencia es el prorrateo del desglose origen, que no produce tributos "descartados". Un desgravamen con intervención tendría `LineaDesgloseMotor[]` (el prorrateo) pero no `LineaDescartada[]`. I10 no distingue este caso, generando ambigüedad para la implementación del factory method `crear()` cuando `efectoFiscal = desgravamen`. | Acotar I10: `"...debe contener LineaDesgloseMotor[]. En gravámenes, también LineaDescartada[] (tributos excluidos por el motor). En desgravámenes, LineaDescartada no aplica — el cálculo de referencia es el prorrateo del origen."` Alinear L1350 (RegistroTributarioCreado) con la misma distinción. |
-
-#### Resumen
-- Alta: 0 | Media: 1 | Baja: 0
-- Total: 1 hallazgo
+**Resumen:** Alta 2 | Media 6 | Baja 2 | Total 10
 
 ---
 
-### 5. Responsabilidades de Agregados
+## 5. Responsabilidades de Agregados (audit-behavior-responsibilities)
 
-**Fecha:** 2026-03-16
+### Hallazgos
 
-#### Mapa de Responsabilidades por Agregado
+| # | Sev | Evidencia | Problema | Corrección mínima |
+|---|-----|-----------|----------|-------------------|
+| F1 | Media | L487 `CondicionDeAplicacion.evaluar(perfilEmisora, perfilContraparte, tributos, fecha)` | Coordinación inter-agregado documentada como comportamiento del propio catálogo — fuga de lógica del motor. | Reclasificar `evaluar(...)` como operación del `MotorDeCalculo`. |
+| F2 | Media | L1361-1364 prorrateo en `ConfirmacionTributaria` | Regla fiscal de prorrateo vive en flujo de aplicación. | Encapsular como `RegistroTributario.prorratearDesde(...)` o domain service. |
+| F3 | Media | L1294 clasificación tributaria | Validación referencial no formalizada como invariante. | Agregar invariante análoga a `[I13]`. |
+| F4 | Media | L567 `validarValor(...)` delega validación referencial | Romper cohesión: parte la cumple el catálogo, parte el consumidor. | Renombrar comportamiento y exponer validación referencial separada. |
+| F5 | Media | L1310-1315 `jurisdiccionResuelta` único | Output ambiguo para multi-jurisdicción (ICA por ciudad). | Mover `jurisdiccionResuelta` dentro de cada línea aplicada. |
+| F6 | Media | L1316 motor declara leer `CatalogoDeAtributosFiscales` | Pero no aparece en el flujo. Ambigüedad. | Eliminarlo de la lista o explicitar el paso. |
+| F7 | Media | L1183/L1256 `puedeGenerarContenido()` | No distingue generar inicial vs regenerar. | Separar en dos métodos. |
+| F8 | Media | L1764 `CertificadoTributarioEntregado/Fallido` | No hay guard sobre intento de envío — at-least-once de infraestructura puede invertir orden. | Agregar `intentoEnvioId` + guard "intento abierto". |
+| F9 | Baja | L1126-1129 `FormatoFiscal` cerca de anémico | Sin invariantes formalizadas (PD5). | Formalizar mínimas como `[I##]` y cerrar PD5. |
+| F10 | Baja | L1144 `ContenidoGenerado` se "reemplaza" | Mecanismo ES de reemplazo no documentado. | Aclarar que cada evento captura contenido completo. |
 
-**Responsabilidades: CatalogoTributario**
-- Razón de cambio dominante: Qué tributos existen y cómo se aplican en un país.
-- Eventos propios: 9
-- Invariantes protegidas: I2, I3, I7
-- Domain services que lo coordinan: MotorDeCalculo (lectura)
-- Diagnóstico: Saludable
-
-**Responsabilidades: TarifaTributaria**
-- Razón de cambio dominante: Cuánto se cobra por tributo × jurisdicción.
-- Eventos propios: 4
-- Invariantes protegidas: I1
-- Domain services que lo coordinan: MotorDeCalculo (lectura)
-- Diagnóstico: Saludable
-
-**Responsabilidades: CondicionDeAplicacion**
-- Razón de cambio dominante: Excepciones por perfil tributario.
-- Eventos propios: 4
-- Invariantes protegidas: I6, I7
-- Domain services que lo coordinan: MotorDeCalculo (lectura)
-- Diagnóstico: Saludable
-
-**Responsabilidades: CatalogoDeAtributosFiscales**
-- Razón de cambio dominante: Esquema de atributos fiscales por país.
-- Eventos propios: 4
-- Invariantes protegidas: I5, I6, I7
-- Domain services que lo coordinan: CargaAsistida (lectura)
-- Diagnóstico: Saludable
-
-**Responsabilidades: PerfilTributario**
-- Razón de cambio dominante: Datos fiscales de una entidad en un país.
-- Eventos propios: 4
-- Invariantes protegidas: I5, I12
-- Domain services que lo coordinan: MotorDeCalculo (lectura), CargaAsistida (escritura indirecta)
-- Diagnóstico: Saludable
-
-**Responsabilidades: RegistroTributario (ES)**
-- Razón de cambio dominante: Hecho fiscal inmutable confirmado.
-- Eventos propios: 1
-- Invariantes protegidas: I9, I10
-- Domain services que lo coordinan: ConfirmacionTributaria (escritura)
-- Diagnóstico: Saludable — no anémico a pesar de 1 evento; tiene factory method complejo (`crear()`) con lógica de comparación y clasificación de intervención, más 4 comportamientos calculados.
-
-**Responsabilidades: HomologacionFiscal**
-- Razón de cambio dominante: Traducción de códigos internos a códigos de autoridad.
-- Eventos propios: 4
-- Invariantes protegidas: I4, I8
-- Domain services que lo coordinan: ninguno (lectura directa por EntregableFiscal/CertificadoTributario)
-- Diagnóstico: Saludable
-
-**Responsabilidades: FormatoFiscal**
-- Razón de cambio dominante: Plantilla de formato para entregables fiscales.
-- Eventos propios: 5
-- Invariantes protegidas: (ninguna formalizada — ver PD5)
-- Domain services que lo coordinan: ninguno (lectura directa por EntregableFiscal/CertificadoTributario)
-- Diagnóstico: Saludable — la ausencia de invariantes formales está reconocida en PD5.
-
-**Responsabilidades: EntregableFiscal (ES)**
-- Razón de cambio dominante: Ciclo de vida de un reporte fiscal concreto.
-- Eventos propios: 4
-- Invariantes protegidas: I8, I11a
-- Domain services que lo coordinan: ninguno
-- Diagnóstico: Saludable
-
-**Responsabilidades: CertificadoTributario (ES)**
-- Razón de cambio dominante: Ciclo de vida de un certificado tributario individual.
-- Eventos propios: 6
-- Invariantes protegidas: I8, I11b
-- Domain services que lo coordinan: ninguno
-- Diagnóstico: Saludable
-
-#### Hallazgos
-
-Sin hallazgos.
-
-#### Resumen
-- Alta: 0 | Media: 0 | Baja: 0
-- Total: 0 hallazgos
+**Resumen:** Alta 0 | Media 8 | Baja 2 | Total 10
 
 ---
 
-### 6. Semántica de Eventos
+## 6. Semántica de Eventos (audit-behavior-event-semantics)
 
-**Fecha:** 2026-03-16
+### Hallazgos
 
-#### Inventario Semántico por Agregado
+| # | Sev | Evidencia | Problema | Corrección mínima |
+|---|-----|-----------|----------|-------------------|
+| E1 | Alta | L1525 "45 eventos … 10 agregados" vs tabla L1553 "56" | Contradicción del catálogo total. | Actualizar L1525 a "56 eventos en 12 agregados". |
+| E2 | Media | L1567 `TributoModificado` "campos modificados" | Ambiguo: delta vs snapshot completo. | Documentar convención (recomendado: snapshot post-modificación). |
+| E3 | Media | L1581 `EntradaDeTarifaModificada` identifica por "Factor + vigencia" | Identidad circular si cambia la propia vigencia. | Introducir `entradaId` estable. |
+| E4 | Media | L1590 `CondicionModificada` "Identificador de condición" | Identidad no documentada en la entidad. | Documentar tupla o `id` sintético. |
+| E5 | Media | L1611 `ActividadEconomicaRegistradaModificada` identifica por triple | Se rompe si una modificación toca un campo identificador. | Introducir `actividadId` o declarar campos inmutables. |
+| E6 | Media | L1649 `SeccionFormatoEliminada` captura solo "Nombre" | Replay-unsafe si se recrea con mismo nombre. | Capturar snapshot completo + política de reutilización. |
+| E7 | Media | L1718 `EntregableFiscalPresentado` sin referencia al contenido | PD6 reconoce el gap — sin hash ni versión del archivo. | Agregar `referenciaContenido` (cierra PD6). |
+| E8 | Media | L1794 `CertificadoTributarioReenviado` sin `intentoEnvioId` | No correlaciona con `Entregado`/`Fallido` posteriores. | Agregar `intentoEnvioId`. |
+| E9 | Baja | L1572/L1573 `TratamientoDefinido`/`ReglaDeLocalizacionDefinida` | Patrón upsert idempotente sin convención formalizada. | Documentar en Sección 2.1. |
+| E10 | Baja | L1551 `EntregableFiscalCreado` vs `EntregableFiscalGenerado` | Nombres semánticamente próximos. | Considerar renombrar (opcional). |
 
-**Eventos: CatalogoTributario (9)**
-- De transición: n/a (sin FSM)
-- De configuración: Creado, TributoAgregado/Modificado/Desactivado, ClasificacionTributariaAgregada/Modificada/Desactivada, TratamientoDefinido, ReglaDeLocalizacionDefinida
-- Naming consistente: Sí — prefijo implícito por agregado, verbos en participio
-- Payloads completos: Sí
-
-**Eventos: TarifaTributaria (4)**
-- De configuración: Creada, EntradaDeTarifaAgregada/Modificada/Cerrada
-- Naming consistente: Sí
-- Payloads completos: Sí
-
-**Eventos: CondicionDeAplicacion (4)**
-- De configuración: Creada, CondicionAgregada/Modificada/Cerrada
-- Naming consistente: Sí
-- Payloads completos: Sí
-
-**Eventos: CatalogoDeAtributosFiscales (4)**
-- De configuración: Creado, DefinicionAtributoAgregada/Modificada/Cerrada
-- Naming consistente: Sí
-- Payloads completos: Sí
-
-**Eventos: PerfilTributario (4)**
-- De configuración: Creado, AtributoFiscalAgregado/Modificado/Cerrado
-- Naming consistente: Sí
-- Payloads completos: Sí
-
-**Eventos: HomologacionFiscal (4)**
-- De configuración: Creada, EquivalenciaAgregada/Modificada/Cerrada
-- Naming consistente: Sí
-- Payloads completos: Sí
-
-**Eventos: FormatoFiscal (5)**
-- De configuración: Creado, Modificado, SeccionFormatoAgregada/Modificada/Eliminada
-- Naming consistente: Sí
-- Payloads completos: Sí
-
-**Eventos: RegistroTributario (1)**
-- De creación: RegistroTributarioCreado
-- Naming consistente: Sí
-- Payloads completos: Sí — captura contexto completo, desglose, intervención
-
-**Eventos: EntregableFiscal (4)**
-- De transición: Creado (→Borrador), Generado (Borrador→Generado), Regenerado (Generado→Borrador), Presentado (Generado→Presentado■)
-- Naming consistente: Sí
-- Payloads completos: Sí
-
-**Eventos: CertificadoTributario (6)**
-- De transición: Creado (→Borrador), Generado (Borrador→Generado), Regenerado (Generado→Borrador), Entregado (Generado→Entregado■), Fallido (Generado→Fallido), Reenviado (Fallido→Generado)
-- Naming consistente: Sí
-- Payloads completos: Gap menor en Reenviado (ver hallazgo)
-
-#### Hallazgos
-
-| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
-|---|-----------|-------------------------------|----------|-------------------|
-| E1 | Baja | L~1476: `"Destinatario actualizado (si se corrigieron datos de contacto)"` | El payload de `CertificadoTributarioReenviado` incluye el Destinatario solo condicionalmente ("si se corrigieron"). Para replay seguro en ES, el evento debería documentar si el Destinatario completo siempre se captura (con o sin cambios) o solo el delta. Un consumidor del stream no puede saber si la ausencia de Destinatario significa "no cambió" sin consultar un evento anterior. | Aclarar: `"Destinatario (estado actual — siempre incluido para replay safety)"` o `"Destinatario actualizado (solo si cambió; si ausente, el valor anterior se conserva)"`. La primera opción es más segura para ES. |
-
-#### Resumen
-- Alta: 0 | Media: 0 | Baja: 1
-- Total: 1 hallazgo
+**Resumen:** Alta 1 | Media 7 | Baja 2 | Total 10
 
 ---
 
-### 7. Idempotencia y Concurrencia
+## 7. Idempotencia y Concurrencia (audit-behavior-idempotency)
 
-**Fecha:** 2026-03-16
+### Hallazgos
 
-#### Contexto
+| # | Sev | Evidencia | Problema | Corrección mínima |
+|---|-----|-----------|----------|-------------------|
+| C1 | Alta | L1813 `[I9]` + L1948 `transaccionId` | Sin invariante de unicidad `(subDominio, transaccionId, efectoFiscal)` para `RegistroTributario` — at-least-once duplica el hecho fiscal. | Agregar invariante `[I##]` de unicidad con enforcement por validación al crear. |
+| C2 | Alta | L1363 búsqueda registro origen para desgravamen | Sin invariante "suma de desgravámenes ≤ gravamen origen". | Agregar invariante de saldo de prorrateo o registrar como premisa del consumidor. |
+| C3 | Alta | L1764 `CertificadoTributarioEntregado/Fallido` | Sin `intentoEnvioId` — at-least-once + orden invertido puede marcar como Fallido un certificado entregado. | Agregar `intentoEnvioId` correlacionado + guard "último intento abierto". |
+| C4 | Media | L1607-1609 `AtributoFiscal*` | Sin invariante de no-solapamiento de vigencias por `(nombre, perfil)`. | Agregar invariante análoga a `[I1]`. |
+| C5 | Media | L1610-1612 `ActividadEconomicaRegistrada*` | Sin invariante de no-solapamiento por tupla + perfil. | Agregar invariante análoga. |
+| C6 | Media | L1814 `[I10]` consistencia intervención | `crear()` asume comparabilidad estructural; redondeos en desgravámenes pueden marcar `huboIntervencion` falsamente. | Definir tolerancia y regla de comparación. |
+| C7 | Media | L1991 `[D11]` invariantes eventuales | Mecanismo de compensación no documentado para violaciones tardías. | Documentar detección + reacción (proyección, evento, guía operativa). |
+| C8 | Media | L879 stream key `registro-tributario-{guid}` | `transaccionId` no aparece en el stream key — depende solo del inbox de plataforma. | Adoptar stream key compuesto o documentar mapeo inbox. |
+| C9 | Media | L1144 + L1693 `ContenidoGenerado` lee `RegistroTributario` del período | Sin snapshot/cursor que congele el conjunto incluido entre generaciones. | Capturar cursor temporal o lista de IDs en `EntregableFiscalGenerado`. |
+| C10 | Baja | L1639 `EquivalenciaCerrada` | `[I4]` no cubre no-solapamiento de vigencias. | Extender `[I4]`. |
 
-El modelo delega explícitamente los mecanismos de concurrencia, deduplicación y trazabilidad a la plataforma mediante `[D11]` (L~1658):
-- **`expectedVersion`**: control de concurrencia optimista por stream (event store).
-- **`idempotencyKey`**: deduplicación vía inbox/outbox pattern.
-- **`correlationId`**: propagación automática por la plataforma de mensajería.
-
-Esta decisión es legítima y está bien fundamentada: estos son concerns de infraestructura, no de dominio. El modelo no los especifica por evento ni por comando porque la plataforma los resuelve transversalmente.
-
-#### Matriz de Idempotencia
-
-| Operación / Comando | Agregado | IdempotencyKey documentada | Guard anti-duplicado | Optimistic concurrency | Riesgo concurrencia |
-|---------------------|----------|---------------------------|---------------------|----------------------|-------------------|
-| Confirmación tributaria (gravamen) | RegistroTributario | D11 (plataforma) | D11 (plataforma) | D11 (event store) | Bajo — cada confirmación crea un nuevo stream |
-| Confirmación tributaria (desgravamen) | RegistroTributario | D11 (plataforma) | D11 (plataforma) | D11 (event store) | Bajo — nuevo stream, lectura de origen es idempotente |
-| Configuración (todos los agregados) | 7 agregados CRUD | D11 (plataforma) | D11 (plataforma) + I7 (unicidad por país) | D11 (event store) | Bajo — streams de configuración con baja concurrencia |
-| Generación de entregable | EntregableFiscal | D11 (plataforma) | FSM (solo desde Borrador) | D11 (event store) | Bajo — operación por período + autoridad |
-| Generación de certificado | CertificadoTributario | D11 (plataforma) | FSM (solo desde Borrador) | D11 (event store) | Bajo — un stream por tercero × período |
-| Entrega de certificado | CertificadoTributario | D11 (plataforma) | FSM (solo desde Generado) | D11 (event store) | Bajo — derivado de infraestructura |
-
-#### Hallazgos
-
-Sin hallazgos. D11 cubre los concerns de idempotencia y concurrencia de forma transversal. Las FSM de los agregados transaccionales agregan guards de estado que previenen doble ejecución a nivel de dominio.
-
-#### Resumen
-- Alta: 0 | Media: 0 | Baja: 0
-- Total: 0 hallazgos
+**Resumen:** Alta 3 | Media 6 | Baja 1 | Total 10
 
 ---
 
-### 8. Sagas y Procesos Multi-Agregado
+## 8. Sagas y Procesos Multi-Agregado (audit-process-sagas)
 
-**Fecha:** 2026-03-16
+### Hallazgos
 
-#### Mapa de Procesos
+| # | Sev | Evidencia | Problema | Corrección mínima |
+|---|-----|-----------|----------|-------------------|
+| S1 | Alta | L1363 desgravamen busca origen por `transaccionId` | Sin invariante de unicidad → resolución no determinista, prorrateo sobre registro equivocado. | Agregar invariante de unicidad o regla explícita de selección. |
+| S2 | Alta | L1364-1365 `crear` después de motor | Sin compensación ni política de retry entre paso 3 y 4 del flujo. | Documentar manejo de fallos con clave de idempotencia natural. |
+| S3 | Alta | L2045 (PD7) generación masiva de certificados | Sin saga formal: sin tracking, fallo parcial, correlationId de lote. | Documentar saga (trigger, estrategia ante fallo, correlationId). |
+| S4 | Media | L1364 + L1991 `[D11]` | Clave natural de idempotencia del comando de confirmación no declarada. | Declarar `(subDominio, transaccionId, efectoFiscal)` como clave. |
+| S5 | Media | L1991 correlationId | Identificador de proceso que conecta consumidor → registro → entregables no especificado. | Documentar identificador y verificar presencia en `RegistroTributarioCreado`. |
+| S6 | Media | L1411 `CargaAsistida` pasos 5-6 humano-en-loop | Sin documentación de la ventana entre `ResultadoCarga` y persistencia. | Documentar pasos 5-6 (re-validación, política ante cambio del catálogo). |
+| S7 | Media | L1342-1346 `ConfirmacionTributaria` | Ambigüedad sobre frontera dominio/aplicación (prorrateo). | Aclarar qué paso es de dominio y qué de aplicación. |
+| S8 | Media | L1346 sin timeouts/retry para `MotorDeCalculo` | Sin política declarada. | Documentar timeout, retry y comportamiento ante timeout. |
+| S9 | Baja | L1367 "Agregados involucrados" | Omite los transitivamente leídos por el motor. | Agregar nota "(transitivamente vía motor: …)". |
+| S10 | Baja | L1369 "proyecciones interpretan efectoFiscal" | Sin documentación de ventana de consistencia eventual. | Documentar garantías de plataforma. |
 
-**Proceso: ConfirmacionTributaria (3.13)**
-- Trigger: Comando asíncrono de confirmación desde sub-dominio consumidor
-- Agregados involucrados: MotorDeCalculo (lectura, solo gravámenes), RegistroTributario (lectura origen en desgravámenes + escritura)
-- Pasos:
-  1. Validar consumidor autorizado
-  2. Validar estructura del comando [D9]
-  3a. (Gravamen) MotorDeCalculo.calcular() → ResultadoCalculo como referencia
-  3b. (Desgravamen) Buscar RegistroTributario origen por transaccionOrigenId → Prorratear desglose como referencia
-  4. RegistroTributario.crear(contexto, desgloseConfirmado, calculoDeReferencia) → RegistroTributarioCreado
-  5. Persistir evento en stream
-- Compensación: No requerida — es una operación atómica de escritura en un solo agregado. Si falla cualquier paso previo, no se emite evento.
-- CorrelationId: D11 (plataforma)
-- IdempotencyKey por paso: D11 (plataforma)
-- Persistencia del estado: No aplica — flujo síncrono sin estado intermedio persistido.
-
-**Proceso: CargaAsistida (3.14)**
-- Trigger: Datos normalizados desde cualquier canal (API, formulario, OCR)
-- Agregados involucrados: CatalogoDeAtributosFiscales (lectura), PerfilTributario (escritura tras aprobación)
-- Pasos:
-  1. Recibir atributos normalizados
-  2. Validar contra CatalogoDeAtributosFiscales
-  3. Retornar ResultadoCarga para aprobación
-  4-6. (Aplicación) Administrador aprueba → PerfilTributario actualizado
-- Compensación: No requerida — la escritura en PerfilTributario es un comando simple post-aprobación.
-- CorrelationId: D11
-- Persistencia del estado: No aplica — flujo con aprobación humana.
-
-**Procesos implícitos (cumplimiento fiscal — segunda fase):**
-- Generación de EntregableFiscal: lectura de RegistroTributario + HomologacionFiscal → escritura en EntregableFiscal. Proceso single-aggregate.
-- Generación/entrega de CertificadoTributario: incluye interacción con infraestructura de envío. PD7 reconoce gaps.
-
-#### Hallazgos
-
-| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
-|---|-----------|-------------------------------|----------|-------------------|
-| SG1 | Media | L~1070: `"Resuelve el RegistroTributario origen buscando por transaccionId = transaccionOrigenId con efectoFiscal = gravamen."` | El flujo de desgravamen asume que el RegistroTributario del gravamen original ya existe al momento de procesar la confirmación del desgravamen. No está documentado: (1) como precondición explícita de la confirmación tributaria para desgravámenes, (2) qué ocurre si el origen no se encuentra (¿rechazo? ¿reintento?). En un sistema EDA, el evento de confirmación del desgravamen podría llegar antes que el del gravamen original (eventual consistency). El desarrollador necesita saber qué hacer en ese caso. | Agregar precondición explícita en 3.13: `"3b. (Desgravamen) Precondición: debe existir un RegistroTributario con transaccionId = transaccionOrigenId y efectoFiscal = gravamen. Si no existe → rechazar con error indicando que el registro origen no fue encontrado."` Si se desea soportar ordenamiento eventual, documentar estrategia de retry. |
-
-#### Resumen
-- Alta: 0 | Media: 1 | Baja: 0
-- Total: 1 hallazgo
+**Resumen:** Alta 3 | Media 5 | Baja 2 | Total 10
 
 ---
 
-### 9. Decisiones Abiertas
+## 9. Decisiones Abiertas (audit-quality-open-decisions)
 
-**Fecha:** 2026-03-16
+### Hallazgos
 
-#### Inventario de Pendientes
+| # | Sev | Evidencia | Problema | Corrección mínima |
+|---|-----|-----------|----------|-------------------|
+| 1 | Alta | L2042 (PD4) "se descarte como parte del producto" | Decisión de producto crítica sin owner ni criterio de cierre. | Agregar owner + criterio de decisión. |
+| 2 | Alta | L680 retiro `actividadEconomica` | Decisión ya tomada sin formalización como `[D##]`. | Formalizar como decisión con plan de migración. |
+| 3 | Alta | L2046 (PD8) "~30-50 ciudades CO" | Sin lista canónica → `[I13]` rechazará transacciones con códigos no precargados. | Lista canónica + procedimiento de expansión + fallback. |
+| 4 | Alta | L2057 changelog "10 agregados, 45 eventos" | Changelog refleja v1.0; documento ya tiene Cambios 1-4. | Agregar fila v2.0 con conteos correctos. |
+| 5 | Media | L1302/L1915 "Sub-cambio 2.3", L1969 "Cambio 5" | Referencias a artefactos externos no resolubles. | Reemplazar por `[D##]`/`[I##]` o mover al changelog. |
+| 6 | Media | L2046-2049 (PD8-11) | Pendientes atados a "Cambio 5"/"Cambio 6" externos. | Sustituir por condición de activación operativa. |
+| 7 | Media | L2043 (PD5) `FormatoFiscal` sin invariantes | TODO abierto desde v1.0 sin owner. | Convertir en hallazgo con owner al iniciar PD1. |
+| 8 | Media | L2049 (PD11) proveedor fiscal externo | Sin criterios ni momento de cierre. | Agregar criterios + RFC programado. |
+| 9 | Media | L799/L2011 tipos candidatos en anexo | Política de extensión del enum no formalizada como `[D##]`. | Formalizar política de extensión del enum. |
+| 10 | Media | L1991 `[D11]` "revalidar si cambia plataforma" | Compromiso implícito sin owner ni proceso. | Convertir en PD## explícito. |
 
-| # | Ubicación (L~N) | Texto literal | Tipo | Decisión temporal | Riesgo | Criterio de cierre |
-|---|-----------------|--------------|------|-------------------|--------|-------------------|
-| PD1 | L~1690 | "Validación final de composición y diseño — agregados de cumplimiento fiscal" | Diferido | Modelo documenta agregados; pendiente validación con datos reales. | Medio — gaps funcionales posibles en el frente de cumplimiento | Implementación del frente de cumplimiento |
-| PD2 | L~1691 | "Localizaciones por país — contenido fiscal" | Diferido | Anexos v1.0 por país. Pendiente: ~50 conceptos RETEFUENTE, ICA municipal, homologaciones, Panamá. | Bajo — son datos operativos, no modelo | Carga de contenido fiscal |
-| PD3 | L~1692 | "Eventos de integración con otros bounded contexts" | Diferido | D9 define contrato semántico. Pendiente: eventos formales. | Medio — bloqueará fase 3 (EventCatalog) | Construcción del EventCatalog |
-| PD4 | L~1693 | "Declaraciones tributarias" | Diferido | FormatoFiscal soporta tipoEntregable extensible. | Bajo — decisión de producto | Decisión de producto |
-| PD5 | L~1694 | "Invariantes formales de FormatoFiscal" | Diferido | Ninguna formalizada. | Bajo — FormatoFiscal es de segunda fase | Diseño del frente de cumplimiento |
-| PD6 | L~1695 | "Payload de EntregableFiscalPresentado — referencia al contenido" | Diferido | Trazabilidad depende de reconstruir stream. | Bajo — segunda fase | Diseño del frente de cumplimiento |
-| PD7 | L~1696 | "Documentación del proceso de generación masiva de certificados" | Diferido | Se menciona como proceso de aplicación sin documentar. | Medio — sin estrategia ante fallo parcial | Implementación de CertificadoTributario |
-| — | L~1171 | `"FormatoFiscal | ... | Por definir"` (Panamá) | Dato pendiente | Contenido fiscal de Panamá incompleto. | Bajo — dato operativo | Carga de contenido Panamá |
-
-#### Hallazgos
-
-| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
-|---|-----------|-------------------------------|----------|-------------------|
-| OD1 | Baja | D9 (L~1627): `"transaccionOrigenId | string | Solo si efectoFiscal = desgravamen"` | El contrato D9 define `transaccionOrigenId` como un string único (no array). Esto implica que un desgravamen mapea a exactamente un gravamen original (relación 1:1). Sin embargo, en la práctica pueden existir notas crédito que cubren conceptos de múltiples facturas. Si la restricción 1:1 es por diseño (el consumidor descompone la nota crédito en múltiples confirmaciones, una por factura origen), debería formalizarse como decisión o precondición. Si es una limitación conocida, documentar como pendiente. | Evaluar: si es por diseño → agregar nota en D9: `"Cada confirmación de desgravamen referencia exactamente una transacción origen. Si una operación del consumidor afecta múltiples orígenes, el consumidor descompone en N confirmaciones."` Si es limitación → agregar como PD. |
-
-#### Resumen
-- Pendientes formales: 7 (PD1–PD7)
-- Datos pendientes: 1 (Panamá)
-- Decisiones implícitas: 1 (OD1)
-- Alta: 0 | Media: 0 | Baja: 1
-- Total: 1 hallazgo
+**Resumen:** Alta 4 | Media 6 | Baja 0 | Total 10
 
 ---
 
-### 10. Sanity Check (Coherencia Cruzada)
+## 10. Sanity Check Coherencia Cruzada (audit-quality-sanity-check)
 
-**Fecha:** 2026-03-16
+### Hallazgos
 
-#### Coherencia Cruzada
+| # | Sev | Evidencia | Problema | Corrección mínima |
+|---|-----|-----------|----------|-------------------|
+| 1 | Alta | L1525 "45 eventos / 10 agregados" vs L1553 tabla "56" | Contradicción interna. | Actualizar L1525. |
+| 2 | Alta | L2057 changelog "10 agregados, 45 eventos, 12 invariantes, 11 decisiones, 7 pendientes" | Desactualizado vs estado actual (16 / 56 / 17 / 13 / 11). | Agregar fila v2.0 al changelog. |
+| 3 | Alta | L89-148 diagrama BC en 3.1 | No incluye `JurisdiccionFiscal` ni `CatalogoDeRegimenesEspeciales`. | Actualizar diagrama ASCII. |
+| 4 | Alta | L38 `[P##]` y `[SI##]` declarados | `[SI##]` sin definición ni uso; `[P##]` sin citas. | Eliminar `[SI##]` y agregar citas `[P##]` donde se operacionalizan. |
+| 5 | Media | L1815-1816 `[I11a]/[I11b]` vs changelog "12 invariantes" | División no documentada. | Documentar división y actualizar conteo a 17. |
+| 6 | Media | L1302/L1915/L2046-2049 referencias "Cambio N" | Apuntan a plan externo. | Reemplazar por `[D##]`/`[I##]` o mover al changelog. |
+| 7 | Media | L83 tabla clasificación de capacidades | No lista `JurisdiccionFiscal` ni `CatalogoDeRegimenesEspeciales`. | Actualizar tabla como Núcleo. |
+| 8 | Media | L38 vs L1135 notación `[PD#]` vs `PD9` | Inconsistencia notacional. | Estandarizar a `[PD##]`. |
+| 9 | Media | L2049 enum `Jurisdiccion.tipo` incluye tipos F2 sin precarga | El diagrama de 3.7 solo muestra tipos F1. | Agregar nota "tipos US/CA declarados sin precarga — PD11". |
+| 10 | Baja | L155 referencias a anexos | Sin versión ni sello temporal. | Agregar versión a citas o nota en Sección 1. |
 
-**Referencias verificadas:**
-- D1–D11: 11 definidas, todas referenciadas (D11 como transversal). ✓
-- I1–I12: 13 IDs (I11 split en a/b), todas definidas y referenciadas internamente. ✓
-- P1–P5: 5 definidas, referenciadas en composición y notas. ✓
-- PD1–PD7: 7 definidas, con cross-references correctas (PD1↔PD5,PD6,PD7). ✓
-- R01–R38: referenciadas desde alcance, sin rotas verificables. ✓
-- **Referencias rotas: 0** ✓
-
-**Conteos verificados:**
-- Total eventos: 45 (tabla L1256 coincide con catálogo detallado). ✓
-- Desglose por tipo: **inconsistente** (ver SC2).
-- Agregados: 10 en Sección 3 + diagrama. ✓
-- Invariantes: 13 IDs vigentes (I1–I12 con I11a/b). ✓
-- Decisiones: 11 (D1–D11). Changelog v1.0 dice 10 — **D11 no registrado** (ver SC1).
-- Premisas: 5 (P1–P5). ✓
-- Pendientes: 7 (PD1–PD7). ✓
-
-**Decisiones vigentes:**
-- D1–D10: todas alineadas con el modelo actual. ✓
-- D11: alineada con el modelo (delega a plataforma), pero sin registro en changelog. ✓
-
-**Premisas operacionalizadas:**
-- P1 → MotorDeCalculo opera por concepto. ✓
-- P2 → CondicionDeAplicacion evalúa roles según dirección. ✓
-- P3 → Todos los agregados de configuración soportan estándar/personalizado. ✓
-- P4 → ES como persistencia (D10). ✓
-- P5 → Vigencia temporal en todas las configuraciones. ✓
-
-**Conceptos eliminados/renombrados:**
-- `base` → `baseGravable` (v1.3): sin remanentes en entidades/contratos. ✓
-- `esRegenerable()` → `puedeGenerarContenido()` (v1.3): sin remanentes. ✓
-- `contenido estándar` → `contenido fiscal` (v1.3): remanente en L170 (reportado en G1).
-
-**Contradicciones entre secciones:**
-- I10 vs L596: reportada en INV1.
-
-#### Hallazgos
-
-| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
-|---|-----------|-------------------------------|----------|-------------------|
-| SC1 | Baja | D11 (L~1658) no tiene entrada en ninguna versión del changelog (L1700–1717). Changelog v1.0 (L~1713): `"10 decisiones (D1–D10)"`. | D11 fue añadida al modelo pero nunca registrada en el control de versiones. No es claro en qué versión se introdujo. | Agregar mención de D11 en la entrada de changelog correspondiente (probablemente v1.0, dado que aparece junto a D10). |
-| SC2 | Baja | L1232: `"33 configuración + 11 transaccionales + 1 RegistroTributario"` | El desglose por tipo es incorrecto. Conteo real: 34 configuración (9+4+4+4+4+4+5) + 10 transaccionales (4+6) + 1 RegistroTributario = 45. El total (45) es correcto pero el desglose invierte 1 evento entre las categorías. | Corregir L1232: `"34 configuración + 10 transaccionales + 1 RegistroTributario"`. |
-
-#### Resumen
-- Alta: 0 | Media: 0 | Baja: 2
-- Total: 2 hallazgos
+**Resumen:** Alta 4 | Media 5 | Baja 1 | Total 10
 
 ---
 
 ## Resumen Ejecutivo
 
 | Skill | Alta | Media | Baja | Total |
-|-------|------|-------|------|-------|
-| Glosario | 0 | 0 | 1 | 1 |
-| Composición | 0 | 0 | 0 | 0 |
-| FSM | 0 | 0 | 0 | 0 |
-| Invariantes | 0 | 1 | 0 | 1 |
-| Responsabilidades | 0 | 0 | 0 | 0 |
-| Semántica Eventos | 0 | 0 | 1 | 1 |
-| Idempotencia | 0 | 0 | 0 | 0 |
-| Sagas | 0 | 1 | 0 | 1 |
-| Decisiones Abiertas | 0 | 0 | 1 | 1 |
-| Sanity Check | 0 | 0 | 2 | 2 |
-| **TOTAL** | **0** | **2** | **5** | **7** |
+|-------|:----:|:-----:|:----:|:-----:|
+| Glosario | 1 | 5 | 4 | 10 |
+| Composición | 2 | 5 | 3 | 10 |
+| FSM | 0 | 3 | 4 | 7 |
+| Invariantes | 2 | 6 | 2 | 10 |
+| Responsabilidades | 0 | 8 | 2 | 10 |
+| Semántica Eventos | 1 | 7 | 2 | 10 |
+| Idempotencia | 3 | 6 | 1 | 10 |
+| Sagas | 3 | 5 | 2 | 10 |
+| Decisiones Abiertas | 4 | 6 | 0 | 10 |
+| Sanity Check | 4 | 5 | 1 | 10 |
+| **TOTAL** | **20** | **56** | **21** | **97** |
 
-### Top 5 Hallazgos Críticos
+---
+
+## Top 5 Hallazgos Críticos
 
 | # | Skill origen | Severidad | Problema | Corrección mínima |
-|---|-------------|-----------|----------|-------------------|
-| 1 | Invariantes (INV1) | Media | I10 exige `LineaDescartada[]` en intervención de desgravámenes, pero `LineaDescartada` es exclusiva del motor (gravámenes). Ambigüedad en factory method `crear()` para desgravámenes con intervención. | Acotar I10 distinguiendo gravámenes (motor → LineaDesgloseMotor + LineaDescartada) de desgravámenes (prorrateo → solo LineaDesgloseMotor). |
-| 2 | Sagas (SG1) | Media | ConfirmacionTributaria no documenta precondición de existencia del RegistroTributario origen al procesar desgravámenes, ni el comportamiento si no se encuentra. | Agregar precondición explícita: origen debe existir, rechazar si no se encuentra. |
-| 3 | Glosario (G1) | Baja | L170 "Contenido estándar del producto" — remanente terminológico post-v1.3. | Cambiar a "Contenido fiscal del producto." |
-| 4 | Semántica Eventos (E1) | Baja | `CertificadoTributarioReenviado` — payload condicional del Destinatario, ambiguo para replay ES. | Documentar si Destinatario siempre se captura o solo cuando cambia. |
-| 5 | Sanity Check (SC2) | Baja | Desglose de 45 eventos: "33 config + 11 transaccionales" debería ser "34 config + 10 transaccionales". | Corregir conteo en L1232. |
+|---|--------------|-----------|----------|-------------------|
+| 1 | Idempotencia (C1+C8) + Sagas (S1+S2) | Alta | **Duplicación potencial de `RegistroTributario`** — no existe invariante de unicidad por `(subDominio, transaccionId, efectoFiscal)`. El stream usa GUID interno, no business key, por lo que un retry at-least-once del bus puede crear dos registros tributarios distintos para la misma transacción. Impacto financiero directo en reportes y certificados. | Agregar invariante `[I##]` de unicidad; adoptar stream key compuesto con business key; declarar clave natural de idempotencia en `ConfirmacionTributaria`. |
+| 2 | Sanity (1+2+3) + Glosario (1) + Eventos (E1) + Decisiones (4) | Alta | **Conteos y diagramas inconsistentes con la v2.0 alcanzada**: introducción de Sección 5 dice "45 eventos / 10 agregados" vs tabla "56 / 12"; changelog refleja v1.0; diagrama del BC en 3.1 no incluye los dos agregados nuevos. Cualquier auditoría derivada o EventCatalog generado quedará incorrecto. | Actualizar L1525, L2057 (fila v2.0 al changelog), L83 (tabla clasificación) y L89-148 (diagrama ASCII del BC). |
+| 3 | Sagas (S3) + Decisiones (7) | Alta | **Generación masiva de `CertificadoTributario` sin saga formal** — declarada como "proceso de aplicación" en 3.13 pero sin trigger, fallo parcial, correlationId de lote ni reanudación. PD7 reconoce el gap pero el riesgo operativo es real: un lote con fallos parciales deja certificados faltantes sin mecanismo de recuperación. | Documentar saga completa (trigger, estrategia de fallo parcial, correlationId, reanudación) y cerrar PD7. |
+| 4 | Idempotencia (C3) + Responsabilidades (F8) + Eventos (E8) | Alta | **Idempotencia del envío de certificados rota** — `CertificadoTributarioEntregado`/`Fallido` no llevan `intentoEnvioId`. Una infraestructura at-least-once puede reportar Entregado y Fallido del mismo intento en orden invertido, y el agregado aplica el último → puede marcar Fallido un certificado realmente entregado (o viceversa). | Agregar `intentoEnvioId` correlacionado a `Reenviado`/`Entregado`/`Fallido` + guard "intento abierto". |
+| 5 | Decisiones (2+3) + Invariantes (2) | Alta | **Riesgo de rechazo masivo en go-live productivo** por dos pendientes acoplados: PD8 admite cobertura limitada (~30-50 ciudades CO) pero `[I13]` exige integridad referencial estricta; PD9 deja la migración de `actividadEconomica` sin formalizar como `[D##]`. Si la migración no se ejecuta antes del corte productivo, los perfiles con el atributo simple harán que el motor descarte el tributo con `motivoExclusion: actividad_no_registrada`. | Cerrar PD8 con lista canónica + procedimiento de expansión + fallback; formalizar la migración de `actividadEconomica` como decisión `[D##]` con plan de migración explícito. |
+
+---
+
+## Notas
+
+- Auditoría ejecutada en paralelo por 4 agentes (uno por capa). Cada skill produjo hasta 10 hallazgos según su SKILL.md.
+- Severidad: Alta (rompe invariante, lógica contradictoria, estado inalcanzable, riesgo financiero) · Media (ambigüedad que bloquea implementación, gap de especificación, riesgo no mitigado) · Baja (claridad, estilo, optimización menor).
+- Regla de oro: NO se reescribió el documento. Solo diagnóstico y corrección mínima sugerida.

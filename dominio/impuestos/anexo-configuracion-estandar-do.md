@@ -22,99 +22,74 @@ El contenido se organiza siguiendo la estructura de los agregados del modelo de 
 
 ## 1. Tributos — CatalogoTributario
 
-| Código | Nombre | Naturaleza | Base | Nivel jurisdiccional | Factor de tarifa | Tributo padre | Definición |
-|--------|--------|:----------:|------|:--------------------:|-----------------|:-------------:|------------|
-| ITBIS | Impuesto a la Transferencia de Bienes Industrializados y Servicios | Aditivo | Ingreso | Nacional | `clasificacion` | — | Equivalente al IVA. Grava la transferencia de bienes industrializados, importación y prestación de servicios. |
-| RITBIS | Retención del ITBIS | Sustractivo | ITBIS (padre) | Nacional | `porcentajeDePadre` | ITBIS | Retención anticipada del ITBIS. |
-| ISC | Impuesto Selectivo al Consumo | Aditivo | Ingreso | Nacional | `clasificacion` | — | Impuesto que se aplica a ciertos productos como forma de desincentivar su consumo. |
-| CDT | Contribución al Desarrollo de las Telecomunicaciones | Aditivo | Ingreso | Nacional | `fija` | — | Impuesto que ayuda al desarrollo de las telecomunicaciones. |
-| PROPINA | Propina Legal | Aditivo | Ingreso | Nacional | `fija` | — | Impuesto de propina legal obligatorio en establecimientos de servicio. |
+Los datos del catálogo `catalogo-tributario-DO` se migraron a [`datos-precargados/do-catalogo-tributario.json`](datos-precargados/do-catalogo-tributario.json) (v1.0, 2026-05-26). Allí viven las 19 entidades iniciales F1 (5 tributos + 4 clasificaciones + 5 tratamientos + 5 reglas de localización). Narrativo: [`datos-precargados/do-catalogo-tributario.md`](datos-precargados/do-catalogo-tributario.md).
 
-**Total:** 5 tributos (4 impuestos + 1 retención).
+**Contexto de diseño:**
+- **5 tributos:** ITBIS (equivalente IVA, 18% general), RITBIS (retención del 30% del ITBIS), ISC (Selectivo al Consumo, varía por producto), CDT (2% telecomunicaciones), PROPINA (10% hoteles/restaurantes).
+- **Todos nacionales** — no hay tributos subnacionales operativos.
+- **Reglas de localización:** todos resuelven por `sedeEmisora` sin fallback (la sede determina el país).
 
-### Clasificaciones tributarias
+### Jurisdicciones fiscales — JurisdiccionFiscal
 
-| Código | Nombre | Tributos que aplican | Notas |
-|--------|--------|---------------------|-------|
-| GRAV_ITBIS_18 | Gravados ITBIS 18% | ITBIS, RITBIS | Tarifa general. |
-| GRAV_ITBIS_16 | Gravados ITBIS 16% | ITBIS, RITBIS | Tarifa reducida. |
-| EXENTO_ITBIS | Exentos de ITBIS | — | Bienes y servicios exentos. |
-| ISC_APLICABLE | Sujeto a ISC | ISC | Bienes gravados con selectivo al consumo. |
+Las 68 jurisdicciones DR (1 nacional + 32 provincias + 35 municipios principales) se migraron a [`datos-precargados/do-jurisdiccion-fiscal.json`](datos-precargados/do-jurisdiccion-fiscal.json). Narrativo: [`datos-precargados/do-jurisdiccion-fiscal.md`](datos-precargados/do-jurisdiccion-fiscal.md).
 
-### Reglas de localización
-
-| Tributo | Rol fiscalmente relevante | Fallback | Notas |
-|---------|--------------------------|----------|-------|
-| ITBIS | `sedeEmisora` | — | Nacional. |
-| RITBIS | `sedeEmisora` | — | Nacional. |
-| ISC | `sedeEmisora` | — | Nacional. |
-| CDT | `sedeEmisora` | — | Nacional. |
-| PROPINA | `sedeEmisora` | — | Nacional. |
+**Contexto de diseño:** DR no tiene regímenes territoriales fiscales operativos en F1. Las zonas francas se modelan como **régimen empresarial** (Ley 8-90), no como `JurisdiccionFiscal` con `tipoRegimen`. La precarga jurisdiccional sirve principalmente para integridad referencial de `ubicaciones` enviadas por consumidores.
 
 ---
 
 ## 2. Tarifas — TarifaTributaria
 
-### ITBIS — `tarifa-DO-ITBIS`
+Las tarifas se migraron a [`datos-precargados/do-tarifa-tributaria.json`](datos-precargados/do-tarifa-tributaria.json) (5 streams nacionales con 9 entradas).
 
-| Factor (clasificación) | Tarifa | Tipo | Vigencia desde |
-|------------------------|:------:|:----:|:--------------:|
-| GRAV_ITBIS_18 | 18% | Porcentaje | 2017-01-01 |
-| GRAV_ITBIS_16 | 16% | Porcentaje | 2017-01-01 |
-
-### RITBIS — `tarifa-DO-RITBIS`
-
-| Factor | Tarifa | Tipo | Notas |
-|--------|:------:|:----:|-------|
-| — (porcentaje del padre) | 30% | Porcentaje del ITBIS | Retención del 30% del ITBIS facturado. Norma general. |
-
-### CDT — `tarifa-DO-CDT`
-
-| Factor | Tarifa | Tipo | Vigencia desde |
-|--------|:------:|:----:|:--------------:|
-| — (fija) | 2% | Porcentaje | 2017-01-01 |
-
-### PROPINA — `tarifa-DO-PROPINA`
-
-| Factor | Tarifa | Tipo | Vigencia desde |
-|--------|:------:|:----:|:--------------:|
-| — (fija) | 10% | Porcentaje | 2017-01-01 |
+**Contexto de diseño:**
+- **ITBIS:** 18% (general), 16% (reducida), 0% (exento).
+- **RITBIS:** 30% general + 100% personas físicas (NG 02-05).
+- **ISC:** Telecomunicaciones 10%, Seguros 16%. Otras categorías ISC (cigarrillos, alcohol, vehículos, combustibles) requieren precarga adicional con consultores.
+- **CDT:** 2% sobre servicios de telecomunicaciones.
+- **PROPINA:** 10% obligatorio en hoteles y restaurantes.
 
 ---
 
 ## 3. Condiciones de aplicación — CondicionDeAplicacion
 
-| Tributo | Entidad evaluada | Atributo evaluado | Valor esperado | Efecto | Notas |
-|---------|:----------------:|-------------------|:--------------:|:------:|-------|
-| ITBIS | — | — | — | `aplicar` (default) | No depende de calidades tributarias del emisor ni adquiriente. |
-| RITBIS | — | — | — | `aplicar` si existe ITBIS | Requiere que ITBIS se haya calculado. No depende de calidades tributarias. |
+Las 9 condiciones DR se migraron a [`datos-precargados/do-condicion-de-aplicacion.json`](datos-precargados/do-condicion-de-aplicacion.json).
 
-> **Nota:** Las condiciones de aplicación en República Dominicana son significativamente más simples que en Colombia. No hay evaluación de calidades tributarias — la aplicación depende de la clasificación del bien/servicio.
+**Contexto de diseño:** Catálogo compacto (vs CO con 32 condiciones) — la operación dominicana es más simple. Las condiciones DR se basan más en **actividad económica CNAE del emisor** (división 61 para CDT, divisiones 55/56 para PROPINA) que en calidades del perfil. La exoneración por zona franca (Ley 8-90) es la condición más compleja.
 
 ---
 
 ## 4. Atributos fiscales — CatalogoDeAtributosFiscales
 
-| Nombre | Tipo | Valores válidos | Requerido | Vigencia definición | Notas |
-|--------|:----:|----------------|:---------:|:-------------------:|-------|
-| tipoContribuyente | Enum | Persona Física, Persona Jurídica | Sí | 2017-01-01 → ∞ | Clasificación del contribuyente. |
-| rnc | String | — | Sí | 2017-01-01 → ∞ | Registro Nacional del Contribuyente. |
-| ncf | Boolean | — | Sí | 2017-01-01 → ∞ | Autorizado a emitir Comprobantes Fiscales (NCF/e-CF). |
+Los 6 atributos DR se migraron a [`datos-precargados/do-catalogo-de-atributos-fiscales.json`](datos-precargados/do-catalogo-de-atributos-fiscales.json).
+
+**Contexto de diseño:**
+- **3 requeridos:** `tipoContribuyente`, `rnc`, `ncf`.
+- **3 opcionales:** `esAgenteRetencionITBIS`, `esGranContribuyente`, `inscripcionParqueZonaFranca` (con `catalogoReferencia`).
+- Compacto vs CO (15 atributos) — DR no tiene Régimen Simple, autorretenciones múltiples ni atributos municipales.
 
 ---
 
-## 5. Formatos fiscales — FormatoFiscal
+## 5. Regímenes especiales empresariales — CatalogoDeRegimenesEspeciales
 
-### Reportes de información fiscal (autoridad: DGII)
+Los regímenes empresariales DR se migraron a [`datos-precargados/do-catalogo-de-regimenes-especiales.json`](datos-precargados/do-catalogo-de-regimenes-especiales.json) (18 parques de zonas francas precargados).
 
-| Código formato | Nombre | Tipo entregable | Periodicidad | Formato salida | Notas |
-|---------------|--------|:---------------:|:------------:|:--------------:|-------|
-| F-606 | Compras y gastos de proveedores | Reporte | Mensual | XML | Formato DGII — compras con NCF. |
-| F-607 | Ventas e ingresos operacionales | Reporte | Mensual | XML | Formato DGII — ventas. Si 100% e-CF, no es obligatorio. |
-| F-608 | Comprobantes cancelados (NCF) | Reporte | Mensual | XML | Formato DGII — NCF anulados. Si 100% e-CF, no es obligatorio. |
-| F-609 | Pagos al exterior sin NCF | Reporte | Mensual | XML | Formato DGII — pagos a proveedores del exterior. |
+**Contexto de diseño:**
+- **Único tipo vigente en F1 DR:** `zona-franca` (administrado por CNZFE bajo Ley 8-90).
+- 15 ZFs industriales + 3 ZFs de servicios.
+- Cobertura total estimada ~75 parques certificados — la precarga inicial es muestra representativa.
+- **Frontera con `JurisdiccionFiscal`:** las ZFs son **empresariales** (dependen de inscripción) — no hay regímenes territoriales fiscales en DR.
 
-> **Nota:** Si el 100% de las facturas son electrónicas (e-CF), no es obligatorio enviar formatos 607 y 608 — solo 606 y 609.
+---
+
+## 6. Formatos fiscales — FormatoFiscal
+
+Los formatos fiscales se migraron a [`datos-precargados/do-formato-fiscal.json`](datos-precargados/do-formato-fiscal.json) (4 formatos DGII: F-606, F-607, F-608, F-609). La homologación oficial DGII se migra a [`datos-precargados/do-homologacion-fiscal-dgii.json`](datos-precargados/do-homologacion-fiscal-dgii.json) (18 equivalencias).
+
+**Contexto de diseño:**
+- **4 formatos DGII** mensuales (día 15 mes siguiente) en formato XML.
+- **F-606 y F-609** siempre obligatorios; F-607 y F-608 redundantes si el contribuyente emite 100% e-CF (los e-CF llegan a DGII en tiempo real).
+- **Migración NCF → e-CF** progresiva (Normas Generales 06-2018 + 06-2021).
+- Homologaciones DGII pendientes de validación con consultores — los códigos precargados son denominaciones internas razonables.
 
 ---
 
@@ -123,3 +98,4 @@ El contenido se organiza siguiendo la estructura de los agregados del modelo de 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
 | 1.0 | Marzo 2026 | Versión inicial: 5 tributos, 4 clasificaciones, condiciones simples, 3 atributos fiscales, formatos DGII (606-609). |
+| 1.1 | Mayo 2026 | Cambio 3 — Sub-cambio 3.4: nueva Sección 5 con régimen empresarial de zonas francas precargado (~75 parques CNZFE, Ley 8-90). Atributo fiscal nuevo en Sección 4 (`inscripcionParqueZonaFranca`) con `catalogoReferencia`. Renumeración de Sección 5 (Formatos) a Sección 6. `[D13]` `[I16]`. |

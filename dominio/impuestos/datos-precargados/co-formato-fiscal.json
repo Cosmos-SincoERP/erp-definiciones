@@ -1,0 +1,151 @@
+{
+  "pais": "CO",
+  "catalogo": "FormatoFiscal",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "DIAN — Resoluciones anuales de información exógena (Resolución 162 de 2023, Resolución 000233 de 2026 vigente) + estatutos tributarios municipales (reportes ICA) + Estatuto Tributario (Certificado 220).",
+  "estructura": {
+    "totalFormatos": 10,
+    "porAutoridad": {
+      "DIAN": 8,
+      "Alcaldias_municipales": 1,
+      "Multiple": 1
+    },
+    "porTipoEntregable": {
+      "reporte": 8,
+      "certificado": 2
+    }
+  },
+  "entradas": [
+    {
+      "codigo": "F-1001",
+      "nombre": "Pagos o abonos en cuenta y retenciones practicadas",
+      "autoridad": "DIAN",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "anual", "mesesAplicables": [3], "diaCorte": "31-03-año-siguiente" },
+      "formatoSalida": ["XML", "Excel-prevalidador"],
+      "alcance": "Información exógena — principal formato de retenciones efectuadas por agentes de retención.",
+      "referenciaHomologacion": "homologacion-fiscal-DIAN-CO",
+      "marcoNormativo": "Resolución DIAN 000233 de 2026 (vigente). Estatuto Tributario art. 631.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "F-1003",
+      "nombre": "Retenciones en la fuente practicadas",
+      "autoridad": "DIAN",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "anual", "mesesAplicables": [3], "diaCorte": "31-03-año-siguiente" },
+      "formatoSalida": ["XML", "Excel-prevalidador"],
+      "alcance": "Detalle de retenciones por tercero, concepto y municipio.",
+      "referenciaHomologacion": "homologacion-fiscal-DIAN-CO",
+      "marcoNormativo": "Resolución DIAN — Información exógena.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "F-1005",
+      "nombre": "IVA descontable",
+      "autoridad": "DIAN",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "anual", "mesesAplicables": [3], "diaCorte": "31-03-año-siguiente" },
+      "formatoSalida": ["XML", "Excel-prevalidador"],
+      "alcance": "Reporte de IVA pagado en compras (descontable).",
+      "referenciaHomologacion": "homologacion-fiscal-DIAN-CO",
+      "marcoNormativo": "Resolución DIAN — Información exógena.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "F-1006",
+      "nombre": "IVA generado",
+      "autoridad": "DIAN",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "anual", "mesesAplicables": [3], "diaCorte": "31-03-año-siguiente" },
+      "formatoSalida": ["XML", "Excel-prevalidador"],
+      "alcance": "Reporte de IVA generado en ventas.",
+      "referenciaHomologacion": "homologacion-fiscal-DIAN-CO",
+      "marcoNormativo": "Resolución DIAN — Información exógena.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "F-1007",
+      "nombre": "Ingresos recibidos",
+      "autoridad": "DIAN",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "anual", "mesesAplicables": [3], "diaCorte": "31-03-año-siguiente" },
+      "formatoSalida": ["XML", "Excel-prevalidador"],
+      "alcance": "Información de ingresos recibidos discriminados por tercero pagador.",
+      "referenciaHomologacion": "homologacion-fiscal-DIAN-CO",
+      "marcoNormativo": "Resolución DIAN — Información exógena.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "F-1647",
+      "nombre": "Ingresos recibidos para terceros",
+      "autoridad": "DIAN",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "anual", "mesesAplicables": [3], "diaCorte": "31-03-año-siguiente" },
+      "formatoSalida": ["XML", "Excel-prevalidador"],
+      "alcance": "Ingresos cobrados en nombre de terceros (mandato, agencia, fiducia).",
+      "referenciaHomologacion": "homologacion-fiscal-DIAN-CO",
+      "marcoNormativo": "Resolución DIAN — Información exógena.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "F-2276",
+      "nombre": "Información de rentas de trabajo y pensiones",
+      "autoridad": "DIAN",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "anual", "mesesAplicables": [3], "diaCorte": "31-03-año-siguiente" },
+      "formatoSalida": ["XML", "Excel-prevalidador"],
+      "alcance": "Detalle de pagos laborales y pensiones por trabajador (insumo para certificados de renta de los empleados).",
+      "referenciaHomologacion": "homologacion-fiscal-DIAN-CO",
+      "marcoNormativo": "Resolución DIAN — Información exógena.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "F-2856",
+      "nombre": "Activos digitales",
+      "autoridad": "DIAN",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "anual", "mesesAplicables": [3], "diaCorte": "31-03-año-siguiente" },
+      "formatoSalida": ["XML", "Excel-prevalidador"],
+      "alcance": "Información de operaciones con activos digitales y cripto-activos (introducido por Resolución 000233 de 2026).",
+      "referenciaHomologacion": "homologacion-fiscal-DIAN-CO",
+      "marcoNormativo": "Resolución DIAN 000233 de 2026.",
+      "vigencia": { "fechaDesde": "2026-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "REPORTE-ICA-MUNICIPAL",
+      "nombre": "Reporte de retenciones de ICA practicadas (por municipio)",
+      "autoridad": "Alcaldías municipales",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "variable", "mesesAplicables": [], "nota": "Varía por municipio: mensual (Bogotá), bimestral (Medellín, Cali), o cuatrimestral según estatuto local." },
+      "formatoSalida": ["Excel", "PDF"],
+      "alcance": "Reporte de retenciones de ICA al municipio donde se causaron. Formato y plazos definidos por cada municipio en su estatuto tributario.",
+      "referenciaHomologacion": null,
+      "marcoNormativo": "Estatutos tributarios municipales (varían por ciudad).",
+      "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "FORM-220",
+      "nombre": "Certificado de Retención en la Fuente — Año Gravable",
+      "autoridad": "DIAN",
+      "tipoEntregable": "certificado",
+      "periodicidad": { "tipo": "anual", "mesesAplicables": [3], "diaCorte": "31-03-año-siguiente" },
+      "formatoSalida": ["PDF"],
+      "alcance": "Certificado entregado a cada tercero (proveedor, empleado) con el total de retenciones practicadas durante el año gravable. Plazo: antes del 31 de marzo del año siguiente.",
+      "referenciaHomologacion": null,
+      "marcoNormativo": "Estatuto Tributario art. 381.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    }
+  ]
+}

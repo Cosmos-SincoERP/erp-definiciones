@@ -1,0 +1,49 @@
+{
+  "pais": "PA",
+  "catalogo": "CatalogoDeRegimenesEspeciales",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Decreto Ley 18 de 1948 (Zona Libre de Colón); Ley 41 de 2004 (Área Económica Especial Panamá-Pacífico — AEEPP); Decreto Ley 6 de 1998 (Fundación Ciudad del Saber); Reglamentos de cada régimen.",
+  "estructura": {
+    "totalPrecargado": 3,
+    "notaCobertura": "Panamá tiene tres áreas económicas especiales principales con regímenes empresariales propios. Cada régimen es atómico (una empresa se inscribe en él como un todo). Otros regímenes existentes (SEM Ley 41/2007, EMMA Ley 159/2020, Ciudad de las Artes, regímenes de licencias específicas) se reservan para entradas personalizadas."
+  },
+  "entradas": [
+    {
+      "codigo": "ZLC-EMP",
+      "nombre": "Inscripción empresarial en la Zona Libre de Colón",
+      "tipo": "zona-economica-especial",
+      "subtipo": "zona-libre-colon",
+      "autoridad": "Administración de la Zona Libre de Colón (Ministerio de Comercio e Industrias)",
+      "jurisdiccionRef": "0301",
+      "marcoNormativo": "Decreto Ley 18 de 1948 y modificatorias",
+      "descripcion": "Zona franca comercial de re-exportación. Empresas inscritas comercializan bajo régimen especial: exoneración de ITBMS sobre ventas al exterior y simplificación arancelaria. Es la segunda zona franca comercial más grande del mundo.",
+      "vigencia": { "fechaDesde": "1948-06-17", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "AEEPP-EMP",
+      "nombre": "Inscripción empresarial en el Área Económica Especial Panamá-Pacífico",
+      "tipo": "zona-economica-especial",
+      "subtipo": "panama-pacifico",
+      "autoridad": "Agencia Panamá-Pacífico (APP)",
+      "jurisdiccionRef": "1002",
+      "marcoNormativo": "Ley 41 de 2004",
+      "descripcion": "Régimen multi-sectorial (logística, manufactura, servicios, alta tecnología) sobre el antiguo predio militar de Howard, en Arraiján (Provincia Panamá Oeste). Beneficios fiscales sobre ISR, ITBMS y aduanas para empresas certificadas (incluye exoneración total o parcial según tipo de operación).",
+      "vigencia": { "fechaDesde": "2004-04-08", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "CDS-EMP",
+      "nombre": "Inscripción empresarial en la Ciudad del Saber",
+      "tipo": "zona-economica-especial",
+      "subtipo": "ciudad-del-saber",
+      "autoridad": "Fundación Ciudad del Saber",
+      "jurisdiccionRef": "0808",
+      "marcoNormativo": "Decreto Ley 6 de 1998",
+      "descripcion": "Régimen orientado a empresas de tecnología, investigación e innovación. Sede en Clayton (antigua base militar Fort Clayton). Exoneraciones específicas sobre importación de equipos, ISR y aportes patronales bajo condiciones de elegibilidad (empresa debe ser certificada por la Fundación).",
+      "vigencia": { "fechaDesde": "1998-02-10", "fechaHasta": null },
+      "origen": "estandar"
+    }
+  ]
+}

@@ -1,0 +1,147 @@
+{
+  "pais": "CO",
+  "catalogo": "CIIU",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Clasificación Industrial Internacional Uniforme Rev. 4 adaptada para Colombia (CIIU Rev. 4 A.C.) — DANE. Vigente desde 01-12-2012 para cámaras de comercio, DIAN y supervigilancia.",
+  "estructura": {
+    "secciones": 21,
+    "divisiones": 88,
+    "grupos": 246,
+    "clases": 503,
+    "nivelPrecargado": "secciones+divisiones",
+    "notaClases": "Las 503 clases (códigos de 4 dígitos) se cargan vía importación del archivo Excel oficial DANE (EstructuraDetalladaCIIU_4AC.xls) en la implementación, no en este JSON."
+  },
+
+  "entradas": [
+    { "codigo": "A", "nivel": "seccion", "nombre": "Agricultura, ganadería, caza, silvicultura y pesca", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "01", "nivel": "division", "nombre": "Agricultura, ganadería, caza y actividades de servicios conexas", "seccionRef": "A", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "02", "nivel": "division", "nombre": "Silvicultura y extracción de madera", "seccionRef": "A", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "03", "nivel": "division", "nombre": "Pesca y acuicultura", "seccionRef": "A", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "B", "nivel": "seccion", "nombre": "Explotación de minas y canteras", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "05", "nivel": "division", "nombre": "Extracción de carbón de piedra y lignito", "seccionRef": "B", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "06", "nivel": "division", "nombre": "Extracción de petróleo crudo y gas natural", "seccionRef": "B", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "07", "nivel": "division", "nombre": "Extracción de minerales metalíferos", "seccionRef": "B", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "08", "nivel": "division", "nombre": "Extracción de otras minas y canteras", "seccionRef": "B", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "09", "nivel": "division", "nombre": "Actividades de servicios de apoyo para la explotación de minas", "seccionRef": "B", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "C", "nivel": "seccion", "nombre": "Industrias manufactureras", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "10", "nivel": "division", "nombre": "Elaboración de productos alimenticios", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "11", "nivel": "division", "nombre": "Elaboración de bebidas", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "12", "nivel": "division", "nombre": "Elaboración de productos de tabaco", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "13", "nivel": "division", "nombre": "Fabricación de productos textiles", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "14", "nivel": "division", "nombre": "Confección de prendas de vestir", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "15", "nivel": "division", "nombre": "Curtido y recurtido de cueros; fabricación de calzado y artículos de viaje", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "16", "nivel": "division", "nombre": "Transformación de la madera y fabricación de productos de madera y corcho, excepto muebles", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "17", "nivel": "division", "nombre": "Fabricación de papel, cartón y productos de papel y cartón", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "18", "nivel": "division", "nombre": "Actividades de impresión y de producción de copias a partir de grabaciones originales", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "19", "nivel": "division", "nombre": "Coquización, fabricación de productos de la refinación del petróleo y actividad de mezcla de combustibles", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "20", "nivel": "division", "nombre": "Fabricación de sustancias y productos químicos", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "21", "nivel": "division", "nombre": "Fabricación de productos farmacéuticos, sustancias químicas medicinales y productos botánicos de uso farmacéutico", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "22", "nivel": "division", "nombre": "Fabricación de productos de caucho y de plástico", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "23", "nivel": "division", "nombre": "Fabricación de otros productos minerales no metálicos", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "24", "nivel": "division", "nombre": "Fabricación de productos metalúrgicos básicos", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "25", "nivel": "division", "nombre": "Fabricación de productos elaborados de metal, excepto maquinaria y equipo", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "26", "nivel": "division", "nombre": "Fabricación de productos informáticos, electrónicos y ópticos", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "27", "nivel": "division", "nombre": "Fabricación de aparatos y equipo eléctrico", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "28", "nivel": "division", "nombre": "Fabricación de maquinaria y equipo n.c.p.", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "29", "nivel": "division", "nombre": "Fabricación de vehículos automotores, remolques y semirremolques", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "30", "nivel": "division", "nombre": "Fabricación de otros tipos de equipo de transporte", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "31", "nivel": "division", "nombre": "Fabricación de muebles, colchones y somieres", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "32", "nivel": "division", "nombre": "Otras industrias manufactureras", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "33", "nivel": "division", "nombre": "Instalación, mantenimiento y reparación especializada de maquinaria y equipo", "seccionRef": "C", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "D", "nivel": "seccion", "nombre": "Suministro de electricidad, gas, vapor y aire acondicionado", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "35", "nivel": "division", "nombre": "Suministro de electricidad, gas, vapor y aire acondicionado", "seccionRef": "D", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "E", "nivel": "seccion", "nombre": "Distribución de agua; evacuación y tratamiento de aguas residuales, gestión de desechos y actividades de saneamiento ambiental", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "36", "nivel": "division", "nombre": "Captación, tratamiento y distribución de agua", "seccionRef": "E", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "37", "nivel": "division", "nombre": "Evacuación y tratamiento de aguas residuales", "seccionRef": "E", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "38", "nivel": "division", "nombre": "Recolección, tratamiento y disposición de desechos, recuperación de materiales", "seccionRef": "E", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "39", "nivel": "division", "nombre": "Actividades de saneamiento ambiental y otros servicios de gestión de desechos", "seccionRef": "E", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "F", "nivel": "seccion", "nombre": "Construcción", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "41", "nivel": "division", "nombre": "Construcción de edificios", "seccionRef": "F", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "42", "nivel": "division", "nombre": "Obras de ingeniería civil", "seccionRef": "F", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "43", "nivel": "division", "nombre": "Actividades especializadas para la construcción de edificios y obras de ingeniería civil", "seccionRef": "F", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "G", "nivel": "seccion", "nombre": "Comercio al por mayor y al por menor; reparación de vehículos automotores y motocicletas", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "45", "nivel": "division", "nombre": "Comercio, mantenimiento y reparación de vehículos automotores y motocicletas, sus partes, piezas y accesorios", "seccionRef": "G", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "46", "nivel": "division", "nombre": "Comercio al por mayor y en comisión o por contrata, excepto el comercio de vehículos automotores y motocicletas", "seccionRef": "G", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "47", "nivel": "division", "nombre": "Comercio al por menor (incluso el comercio al por menor de combustibles), excepto el de vehículos automotores y motocicletas", "seccionRef": "G", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "H", "nivel": "seccion", "nombre": "Transporte y almacenamiento", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "49", "nivel": "division", "nombre": "Transporte terrestre; transporte por tuberías", "seccionRef": "H", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "50", "nivel": "division", "nombre": "Transporte acuático", "seccionRef": "H", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "51", "nivel": "division", "nombre": "Transporte aéreo", "seccionRef": "H", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "52", "nivel": "division", "nombre": "Almacenamiento y actividades complementarias al transporte", "seccionRef": "H", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "53", "nivel": "division", "nombre": "Correo y servicios de mensajería", "seccionRef": "H", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "I", "nivel": "seccion", "nombre": "Alojamiento y servicios de comida", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "55", "nivel": "division", "nombre": "Alojamiento", "seccionRef": "I", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "56", "nivel": "division", "nombre": "Actividades de servicios de comidas y bebidas", "seccionRef": "I", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "J", "nivel": "seccion", "nombre": "Información y comunicaciones", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "58", "nivel": "division", "nombre": "Actividades de edición", "seccionRef": "J", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "59", "nivel": "division", "nombre": "Actividades cinematográficas, de video y producción de programas de televisión, grabación de sonido y edición de música", "seccionRef": "J", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "60", "nivel": "division", "nombre": "Actividades de programación, transmisión y/o difusión", "seccionRef": "J", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "61", "nivel": "division", "nombre": "Telecomunicaciones", "seccionRef": "J", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "62", "nivel": "division", "nombre": "Desarrollo de sistemas informáticos (planificación, análisis, diseño, programación, pruebas), consultoría informática y actividades relacionadas", "seccionRef": "J", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "63", "nivel": "division", "nombre": "Actividades de servicios de información", "seccionRef": "J", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "K", "nivel": "seccion", "nombre": "Actividades financieras y de seguros", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "64", "nivel": "division", "nombre": "Actividades de servicios financieros, excepto las de seguros y de pensiones", "seccionRef": "K", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "65", "nivel": "division", "nombre": "Seguros (incluso el reaseguro), seguros sociales y fondos de pensiones, excepto la seguridad social", "seccionRef": "K", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "66", "nivel": "division", "nombre": "Actividades auxiliares de las actividades de servicios financieros", "seccionRef": "K", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "L", "nivel": "seccion", "nombre": "Actividades inmobiliarias", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "68", "nivel": "division", "nombre": "Actividades inmobiliarias", "seccionRef": "L", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "M", "nivel": "seccion", "nombre": "Actividades profesionales, científicas y técnicas", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "69", "nivel": "division", "nombre": "Actividades jurídicas y de contabilidad", "seccionRef": "M", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "70", "nivel": "division", "nombre": "Actividades de administración empresarial; actividades de consultoría de gestión", "seccionRef": "M", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "71", "nivel": "division", "nombre": "Actividades de arquitectura e ingeniería; ensayos y análisis técnicos", "seccionRef": "M", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "72", "nivel": "division", "nombre": "Investigación científica y desarrollo", "seccionRef": "M", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "73", "nivel": "division", "nombre": "Publicidad y estudios de mercado", "seccionRef": "M", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "74", "nivel": "division", "nombre": "Otras actividades profesionales, científicas y técnicas", "seccionRef": "M", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "75", "nivel": "division", "nombre": "Actividades veterinarias", "seccionRef": "M", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "N", "nivel": "seccion", "nombre": "Actividades de servicios administrativos y de apoyo", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "77", "nivel": "division", "nombre": "Actividades de alquiler y arrendamiento", "seccionRef": "N", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "78", "nivel": "division", "nombre": "Actividades de empleo", "seccionRef": "N", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "79", "nivel": "division", "nombre": "Actividades de las agencias de viajes, operadores turísticos, servicios de reserva y actividades relacionadas", "seccionRef": "N", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "80", "nivel": "division", "nombre": "Actividades de seguridad e investigación", "seccionRef": "N", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "81", "nivel": "division", "nombre": "Actividades de servicios a edificios y paisajismo (jardines, zonas verdes)", "seccionRef": "N", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "82", "nivel": "division", "nombre": "Actividades administrativas y de apoyo de oficina y otras actividades de apoyo a las empresas", "seccionRef": "N", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "O", "nivel": "seccion", "nombre": "Administración pública y defensa; planes de seguridad social de afiliación obligatoria", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "84", "nivel": "division", "nombre": "Administración pública y defensa; planes de seguridad social de afiliación obligatoria", "seccionRef": "O", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "P", "nivel": "seccion", "nombre": "Educación", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "85", "nivel": "division", "nombre": "Educación", "seccionRef": "P", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "Q", "nivel": "seccion", "nombre": "Atención de la salud humana y de asistencia social", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "86", "nivel": "division", "nombre": "Actividades de atención de la salud humana", "seccionRef": "Q", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "87", "nivel": "division", "nombre": "Actividades de atención residencial medicalizada", "seccionRef": "Q", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "88", "nivel": "division", "nombre": "Actividades de asistencia social sin alojamiento", "seccionRef": "Q", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "R", "nivel": "seccion", "nombre": "Actividades artísticas, de entretenimiento y recreación", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "90", "nivel": "division", "nombre": "Actividades creativas, artísticas y de entretenimiento", "seccionRef": "R", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "91", "nivel": "division", "nombre": "Actividades de bibliotecas, archivos, museos y otras actividades culturales", "seccionRef": "R", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "92", "nivel": "division", "nombre": "Actividades de juegos de azar y apuestas", "seccionRef": "R", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "93", "nivel": "division", "nombre": "Actividades deportivas y actividades recreativas y de esparcimiento", "seccionRef": "R", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "S", "nivel": "seccion", "nombre": "Otras actividades de servicios", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "94", "nivel": "division", "nombre": "Actividades de asociaciones", "seccionRef": "S", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "95", "nivel": "division", "nombre": "Mantenimiento y reparación de computadores, efectos personales y enseres domésticos", "seccionRef": "S", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "96", "nivel": "division", "nombre": "Otras actividades de servicios personales", "seccionRef": "S", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "T", "nivel": "seccion", "nombre": "Actividades de los hogares individuales en calidad de empleadores; actividades no diferenciadas de los hogares individuales como productores de bienes y servicios para uso propio", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "97", "nivel": "division", "nombre": "Actividades de los hogares individuales como empleadores de personal doméstico", "seccionRef": "T", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "98", "nivel": "division", "nombre": "Actividades no diferenciadas de los hogares individuales como productores de bienes y servicios para uso propio", "seccionRef": "T", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "U", "nivel": "seccion", "nombre": "Actividades de organizaciones y entidades extraterritoriales", "seccionRef": null, "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "99", "nivel": "division", "nombre": "Actividades de organizaciones y entidades extraterritoriales", "seccionRef": "U", "divisionRef": null, "vigencia": { "fechaDesde": "2012-12-01", "fechaHasta": null }, "origen": "estandar" }
+  ]
+}

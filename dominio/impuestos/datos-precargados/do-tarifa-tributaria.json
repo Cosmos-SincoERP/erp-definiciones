@@ -1,0 +1,61 @@
+{
+  "pais": "DO",
+  "catalogo": "TarifaTributaria",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Código Tributario (Ley 11-92) Título III (ITBIS) y IV (ISC) + Ley 153-98 (CDT) + Ley 158-01 (PROPINA) + Reglamentos DGII vigentes.",
+  "estructura": {
+    "totalStreams": 5,
+    "streamsNacionales": 5,
+    "streamsMunicipales": 0,
+    "totalEntradas": 9,
+    "notaCobertura": "DR opera con tributos nacionales únicamente — no hay tributos subnacionales por jurisdicción. Las tarifas precargadas son las vigentes en 2024-2025 según Código Tributario y Reglamentos DGII."
+  },
+
+  "streams": [
+    {
+      "streamKey": "tarifa-DO-ITBIS",
+      "tributo": "ITBIS",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "itbis-grav18", "factor": "GRAV_ITBIS_18", "descripcion": "Tarifa general de ITBIS", "tarifa": 18, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2012-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "itbis-grav16", "factor": "GRAV_ITBIS_16", "descripcion": "Tarifa reducida de ITBIS (yogur, café, azúcar, chocolate, etc.)", "tarifa": 16, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "itbis-exento", "factor": "EXENTO_ITBIS", "descripcion": "Bienes y servicios exentos del ITBIS", "tarifa": 0, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "1992-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+    {
+      "streamKey": "tarifa-DO-RITBIS",
+      "tributo": "RITBIS",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "ritbis-general", "factor": null, "descripcion": "Retención general del 30% del ITBIS facturado (norma general)", "tarifa": 30, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ritbis-personas-fisicas", "factor": "RETENCION_PERSONAS_FISICAS", "descripcion": "Retención total del 100% del ITBIS sobre servicios profesionales prestados por personas físicas (NG 02-05)", "tarifa": 100, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+    {
+      "streamKey": "tarifa-DO-ISC",
+      "tributo": "ISC",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "isc-telecom", "factor": "ISC_TELECOMUNICACIONES", "descripcion": "ISC sobre servicios de telecomunicaciones", "tarifa": 10, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2006-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "isc-seguros", "factor": "ISC_SEGUROS", "descripcion": "ISC sobre primas de seguros (Ley 253-12)", "tarifa": 16, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2013-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+    {
+      "streamKey": "tarifa-DO-CDT",
+      "tributo": "CDT",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "cdt-general", "factor": null, "descripcion": "CDT — 2% sobre servicios de telecomunicaciones", "tarifa": 2, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "1998-05-27", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+    {
+      "streamKey": "tarifa-DO-PROPINA",
+      "tributo": "PROPINA",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "propina-general", "factor": null, "descripcion": "Propina Legal — 10% obligatorio en hoteles, restaurantes y similares (Ley 158-01)", "tarifa": 10, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2001-10-09", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    }
+  ]
+}

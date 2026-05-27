@@ -1,0 +1,349 @@
+{
+  "pais": "CO",
+  "catalogo": "TarifaTributaria",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Decreto Único Reglamentario 1625 de 2016 (DIAN — RETEFUENTE) + Estatuto Tributario Nacional (IVA, INC, RIVA) + Decreto 2201 de 2016 (AUTO_RENTA) + estatutos tributarios municipales (ICA, RICA, SOBRETASA_BOMBERIL, AUTO_RICA).",
+  "estructura": {
+    "totalStreams": 22,
+    "streamsNacionales": 7,
+    "streamsMunicipales": 15,
+    "ciudadesCubiertas": 12,
+    "totalEntradas": 124,
+    "notaCobertura": "Tarifas nacionales basadas en normativa DIAN vigente 2024. Tarifas municipales ICA/RICA basadas en estatutos tributarios municipales con valores típicos por rango de actividad — las tarifas exactas por actividad CIIU varían trimestralmente y requieren validación contra el estatuto tributario vigente de cada municipio. La cobertura municipal F1 abarca 12 ciudades principales: Bogotá D.C., Medellín, Cali, Barranquilla, Bucaramanga, Cartagena, Pereira, Manizales, Cúcuta, Ibagué, Santa Marta y Villavicencio."
+  },
+
+  "streams": [
+
+    {
+      "streamKey": "tarifa-CO-IVA",
+      "tributo": "IVA",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "iva-grav19", "factor": "GRAV_19", "tarifa": 19, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "iva-grav5", "factor": "GRAV_5", "tarifa": 5, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "iva-exento", "factor": "EXENTO", "tarifa": 0, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-INC",
+      "tributo": "INC",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "inc-8", "factor": "INC_8", "tarifa": 8, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-RETEFUENTE",
+      "tributo": "RETEFUENTE",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "rtf-compras-grales-decl", "factor": "COMPRAS_GENERALES_DECLARANTES", "descripcion": "Compras generales — declarantes", "tarifa": 2.5, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 27, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-compras-grales-nodecl", "factor": "COMPRAS_GENERALES_NO_DECLARANTES", "descripcion": "Compras generales — no declarantes", "tarifa": 3.5, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 27, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-compras-agropecuarias", "factor": "COMPRAS_AGROPECUARIAS", "descripcion": "Compras a productores agropecuarios", "tarifa": 1.5, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 92, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-compras-cafe", "factor": "COMPRAS_CAFE_PERGAMINO", "descripcion": "Compras de café pergamino", "tarifa": 0.5, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 160, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-compras-combustibles", "factor": "COMPRAS_COMBUSTIBLES", "descripcion": "Compras de combustibles derivados del petróleo", "tarifa": 0.1, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-compras-vehiculos", "factor": "COMPRAS_VEHICULOS", "descripcion": "Adquisición de vehículos automotores", "tarifa": 1, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-compras-bienes-raices-vivienda", "factor": "COMPRAS_BIENES_RAICES_VIVIENDA", "descripcion": "Adquisición de bienes raíces (uso vivienda hasta 20.000 UVT)", "tarifa": 1, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-compras-bienes-raices-otros", "factor": "COMPRAS_BIENES_RAICES_OTROS", "descripcion": "Adquisición de bienes raíces (otros usos o > 20.000 UVT vivienda)", "tarifa": 2.5, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+        { "entradaId": "rtf-servicios-grales-decl", "factor": "SERVICIOS_GENERALES_DECLARANTES", "descripcion": "Servicios generales — declarantes", "tarifa": 4, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-grales-nodecl", "factor": "SERVICIOS_GENERALES_NO_DECLARANTES", "descripcion": "Servicios generales — no declarantes", "tarifa": 6, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-transporte-carga", "factor": "SERVICIOS_TRANSPORTE_CARGA", "descripcion": "Servicios de transporte nacional de carga", "tarifa": 1, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-transporte-pasajeros", "factor": "SERVICIOS_TRANSPORTE_PASAJEROS", "descripcion": "Servicios de transporte nacional de pasajeros", "tarifa": 3.5, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 27, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-transporte-internacional", "factor": "SERVICIOS_TRANSPORTE_INTERNACIONAL", "descripcion": "Servicios de transporte internacional prestados por empresas residentes", "tarifa": 3, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-aseo-vigilancia", "factor": "SERVICIOS_ASEO_VIGILANCIA", "descripcion": "Servicios de aseo y vigilancia (sobre AIU)", "tarifa": 2, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-temporales", "factor": "SERVICIOS_TEMPORALES_EMPLEO", "descripcion": "Servicios temporales de empleo (sobre AIU)", "tarifa": 1, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-restaurante-hotel", "factor": "SERVICIOS_RESTAURANTE_HOTEL", "descripcion": "Servicios de restaurante, hotel y hospedaje", "tarifa": 3.5, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-construccion", "factor": "SERVICIOS_CONSTRUCCION", "descripcion": "Servicios de construcción", "tarifa": 2, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 27, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-obra-civil", "factor": "SERVICIOS_OBRA_CIVIL", "descripcion": "Contratos de obra civil", "tarifa": 2, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 27, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-salud-decl", "factor": "SERVICIOS_SALUD_DECLARANTES", "descripcion": "Servicios de salud — declarantes", "tarifa": 2, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-salud-nodecl", "factor": "SERVICIOS_SALUD_NO_DECLARANTES", "descripcion": "Servicios de salud — no declarantes", "tarifa": 3, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-educacion", "factor": "SERVICIOS_EDUCACION", "descripcion": "Servicios de educación", "tarifa": 2, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-publicos", "factor": "SERVICIOS_PUBLICOS_DOMICILIARIOS", "descripcion": "Servicios públicos domiciliarios", "tarifa": 2.5, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-impresion-publicidad", "factor": "SERVICIOS_IMPRESION_PUBLICIDAD", "descripcion": "Servicios de impresión y publicidad", "tarifa": 4, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-software", "factor": "SERVICIOS_SOFTWARE_DESARROLLO", "descripcion": "Servicios de desarrollo de software / consultoría informática (servicios generales)", "tarifa": 4, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-consultoria-obra-civil", "factor": "SERVICIOS_CONSULTORIA_OBRA_CIVIL", "descripcion": "Servicios de consultoría en obras civiles", "tarifa": 6, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 27, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-servicios-financieros", "factor": "SERVICIOS_FINANCIEROS", "descripcion": "Servicios prestados por el sector financiero", "tarifa": 4, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+        { "entradaId": "rtf-honorarios-decl", "factor": "HONORARIOS_DECLARANTES", "descripcion": "Honorarios y comisiones — declarantes", "tarifa": 10, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-honorarios-nodecl", "factor": "HONORARIOS_NO_DECLARANTES", "descripcion": "Honorarios y comisiones — no declarantes", "tarifa": 11, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-comisiones-intermediacion", "factor": "COMISIONES_INTERMEDIACION", "descripcion": "Comisiones de intermediación comercial", "tarifa": 11, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-comisiones-sector-financiero", "factor": "COMISIONES_SECTOR_FINANCIERO", "descripcion": "Comisiones del sector financiero", "tarifa": 11, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+        { "entradaId": "rtf-arrendamiento-muebles", "factor": "ARRENDAMIENTO_MUEBLES", "descripcion": "Arrendamiento de bienes muebles", "tarifa": 4, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-arrendamiento-inmuebles", "factor": "ARRENDAMIENTO_INMUEBLES", "descripcion": "Arrendamiento de bienes inmuebles", "tarifa": 3.5, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 27, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+        { "entradaId": "rtf-rendimientos-financieros", "factor": "RENDIMIENTOS_FINANCIEROS", "descripcion": "Rendimientos financieros generales", "tarifa": 7, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-loterias-rifas", "factor": "LOTERIAS_RIFAS_APUESTAS", "descripcion": "Loterías, rifas, apuestas y similares (premios)", "tarifa": 20, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 48, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-premios", "factor": "PREMIOS", "descripcion": "Premios obtenidos en concursos", "tarifa": 20, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 48, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+        { "entradaId": "rtf-exterior-servicios-tecnicos", "factor": "EXTERIOR_SERVICIOS_TECNICOS", "descripcion": "Pagos al exterior por servicios técnicos", "tarifa": 15, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-exterior-asistencia-tecnica", "factor": "EXTERIOR_ASISTENCIA_TECNICA", "descripcion": "Pagos al exterior por asistencia técnica", "tarifa": 15, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-exterior-regalias", "factor": "EXTERIOR_REGALIAS", "descripcion": "Pagos al exterior por regalías y explotación de intangibles", "tarifa": 15, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-exterior-software", "factor": "EXTERIOR_SOFTWARE", "descripcion": "Pagos al exterior por explotación de software (sobre 80% del pago)", "tarifa": 33, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-exterior-intereses", "factor": "EXTERIOR_INTERESES", "descripcion": "Pagos al exterior por intereses", "tarifa": 15, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-exterior-dividendos", "factor": "EXTERIOR_DIVIDENDOS", "descripcion": "Pagos al exterior por dividendos y participaciones (utilidades no gravadas)", "tarifa": 0, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-exterior-consultoria", "factor": "EXTERIOR_CONSULTORIA", "descripcion": "Pagos al exterior por consultoría", "tarifa": 15, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-exterior-comisiones-extranjeras", "factor": "EXTERIOR_COMISIONES_EXTRANJERAS", "descripcion": "Comisiones a sociedades extranjeras sin domicilio en Colombia", "tarifa": 33, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+        { "entradaId": "rtf-otros-ingresos-decl", "factor": "OTROS_INGRESOS_DECLARANTES", "descripcion": "Otros ingresos tributarios — declarantes", "tarifa": 2.5, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 27, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-otros-ingresos-nodecl", "factor": "OTROS_INGRESOS_NO_DECLARANTES", "descripcion": "Otros ingresos tributarios — no declarantes", "tarifa": 3.5, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 27, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-indemnizaciones-laborales", "factor": "INDEMNIZACIONES_LABORALES", "descripcion": "Indemnizaciones laborales para trabajadores con ingreso superior", "tarifa": 20, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-comercializacion-animales", "factor": "COMERCIALIZACION_ANIMALES_VIVOS", "descripcion": "Comercialización de animales vivos", "tarifa": 1.5, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 92, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-seguros-primas", "factor": "SEGUROS_PRIMAS", "descripcion": "Pagos por primas de seguros", "tarifa": 2.5, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "rtf-honorarios-temporales", "factor": "HONORARIOS_SERVICIOS_TEMPORALES", "descripcion": "Honorarios de personal de servicios temporales (sobre AIU)", "tarifa": 1, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-RIVA",
+      "tributo": "RIVA",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "riva-general", "factor": null, "descripcion": "Tarifa general de retención de IVA (porcentaje del IVA generado)", "tarifa": 15, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-AUTO_RENTA",
+      "tributo": "AUTO_RENTA",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "auto-renta-general", "factor": null, "descripcion": "Autorretención general (Decreto 2201/2016 — tarifa base; existen tarifas sectoriales que pueden ser distintas)", "tarifa": 0.55, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-AUTO_RETEFUENTE",
+      "tributo": "AUTO_RETEFUENTE",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "auto-rtf-compras-grales", "factor": "COMPRAS_GENERALES_DECLARANTES", "descripcion": "Autorretención sobre compras generales (declarantes) — replica tarifa de RETEFUENTE", "tarifa": 2.5, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 27, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "auto-rtf-servicios-grales", "factor": "SERVICIOS_GENERALES_DECLARANTES", "descripcion": "Autorretención sobre servicios generales (declarantes)", "tarifa": 4, "tipoTarifa": "porcentaje", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "auto-rtf-honorarios", "factor": "HONORARIOS_DECLARANTES", "descripcion": "Autorretención sobre honorarios (declarantes)", "tarifa": 10, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-AUTO_RIVA",
+      "tributo": "AUTO_RIVA",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "auto-riva-general", "factor": null, "descripcion": "Autorretención de IVA en reverse charge (importación de servicios) — 100% del IVA autoliquidado", "tarifa": 100, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-11001-ICA",
+      "tributo": "ICA",
+      "jurisdiccion": "11001",
+      "ciudad": "Bogotá D.C.",
+      "tarifas": [
+        { "entradaId": "ica-bog-4711", "factor": "4711", "descripcion": "Comercio al por menor en establecimientos no especializados (con surtido en alimentos)", "tarifa": 4.14, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bog-4719", "factor": "4719", "descripcion": "Otro comercio al por menor en establecimientos no especializados", "tarifa": 4.14, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bog-4631", "factor": "4631", "descripcion": "Comercio al por mayor de productos alimenticios", "tarifa": 4.14, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bog-1011", "factor": "1011", "descripcion": "Procesamiento y conservación de carne y productos cárnicos", "tarifa": 4.14, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bog-5611", "factor": "5611", "descripcion": "Restaurantes con servicio de mesa", "tarifa": 9.66, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bog-6201", "factor": "6201", "descripcion": "Desarrollo de sistemas informáticos (planificación, análisis, diseño)", "tarifa": 9.66, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bog-6810", "factor": "6810", "descripcion": "Actividades inmobiliarias realizadas con bienes propios o arrendados", "tarifa": 6.9, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bog-7010", "factor": "7010", "descripcion": "Actividades de administración empresarial (sedes principales)", "tarifa": 11.04, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bog-7110", "factor": "7110", "descripcion": "Actividades de arquitectura e ingeniería; ensayos y análisis técnicos", "tarifa": 9.66, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bog-4321", "factor": "4321", "descripcion": "Instalaciones eléctricas", "tarifa": 6.9, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bog-4111", "factor": "4111", "descripcion": "Construcción de edificios residenciales", "tarifa": 6.9, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bog-8511", "factor": "8511", "descripcion": "Educación de la primera infancia y básica primaria privada", "tarifa": 4.14, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bog-9001", "factor": "9001", "descripcion": "Creación literaria, musical, artística y de espectáculos", "tarifa": 13.8, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-05001-ICA",
+      "tributo": "ICA",
+      "jurisdiccion": "05001",
+      "ciudad": "Medellín",
+      "notaCobertura": "Tarifas representativas — verificar contra Estatuto Tributario Municipal de Medellín vigente.",
+      "tarifas": [
+        { "entradaId": "ica-med-4711", "factor": "4711", "descripcion": "Comercio al por menor en establecimientos no especializados", "tarifa": 4, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-med-4631", "factor": "4631", "descripcion": "Comercio al por mayor de productos alimenticios", "tarifa": 4, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-med-5611", "factor": "5611", "descripcion": "Restaurantes con servicio de mesa", "tarifa": 7, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-med-6201", "factor": "6201", "descripcion": "Desarrollo de sistemas informáticos", "tarifa": 7, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-med-6810", "factor": "6810", "descripcion": "Actividades inmobiliarias", "tarifa": 6, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-med-7010", "factor": "7010", "descripcion": "Actividades de administración empresarial (sedes principales)", "tarifa": 10, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-med-1011", "factor": "1011", "descripcion": "Procesamiento y conservación de carne (industria)", "tarifa": 4, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-med-4111", "factor": "4111", "descripcion": "Construcción de edificios residenciales", "tarifa": 6, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-76001-ICA",
+      "tributo": "ICA",
+      "jurisdiccion": "76001",
+      "ciudad": "Cali",
+      "notaCobertura": "Tarifas representativas — verificar contra Estatuto Tributario Municipal de Cali vigente.",
+      "tarifas": [
+        { "entradaId": "ica-cli-4711", "factor": "4711", "descripcion": "Comercio al por menor en establecimientos no especializados", "tarifa": 5.5, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-cli-4631", "factor": "4631", "descripcion": "Comercio al por mayor de productos alimenticios", "tarifa": 5.5, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-cli-5611", "factor": "5611", "descripcion": "Restaurantes con servicio de mesa", "tarifa": 7.7, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-cli-6201", "factor": "6201", "descripcion": "Desarrollo de sistemas informáticos", "tarifa": 7.7, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-cli-7010", "factor": "7010", "descripcion": "Actividades de administración empresarial", "tarifa": 11, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-cli-1011", "factor": "1011", "descripcion": "Procesamiento de carne (industria)", "tarifa": 3.3, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-cli-4111", "factor": "4111", "descripcion": "Construcción de edificios residenciales", "tarifa": 7, "tipoTarifa": "porMil", "cuantiaMinima": { "valor": 4, "unidad": "UVT" }, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-08001-ICA",
+      "tributo": "ICA",
+      "jurisdiccion": "08001",
+      "ciudad": "Barranquilla",
+      "notaCobertura": "Tarifas representativas — verificar contra Estatuto Tributario Distrital de Barranquilla vigente.",
+      "tarifas": [
+        { "entradaId": "ica-baq-4711", "factor": "4711", "descripcion": "Comercio al por menor en establecimientos no especializados", "tarifa": 5, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-baq-4631", "factor": "4631", "descripcion": "Comercio al por mayor de productos alimenticios", "tarifa": 5, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-baq-5611", "factor": "5611", "descripcion": "Restaurantes con servicio de mesa", "tarifa": 8, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-baq-6201", "factor": "6201", "descripcion": "Desarrollo de sistemas informáticos", "tarifa": 7, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-baq-7010", "factor": "7010", "descripcion": "Actividades de administración empresarial", "tarifa": 10, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-baq-1011", "factor": "1011", "descripcion": "Procesamiento de carne (industria)", "tarifa": 4, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-68001-ICA",
+      "tributo": "ICA",
+      "jurisdiccion": "68001",
+      "ciudad": "Bucaramanga",
+      "notaCobertura": "Tarifas representativas — verificar contra Estatuto Tributario Municipal de Bucaramanga vigente.",
+      "tarifas": [
+        { "entradaId": "ica-bga-4711", "factor": "4711", "descripcion": "Comercio al por menor", "tarifa": 5, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bga-4631", "factor": "4631", "descripcion": "Comercio al por mayor de alimentos", "tarifa": 5, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bga-5611", "factor": "5611", "descripcion": "Restaurantes", "tarifa": 7, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bga-6201", "factor": "6201", "descripcion": "Desarrollo de software", "tarifa": 7, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-bga-7010", "factor": "7010", "descripcion": "Administración empresarial", "tarifa": 10, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-13001-ICA",
+      "tributo": "ICA",
+      "jurisdiccion": "13001",
+      "ciudad": "Cartagena",
+      "notaCobertura": "Tarifas representativas — verificar contra Estatuto Tributario Distrital de Cartagena vigente.",
+      "tarifas": [
+        { "entradaId": "ica-ctg-4711", "factor": "4711", "descripcion": "Comercio al por menor", "tarifa": 5, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-ctg-5611", "factor": "5611", "descripcion": "Restaurantes", "tarifa": 8, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-ctg-6201", "factor": "6201", "descripcion": "Desarrollo de software", "tarifa": 7, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-ctg-7010", "factor": "7010", "descripcion": "Administración empresarial", "tarifa": 10, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-ctg-5511", "factor": "5511", "descripcion": "Alojamiento en hoteles", "tarifa": 9, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-66001-ICA",
+      "tributo": "ICA",
+      "jurisdiccion": "66001",
+      "ciudad": "Pereira",
+      "notaCobertura": "Tarifas representativas — verificar contra Estatuto Tributario Municipal de Pereira vigente.",
+      "tarifas": [
+        { "entradaId": "ica-per-4711", "factor": "4711", "descripcion": "Comercio al por menor", "tarifa": 4, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-per-5611", "factor": "5611", "descripcion": "Restaurantes", "tarifa": 7, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-per-6201", "factor": "6201", "descripcion": "Desarrollo de software", "tarifa": 6, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-per-7010", "factor": "7010", "descripcion": "Administración empresarial", "tarifa": 9, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-17001-ICA",
+      "tributo": "ICA",
+      "jurisdiccion": "17001",
+      "ciudad": "Manizales",
+      "notaCobertura": "Tarifas representativas — verificar contra Estatuto Tributario Municipal de Manizales vigente.",
+      "tarifas": [
+        { "entradaId": "ica-man-4711", "factor": "4711", "descripcion": "Comercio al por menor", "tarifa": 4, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-man-5611", "factor": "5611", "descripcion": "Restaurantes", "tarifa": 7, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-man-6201", "factor": "6201", "descripcion": "Desarrollo de software", "tarifa": 6, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-man-7010", "factor": "7010", "descripcion": "Administración empresarial", "tarifa": 9, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-54001-ICA",
+      "tributo": "ICA",
+      "jurisdiccion": "54001",
+      "ciudad": "Cúcuta",
+      "notaCobertura": "Tarifas representativas — verificar contra Estatuto Tributario Municipal de Cúcuta vigente.",
+      "tarifas": [
+        { "entradaId": "ica-ccu-4711", "factor": "4711", "descripcion": "Comercio al por menor", "tarifa": 5, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-ccu-5611", "factor": "5611", "descripcion": "Restaurantes", "tarifa": 7, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-ccu-6201", "factor": "6201", "descripcion": "Desarrollo de software", "tarifa": 6, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-73001-ICA",
+      "tributo": "ICA",
+      "jurisdiccion": "73001",
+      "ciudad": "Ibagué",
+      "notaCobertura": "Tarifas representativas — verificar contra Estatuto Tributario Municipal de Ibagué vigente.",
+      "tarifas": [
+        { "entradaId": "ica-ibg-4711", "factor": "4711", "descripcion": "Comercio al por menor", "tarifa": 4, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-ibg-5611", "factor": "5611", "descripcion": "Restaurantes", "tarifa": 7, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-ibg-6201", "factor": "6201", "descripcion": "Desarrollo de software", "tarifa": 6, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-47001-ICA",
+      "tributo": "ICA",
+      "jurisdiccion": "47001",
+      "ciudad": "Santa Marta",
+      "notaCobertura": "Tarifas representativas — verificar contra Estatuto Tributario Distrital de Santa Marta vigente.",
+      "tarifas": [
+        { "entradaId": "ica-stm-4711", "factor": "4711", "descripcion": "Comercio al por menor", "tarifa": 5, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-stm-5611", "factor": "5611", "descripcion": "Restaurantes", "tarifa": 8, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-stm-5511", "factor": "5511", "descripcion": "Alojamiento en hoteles", "tarifa": 9, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-50001-ICA",
+      "tributo": "ICA",
+      "jurisdiccion": "50001",
+      "ciudad": "Villavicencio",
+      "notaCobertura": "Tarifas representativas — verificar contra Estatuto Tributario Municipal de Villavicencio vigente.",
+      "tarifas": [
+        { "entradaId": "ica-vvc-4711", "factor": "4711", "descripcion": "Comercio al por menor", "tarifa": 4, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-vvc-5611", "factor": "5611", "descripcion": "Restaurantes", "tarifa": 7, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ica-vvc-6201", "factor": "6201", "descripcion": "Desarrollo de software", "tarifa": 6, "tipoTarifa": "porMil", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2020-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-RICA-municipal-replica",
+      "tributo": "RICA",
+      "jurisdiccion": "*",
+      "notaCobertura": "RICA replica la tarifa de ICA del municipio correspondiente cuando aplica retención. La tabla efectiva por municipio se genera dinámicamente desde los streams tarifa-CO-{municipio}-ICA. Esta entrada documenta el patrón, no es un stream operativo. Cada municipio puede definir un porcentaje retenido distinto del causado — verificar caso por caso con consultores.",
+      "tarifas": []
+    },
+
+    {
+      "streamKey": "tarifa-CO-11001-SOBRETASA_BOMBERIL",
+      "tributo": "SOBRETASA_BOMBERIL",
+      "jurisdiccion": "11001",
+      "ciudad": "Bogotá D.C.",
+      "tarifas": [
+        { "entradaId": "sb-bog", "factor": null, "descripcion": "Sobretasa bomberil — porcentaje del RICA causado", "tarifa": 8, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+
+    {
+      "streamKey": "tarifa-CO-municipios-AUTO_RICA",
+      "tributo": "AUTO_RICA",
+      "jurisdiccion": "*",
+      "notaCobertura": "AUTO_RICA replica la tarifa de ICA del municipio correspondiente — la empresa autorretenedora aplica la tarifa ICA sobre sus propios ingresos. La tabla efectiva por municipio referencia los streams tarifa-CO-{municipio}-ICA. Cada municipio define si autoriza la autorretención y el porcentaje aplicable.",
+      "tarifas": []
+    }
+
+  ]
+}

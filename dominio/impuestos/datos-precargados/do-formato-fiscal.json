@@ -1,0 +1,70 @@
+{
+  "pais": "DO",
+  "catalogo": "FormatoFiscal",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "DGII República Dominicana — Normas Generales de Información Fiscal (formatos 606-609) + Reglamentos de declaraciones mensuales y anuales.",
+  "estructura": {
+    "totalFormatos": 4,
+    "porAutoridad": { "DGII": 4 },
+    "porTipoEntregable": { "reporte": 4 }
+  },
+  "entradas": [
+    {
+      "codigo": "F-606",
+      "nombre": "Compras y gastos de proveedores",
+      "autoridad": "DGII",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "mensual", "diaCorte": "20-mes-siguiente" },
+      "formatoSalida": ["XML"],
+      "alcance": "Reporte mensual de las compras y gastos del contribuyente, identificando proveedores con NCF.",
+      "referenciaHomologacion": "homologacion-fiscal-DGII-DO",
+      "marcoNormativo": "Norma General DGII 06-2018 (NCF) + actualizaciones para e-CF (06-2021).",
+      "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null },
+      "obligatorio": "Si el contribuyente no emite 100% e-CF (en cuyo caso F-606 sigue siendo obligatorio para compras).",
+      "origen": "estandar"
+    },
+    {
+      "codigo": "F-607",
+      "nombre": "Ventas e ingresos operacionales",
+      "autoridad": "DGII",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "mensual", "diaCorte": "20-mes-siguiente" },
+      "formatoSalida": ["XML"],
+      "alcance": "Reporte mensual de las ventas e ingresos del contribuyente.",
+      "referenciaHomologacion": "homologacion-fiscal-DGII-DO",
+      "marcoNormativo": "Norma General DGII 06-2018 + 06-2021.",
+      "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null },
+      "obligatorio": "No obligatorio si el contribuyente emite 100% e-CF (los e-CF llegan a DGII en tiempo real).",
+      "origen": "estandar"
+    },
+    {
+      "codigo": "F-608",
+      "nombre": "Comprobantes fiscales cancelados (NCF anulados)",
+      "autoridad": "DGII",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "mensual", "diaCorte": "20-mes-siguiente" },
+      "formatoSalida": ["XML"],
+      "alcance": "Reporte mensual de Comprobantes Fiscales que fueron anulados durante el periodo.",
+      "referenciaHomologacion": "homologacion-fiscal-DGII-DO",
+      "marcoNormativo": "Norma General DGII 06-2018.",
+      "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null },
+      "obligatorio": "No obligatorio si el contribuyente emite 100% e-CF.",
+      "origen": "estandar"
+    },
+    {
+      "codigo": "F-609",
+      "nombre": "Pagos al exterior sin NCF",
+      "autoridad": "DGII",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "mensual", "diaCorte": "20-mes-siguiente" },
+      "formatoSalida": ["XML"],
+      "alcance": "Reporte mensual de pagos a proveedores del exterior (sin NCF) y retenciones aplicables.",
+      "referenciaHomologacion": "homologacion-fiscal-DGII-DO",
+      "marcoNormativo": "Norma General DGII 06-2018 + Reglamentos ISR.",
+      "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null },
+      "obligatorio": "Siempre, independiente de si el contribuyente emite e-CF.",
+      "origen": "estandar"
+    }
+  ]
+}

@@ -1,0 +1,32 @@
+{
+  "pais": "DO",
+  "catalogo": "CatalogoDeRegimenesEspeciales",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Consejo Nacional de Zonas Francas de Exportación (CNZFE) — listado oficial de parques certificados; Ley 8-90 de 1990 (Régimen de Zonas Francas de Exportación de la República Dominicana); Reglamentos CNZFE.",
+  "estructura": {
+    "totalConocido": 75,
+    "totalPrecargadoEnEsteJson": 18,
+    "notaCobertura": "Esta precarga F1 incluye 18 parques representativos. La precarga completa de los ~75 parques CNZFE certificados se valida y completa con el equipo de consultores fiscales tras revisión del catálogo. Las entradas faltantes se agregan vía RegimenEspecialAgregado con origen estandar."
+  },
+  "entradas": [
+    { "codigo": "ZF-DO-LAS-AMERICAS", "nombre": "Zona Franca Industrial Las Américas", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "3201", "vigencia": { "fechaDesde": "1990-11-23", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-SAN-PEDRO", "nombre": "Zona Franca Industrial San Pedro de Macorís", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "23", "vigencia": { "fechaDesde": "1990-11-23", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-SANTIAGO", "nombre": "Zona Franca Industrial Santiago (ITABO)", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "25", "vigencia": { "fechaDesde": "1990-11-23", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-LA-ROMANA", "nombre": "Zona Franca Industrial La Romana", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "12", "vigencia": { "fechaDesde": "1990-11-23", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-PUERTO-PLATA", "nombre": "Zona Franca Industrial Puerto Plata", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "18", "vigencia": { "fechaDesde": "1990-11-23", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-SANTIAGO-NORTE", "nombre": "Parque Industrial de Zona Franca Santiago Norte", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "25", "vigencia": { "fechaDesde": "1995-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-SAN-ISIDRO", "nombre": "Parque Industrial San Isidro", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "32", "vigencia": { "fechaDesde": "1992-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-LAS-CAYAS", "nombre": "Parque de Zona Franca Las Cayas", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "06", "vigencia": { "fechaDesde": "1999-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-CABO-ENGAÑO", "nombre": "Zona Franca Punta Cana / Cabo Engaño", "tipo": "zona-franca", "subtipo": "servicios", "autoridad": "CNZFE", "jurisdiccionRef": "11", "vigencia": { "fechaDesde": "2000-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-CONSUELO", "nombre": "Parque Industrial de Zona Franca Consuelo", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "23", "vigencia": { "fechaDesde": "2002-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-HAINA", "nombre": "Parque Industrial de Zona Franca Haina", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "21", "vigencia": { "fechaDesde": "1996-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-BAVARO", "nombre": "Zona Franca Bávaro", "tipo": "zona-franca", "subtipo": "servicios", "autoridad": "CNZFE", "jurisdiccionRef": "11", "vigencia": { "fechaDesde": "2001-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-MOCA", "nombre": "Parque Industrial Zona Franca Moca", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "09", "vigencia": { "fechaDesde": "1997-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-BONAO", "nombre": "Parque Industrial de Zona Franca Bonao", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "28", "vigencia": { "fechaDesde": "1998-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-SAN-CRISTOBAL", "nombre": "Parque Industrial de Zona Franca San Cristóbal", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "21", "vigencia": { "fechaDesde": "1995-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-VALVERDE", "nombre": "Parque Industrial de Zona Franca Valverde", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "27", "vigencia": { "fechaDesde": "1999-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-BARAHONA", "nombre": "Parque Industrial de Zona Franca Barahona", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "04", "vigencia": { "fechaDesde": "2002-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "ZF-DO-AZUA", "nombre": "Parque Industrial de Zona Franca Azua", "tipo": "zona-franca", "subtipo": "industrial", "autoridad": "CNZFE", "jurisdiccionRef": "02", "vigencia": { "fechaDesde": "2005-01-01", "fechaHasta": null }, "origen": "estandar" }
+  ]
+}

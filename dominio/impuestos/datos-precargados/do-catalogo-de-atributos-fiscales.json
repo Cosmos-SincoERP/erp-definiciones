@@ -1,0 +1,72 @@
+{
+  "pais": "DO",
+  "catalogo": "CatalogoDeAtributosFiscales",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Código Tributario (Ley 11-92) + Normas Generales DGII (registro RNC, comprobantes fiscales, e-CF) + Ley 8-90 (Zonas Francas de Exportación).",
+  "entradas": [
+    {
+      "nombre": "tipoContribuyente",
+      "descripcion": "Clasificación del contribuyente según tipo de persona fiscal.",
+      "tipo": "enum",
+      "valoresValidos": ["PersonaFisica", "PersonaJuridica"],
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "rnc",
+      "descripcion": "Registro Nacional del Contribuyente — identificador fiscal único asignado por DGII. Personas físicas usan cédula como RNC; personas jurídicas reciben un RNC de 9 dígitos.",
+      "tipo": "string",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "ncf",
+      "descripcion": "Autorizado a emitir Comprobantes Fiscales (NCF) o Comprobantes Fiscales Electrónicos (e-CF). Habilita la emisión de facturas con valor tributario.",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "esAgenteRetencionITBIS",
+      "descripcion": "Designado por DGII como agente de retención del ITBIS. Activa RITBIS al emitir facturas a proveedores.",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": false,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "esGranContribuyente",
+      "descripcion": "Calificación DGII como Gran Contribuyente. Sujeto a controles especiales y plazos diferenciados.",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": false,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "inscripcionParqueZonaFranca",
+      "descripcion": "Código del parque de zona franca al que la empresa está inscrita ante el Consejo Nacional de Zonas Francas de Exportación (CNZFE). Habilita beneficios fiscales de la Ley 8-90 (exoneración de ISR, ITBIS y aranceles bajo condiciones).",
+      "tipo": "enum",
+      "valoresValidos": null,
+      "catalogoReferencia": {
+        "agregado": "CatalogoDeRegimenesEspeciales",
+        "filtroTipo": "zona-franca"
+      },
+      "requerido": false,
+      "vigencia": { "fechaDesde": "1990-11-23", "fechaHasta": null },
+      "origen": "estandar"
+    }
+  ]
+}

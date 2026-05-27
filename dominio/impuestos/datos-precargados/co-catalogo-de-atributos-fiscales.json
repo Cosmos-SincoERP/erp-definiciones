@@ -1,0 +1,168 @@
+{
+  "pais": "CO",
+  "catalogo": "CatalogoDeAtributosFiscales",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Estatuto Tributario Nacional + Régimen Simple de Tributación (Ley 1943/2018 modificada por Ley 2010/2019) + Ley 1816/2016 (monopolios) + Ley 47/1993 (Puerto Libre San Andrés) + clasificación DIAN de contribuyentes.",
+  "entradas": [
+    {
+      "nombre": "regimenTributario",
+      "descripcion": "Régimen tributario al que pertenece la entidad. Determina obligaciones fiscales generales (declarar renta, IVA, etc.).",
+      "tipo": "enum",
+      "valoresValidos": ["Ordinario", "Simple", "Especial", "NoResponsable"],
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2023-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "perteneceRegimenIVA",
+      "descripcion": "Indica si la entidad está obligada a generar IVA y si se le practica retención de IVA.",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "esGranContribuyente",
+      "descripcion": "Calificación DIAN como Gran Contribuyente. Afecta RETEFUENTE (los grandes contribuyentes son agentes retenedores).",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "esAutorretenedora",
+      "descripcion": "Calificación DIAN de la entidad como autorretenedora. Activa AUTO_RETEFUENTE en lugar de RETEFUENTE.",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "esAgenteRetenedorIVA",
+      "descripcion": "Indica si la entidad actúa como agente retenedor de IVA. Activa RIVA o AUTO_RIVA según el rol.",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "esExentoRetefuente",
+      "descripcion": "Entidad exenta de retención en la fuente.",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "perteneceRegimenSimple",
+      "descripcion": "Régimen Simple de Tributación. Las entidades en este régimen no practican ni les practican retenciones bajo ciertas condiciones (Ley 2010/2019).",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2019-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "esAutorretenedorRenta",
+      "descripcion": "Activa AUTO_RENTA — autorretención a título de renta sobre los ingresos propios de la empresa.",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "esAgenteRetenedorICA",
+      "descripcion": "Agente retenedor de ICA en uno o más municipios. La condición se evalúa contextualmente por jurisdicción municipal.",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": false,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "esAutorretenedorICA",
+      "descripcion": "Autorretenedor municipal de ICA. Activa AUTO_RICA en lugar de RICA en operaciones donde se aplique.",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": false,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "esGranContribuyenteICA",
+      "descripcion": "Calificación municipal como Gran Contribuyente de ICA. Aplica principalmente en Bogotá y otras ciudades grandes que tienen esta calificación.",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": false,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "tipoPersona",
+      "descripcion": "Tipo de persona fiscal: natural o jurídica. Afecta cuentas contables y tarifas de autorretenciones.",
+      "tipo": "enum",
+      "valoresValidos": ["Natural", "Juridica"],
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "inscripcionZonaFranca",
+      "descripcion": "Código del régimen de zona franca al que la entidad está inscrita. El valor se valida contra el CatalogoDeRegimenesEspeciales filtrado por tipo zona-franca.",
+      "tipo": "enum",
+      "valoresValidos": null,
+      "catalogoReferencia": {
+        "agregado": "CatalogoDeRegimenesEspeciales",
+        "filtroTipo": "zona-franca"
+      },
+      "requerido": false,
+      "vigencia": { "fechaDesde": "2018-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "inscripcionMonopolio",
+      "descripcion": "Código del monopolio departamental al que la entidad está inscrita (Ley 1816/2016 — licores; sistemas departamentales de juegos de azar). El valor se valida contra el CatalogoDeRegimenesEspeciales filtrado por tipo monopolio-sectorial.",
+      "tipo": "enum",
+      "valoresValidos": null,
+      "catalogoReferencia": {
+        "agregado": "CatalogoDeRegimenesEspeciales",
+        "filtroTipo": "monopolio-sectorial"
+      },
+      "requerido": false,
+      "vigencia": { "fechaDesde": "2016-12-19", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "inscripcionPuertoLibre",
+      "descripcion": "Código de inscripción empresarial en el Régimen Puerto Libre San Andrés (Constitución art. 310, Ley 47/1993). El valor se valida contra el CatalogoDeRegimenesEspeciales filtrado por tipo puerto-libre-empresa. Complementario al régimen territorial modelado en JurisdiccionFiscal.",
+      "tipo": "enum",
+      "valoresValidos": null,
+      "catalogoReferencia": {
+        "agregado": "CatalogoDeRegimenesEspeciales",
+        "filtroTipo": "puerto-libre-empresa"
+      },
+      "requerido": false,
+      "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null },
+      "origen": "estandar"
+    }
+  ]
+}

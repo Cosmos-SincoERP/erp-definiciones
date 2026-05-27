@@ -1,0 +1,84 @@
+{
+  "pais": "PA",
+  "catalogo": "FormatoFiscal",
+  "version": "0.1-placeholder",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "DGI Panamá — pendiente de validación con consultores fiscales. Los formatos precargados son estimaciones basadas en obligaciones conocidas del régimen fiscal panameño.",
+  "estructura": {
+    "totalFormatos": 5,
+    "estado": "placeholder",
+    "notaCobertura": "Los formatos fiscales exigidos por la DGI Panamá no estaban documentados en las fuentes consultadas (ver anexo original). Esta precarga es una propuesta inicial basada en obligaciones declarativas conocidas. Requiere validación detallada con consultores fiscales PA."
+  },
+  "entradas": [
+    {
+      "codigo": "DECL-ITBMS",
+      "nombre": "Declaración Mensual del ITBMS",
+      "autoridad": "DGI",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "mensual", "diaCorte": "15-mes-siguiente" },
+      "formatoSalida": ["XML", "PDF"],
+      "alcance": "Declaración mensual del ITBMS causado y pagado en el periodo. Contiene resumen de ventas, compras y retenciones ITBMS.",
+      "referenciaHomologacion": "homologacion-fiscal-DGI-PA",
+      "marcoNormativo": "Código Fiscal arts. 1057-V y siguientes + Decretos Ejecutivos DGI.",
+      "vigencia": { "fechaDesde": "2010-07-01", "fechaHasta": null },
+      "estado": "propuesta",
+      "origen": "estandar"
+    },
+    {
+      "codigo": "DECL-ISR-PJ",
+      "nombre": "Declaración Anual del Impuesto sobre la Renta — Persona Jurídica",
+      "autoridad": "DGI",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "anual", "mesesAplicables": [3], "diaCorte": "31-03-año-siguiente" },
+      "formatoSalida": ["XML", "PDF"],
+      "alcance": "Declaración anual del ISR para empresas. Calcula la base imponible, aplica deducciones, determina ISR a pagar.",
+      "referenciaHomologacion": "homologacion-fiscal-DGI-PA",
+      "marcoNormativo": "Código Fiscal arts. 694 y siguientes.",
+      "vigencia": { "fechaDesde": "1956-01-01", "fechaHasta": null },
+      "estado": "propuesta",
+      "origen": "estandar"
+    },
+    {
+      "codigo": "DECL-ISR-PN",
+      "nombre": "Declaración Anual del Impuesto sobre la Renta — Persona Natural",
+      "autoridad": "DGI",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "anual", "mesesAplicables": [3], "diaCorte": "15-03-año-siguiente" },
+      "formatoSalida": ["XML", "PDF"],
+      "alcance": "Declaración anual del ISR para personas naturales con escala progresiva.",
+      "referenciaHomologacion": "homologacion-fiscal-DGI-PA",
+      "marcoNormativo": "Código Fiscal arts. 694 y siguientes.",
+      "vigencia": { "fechaDesde": "1956-01-01", "fechaHasta": null },
+      "estado": "propuesta",
+      "origen": "estandar"
+    },
+    {
+      "codigo": "DECL-RETENCIONES",
+      "nombre": "Declaración de Retenciones del ISR",
+      "autoridad": "DGI",
+      "tipoEntregable": "reporte",
+      "periodicidad": { "tipo": "mensual", "diaCorte": "15-mes-siguiente" },
+      "formatoSalida": ["XML"],
+      "alcance": "Reporte mensual de retenciones del ISR practicadas por agentes designados (honorarios, alquileres, dividendos, exterior).",
+      "referenciaHomologacion": "homologacion-fiscal-DGI-PA",
+      "marcoNormativo": "Código Fiscal + Decretos Ejecutivos DGI.",
+      "vigencia": { "fechaDesde": "1956-01-01", "fechaHasta": null },
+      "estado": "propuesta",
+      "origen": "estandar"
+    },
+    {
+      "codigo": "CERT-RET-ANUAL",
+      "nombre": "Certificado Anual de Retenciones",
+      "autoridad": "DGI",
+      "tipoEntregable": "certificado",
+      "periodicidad": { "tipo": "anual", "mesesAplicables": [3], "diaCorte": "31-03-año-siguiente" },
+      "formatoSalida": ["PDF"],
+      "alcance": "Certificado entregado a cada tercero (proveedor, empleado) con el total de retenciones ISR practicadas durante el año.",
+      "referenciaHomologacion": null,
+      "marcoNormativo": "Código Fiscal + Decretos Ejecutivos DGI.",
+      "vigencia": { "fechaDesde": "1956-01-01", "fechaHasta": null },
+      "estado": "propuesta",
+      "origen": "estandar"
+    }
+  ]
+}

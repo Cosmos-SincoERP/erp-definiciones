@@ -1,0 +1,83 @@
+{
+  "pais": "PA",
+  "catalogo": "CatalogoTributario",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Código Fiscal de Panamá (Ley 8 de 1956 y modificatorias) + Ley 8 de 2010 (reforma fiscal, ITBMS) + Decretos Ejecutivos reglamentarios DGI.",
+
+  "tributos": [
+    {
+      "codigo": "ITBMS",
+      "nombre": "Impuesto sobre la Transferencia de Bienes Corporales Muebles y la Prestación de Servicios",
+      "naturaleza": "aditivo",
+      "caracterRetencion": null,
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "clasificacion",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Equivalente al IVA. Grava la transferencia de bienes y prestación de servicios. Tarifa general 7%; 10% bebidas alcohólicas y hospedaje; 15% cigarrillos."
+    },
+    {
+      "codigo": "RITBMS",
+      "nombre": "Retención del ITBMS",
+      "naturaleza": "sustractivo",
+      "caracterRetencion": "anticipado",
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "clasificacion",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": "ITBMS",
+      "origen": "estandar",
+      "definicion": "Retención del ITBMS aplicada por agentes de retención designados por DGI."
+    },
+    {
+      "codigo": "ISC",
+      "nombre": "Impuesto Selectivo al Consumo",
+      "naturaleza": "aditivo",
+      "caracterRetencion": null,
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "clasificacion",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Impuesto que se aplica a la importación y venta de ciertos bienes y servicios no esenciales o de lujo (vehículos, alcohol, tabaco, joyas, telecomunicaciones móviles)."
+    },
+    {
+      "codigo": "ISR",
+      "nombre": "Impuesto sobre la Renta",
+      "naturaleza": "sustractivo",
+      "caracterRetencion": "anticipado",
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "conceptoPago",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Retención del ISR sobre ingresos de personas naturales y jurídicas (honorarios, dividendos, intereses, alquileres, pagos al exterior). Código Fiscal arts. 694 y siguientes."
+    }
+  ],
+
+  "clasificaciones": [
+    { "codigo": "GRAV_ITBMS_7", "nombre": "Gravados ITBMS 7%", "descripcion": "Tarifa general de ITBMS.", "origen": "estandar" },
+    { "codigo": "GRAV_ITBMS_10", "nombre": "Gravados ITBMS 10%", "descripcion": "Bebidas alcohólicas y servicios de hospedaje.", "origen": "estandar" },
+    { "codigo": "GRAV_ITBMS_15", "nombre": "Gravados ITBMS 15%", "descripcion": "Cigarrillos y productos del tabaco.", "origen": "estandar" },
+    { "codigo": "EXENTO_ITBMS", "nombre": "Exentos de ITBMS", "descripcion": "Bienes y servicios exentos del ITBMS (medicamentos, alimentos canasta básica, educación, salud).", "origen": "estandar" },
+    { "codigo": "ISC_APLICABLE", "nombre": "Sujeto a ISC", "descripcion": "Bienes y servicios gravados con Impuesto Selectivo al Consumo.", "origen": "estandar" }
+  ],
+
+  "tratamientos": [
+    { "clasificacion": "GRAV_ITBMS_7", "tributo": "ITBMS", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_ITBMS_7", "tributo": "RITBMS", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_ITBMS_10", "tributo": "ITBMS", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_ITBMS_10", "tributo": "RITBMS", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_ITBMS_15", "tributo": "ITBMS", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_ITBMS_15", "tributo": "RITBMS", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "ISC_APLICABLE", "tributo": "ISC", "aplica": true, "origen": "estandar" }
+  ],
+
+  "reglasLocalizacion": [
+    { "tributo": "ITBMS", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "RITBMS", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "ISC", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "ISR", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" }
+  ]
+}

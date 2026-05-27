@@ -22,71 +22,73 @@ El contenido se organiza siguiendo la estructura de los agregados del modelo de 
 
 ## 1. Tributos — CatalogoTributario
 
-| Código | Nombre | Naturaleza | Base | Nivel jurisdiccional | Factor de tarifa | Tributo padre | Definición |
-|--------|--------|:----------:|------|:--------------------:|-----------------|:-------------:|------------|
-| ITBMS | Impuesto sobre la Transferencia de Bienes Corporales Muebles y la Prestación de Servicios | Aditivo | Ingreso | Nacional | `clasificacion` | — | Similar al IVA. Grava la transferencia de bienes y prestación de servicios. |
-| RITBMS | Retención del ITBMS | Sustractivo | Ingreso | Nacional | `clasificacion` | — | Retención a título del ITBMS. |
-| ISC | Impuesto Selectivo al Consumo | Aditivo | Ingreso | Nacional | `clasificacion` | — | Impuesto indirecto que se aplica a la importación y venta de ciertos bienes y servicios no esenciales o de lujo. |
-| ISR | Impuesto sobre la Renta | Sustractivo | Ingreso | Nacional | `conceptoPago` | — | Tributo que se aplica sobre los ingresos obtenidos por personas naturales y jurídicas. |
+Los datos del catálogo `catalogo-tributario-PA` se migraron a [`datos-precargados/pa-catalogo-tributario.json`](datos-precargados/pa-catalogo-tributario.json) (v1.0, 2026-05-26). Allí viven las 20 entidades F1 (4 tributos + 5 clasificaciones + 7 tratamientos + 4 reglas de localización). Narrativo: [`datos-precargados/pa-catalogo-tributario.md`](datos-precargados/pa-catalogo-tributario.md).
 
-**Total:** 4 tributos (2 impuestos + 2 retenciones).
+**Contexto de diseño:**
+- **4 tributos:** ITBMS (tarifa progresiva 7/10/15%), RITBMS (50% del ITBMS), ISC (varía por producto), ISR (retenciones por concepto).
+- **Todos nacionales** — sin tributos subnacionales operativos en F1.
+- **ISR como tributo transaccional** (retenciones) — Panamá modela las retenciones del Impuesto sobre la Renta como tributo del catálogo, no solo como provisión anual.
 
-### Clasificaciones tributarias
+### Jurisdicciones fiscales — JurisdiccionFiscal
 
-| Código | Nombre | Tributos que aplican | Notas |
-|--------|--------|---------------------|-------|
-| GRAV_ITBMS_7 | Gravados ITBMS 7% | ITBMS, RITBMS | Tarifa general. |
-| GRAV_ITBMS_10 | Gravados ITBMS 10% | ITBMS, RITBMS | Bebidas alcohólicas, hospedaje. |
-| GRAV_ITBMS_15 | Gravados ITBMS 15% | ITBMS, RITBMS | Cigarrillos y productos del tabaco. |
-| EXENTO_ITBMS | Exentos de ITBMS | ISR | Bienes y servicios exentos del ITBMS. |
-| ISC_APLICABLE | Sujeto a ISC | ISC | Bienes gravados con selectivo al consumo. |
+Las 25 jurisdicciones PA (1 nacional + 10 provincias + 3 comarcas + 11 distritos) se migraron a [`datos-precargados/pa-jurisdiccion-fiscal.json`](datos-precargados/pa-jurisdiccion-fiscal.json). Narrativo: [`datos-precargados/pa-jurisdiccion-fiscal.md`](datos-precargados/pa-jurisdiccion-fiscal.md).
 
-### Reglas de localización
-
-| Tributo | Rol fiscalmente relevante | Fallback | Notas |
-|---------|--------------------------|----------|-------|
-| ITBMS | `sedeEmisora` | — | Nacional. |
-| RITBMS | `sedeEmisora` | — | Nacional. |
-| ISC | `sedeEmisora` | — | Nacional. |
-| ISR | `sedeEmisora` | — | Nacional. |
+**Contexto de diseño:** Las áreas económicas especiales panameñas (ZLC, AEEPP, Ciudad del Saber) son **regímenes empresariales** (dependen de inscripción), NO territoriales — `JurisdiccionFiscal` no tiene entradas con `tipoRegimen` para PA.
 
 ---
 
 ## 2. Tarifas — TarifaTributaria
 
-### ITBMS — `tarifa-PA-ITBMS`
+Las tarifas se migraron a [`datos-precargados/pa-tarifa-tributaria.json`](datos-precargados/pa-tarifa-tributaria.json) (4 streams nacionales con 13 entradas).
 
-| Factor (clasificación) | Tarifa | Tipo | Vigencia desde |
-|------------------------|:------:|:----:|:--------------:|
-| GRAV_ITBMS_7 | 7% | Porcentaje | 2010-01-01 |
-| GRAV_ITBMS_10 | 10% | Porcentaje | 2010-01-01 |
-| GRAV_ITBMS_15 | 15% | Porcentaje | 2010-01-01 |
+**Contexto de diseño:**
+- **ITBMS:** 3 tarifas progresivas (7% general, 10% alcohol/hospedaje, 15% tabaco) + 0% exento.
+- **RITBMS:** 50% sobre ITBMS facturado.
+- **ISC:** Tarifas por categoría (telecomunicaciones móvil 5%, joyas/armas 5%) — otras categorías ISC (vehículos, alcohol, combustibles) pendientes.
+- **ISR:** 5 conceptos precargados (honorarios 15%, dividendos 10%, intereses 5%, alquileres 12.5%, pagos exterior 12.5%).
 
 ---
 
 ## 3. Condiciones de aplicación — CondicionDeAplicacion
 
-| Tributo | Entidad evaluada | Atributo evaluado | Valor esperado | Efecto | Notas |
-|---------|:----------------:|-------------------|:--------------:|:------:|-------|
-| ITBMS | — | — | — | `aplicar` (default) | No depende de calidades tributarias. |
-| RITBMS | — | — | — | `aplicar` | Reglas de tipo tercero configuradas previamente. Verifica que el adquiriente esté configurado en el concepto de RITBMS. |
+Las 11 condiciones PA se migraron a [`datos-precargados/pa-condicion-de-aplicacion.json`](datos-precargados/pa-condicion-de-aplicacion.json).
 
-> **Nota:** Al igual que República Dominicana, las condiciones en Panamá son simples. La complejidad de Colombia (8 casos para RETEFUENTE, 3 para RICA) no se replica en este país.
+**Contexto de diseño:**
+- **Régimen territorial de renta:** condición `ISR-02-territorial` materializa que pagos al exterior por servicios prestados desde el extranjero NO están sujetos a ISR (principio territorial panameño).
+- **CDIs:** condición `ISR-03-cdi` reconoce tarifas reducidas por Convenios para Evitar Doble Imposición. Tabla CDI pendiente de modelar.
+- **Exoneraciones por áreas económicas:** condiciones `ITBMS-02-zlc` (ZLC) y `ITBMS-03-aeepp` (AEEPP) — alcance específico pendiente de refinamiento con consultores.
 
 ---
 
 ## 4. Atributos fiscales — CatalogoDeAtributosFiscales
 
-| Nombre | Tipo | Valores válidos | Requerido | Vigencia definición | Notas |
-|--------|:----:|----------------|:---------:|:-------------------:|-------|
-| tipoContribuyente | Enum | Natural, Jurídica | Sí | 2017-01-01 → ∞ | Clasificación del contribuyente. |
-| ruc | String | — | Sí | 2017-01-01 → ∞ | Registro Único del Contribuyente. |
+Los 8 atributos PA se migraron a [`datos-precargados/pa-catalogo-de-atributos-fiscales.json`](datos-precargados/pa-catalogo-de-atributos-fiscales.json).
+
+**Contexto de diseño:**
+- **3 requeridos:** `tipoContribuyente`, `ruc`, `esContribuyenteITBMS`.
+- **5 opcionales:** `esAgenteRetencionITBMS`, `esAgenteRetencionISR`, + 3 con `catalogoReferencia` (uno por cada área económica especial).
+- **Tres atributos para tres regímenes** — modelado explícito para distinguir ZLC, AEEPP y Ciudad del Saber en condiciones.
 
 ---
 
-## 5. Formatos fiscales — FormatoFiscal
+## 5. Regímenes especiales empresariales — CatalogoDeRegimenesEspeciales
 
-> **Pendiente:** Los formatos fiscales exigidos por la DGI de Panamá no están documentados en las fuentes disponibles. Se completarán cuando se inicie la localización de Panamá.
+Los 3 regímenes empresariales PA se migraron a [`datos-precargados/pa-catalogo-de-regimenes-especiales.json`](datos-precargados/pa-catalogo-de-regimenes-especiales.json).
+
+**Contexto de diseño:**
+- **Único tipo vigente en F1 PA:** `zona-economica-especial`.
+- **3 entradas atómicas:** ZLC (Colón, Decreto Ley 18/1948), AEEPP (Arraiján, Ley 41/2004), Ciudad del Saber (Clayton, Decreto Ley 6/1998).
+- **Subtipos distintos** (`zona-libre-colon`, `panama-pacifico`, `ciudad-del-saber`) — permiten distinguir en condiciones de aplicación.
+- **Cardinalidad atómica:** una entrada por régimen (no múltiples parques como CO/DR).
+- **Frontera con `JurisdiccionFiscal`:** las áreas están físicamente en PA pero NO son regímenes territoriales — el beneficio depende de inscripción empresarial.
+
+---
+
+## 6. Formatos fiscales — FormatoFiscal
+
+Propuesta inicial migrada a [`datos-precargados/pa-formato-fiscal.json`](datos-precargados/pa-formato-fiscal.json) (v0.1-placeholder, 5 formatos propuestos). Homologación DGI placeholder en [`datos-precargados/pa-homologacion-fiscal-dgi.json`](datos-precargados/pa-homologacion-fiscal-dgi.json) (14 equivalencias propuestas).
+
+**Estado: pendiente de validación con consultores fiscales PA.** Los formatos exactos que DGI Panamá espera no estaban documentados en las fuentes disponibles. La precarga incluye obligaciones declarativas razonablemente esperables (Declaración mensual ITBMS, Declaración anual ISR PJ/PN, Declaración mensual retenciones, Certificado anual de retenciones) pero requiere validación detallada antes de implementar. Ver el `.md` con las preguntas bloqueantes específicas.
 
 ---
 
@@ -95,3 +97,4 @@ El contenido se organiza siguiendo la estructura de los agregados del modelo de 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
 | 1.0 | Marzo 2026 | Versión inicial: 4 tributos, 5 clasificaciones, condiciones simples, 2 atributos fiscales. Formatos DGI pendientes. |
+| 1.1 | Mayo 2026 | Cambio 3 — Sub-cambio 3.4: nueva Sección 5 con regímenes empresariales precargados (Zona Libre de Colón, AEEPP Panamá-Pacífico, Ciudad del Saber). 3 atributos fiscales nuevos en Sección 4 (`inscripcionZonaLibreColon`, `inscripcionAEEPP`, `inscripcionCiudadDelSaber`) con `catalogoReferencia`. Renumeración de Sección 5 (Formatos) a Sección 6. `[D13]` `[I16]`. |

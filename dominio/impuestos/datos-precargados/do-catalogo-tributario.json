@@ -1,0 +1,93 @@
+{
+  "pais": "DO",
+  "catalogo": "CatalogoTributario",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Código Tributario de la República Dominicana (Ley 11-92) + Ley 18-88 (Impuesto Selectivo al Consumo) + Ley 158-01 (Propina Legal) + Reglamentos DGII vigentes.",
+
+  "tributos": [
+    {
+      "codigo": "ITBIS",
+      "nombre": "Impuesto a la Transferencia de Bienes Industrializados y Servicios",
+      "naturaleza": "aditivo",
+      "caracterRetencion": null,
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "clasificacion",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Impuesto equivalente al IVA — grava la transferencia de bienes industrializados, importación y prestación de servicios. Código Tributario art. 335 y siguientes."
+    },
+    {
+      "codigo": "RITBIS",
+      "nombre": "Retención del ITBIS",
+      "naturaleza": "sustractivo",
+      "caracterRetencion": "anticipado",
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "porcentajeDePadre",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": "ITBIS",
+      "origen": "estandar",
+      "definicion": "Retención anticipada del ITBIS. Aplica por agentes de retención designados. Norma general: 30% del ITBIS facturado."
+    },
+    {
+      "codigo": "ISC",
+      "nombre": "Impuesto Selectivo al Consumo",
+      "naturaleza": "aditivo",
+      "caracterRetencion": null,
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "clasificacion",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Impuesto a productos específicos (tabaco, alcohol, bebidas azucaradas, combustibles, vehículos, telecomunicaciones). Ley 11-92 Título IV."
+    },
+    {
+      "codigo": "CDT",
+      "nombre": "Contribución al Desarrollo de las Telecomunicaciones",
+      "naturaleza": "aditivo",
+      "caracterRetencion": null,
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "fija",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Impuesto del 2% sobre servicios de telecomunicaciones — destino al desarrollo del sector. Ley 153-98."
+    },
+    {
+      "codigo": "PROPINA",
+      "nombre": "Propina Legal",
+      "naturaleza": "aditivo",
+      "caracterRetencion": null,
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "fija",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Recargo del 10% obligatorio en establecimientos de servicio gastronómico y hospedaje. Ley 158-01."
+    }
+  ],
+
+  "clasificaciones": [
+    { "codigo": "GRAV_ITBIS_18", "nombre": "Gravados ITBIS 18%", "descripcion": "Tarifa general de ITBIS.", "origen": "estandar" },
+    { "codigo": "GRAV_ITBIS_16", "nombre": "Gravados ITBIS 16%", "descripcion": "Tarifa reducida de ITBIS (yogur, café, azúcar, chocolate, etc.).", "origen": "estandar" },
+    { "codigo": "EXENTO_ITBIS", "nombre": "Exentos de ITBIS", "descripcion": "Bienes y servicios exentos del ITBIS (medicamentos, educación, salud, etc.).", "origen": "estandar" },
+    { "codigo": "ISC_APLICABLE", "nombre": "Sujeto a ISC", "descripcion": "Bienes y servicios gravados con Impuesto Selectivo al Consumo.", "origen": "estandar" }
+  ],
+
+  "tratamientos": [
+    { "clasificacion": "GRAV_ITBIS_18", "tributo": "ITBIS", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_ITBIS_18", "tributo": "RITBIS", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_ITBIS_16", "tributo": "ITBIS", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_ITBIS_16", "tributo": "RITBIS", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "ISC_APLICABLE", "tributo": "ISC", "aplica": true, "origen": "estandar" }
+  ],
+
+  "reglasLocalizacion": [
+    { "tributo": "ITBIS", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "RITBIS", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "ISC", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "CDT", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "PROPINA", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" }
+  ]
+}

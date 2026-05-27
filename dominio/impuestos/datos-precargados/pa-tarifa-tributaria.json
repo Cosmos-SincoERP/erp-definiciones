@@ -1,0 +1,58 @@
+{
+  "pais": "PA",
+  "catalogo": "TarifaTributaria",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Código Fiscal de Panamá (Ley 8 de 1956) + Ley 8 de 2010 (reforma ITBMS) + Decretos Ejecutivos DGI vigentes.",
+  "estructura": {
+    "totalStreams": 4,
+    "streamsNacionales": 4,
+    "streamsMunicipales": 0,
+    "totalEntradas": 13,
+    "notaCobertura": "PA opera con tributos nacionales. ITBMS (7/10/15%), RITBMS (50%), ISC (varía), ISR (retenciones según concepto)."
+  },
+
+  "streams": [
+    {
+      "streamKey": "tarifa-PA-ITBMS",
+      "tributo": "ITBMS",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "itbms-grav7", "factor": "GRAV_ITBMS_7", "descripcion": "Tarifa general de ITBMS", "tarifa": 7, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2010-07-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "itbms-grav10", "factor": "GRAV_ITBMS_10", "descripcion": "Tarifa especial — bebidas alcohólicas y servicios de hospedaje", "tarifa": 10, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2010-07-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "itbms-grav15", "factor": "GRAV_ITBMS_15", "descripcion": "Tarifa especial — cigarrillos y productos del tabaco", "tarifa": 15, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2010-07-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "itbms-exento", "factor": "EXENTO_ITBMS", "descripcion": "Bienes y servicios exentos del ITBMS", "tarifa": 0, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2010-07-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+    {
+      "streamKey": "tarifa-PA-RITBMS",
+      "tributo": "RITBMS",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "ritbms-general", "factor": "GRAV_ITBMS_7", "descripcion": "Retención del 50% del ITBMS facturado (norma general). Aplica sobre ITBMS al 7%.", "tarifa": 50, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2011-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "ritbms-grav10", "factor": "GRAV_ITBMS_10", "descripcion": "Retención del 50% sobre ITBMS al 10%.", "tarifa": 50, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2011-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+    {
+      "streamKey": "tarifa-PA-ISC",
+      "tributo": "ISC",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "isc-telecom-movil", "factor": "ISC_TELECOMUNICACIONES_MOVIL", "descripcion": "ISC sobre servicios de telecomunicaciones móviles", "tarifa": 5, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "isc-joyas", "factor": "ISC_JOYAS_ARMAS", "descripcion": "ISC sobre joyas y armas de fuego", "tarifa": 5, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    },
+    {
+      "streamKey": "tarifa-PA-ISR",
+      "tributo": "ISR",
+      "jurisdiccion": null,
+      "tarifas": [
+        { "entradaId": "isr-honorarios", "factor": "HONORARIOS_PROFESIONALES", "descripcion": "Retención sobre honorarios profesionales pagados a residentes (porcentaje aplicable a tarifa de ISR vigente)", "tarifa": 15, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "isr-dividendos", "factor": "DIVIDENDOS", "descripcion": "Retención sobre dividendos pagados", "tarifa": 10, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "isr-intereses", "factor": "INTERESES_BANCARIOS", "descripcion": "Retención sobre intereses bancarios", "tarifa": 5, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "isr-alquileres", "factor": "ALQUILERES_PERSONAS_FISICAS", "descripcion": "Retención sobre alquileres pagados a personas físicas", "tarifa": 12.5, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "isr-exterior-servicios", "factor": "PAGOS_EXTERIOR_SERVICIOS", "descripcion": "Retención sobre pagos al exterior por servicios prestados desde el extranjero (sujeta a CDIs vigentes)", "tarifa": 12.5, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "origen": "estandar" }
+      ]
+    }
+  ]
+}

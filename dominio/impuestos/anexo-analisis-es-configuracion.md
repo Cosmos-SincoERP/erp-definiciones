@@ -2,7 +2,7 @@
 
 ## Contexto
 
-El bounded context de Impuestos tiene 9 agregados: 2 transaccionales (RegistroTributario, EntregableFiscal) y 7 de configuración (CatalogoTributario, TarifaTributaria, CondicionDeAplicacion, CatalogoDeAtributosFiscales, PerfilTributario, HomologacionFiscal, FormatoFiscal). Los transaccionales usan Event Sourcing (ES) como fuente de verdad. Este análisis evalúa si los agregados de configuración deben usar el mismo patrón o persistir como CRUD con eventos de auditoría.
+El bounded context de Impuestos tiene 11 agregados: 2 transaccionales (RegistroTributario, EntregableFiscal) y 9 de configuración (CatalogoTributario, TarifaTributaria, CondicionDeAplicacion, CatalogoDeAtributosFiscales, PerfilTributario, JurisdiccionFiscal, CatalogoDeRegimenesEspeciales, HomologacionFiscal, FormatoFiscal). Los transaccionales usan Event Sourcing (ES) como fuente de verdad. Este análisis evalúa si los agregados de configuración deben usar el mismo patrón o persistir como CRUD con eventos de auditoría. La conclusión del análisis (ES para todos los agregados, ver `[D10]`) aplica también a `JurisdiccionFiscal` (Cambio 2) y a `CatalogoDeRegimenesEspeciales` (Cambio 3) introducidos posteriormente — los streams de ambos son pequeños (~50–200 eventos por país en escenarios típicos) y la inmutabilidad del histórico es crítica para reconstruir auditorías que requieran ver qué jurisdicciones y regímenes (territoriales o empresariales) estaban vigentes en un período pasado.
 
 **Referencia:** Decisión `[D10]` en `modelo-dominio.md`, Sección 8.
 
@@ -199,3 +199,4 @@ El único contra real es el costo de evolución de esquema (upcasting), pero en 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
 | 1.0 | Marzo 2026 | Versión inicial: análisis de 7 criterios, matriz de evaluación, conclusión a favor de ES completo. |
+| 1.1 | Mayo 2026 | Cambio 2: incorporación de `JurisdiccionFiscal` al conteo (10 agregados, 8 configuración). Cambio 3 — Sub-cambio 3.5: incorporación de `CatalogoDeRegimenesEspeciales` (11 agregados, 9 configuración). La conclusión del análisis (ES completo, `[D10]`) aplica a ambos agregados nuevos. |

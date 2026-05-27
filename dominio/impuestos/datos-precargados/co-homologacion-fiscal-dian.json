@@ -1,0 +1,57 @@
+{
+  "pais": "CO",
+  "catalogo": "HomologacionFiscal",
+  "autoridad": "DIAN",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "DIAN — Anexos técnicos de las Resoluciones de información exógena (Res. 162/2023, Res. 000233/2026). Códigos de conceptos, tributos, tarifas y tipos de operación según especificaciones DIAN.",
+  "estructura": {
+    "totalEquivalencias": 35,
+    "porTributo": {
+      "RETEFUENTE": 18,
+      "IVA": 8,
+      "ICA": 4,
+      "RENTA_LABORAL": 5
+    }
+  },
+  "entradas": [
+    { "valorInterno": "COMPRAS_GENERALES_DECLARANTES", "tributo": "RETEFUENTE", "codigoAutoridad": "5001", "nombreAutoridad": "Compras generales — declarantes", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "COMPRAS_GENERALES_NO_DECLARANTES", "tributo": "RETEFUENTE", "codigoAutoridad": "5002", "nombreAutoridad": "Compras generales — no declarantes", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "COMPRAS_AGROPECUARIAS", "tributo": "RETEFUENTE", "codigoAutoridad": "5003", "nombreAutoridad": "Compras a productores agropecuarios", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "COMPRAS_CAFE_PERGAMINO", "tributo": "RETEFUENTE", "codigoAutoridad": "5004", "nombreAutoridad": "Compras de café pergamino", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "COMPRAS_COMBUSTIBLES", "tributo": "RETEFUENTE", "codigoAutoridad": "5005", "nombreAutoridad": "Compras de combustibles", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "COMPRAS_VEHICULOS", "tributo": "RETEFUENTE", "codigoAutoridad": "5006", "nombreAutoridad": "Adquisición de vehículos", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "SERVICIOS_GENERALES_DECLARANTES", "tributo": "RETEFUENTE", "codigoAutoridad": "5010", "nombreAutoridad": "Servicios generales — declarantes", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "SERVICIOS_GENERALES_NO_DECLARANTES", "tributo": "RETEFUENTE", "codigoAutoridad": "5011", "nombreAutoridad": "Servicios generales — no declarantes", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "SERVICIOS_TRANSPORTE_CARGA", "tributo": "RETEFUENTE", "codigoAutoridad": "5012", "nombreAutoridad": "Transporte nacional de carga", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "SERVICIOS_TRANSPORTE_PASAJEROS", "tributo": "RETEFUENTE", "codigoAutoridad": "5013", "nombreAutoridad": "Transporte nacional de pasajeros", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "SERVICIOS_RESTAURANTE_HOTEL", "tributo": "RETEFUENTE", "codigoAutoridad": "5014", "nombreAutoridad": "Servicios de restaurante, hotel y hospedaje", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "HONORARIOS_DECLARANTES", "tributo": "RETEFUENTE", "codigoAutoridad": "5020", "nombreAutoridad": "Honorarios y comisiones — declarantes", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "HONORARIOS_NO_DECLARANTES", "tributo": "RETEFUENTE", "codigoAutoridad": "5021", "nombreAutoridad": "Honorarios y comisiones — no declarantes", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "ARRENDAMIENTO_MUEBLES", "tributo": "RETEFUENTE", "codigoAutoridad": "5030", "nombreAutoridad": "Arrendamiento de bienes muebles", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "ARRENDAMIENTO_INMUEBLES", "tributo": "RETEFUENTE", "codigoAutoridad": "5031", "nombreAutoridad": "Arrendamiento de bienes inmuebles", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "RENDIMIENTOS_FINANCIEROS", "tributo": "RETEFUENTE", "codigoAutoridad": "5040", "nombreAutoridad": "Rendimientos financieros", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "EXTERIOR_SERVICIOS_TECNICOS", "tributo": "RETEFUENTE", "codigoAutoridad": "5050", "nombreAutoridad": "Pagos al exterior — servicios técnicos", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "EXTERIOR_REGALIAS", "tributo": "RETEFUENTE", "codigoAutoridad": "5051", "nombreAutoridad": "Pagos al exterior — regalías", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "valorInterno": "GRAV_19", "tributo": "IVA", "codigoAutoridad": "01", "nombreAutoridad": "IVA al 19%", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "GRAV_5", "tributo": "IVA", "codigoAutoridad": "02", "nombreAutoridad": "IVA al 5%", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "EXENTO", "tributo": "IVA", "codigoAutoridad": "03", "nombreAutoridad": "IVA exento", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "EXCLUIDO", "tributo": "IVA", "codigoAutoridad": "04", "nombreAutoridad": "IVA excluido", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "IVA-RETENCION-15", "tributo": "RIVA", "codigoAutoridad": "10", "nombreAutoridad": "Retención IVA 15%", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "INC_8", "tributo": "INC", "codigoAutoridad": "08", "nombreAutoridad": "INC 8%", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "GRAV_19_BIENES", "tributo": "IVA", "codigoAutoridad": "01-B", "nombreAutoridad": "IVA al 19% — bienes", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "GRAV_19_SERVICIOS", "tributo": "IVA", "codigoAutoridad": "01-S", "nombreAutoridad": "IVA al 19% — servicios", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "valorInterno": "ICA-CAUSADO", "tributo": "ICA", "codigoAutoridad": "ICA-01", "nombreAutoridad": "ICA causado en el periodo", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "ICA-RETENIDO", "tributo": "RICA", "codigoAutoridad": "ICA-02", "nombreAutoridad": "ICA retenido — Reteica", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "ICA-AUTORRETENIDO", "tributo": "AUTO_RICA", "codigoAutoridad": "ICA-03", "nombreAutoridad": "ICA autorretenido", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "SOBRETASA-BOMBERIL", "tributo": "SOBRETASA_BOMBERIL", "codigoAutoridad": "ICA-04", "nombreAutoridad": "Sobretasa bomberil", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "valorInterno": "SALARIOS", "tributo": "RETEFUENTE", "codigoAutoridad": "5300", "nombreAutoridad": "Pagos laborales y prestaciones sociales", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "PENSIONES", "tributo": "RETEFUENTE", "codigoAutoridad": "5301", "nombreAutoridad": "Pensiones", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "APORTES_SS", "tributo": "RETEFUENTE", "codigoAutoridad": "5302", "nombreAutoridad": "Aportes al sistema de seguridad social del trabajador", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "AFC", "tributo": "RETEFUENTE", "codigoAutoridad": "5303", "nombreAutoridad": "Aportes voluntarios pensiones y AFC", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "MEDICINA_PREPAGADA", "tributo": "RETEFUENTE", "codigoAutoridad": "5304", "nombreAutoridad": "Medicina prepagada deducible", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
+  ]
+}

@@ -44,10 +44,10 @@ Los reportes de exógena ante la DIAN (formatos 1001, 1003, entre otros) y los c
 
 ### Implementación inicial
 
-- **País:** Colombia.
-- **Frentes:** Gastos (sub-dominio OXP como primer consumidor) e ingresos (sub-dominio CXC cuando se construya).
-- **Reportes:** Exógenos a nivel nacional y municipal, certificados de retención a proveedores.
-- **Diseño:** Extensible para incorporar otros países y módulos en el futuro.
+- **Primer país productivo:** Colombia, con el sub-dominio OXP (dirección fiscal de gastos) como primer consumidor. El sub-dominio CXC (ingresos) se incorporará cuando se construya.
+- **Cobertura de diseño F1:** Colombia, República Dominicana y Panamá. La pertenencia de una capacidad a F1 no implica salida productiva simultánea en los tres países — cada país requiere su propia precarga certificada de contenido fiscal antes del go-live. Ver Sección 8.
+- **Reportes y certificados:** Los reportes de información fiscal (exógenos nacionales y municipales) y los certificados de retención a proveedores se generan desde el registro tributario como capacidades de Fase 2. En Fase 1 el registro tributario captura toda la información necesaria para habilitarlos posteriormente.
+- **Diseño:** Extensible para incorporar otros países (apertura US/CA en Fase 2, ver `[PD11]` del modelo de dominio) y nuevos sub-dominios consumidores.
 
 ---
 
@@ -71,7 +71,7 @@ Los términos de esta sección son **globales** — aplican independiente de la 
 | 12 | **Registro tributario** | Registro inmutable que documenta un cálculo tributario realizado por el motor del sistema: qué tributos se aplicaron, sobre qué base gravable, con qué tarifa y a qué transacción origen. Es la fuente de verdad del sub-dominio de Impuestos y sustenta auditorías, reportes y certificados. En otros ERPs este concepto se representa como líneas de impuesto (tax lines) distribuidas dentro de cada documento transaccional; en este sistema se centraliza como registro propio del sub-dominio. |
 | 13 | **Desglose fiscal** | Conjunto de tributos (impuestos y retenciones) calculados para un concepto de una transacción. Cada concepto dentro de un mismo documento puede tener un desglose fiscal diferente según su clasificación tributaria. Es el resultado que el motor de cálculo entrega al sub-dominio solicitante. Cada sub-dominio consumidor (OXP, CXC, etc.) almacena su propia copia para operar de forma autónoma. |
 | 14 | **Régimen tributario** | Marco normativo bajo el cual un tercero cumple sus obligaciones tributarias en una jurisdicción. El régimen determina qué tributos aplican y bajo qué condiciones. Es un atributo del perfil tributario del tercero. Los regímenes disponibles varían según la localización. |
-| 15 | **Jurisdicción** | Ámbito territorial donde una autoridad fiscal tiene potestad para gravar. Puede ser a nivel de país, región, estado, municipio o ciudad. Una misma transacción puede estar sujeta a tributos de múltiples jurisdicciones simultáneamente. Equivale a "Tax Jurisdiction" (SAP, Oracle, Dynamics) o "Nexus" (Avalara, Vertex). |
+| 15 | **Jurisdicción fiscal** | Ámbito (territorial o no) donde una autoridad fiscal tiene potestad para gravar. Puede ser de naturaleza territorial-administrativa (país, estado, departamento, municipio), territorial con régimen especial (Puerto Libre, frontera fiscal, archipiélago con régimen propio), distrito fiscal especial (jurisdicciones sin equivalente administrativo como transit districts o BIDs en EE.UU.) o soberanía tributaria (reservas indígenas con potestad fiscal propia). Una misma transacción puede estar sujeta a tributos de múltiples jurisdicciones simultáneamente. El sistema gestiona el catálogo de jurisdicciones fiscales por país como dato propio, con referencia opcional al catálogo de divisiones territoriales administrativas de Datos de Referencia cuando coincide. Equivale a "Tax Jurisdiction" (SAP, Oracle, Dynamics), "PCode" (Avalara) o "GeoCode" (Vertex). |
 | 16 | **Certificado tributario** | Documento que certifica las retenciones practicadas a un tercero durante un período fiscal. Se emite como constancia al tercero retenido. Su formato, obligatoriedad y periodicidad varían según la jurisdicción. Equivale a "Withholding Tax Certificate" (SAP, Oracle) o "Form 1099" en EE.UU. |
 | 17 | **Declaración tributaria** | Informe presentado ante una autoridad fiscal donde la empresa reporta sus propios impuestos y el valor a pagar o saldo a favor. Su estructura y periodicidad varían según la jurisdicción y el tipo de tributo. Equivale a "Tax Return" o "Tax Declaration". |
 | 18 | **Reporte de información fiscal** | Informe presentado ante una autoridad fiscal que detalla las transacciones y retenciones realizadas a terceros. Su propósito es permitir a la autoridad el cruce de información para verificación y control. Puede generarse a nivel nacional o municipal. Equivale a "Information Return" (EE.UU.) o "SAF-T" (UE). |
@@ -81,6 +81,8 @@ Los términos de esta sección son **globales** — aplican independiente de la 
 | 22 | **Contenido fiscal** | Conjunto de tributos, tarifas, bases mínimas, reglas de aplicación, dependencias y vigencias que el sistema provee como parte del producto para cada jurisdicción soportada. El contenido fiscal viene precargado para que el cliente inicie operación sin configurar el estándar fiscal del país — solo configura lo propio de su empresa (perfil tributario, excepciones). Cuando la normativa cambia, el contenido fiscal se actualiza sin intervención del cliente. Equivale a "Tax Content" (Avalara, Vertex, ONESOURCE). |
 | 23 | **Efecto fiscal** | Clasificación del hecho económico registrado desde la perspectiva tributaria: gravamen o desgravamen. Determina cómo se interpreta el registro tributario al consolidar períodos — los gravámenes suman y los desgravámenes restan proporcionalmente. |
 | 24 | **Desgravamen** | Efecto fiscal que revierte total o parcialmente los tributos de un gravamen previo. Se origina por notas crédito, devoluciones u otras transacciones de ajuste del sub-dominio consumidor. El desglose fiscal del desgravamen se deriva proporcionalmente del desglose del gravamen original — el motor de cálculo no participa. Cada desgravamen referencia exactamente una transacción origen. |
+| 25 | **Régimen fiscal territorial** | Conjunto de reglas tributarias diferenciadas que aplican a una jurisdicción territorial específica. Una jurisdicción con régimen especial conserva su naturaleza administrativa (sigue siendo un municipio o departamento) pero tributa con reglas propias. Ejemplos: Puerto Libre San Andrés (Colombia, sin IVA nacional), Galápagos LOREG (Ecuador, IVA 0% en ciertos servicios), Frontera Norte/Sur México (IVA reducido al 8%), Áreas de Livre Comércio (Brasil). El régimen se modela como atributo categórico (`tipoRegimen`) en el catálogo de jurisdicciones fiscales, permitiendo que las condiciones de aplicación evalúen el régimen para modificar la tributación. Diferenciar de "régimen tributario" (término 14) que es un atributo del perfil de la entidad, no de una jurisdicción territorial. |
+| 26 | **Régimen fiscal empresarial** | Conjunto de reglas tributarias diferenciadas que aplican a una empresa por su **inscripción** en un registro oficial ante una autoridad, no por su ubicación territorial. Una empresa inscrita en un régimen empresarial accede a beneficios fiscales (exenciones, tarifas reducidas, simplificación arancelaria) condicionados a la permanencia de la inscripción. Ejemplos: empresas de zonas francas certificadas por DIAN (Colombia) o CNZFE (República Dominicana), empresas en monopolios departamentales de licores (Colombia, Ley 1816/2016), empresas inscritas en la Zona Libre de Colón o el AEEPP Panamá-Pacífico, empresas con regímenes otorgados por decretos individuales. Se diferencia del "régimen fiscal territorial" (término 25) que aplica a una jurisdicción territorial completa independientemente de qué empresas operen allí. Una misma empresa puede tener varias inscripciones simultáneas (ej: empresa de zona franca en CO inscrita además en monopolio departamental). El sistema modela este régimen como catálogo propio del sub-dominio (CatalogoDeRegimenesEspeciales), referenciado desde el perfil tributario mediante atributos cuyo dominio es el catálogo externo. |
 
 ---
 
@@ -143,7 +145,9 @@ Cuando la transacción del consumidor revierte total o parcialmente una transacc
 3. El desglose prorrateado se propone al consumidor como referencia. El consumidor puede confirmarlo tal cual o ajustarlo manualmente (intervención manual).
 4. La confirmación y creación del registro tributario sigue los pasos 5-7 del flujo principal.
 
-### Flujo 3 — Cumplimiento fiscal (Responsable de cumplimiento fiscal)
+### Flujo 3 — Cumplimiento fiscal (F2 — Responsable de cumplimiento fiscal)
+
+> **Nota de fase:** Este flujo corresponde a capacidades derivadas de Fase 2. En Fase 1 el registro tributario conserva la información necesaria para habilitar posteriormente la generación de reportes de información fiscal, certificados tributarios y demás entregables regulatorios.
 
 1. El responsable de cumplimiento fiscal solicita la generación de un entregable (reporte de información fiscal o certificado tributario) para un período fiscal.
 2. El sistema consulta sus propios registros tributarios para el período solicitado.
@@ -167,12 +171,36 @@ Cuando la transacción del consumidor revierte total o parcialmente una transacc
 |---------|------|-----------|
 | **Sub-dominio consumidor** (OXP, CXC) | Catálogo de clasificaciones tributarias | Para que cada sub-dominio clasifique sus conceptos |
 | **Sub-dominio consumidor** (OXP, CXC) | Desglose fiscal propuesto | Resultado del cálculo tributario |
-| **Tercero** (proveedor, cliente) | Certificado tributario | Entrega controlada con trazabilidad |
-| **Autoridad fiscal** | Reportes de información fiscal | Cumplimiento fiscal |
+| **Tercero** (proveedor, cliente) | Certificado tributario (F2) | Entrega controlada con trazabilidad |
+| **Autoridad fiscal** | Reportes de información fiscal (F2) | Cumplimiento fiscal |
 
 ### Datos propios del sub-dominio
 
 El sistema de impuestos gestiona como datos propios los **perfiles tributarios** de las entidades fiscales — tanto emisoras como contrapartes — (régimen tributario, condición de autorretenedor, gran contribuyente, agente de retención, entre otros según la jurisdicción). Los sub-dominios consumidores no envían estos datos — envían la identificación (tipo y número) y el motor de cálculo resuelve los perfiles internamente.
+
+### Matriz de responsabilidades funcionales
+
+La siguiente matriz consolida la distribución de responsabilidades entre Impuestos, los sub-dominios consumidores (OXP, CXC, etc.) y Contabilidad. No introduce reglas nuevas — formaliza en un solo lugar las responsabilidades que están descritas en otras partes del alcance (Sección 5, R21, R25, R33) y en el alcance del sub-dominio de Contabilidad.
+
+| Responsabilidad | Impuestos | Sub-dominio consumidor | Contabilidad |
+|---|:---:|:---:|:---:|
+| Mantener catálogo de clasificaciones tributarias | Sí | No | No |
+| Asignar clasificación tributaria a sus conceptos transaccionales | No | Sí | No |
+| Determinar entidad fiscal emisora y contraparte de la transacción | No | Sí | No |
+| Mantener perfiles tributarios de las entidades fiscales | Sí | No | No |
+| Resolver el cálculo tributario (motor) | Sí | No | No |
+| Presentar el desglose fiscal propuesto al usuario | No | Sí | No |
+| Permitir ajustes manuales al desglose antes de confirmar | No | Sí | No |
+| Registrar trazabilidad detallada de los ajustes manuales | No | Sí (R21) | No |
+| Crear el registro tributario inmutable al confirmar | Sí | No | No |
+| Mantener copia operativa autónoma del desglose confirmado | No | Sí (R25) | No |
+| Emitir líneas de traducción contable con el contexto del hecho económico | No | Sí | No |
+| Traducir las líneas a cuentas contables (motor de traducción N1) | No (R33) | No | Sí |
+| Generar asientos contables (cuando N2 está activo) | No | No | Sí |
+| Generar reportes y certificados fiscales desde el registro tributario | Sí (F2) | No | No |
+| Realizar la conciliación fiscal-contable | No | No | Sí |
+
+> **Nota:** Esta matriz consolida responsabilidades ya definidas. Cualquier ambigüedad operativa debe resolverse contra la regla aplicable (R21, R25, R33 para Impuestos) o contra el alcance del sub-dominio responsable (Contabilidad para traducción y asientos).
 
 ### Nota sobre la traducción contable
 
@@ -202,6 +230,8 @@ Las reglas se organizan en seis frentes funcionales del producto.
 | **R03** | **Dependencia entre tributos:** Un tributo hijo solo puede configurarse si su tributo padre está definido en la misma combinación de reglas de aplicación. El sistema impide crear un tributo hijo sin su padre. Ejemplo: la retención de IVA solo puede existir si el IVA está configurado para esa combinación. | No |
 | **R34** | **Jurisdicción multinivel:** Una clasificación tributaria puede tener tributos de diferentes niveles jurisdiccionales simultáneamente (nacional y municipal). Los tributos municipales (ej: ICA, RICA en Colombia) requieren tarifa a nivel de ciudad. El sistema soporta esta granularidad sin duplicar la clasificación tributaria. | No |
 | **R38** | **Contenido fiscal como parte del producto:** El sistema provee precargados los tributos, tarifas, bases mínimas, reglas de aplicación, dependencias y vigencias para cada jurisdicción soportada. El cliente inicia operación sin configurar el estándar fiscal del país. El administrador fiscal solo configura los perfiles tributarios de sus entidades fiscales y las excepciones no cubiertas por el contenido estándar. | No |
+| **R40** | **Catálogo propio de jurisdicciones fiscales:** Las jurisdicciones fiscales se gestionan como catálogo propio del sub-dominio de Impuestos, no como referencia ciega a divisiones territoriales administrativas. Cada jurisdicción declara su tipo (territorial-administrativa, régimen-especial-territorial, distrito-fiscal-especial, soberanía-tributaria) y, opcionalmente, su régimen fiscal categórico (puerto-libre, frontera-iva-reducido, etc.) y referencia al catálogo de divisiones territoriales administrativas de Datos de Referencia cuando coincide. Los códigos enviados por el sub-dominio consumidor en las ubicaciones (sede emisora, sede contraparte, lugar de ejecución) deben referenciar jurisdicciones fiscales vigentes del país correspondiente — el motor valida la referencia y rechaza solicitudes con códigos inválidos. | No |
+| **R41** | **Catálogo propio de regímenes especiales empresariales:** Los regímenes fiscales que aplican a una empresa por **inscripción** ante una autoridad (no por su ubicación territorial) se gestionan como catálogo propio del sub-dominio de Impuestos: zonas francas (CO, DO), monopolios departamentales (CO), zonas económicas especiales (ZLC, AEEPP y Ciudad del Saber en PA), regímenes empresariales archipelágicos, regímenes otorgados por decretos individuales. Se diferencian de las jurisdicciones fiscales (R40) porque el beneficio se condiciona a la inscripción de la empresa, no a la ubicación geográfica del hecho económico. La inscripción se modela como atributo del perfil tributario cuyo dominio de valores se valida contra este catálogo. La precarga estándar por país viene como parte del contenido fiscal del producto; el administrador fiscal puede extenderla con entradas personalizadas para regímenes no cubiertos por el contenido estándar. | No |
 
 ### 6.2 Perfil tributario
 
@@ -281,6 +311,26 @@ Este frente se subdivide en cuatro aspectos del proceso de cálculo: la vigencia
 | **R32** | **Clasificación tributaria válida:** Cada concepto de la solicitud debe referenciar una clasificación tributaria que exista en el catálogo vigente del sub-dominio de Impuestos. Si la clasificación no existe o no está vigente, el motor rechaza el concepto. | No |
 | **R33** | **Sin conocimiento contable:** El sub-dominio de Impuestos no tiene conocimiento de cuentas contables. La traducción contable de los tributos es responsabilidad de cada sub-dominio consumidor a partir de su copia del desglose fiscal. | No |
 
+### Rechazos funcionales esperados
+
+Cuando una confirmación tributaria no puede procesarse, el sub-dominio de Impuestos emite el evento `ConfirmacionTributariaRechazada` con un motivo estructurado para que el sub-dominio consumidor reaccione funcionalmente (registrar el caso, escalar al usuario, retirar la transacción, reintentar con corrección). La lista canónica de motivos se mantiene en el modelo de dominio (Sección 5.3.4); esta tabla los expone como parte del alcance funcional:
+
+| Motivo (`motivoCodigo`) | Cuándo ocurre |
+|---|---|
+| `comando_invalido` | El comando de confirmación no cumple el contrato — campos obligatorios ausentes, tipos incorrectos. |
+| `consumidor_no_autorizado` | El sub-dominio que envía la confirmación no tiene permiso de confirmar contra Impuestos. |
+| `datos_faltantes` | Falta información obligatoria del contexto transaccional (incluye perfil tributario inexistente para la entidad fiscal emisora o contraparte, y ubicaciones requeridas no informadas). |
+| `clasificacion_no_vigente` | Un concepto referencia una clasificación tributaria inexistente o fuera de vigencia a la fecha de la transacción. |
+| `jurisdiccion_no_encontrada` | Una ubicación referencia un código de jurisdicción fiscal no precargado o no vigente. |
+| `transaccion_ya_confirmada` | Ya existe un registro tributario para la misma combinación (sub-dominio, transacción, efecto fiscal) — protege la unicidad del hecho fiscal. |
+| `origen_no_encontrado` | Un desgravamen referencia una transacción origen sin registro tributario de gravamen confirmado. |
+| `concepto_no_existe_en_origen` | Un desgravamen incluye un concepto que no existía en el desglose confirmado del registro origen. |
+| `desgravamen_excede_saldo` | La suma de desgravámenes superaría el saldo disponible del gravamen origen (por concepto y por tributo). |
+| `concepto_sin_tributos_aplicables` | El motor descartó todos los tributos del concepto — no hay desglose fiscal posible para esa combinación. |
+| `intervencion_excede_margen` | El desglose confirmado por el consumidor diverge del cálculo de referencia más allá del margen de redondeo aceptable. |
+
+> **Nota sobre granularidad:** Los rechazos arriba son los **motivos del flujo de confirmación** (`ConfirmacionTributariaRechazada.motivoCodigo`). Distintos de los **motivos de exclusión de tributos individuales** dentro de un cálculo (`motivoExclusion` en una línea descartada: `cuantia_minima`, `perfil_no_aplica`, `clasificacion_excluida`, `jurisdiccion_no_aplica`, `dependencia_padre`, `actividad_no_registrada`) — esos no rechazan la confirmación, solo informan por qué un tributo específico no aplicó al concepto. La lista detallada de motivos de exclusión se mantiene en el modelo.
+
 ---
 
 ## Sección 7: Qué está dentro y fuera del alcance
@@ -306,7 +356,9 @@ Las tablas a continuación detallan qué está dentro y fuera del alcance del su
 | **Referencia documental del perfil tributario** | Referencia al documento que respalda atributos del perfil tributario de las entidades fiscales (ej: RUT en Colombia, RNC en República Dominicana): tipo de documento, número y fecha de emisión. Permite registrar la procedencia del atributo fiscal para trazabilidad. | F1 |
 | **Reglas de aplicación** | Configuración de qué tributos aplican para cada combinación de clasificación tributaria + dirección fiscal + jurisdicción, con soporte de dependencias entre tributos, cuantía mínima y vigencia temporal. | F1 |
 | **Motor de cálculo** | Determinación automática y cálculo de tributos a partir del contexto de la transacción: entidades fiscales, clasificación tributaria, dirección fiscal y jurisdicción. Retorna un desglose fiscal propuesto al sub-dominio consumidor. | F1 |
-| **Resolución de jurisdicción** | El consumidor envía ubicaciones tipificadas por rol semántico: sede emisora, sede contraparte y, cuando aplique, lugar de ejecución del hecho económico (donde se presta el servicio, se entrega el bien, se ubica el inmueble o se ejecuta el proyecto). El motor resuelve internamente cuál ubicación es la fiscalmente relevante para cada tributo mediante reglas de localización configuradas por tributo y clasificación tributaria (contenido estándar del producto). A partir de la ubicación seleccionada, el motor identifica los niveles jurisdiccionales que aplican según el país (nacional, municipal) y resuelve los tributos correspondientes a cada nivel. El contenido fiscal incluye el catálogo de jurisdicciones por país con su jerarquía y códigos estándar. | F1 |
+| **Resolución de jurisdicción** | El consumidor envía ubicaciones tipificadas por rol semántico: sede emisora, sede contraparte y, cuando aplique, lugar de ejecución del hecho económico (donde se presta el servicio, se entrega el bien, se ubica el inmueble o se ejecuta el proyecto). Cada ubicación referencia una jurisdicción fiscal del catálogo propio del sub-dominio (validada por integridad referencial). El motor resuelve internamente cuál ubicación es la fiscalmente relevante para cada tributo mediante reglas de localización configuradas por tributo y clasificación tributaria (contenido estándar del producto). A partir de la ubicación seleccionada, el motor identifica los niveles jurisdiccionales que aplican según el país (nacional, municipal) y resuelve los tributos correspondientes a cada nivel. Las condiciones de aplicación pueden evaluar atributos de la jurisdicción (tipo, régimen) para modelar regímenes fiscales territoriales sin proliferar reglas por código. | F1 |
+| **Gestión de jurisdicciones fiscales** | El sistema mantiene como dato propio el catálogo de jurisdicciones fiscales por país: jurisdicción nacional, divisiones territoriales administrativas (departamentos, municipios, provincias), regímenes territoriales especiales (Puerto Libre, frontera fiscal, archipiélago) y, en fases posteriores, distritos fiscales sin equivalente administrativo (transit districts, BIDs) y territorios con soberanía tributaria (reservas indígenas). Cada jurisdicción declara su tipo y régimen fiscal opcional. La referencia al catálogo de divisiones territoriales administrativas de Datos de Referencia es opcional — preserva trazabilidad cuando coinciden, pero el sub-dominio no depende de DR para representar regímenes ni jurisdicciones puramente fiscales. | F1 |
+| **Gestión de regímenes especiales empresariales** | El sistema mantiene como dato propio el catálogo de regímenes especiales empresariales por país: zonas francas (DIAN en Colombia, CNZFE en República Dominicana), monopolios departamentales (Colombia, Ley 1816/2016 — licores y juegos), zonas económicas especiales (Zona Libre de Colón, AEEPP y Ciudad del Saber en Panamá), regímenes empresariales archipelágicos y regímenes otorgados por decretos individuales. Cada régimen declara su tipo categórico, autoridad administradora y, opcionalmente, una referencia al municipio donde está físicamente localizado. Las inscripciones de una empresa en estos regímenes se materializan como atributos del perfil tributario cuyo dominio se valida contra el catálogo externo. La precarga estándar por país viene como parte del contenido fiscal; el administrador fiscal puede extenderla con regímenes personalizados (origen personalizado, precedencia sobre estándar). | F1 |
 | **Tributos autoliquidados (reverse charge)** | El motor soporta la determinación de tributos autoliquidados: transacciones donde la entidad fiscal emisora debe autoliquidar un impuesto que la contraparte no cobra (ej: importación de servicios, compras a no residentes). | F1 |
 | **IVA descontable** | El registro tributario preserva los datos necesarios (naturaleza del tributo, dirección fiscal, base gravable, valor) para que se pueda clasificar el IVA como generado o soportado. La determinación de si el IVA soportado es descontable (crédito fiscal) — que depende del régimen de la empresa y la proporción de ingresos gravados del período — y su presentación en declaraciones (ej: F-1005 DIAN) es capacidad de Fase 2. | F1 |
 | **Conversión por cuantía mínima** | Cuando la moneda de la transacción difiere de la moneda de la jurisdicción, el motor recibe un tipo de cambio de referencia como parte de la solicitud de cálculo y lo utiliza para convertir a la moneda de la jurisdicción al evaluar cuantías mínimas. El resultado del cálculo se retorna en la moneda de la transacción; la conversión para efectos contables es responsabilidad del traductor contable. | F1 |
@@ -315,7 +367,7 @@ Las tablas a continuación detallan qué está dentro y fuera del alcance del su
 | **Reportes de información fiscal** | Generación de reportes exigidos por autoridades fiscales (exógena DIAN, formatos DGII, reportes municipales) desde los registros tributarios propios, en los formatos requeridos (XML, Excel para prevalidador). | F2 |
 | **Certificados tributarios** | Generación de certificados de retención en formato legible (PDF), con entrega controlada individual y masiva al tercero destinatario, registrando trazabilidad de la entrega. | F2 |
 | **Vistas de conciliación fiscal** | El sistema expone vistas y reportes de sus registros tributarios organizados por tipo de tributo, período, jurisdicción y entidad fiscal, para facilitar la conciliación contra el libro mayor. El sistema no realiza la conciliación (no conoce cuentas contables), pero provee los datos como fuente de verdad fiscal. | F2 |
-| **Multi-jurisdicción** | Diseño extensible para múltiples jurisdicciones y múltiples países. Implementación inicial: Colombia. | F1 |
+| **Multi-jurisdicción** | Diseño extensible para múltiples jurisdicciones y múltiples países. **F1 — cobertura LatAm:** Colombia, República Dominicana y Panamá, con regímenes territoriales especiales (Puerto Libre San Andrés) y regímenes empresariales precargados (zonas francas DIAN/CNZFE, monopolios departamentales CO bajo Ley 1816/2016, zonas económicas especiales PA: Zona Libre de Colón, AEEPP, Ciudad del Saber). **F2 — apertura a Estados Unidos y Canadá:** activación de jurisdicciones tipo `distrito-fiscal-especial` (transit districts, fire districts, water districts, BIDs, TIFs) y `soberania-tributaria` (reservas indígenas con potestad fiscal propia, First Nations CA), servicio de resolución de jurisdicción por dirección (rooftop/geocoding), decisión arquitectónica de proveedor fiscal externo (Avalara/Vertex/Sovos) versus catálogo propio. | F1 + F2 |
 
 ---
 
@@ -353,23 +405,27 @@ Las tablas a continuación detallan qué está dentro y fuera del alcance del su
 
 El sub-dominio de Impuestos conserva una visión integral de largo plazo que abarca todas las capacidades descritas en este documento. Su implementación se organiza por fases alineadas con la clasificación de capacidades `[D7]`:
 
-### Fase 1 — Núcleo + Soporte
+### Fase 1 — Núcleo + Soporte (cobertura LatAm: CO, DO, PA)
 
-Capacidades que habilitan el ciclo operativo básico del sub-dominio:
+Capacidades que habilitan el ciclo operativo básico del sub-dominio. La cobertura geográfica de F1 abarca Colombia, República Dominicana y Panamá — incluye los regímenes territoriales y empresariales propios de la región.
 
 | Capacidad | Nivel | Descripción |
 |-----------|-------|-------------|
 | Contenido fiscal (configuración tributaria base) | Núcleo | Catálogo de tributos, clasificaciones tributarias, reglas de aplicación, tarifas con vigencia temporal. |
 | Perfil tributario | Núcleo | Gestión de perfiles tributarios de entidades fiscales: régimen, condiciones, atributos por jurisdicción. Referencia documental como metadato de trazabilidad. |
+| Gestión de jurisdicciones fiscales | Núcleo | Catálogo propio de jurisdicciones fiscales por país con tipos `territorial-administrativa` (LatAm clásico) y `regimen-especial-territorial` (Puerto Libre San Andrés). Habilita la resolución de jurisdicción por código y la evaluación de regímenes territoriales en las condiciones de aplicación. Los tipos `distrito-fiscal-especial` y `soberania-tributaria` están definidos en el enum pero sin precarga en F1. |
+| Gestión de regímenes especiales empresariales | Núcleo | Catálogo propio de regímenes empresariales por país: zonas francas (DIAN en CO — 121 ZFs, CNZFE en DO — 75 parques), monopolios departamentales (CO bajo Ley 1816/2016), zonas económicas especiales en Panamá (Zona Libre de Colón, AEEPP Panamá-Pacífico, Ciudad del Saber), régimen empresarial Puerto Libre. Inscripción referenciada desde el perfil tributario con validación contra el catálogo. |
 | Motor de cálculo | Núcleo | Determinación automática y cálculo de tributos a partir del contexto transaccional. |
 | Registro tributario | Núcleo | Registro inmutable del hecho fiscal confirmado. Fuente de verdad del sub-dominio. |
 | Carga asistida del perfil tributario | Soporte | Construcción del perfil desde fuentes oficiales con validación del administrador fiscal. |
 | Catálogos jurisdiccionales | Soporte | Proyección consolidada de información jurisdiccional para consulta. |
 | Integración con consumidores | Núcleo | Contrato de solicitud de cálculo y confirmación tributaria con sub-dominios consumidores (OXP, CXC). |
 
-### Fase 2 — Derivadas
+### Fase 2 — Derivadas + Apertura multi-país (US, CA)
 
-Capacidades que consumen el núcleo y el registro tributario sin redefinirlos:
+Capacidades que consumen el núcleo y el registro tributario sin redefinirlos, más la apertura geográfica a Estados Unidos y Canadá.
+
+**Capacidades derivadas:**
 
 | Capacidad | Descripción |
 |-----------|-------------|
@@ -381,6 +437,18 @@ Capacidades que consumen el núcleo y el registro tributario sin redefinirlos:
 | IVA descontable | Determinación de crédito fiscal del IVA soportado para declaraciones (F-1005 DIAN, equivalentes por país). |
 | Vistas de conciliación fiscal | Reportes organizados por tributo, período, jurisdicción. |
 
+**Apertura multi-país (US, CA):**
+
+| Capacidad | Descripción |
+|-----------|-------------|
+| Distritos fiscales especiales (US) | Precarga de jurisdicciones con `tipo: distrito-fiscal-especial`: transit districts, fire districts, water districts, BIDs (Business Improvement Districts), TIFs (Tax Increment Financing districts). Los códigos no coinciden con divisiones administrativas — divisionTerritorialRef queda vacío. El tipo ya está en el enum F1 sin precarga. |
+| Soberanías tributarias (US, CA) | Precarga de jurisdicciones con `tipo: soberania-tributaria`: reservas indígenas en EE.UU. con potestad fiscal propia (ej: Navajo Nation), First Nations en Canadá. El tipo ya está en el enum F1 sin precarga. |
+| Resolución de jurisdicción por dirección | Servicio que, dada una dirección postal, retorna el código de `JurisdiccionFiscal` aplicable. Requerido para US porque la pertenencia a distritos especiales no se deduce del ZIP code ni del condado. Para LatAm el motor recibe directamente el código de jurisdicción del consumidor. |
+| Decisión arquitectónica proveedor fiscal | Evaluación de integrar proveedor fiscal externo (Avalara, Vertex, Sovos) versus mantener catálogo propio para las >100.000 jurisdicciones US. Decisión condicionada por costo de mantenimiento y frecuencia de cambio normativo. |
+| Regímenes empresariales adicionales | Activación de tipos candidatos del enum `CatalogoDeRegimenesEspeciales` documentados en el anexo y fuera del enum F1: `polo-economico`, `inscripcion-region-fronteriza`, `area-libre-comercio`, `regimen-archipielago-empresa`, `status-indigena`. Extensión del enum es operación cheap (sin eventos nuevos, sin migración estructural). |
+
+> **Trazabilidad:** Las cuatro líneas de trabajo de la apertura US/CA se consolidan en el pendiente `PD11` del modelo de dominio.
+
 ### Criterio de éxito de la Fase 1
 
 La Fase 1 se considera operativa cuando:
@@ -391,6 +459,7 @@ La Fase 1 se considera operativa cuando:
 4. El consumidor puede confirmar la transacción con el desglose aceptado (con o sin intervención manual).
 5. Se genera el registro tributario inmutable como fuente de verdad del hecho fiscal.
 6. Existe trazabilidad suficiente para auditoría y reconstrucción funcional del cálculo.
+7. La operación es válida para los tres países de cobertura F1 — Colombia, República Dominicana y Panamá — con sus catálogos fiscales precargados (tributos, tarifas, jurisdicciones fiscales con regímenes territoriales y catálogos de regímenes empresariales certificados).
 
 > **Nota:** Esta sección es una decisión de alcance funcional y de implementación, no un cronograma ni plan de proyecto. Las fases reflejan la dependencia natural entre capacidades: las derivadas requieren que el núcleo esté operativo.
 
@@ -418,3 +487,7 @@ La Fase 1 se considera operativa cuando:
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
 | 1.0 | Marzo 2026 | Versión inicial: 9 secciones, 24 términos en glosario, 6 actores, 3 flujos, 39 reglas de negocio, 17 áreas dentro del alcance, 13 áreas fuera del alcance, estrategia de implementación por fases (F1 Núcleo+Soporte, F2 Derivadas). |
+| 1.1 | Mayo 2026 | Cambio 2 — Sub-cambio 2.1: nuevo término 25 (Régimen fiscal territorial), nueva regla R40 (Catálogo propio de jurisdicciones fiscales — antes numerada como R39, renumerada para resolver conflicto con R39 preexistente sobre desgravámenes), nueva capacidad "Gestión de jurisdicciones fiscales" en Sección 7. Cambio 3 — Sub-cambio 3.5: nuevo término 26 (Régimen fiscal empresarial), nueva regla R41 (Catálogo propio de regímenes especiales empresariales), nueva capacidad "Gestión de regímenes especiales empresariales" en Sección 7. Total: 26 términos, 41 reglas, 19 áreas dentro del alcance. |
+| 1.2 | Mayo 2026 | Cambio 4 — Reordenamiento F1/F2 multi-país. Sección 7: capacidad "Multi-jurisdicción" actualizada para explicitar cobertura F1 LatAm (CO/DO/PA) y apertura F2 a US/CA con distritos especiales y soberanías tributarias. Sección 8 Fase 1: agregadas capacidades "Gestión de jurisdicciones fiscales" y "Gestión de regímenes especiales empresariales" a la tabla (alineadas con `[D7]` del modelo). Sección 8 Fase 2: nuevo sub-bloque "Apertura multi-país (US, CA)" con 5 capacidades — distritos fiscales especiales, soberanías tributarias, resolución por dirección, decisión proveedor fiscal externo, regímenes empresariales adicionales. Criterios de éxito F1: nuevo criterio (7) que valida operación para los tres países LatAm. Trazabilidad: la apertura US/CA está consolidada en `PD11` del modelo. |
+| 1.3 | Mayo 2026 | Refinamiento (3 aplicados de 7 propuestos, 4 descartados conscientes). **Sección 1 — bloque "Implementación inicial" reformulado:** "País: Colombia" (singular) → "Primer país productivo: Colombia" + nueva línea explícita de cobertura de diseño F1 (CO/DO/PA con go-live país-por-país) + reportes/certificados anclados a Fase 2 + apertura US/CA referenciada a `[PD11]` del modelo. **Sección 5 — nueva subsección "Matriz de responsabilidades funcionales"** que consolida en un solo lugar la distribución entre Impuestos, sub-dominios consumidores y Contabilidad (referencias cruzadas a R21, R25, R33 y al alcance de Contabilidad). **Sección 6.6 — nueva subsección "Rechazos funcionales esperados"** con los 11 motivos canónicos de `ConfirmacionTributariaRechazada.motivoCodigo` alineados al modelo (Sección 5.3.4) + nota de distinción entre `motivoCodigo` (rechazo del flujo) y `motivoExclusion` (tributo descartado en el cálculo). **Descartados conscientes:** A2 nota de F2 (ya explícito en Secciones 7-8), A3 tabla "Criterio de corte operativo" (duplicaba Sección 8 — la frase útil sobre go-live país-por-país se incorporó en "Implementación inicial"), A6 matriz cobertura fiscal por país (duplica Sección 8 + `datos-precargados/`), A7 criterios de aceptación del alcance (meta-documental — esa función la cumplen las skills de auditoría). |
+| 1.4 | Mayo 2026 | Refinamiento (3 aplicados de 3 propuestos, ninguno descartado). **Sección 4 — Flujo 3 marcado como F2:** título renombrado a "Cumplimiento fiscal (F2 — Responsable de cumplimiento fiscal)" + nota de fase agregada que aclara que F1 conserva la información necesaria para habilitar posteriormente reportes, certificados y entregables regulatorios. **Sección 5 — Integraciones de salida con marca de fase:** filas de "Certificado tributario" y "Reportes de información fiscal" marcadas con `(F2)` en la columna "Dato"; las filas F1 (catálogo de clasificaciones, desglose fiscal propuesto) no se tocaron. Cierre coherente con la línea de "Implementación inicial" agregada en v1.3 y con la marca F2 en Sección 7. |

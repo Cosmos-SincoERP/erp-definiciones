@@ -1,0 +1,190 @@
+{
+  "pais": "CO",
+  "catalogo": "CatalogoTributario",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Estatuto Tributario Nacional (Decreto 624 de 1989) + Decreto Único Reglamentario 1625 de 2016 (DIAN) + Ley 14 de 1983 (ICA) + Ley 1430 de 2010 (autorretenciones) + estatutos tributarios municipales.",
+
+  "tributos": [
+    {
+      "codigo": "IVA",
+      "nombre": "Impuesto al Valor Agregado",
+      "naturaleza": "aditivo",
+      "caracterRetencion": null,
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "clasificacion",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Impuesto indirecto nacional sobre la prestación de servicios y la venta o importación de bienes."
+    },
+    {
+      "codigo": "INC",
+      "nombre": "Impuesto Nacional al Consumo",
+      "naturaleza": "aditivo",
+      "caracterRetencion": null,
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "clasificacion",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Impuesto indirecto que grava sectores específicos: vehículos, telecomunicaciones, comidas y bebidas."
+    },
+    {
+      "codigo": "ICA",
+      "nombre": "Impuesto de Industria y Comercio",
+      "naturaleza": "aditivo",
+      "caracterRetencion": null,
+      "nivelJurisdiccional": "municipal",
+      "factorDeTarifa": "actividadEconomica",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Impuesto municipal sobre actividades industriales, comerciales y de servicios. Cada municipio define sus tarifas dentro de los rangos de la Ley 14 de 1983."
+    },
+    {
+      "codigo": "RETEFUENTE",
+      "nombre": "Retención en la Fuente",
+      "naturaleza": "sustractivo",
+      "caracterRetencion": "anticipado",
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "conceptoPago",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Mecanismo anticipado de recaudación del impuesto a la renta y complementarios. Se compensa con la declaración anual de renta."
+    },
+    {
+      "codigo": "RIVA",
+      "nombre": "Retención sobre el IVA",
+      "naturaleza": "sustractivo",
+      "caracterRetencion": "anticipado",
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "porcentajeDePadre",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": "IVA",
+      "origen": "estandar",
+      "definicion": "Recaudación anticipada del IVA efectuada por un agente retenedor."
+    },
+    {
+      "codigo": "RICA",
+      "nombre": "Retención sobre el ICA",
+      "naturaleza": "sustractivo",
+      "caracterRetencion": "anticipado",
+      "nivelJurisdiccional": "municipal",
+      "factorDeTarifa": "actividadEconomica",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Retención a título del impuesto de industria y comercio. Tarifa municipal según la actividad."
+    },
+    {
+      "codigo": "SOBRETASA_BOMBERIL",
+      "nombre": "Sobretasa Bomberil",
+      "naturaleza": "sustractivo",
+      "caracterRetencion": "definitivo",
+      "nivelJurisdiccional": "municipal",
+      "factorDeTarifa": "porcentajeDePadre",
+      "direccionFiscalAplicable": "ambas",
+      "tributoPadre": "RICA",
+      "origen": "estandar",
+      "definicion": "Sobretasa municipal con destinación al cuerpo de bomberos. Aplica sobre el valor de RICA. Requisito: el tercero debe ser responsable de ICA. Ley 1575 de 2012."
+    },
+    {
+      "codigo": "AUTO_RENTA",
+      "nombre": "Autorretención de Renta",
+      "naturaleza": "sustractivo",
+      "caracterRetencion": "anticipado",
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "fija",
+      "direccionFiscalAplicable": "ingreso",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Autorretención a título de renta. Aplica cuando la empresa es autorretenedora. Decreto 2201 de 2016."
+    },
+    {
+      "codigo": "AUTO_RETEFUENTE",
+      "nombre": "Autorretención en la Fuente",
+      "naturaleza": "sustractivo",
+      "caracterRetencion": "anticipado",
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "conceptoPago",
+      "direccionFiscalAplicable": "ingreso",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Autorretención en la fuente que la empresa practica sobre sus propios ingresos cuando es responsable como autorretenedora."
+    },
+    {
+      "codigo": "AUTO_RIVA",
+      "nombre": "Autorretención de IVA",
+      "naturaleza": "sustractivo",
+      "caracterRetencion": "anticipado",
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "porcentajeDePadre",
+      "direccionFiscalAplicable": "gasto",
+      "tributoPadre": "IVA",
+      "origen": "estandar",
+      "definicion": "Autorretención de IVA por reverse charge (importación de servicios). El comprador autoliquida el IVA cuando el vendedor no está obligado."
+    },
+    {
+      "codigo": "AUTO_RICA",
+      "nombre": "Autorretención de ICA",
+      "naturaleza": "sustractivo",
+      "caracterRetencion": "anticipado",
+      "nivelJurisdiccional": "municipal",
+      "factorDeTarifa": "actividadEconomica",
+      "direccionFiscalAplicable": "ingreso",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Autorretención de ICA aplicable cuando la empresa es autorretenedora municipal."
+    }
+  ],
+
+  "clasificaciones": [
+    { "codigo": "GRAV_19", "nombre": "Gravados 19%", "descripcion": "Tarifa general de IVA — bienes y servicios gravados al 19%.", "origen": "estandar" },
+    { "codigo": "GRAV_5", "nombre": "Gravados 5%", "descripcion": "Tarifa reducida de IVA — bienes y servicios de la canasta básica y otros con tarifa especial.", "origen": "estandar" },
+    { "codigo": "EXCLUIDO", "nombre": "Excluidos de IVA", "descripcion": "Bienes y servicios que no generan IVA. Pueden tener retenciones e ICA.", "origen": "estandar" },
+    { "codigo": "EXENTO", "nombre": "Exentos de IVA", "descripcion": "Bienes y servicios con IVA tarifa 0%. Otorgan derecho a descontar el IVA pagado.", "origen": "estandar" },
+    { "codigo": "INC_8", "nombre": "Gravados INC 8%", "descripcion": "Bienes y servicios sujetos a Impuesto Nacional al Consumo tarifa 8%.", "origen": "estandar" },
+    { "codigo": "NO_GRAVADO", "nombre": "No sujeto a impuestos", "descripcion": "Conceptos que no generan ningún tributo.", "origen": "estandar" }
+  ],
+
+  "tratamientos": [
+    { "clasificacion": "GRAV_19", "tributo": "IVA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_19", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_19", "tributo": "RIVA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_19", "tributo": "ICA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_19", "tributo": "RICA", "aplica": true, "origen": "estandar" },
+
+    { "clasificacion": "GRAV_5", "tributo": "IVA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_5", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_5", "tributo": "RIVA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_5", "tributo": "ICA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_5", "tributo": "RICA", "aplica": true, "origen": "estandar" },
+
+    { "clasificacion": "EXCLUIDO", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "EXCLUIDO", "tributo": "ICA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "EXCLUIDO", "tributo": "RICA", "aplica": true, "origen": "estandar" },
+
+    { "clasificacion": "EXENTO", "tributo": "IVA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "EXENTO", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "EXENTO", "tributo": "ICA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "EXENTO", "tributo": "RICA", "aplica": true, "origen": "estandar" },
+
+    { "clasificacion": "INC_8", "tributo": "INC", "aplica": true, "origen": "estandar" }
+  ],
+
+  "reglasLocalizacion": [
+    { "tributo": "IVA", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "INC", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "RETEFUENTE", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "ICA", "clasificacion": "*", "rolQueManda": "lugarEjecucion", "rolFallback": "sedeEmisora", "origen": "estandar" },
+    { "tributo": "RIVA", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "RICA", "clasificacion": "*", "rolQueManda": "lugarEjecucion", "rolFallback": "sedeEmisora", "origen": "estandar" },
+    { "tributo": "SOBRETASA_BOMBERIL", "clasificacion": "*", "rolQueManda": "lugarEjecucion", "rolFallback": "sedeEmisora", "origen": "estandar" },
+    { "tributo": "AUTO_RENTA", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "AUTO_RETEFUENTE", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "AUTO_RIVA", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "AUTO_RICA", "clasificacion": "*", "rolQueManda": "lugarEjecucion", "rolFallback": "sedeEmisora", "origen": "estandar" }
+  ]
+}

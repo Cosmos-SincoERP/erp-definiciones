@@ -1,0 +1,33 @@
+{
+  "pais": "PA",
+  "catalogo": "HomologacionFiscal",
+  "autoridad": "DGI",
+  "version": "0.1-placeholder",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "DGI Panamá — códigos pendientes de validación con consultores fiscales. Esta precarga lista las equivalencias razonablemente esperables basadas en el modelo fiscal panameño.",
+  "estructura": {
+    "totalEquivalencias": 14,
+    "estado": "placeholder",
+    "notaCobertura": "Códigos internos propuestos para los formatos fiscales DGI. Requiere validación con consultores."
+  },
+  "entradas": [
+    { "valorInterno": "GRAV_ITBMS_7", "tributo": "ITBMS", "codigoAutoridad": "07", "nombreAutoridad": "ITBMS 7% — tarifa general", "vigencia": { "fechaDesde": "2010-07-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+    { "valorInterno": "GRAV_ITBMS_10", "tributo": "ITBMS", "codigoAutoridad": "10", "nombreAutoridad": "ITBMS 10% — alcohol y hospedaje", "vigencia": { "fechaDesde": "2010-07-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+    { "valorInterno": "GRAV_ITBMS_15", "tributo": "ITBMS", "codigoAutoridad": "15", "nombreAutoridad": "ITBMS 15% — tabaco", "vigencia": { "fechaDesde": "2010-07-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+    { "valorInterno": "EXENTO_ITBMS", "tributo": "ITBMS", "codigoAutoridad": "EX", "nombreAutoridad": "ITBMS — Exento", "vigencia": { "fechaDesde": "2010-07-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+
+    { "valorInterno": "RITBMS-50", "tributo": "RITBMS", "codigoAutoridad": "R50", "nombreAutoridad": "Retención ITBMS 50%", "vigencia": { "fechaDesde": "2011-01-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+
+    { "valorInterno": "ISR-HONORARIOS", "tributo": "ISR", "codigoAutoridad": "ISR-HON", "nombreAutoridad": "Retención ISR — Honorarios profesionales", "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+    { "valorInterno": "ISR-DIVIDENDOS", "tributo": "ISR", "codigoAutoridad": "ISR-DIV", "nombreAutoridad": "Retención ISR — Dividendos", "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+    { "valorInterno": "ISR-INTERESES", "tributo": "ISR", "codigoAutoridad": "ISR-INT", "nombreAutoridad": "Retención ISR — Intereses bancarios", "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+    { "valorInterno": "ISR-ALQUILERES", "tributo": "ISR", "codigoAutoridad": "ISR-ALQ", "nombreAutoridad": "Retención ISR — Alquileres", "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+    { "valorInterno": "ISR-EXTERIOR", "tributo": "ISR", "codigoAutoridad": "ISR-EXT", "nombreAutoridad": "Retención ISR — Pagos al exterior (no exento por territorialidad)", "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+
+    { "valorInterno": "ISC_TELECOMUNICACIONES_MOVIL", "tributo": "ISC", "codigoAutoridad": "ISC-TM", "nombreAutoridad": "ISC — Telecomunicaciones móviles", "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+    { "valorInterno": "ISC_JOYAS_ARMAS", "tributo": "ISC", "codigoAutoridad": "ISC-JA", "nombreAutoridad": "ISC — Joyas y armas", "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+
+    { "valorInterno": "OPERACION_LOCAL", "tributo": null, "codigoAutoridad": "L", "nombreAutoridad": "Operación local", "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" },
+    { "valorInterno": "OPERACION_EXTERIOR", "tributo": null, "codigoAutoridad": "E", "nombreAutoridad": "Operación con el exterior", "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null }, "estado": "propuesta", "origen": "estandar" }
+  ]
+}

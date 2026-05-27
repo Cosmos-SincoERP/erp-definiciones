@@ -1,0 +1,136 @@
+{
+  "pais": "CO",
+  "catalogo": "JurisdiccionFiscal",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "DIVIPOLA - DANE (División Político-Administrativa de Colombia); Constitución Política de Colombia (1991); Ley 47 de 1993 (Puerto Libre San Andrés); Ley 1617 de 2013 (Régimen Distritos Especiales); leyes y actos legislativos de creación de distritos.",
+  "entradas": [
+    {
+      "codigo": "CO",
+      "nombre": "Colombia",
+      "nivelJurisdiccional": "nacional",
+      "tipo": "territorial-administrativa",
+      "divisionTerritorialRef": null,
+      "tipoRegimen": null,
+      "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null },
+      "origen": "estandar"
+    },
+
+    { "codigo": "05", "nombre": "Antioquia", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "05", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "08", "nombre": "Atlántico", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "08", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "11", "nombre": "Bogotá D.C.", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "11", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "13", "nombre": "Bolívar", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "13", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "15", "nombre": "Boyacá", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "15", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "17", "nombre": "Caldas", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "17", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "18", "nombre": "Caquetá", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "18", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "19", "nombre": "Cauca", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "19", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "20", "nombre": "Cesar", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "20", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "23", "nombre": "Córdoba", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "23", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "25", "nombre": "Cundinamarca", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "25", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "27", "nombre": "Chocó", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "27", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "41", "nombre": "Huila", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "41", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "44", "nombre": "La Guajira", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "44", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "47", "nombre": "Magdalena", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "47", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "50", "nombre": "Meta", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "50", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "52", "nombre": "Nariño", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "52", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "54", "nombre": "Norte de Santander", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "54", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "63", "nombre": "Quindío", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "63", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "66", "nombre": "Risaralda", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "66", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "68", "nombre": "Santander", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "68", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "70", "nombre": "Sucre", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "70", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "73", "nombre": "Tolima", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "73", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "76", "nombre": "Valle del Cauca", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "76", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "81", "nombre": "Arauca", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "81", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "85", "nombre": "Casanare", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "85", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "86", "nombre": "Putumayo", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "86", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "88", "nombre": "Archipiélago de San Andrés, Providencia y Santa Catalina", "nivelJurisdiccional": "departamental", "tipo": "regimen-especial-territorial", "divisionTerritorialRef": "88", "tipoRegimen": "puerto-libre", "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "91", "nombre": "Amazonas", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "91", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "94", "nombre": "Guainía", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "94", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "95", "nombre": "Guaviare", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "95", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "97", "nombre": "Vaupés", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "97", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "99", "nombre": "Vichada", "nivelJurisdiccional": "departamental", "tipo": "territorial-administrativa", "divisionTerritorialRef": "99", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "05001", "nombre": "Medellín", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "05001", "tipoRegimen": null, "vigencia": { "fechaDesde": "2021-07-14", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "05088", "nombre": "Bello", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "05088", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "05266", "nombre": "Envigado", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "05266", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "05360", "nombre": "Itagüí", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "05360", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "05631", "nombre": "Sabaneta", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "05631", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "05837", "nombre": "Turbo", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "05837", "tipoRegimen": null, "vigencia": { "fechaDesde": "2018-01-24", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "08001", "nombre": "Barranquilla", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "08001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1993-12-29", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "08758", "nombre": "Soledad", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "08758", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "11001", "nombre": "Bogotá D.C.", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "11001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "13001", "nombre": "Cartagena de Indias", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "13001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "13468", "nombre": "Santa Cruz de Mompox", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "13468", "tipoRegimen": null, "vigencia": { "fechaDesde": "2017-12-27", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "15001", "nombre": "Tunja", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "15001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "17001", "nombre": "Manizales", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "17001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "18001", "nombre": "Florencia", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "18001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "19001", "nombre": "Popayán", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "19001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "20001", "nombre": "Valledupar", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "20001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "23001", "nombre": "Montería", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "23001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "25754", "nombre": "Soacha", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "25754", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "27001", "nombre": "Quibdó", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "27001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "41001", "nombre": "Neiva", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "41001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "44001", "nombre": "Riohacha", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "44001", "tipoRegimen": null, "vigencia": { "fechaDesde": "2015-07-15", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "47001", "nombre": "Santa Marta", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "47001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "50001", "nombre": "Villavicencio", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "50001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "52001", "nombre": "Pasto", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "52001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "52835", "nombre": "San Andrés de Tumaco", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "52835", "tipoRegimen": null, "vigencia": { "fechaDesde": "2007-07-17", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "54001", "nombre": "Cúcuta", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "54001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "63001", "nombre": "Armenia", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "63001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "66001", "nombre": "Pereira", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "66001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "68001", "nombre": "Bucaramanga", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "68001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "68081", "nombre": "Barrancabermeja", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "68081", "tipoRegimen": null, "vigencia": { "fechaDesde": "2024-01-25", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "68276", "nombre": "Floridablanca", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "68276", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "68307", "nombre": "Girón", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "68307", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "68547", "nombre": "Piedecuesta", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "68547", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "70001", "nombre": "Sincelejo", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "70001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "73001", "nombre": "Ibagué", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "73001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "76001", "nombre": "Cali", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "76001", "tipoRegimen": null, "vigencia": { "fechaDesde": "2023-07-25", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "76109", "nombre": "Buenaventura", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "76109", "tipoRegimen": null, "vigencia": { "fechaDesde": "2007-07-06", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "76520", "nombre": "Palmira", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "76520", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "76834", "nombre": "Tuluá", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "76834", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "76892", "nombre": "Yumbo", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "76892", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "81001", "nombre": "Arauca", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "81001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "85001", "nombre": "Yopal", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "85001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "86001", "nombre": "Mocoa", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "86001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "88001", "nombre": "San Andrés", "nivelJurisdiccional": "municipal", "tipo": "regimen-especial-territorial", "divisionTerritorialRef": "88001", "tipoRegimen": "puerto-libre", "vigencia": { "fechaDesde": "1993-02-19", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "88564", "nombre": "Providencia", "nivelJurisdiccional": "municipal", "tipo": "regimen-especial-territorial", "divisionTerritorialRef": "88564", "tipoRegimen": "puerto-libre", "vigencia": { "fechaDesde": "1993-02-19", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "91001", "nombre": "Leticia", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "91001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "94001", "nombre": "Inírida", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "94001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "95001", "nombre": "San José del Guaviare", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "95001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "97001", "nombre": "Mitú", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "97001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "99001", "nombre": "Puerto Carreño", "nivelJurisdiccional": "municipal", "tipo": "territorial-administrativa", "divisionTerritorialRef": "99001", "tipoRegimen": null, "vigencia": { "fechaDesde": "1991-07-04", "fechaHasta": null }, "origen": "estandar" }
+  ]
+}

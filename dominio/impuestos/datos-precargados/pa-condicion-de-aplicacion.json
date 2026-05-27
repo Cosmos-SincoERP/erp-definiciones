@@ -1,0 +1,163 @@
+{
+  "pais": "PA",
+  "catalogo": "CondicionDeAplicacion",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "Código Fiscal de Panamá + Decretos Ejecutivos DGI + leyes orgánicas de áreas económicas especiales (ZLC, AEEPP, Ciudad del Saber).",
+  "estructura": {
+    "totalCondiciones": 11,
+    "porTributo": {
+      "ITBMS": 4,
+      "RITBMS": 3,
+      "ISC": 1,
+      "ISR": 3
+    }
+  },
+  "entradas": [
+    {
+      "codigo": "ITBMS-01a",
+      "tributo": "ITBMS",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esContribuyenteITBMS", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "ingreso",
+      "descripcion": "Empresa vendedora contribuyente ITBMS → genera ITBMS en sus ventas.",
+      "vigencia": { "fechaDesde": "2010-07-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "ITBMS-01b",
+      "tributo": "ITBMS",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "esContribuyenteITBMS", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Proveedor contribuyente ITBMS → cobra ITBMS a la empresa adquiriente.",
+      "vigencia": { "fechaDesde": "2010-07-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "ITBMS-02-zlc",
+      "tributo": "ITBMS",
+      "entidadEvaluada": "emisora-o-contraparte",
+      "criterios": [
+        { "atributo": "inscripcionZonaLibreColon", "operador": "no-nulo" }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "ambas",
+      "descripcion": "Empresa inscrita en ZLC — exoneración de ITBMS sobre operaciones de re-exportación. Alcance específico (ventas al exterior vs locales) requiere refinamiento con consultores.",
+      "vigencia": { "fechaDesde": "1948-06-17", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "ITBMS-03-aeepp",
+      "tributo": "ITBMS",
+      "entidadEvaluada": "emisora-o-contraparte",
+      "criterios": [
+        { "atributo": "inscripcionAEEPP", "operador": "no-nulo" }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "ambas",
+      "descripcion": "Empresa inscrita en AEEPP — exoneración condicional de ITBMS según tipo de operación (logística internacional, manufactura, servicios). Alcance detallado requiere validación con consultores.",
+      "vigencia": { "fechaDesde": "2004-04-08", "fechaHasta": null },
+      "origen": "estandar"
+    },
+
+    {
+      "codigo": "RITBMS-01",
+      "tributo": "RITBMS",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esAgenteRetencionITBMS", "operador": "igual", "valor": true },
+        { "entidad": "contraparte", "atributo": "esContribuyenteITBMS", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Empresa adquiriente agente de retención ITBMS + proveedor contribuyente ITBMS → empresa retiene el 50% del ITBMS al proveedor.",
+      "vigencia": { "fechaDesde": "2011-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RITBMS-02",
+      "tributo": "RITBMS",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esAgenteRetencionITBMS", "operador": "igual", "valor": false }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Empresa adquiriente NO designada como agente de retención → no retiene RITBMS al proveedor.",
+      "vigencia": { "fechaDesde": "2011-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RITBMS-03",
+      "tributo": "RITBMS",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "esContribuyenteITBMS", "operador": "igual", "valor": false }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Proveedor no es contribuyente ITBMS → no hay ITBMS que retener.",
+      "vigencia": { "fechaDesde": "2011-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+
+    {
+      "codigo": "ISC-01",
+      "tributo": "ISC",
+      "entidadEvaluada": null,
+      "criterios": [],
+      "efecto": "aplicar-default",
+      "direccionFiscalAplicable": "ambas",
+      "descripcion": "ISC aplica cuando el concepto tiene clasificación ISC_APLICABLE y el motor encuentra tarifa específica en TarifaTributaria. No depende de calidades del perfil tributario.",
+      "vigencia": { "fechaDesde": "2010-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+
+    {
+      "codigo": "ISR-01-agente",
+      "tributo": "ISR",
+      "entidadEvaluada": "emisora",
+      "criterios": [
+        { "atributo": "esAgenteRetencionISR", "operador": "igual", "valor": true }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Empresa adquiriente designada como agente de retención de ISR → retiene sobre el pago al proveedor según concepto.",
+      "vigencia": { "fechaDesde": "1956-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "ISR-02-territorial",
+      "tributo": "ISR",
+      "entidadEvaluada": null,
+      "criterios": [
+        { "atributo": "fuente", "operador": "igual", "valor": "extranjera" }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Régimen territorial de renta — pagos al exterior por servicios prestados desde el extranjero (fuente extranjera) NO están sujetos a ISR en Panamá. La determinación de fuente es caso por caso.",
+      "vigencia": { "fechaDesde": "1956-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "ISR-03-cdi",
+      "tributo": "ISR",
+      "entidadEvaluada": null,
+      "criterios": [
+        { "atributo": "paisContraparte", "operador": "tiene-cdi-vigente", "valor": "PA" }
+      ],
+      "efecto": "aplicar-con-tarifa-cdi",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Convenios para Evitar la Doble Imposición (CDIs) vigentes reducen la tarifa de retención al exterior. El motor consulta la tabla de CDIs para resolver tarifa aplicable (pendiente modelado de tabla CDIs).",
+      "vigencia": { "fechaDesde": "1956-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "pais": "PA",
+  "catalogo": "JurisdiccionFiscal",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "INEC (Instituto Nacional de Estadística y Censo de Panamá) — División Político Administrativa de Panamá; Constitución Política de Panamá (1972, reforma 2004); Ley 1 de 1982 (Comarca Kuna Yala); Ley 22 de 1983 (Comarca Emberá-Wounaan); Ley 10 de 1997 (Comarca Ngäbe-Buglé); Ley 119 de 2013 (creación Provincia Panamá Oeste).",
+  "entradas": [
+    { "codigo": "PA", "nombre": "República de Panamá", "nivelJurisdiccional": "nacional", "tipo": "territorial-administrativa", "divisionTerritorialRef": null, "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "01", "nombre": "Bocas del Toro", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "01", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "02", "nombre": "Coclé", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "02", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "03", "nombre": "Colón", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "03", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "04", "nombre": "Chiriquí", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "04", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "05", "nombre": "Darién", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "05", "tipoRegimen": null, "vigencia": { "fechaDesde": "1922-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "06", "nombre": "Herrera", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "06", "tipoRegimen": null, "vigencia": { "fechaDesde": "1915-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "07", "nombre": "Los Santos", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "07", "tipoRegimen": null, "vigencia": { "fechaDesde": "1850-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "08", "nombre": "Panamá", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "08", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "09", "nombre": "Veraguas", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "09", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "10", "nombre": "Panamá Oeste", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "10", "tipoRegimen": null, "vigencia": { "fechaDesde": "2014-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "11", "nombre": "Comarca Kuna Yala (Guna Yala)", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "11", "tipoRegimen": null, "vigencia": { "fechaDesde": "1953-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "12", "nombre": "Comarca Emberá-Wounaan", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "12", "tipoRegimen": null, "vigencia": { "fechaDesde": "1983-11-08", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "13", "nombre": "Comarca Ngäbe-Buglé", "nivelJurisdiccional": "provincial", "tipo": "territorial-administrativa", "divisionTerritorialRef": "13", "tipoRegimen": null, "vigencia": { "fechaDesde": "1997-03-07", "fechaHasta": null }, "origen": "estandar" },
+
+    { "codigo": "0101", "nombre": "Bocas del Toro (distrito)", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "0101", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "0201", "nombre": "Penonomé", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "0201", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "0301", "nombre": "Colón (distrito)", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "0301", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "0401", "nombre": "David", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "0401", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "0501", "nombre": "La Palma", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "0501", "tipoRegimen": null, "vigencia": { "fechaDesde": "1922-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "0601", "nombre": "Chitré", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "0601", "tipoRegimen": null, "vigencia": { "fechaDesde": "1915-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "0701", "nombre": "Las Tablas", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "0701", "tipoRegimen": null, "vigencia": { "fechaDesde": "1850-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "0801", "nombre": "Panamá (distrito)", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "0801", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "0808", "nombre": "Clayton (corregimiento — Ciudad del Saber)", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "0808", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "0901", "nombre": "Santiago", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "0901", "tipoRegimen": null, "vigencia": { "fechaDesde": "1903-11-03", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "1001", "nombre": "La Chorrera", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "1001", "tipoRegimen": null, "vigencia": { "fechaDesde": "2014-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "codigo": "1002", "nombre": "Arraiján", "nivelJurisdiccional": "distrital", "tipo": "territorial-administrativa", "divisionTerritorialRef": "1002", "tipoRegimen": null, "vigencia": { "fechaDesde": "2014-01-01", "fechaHasta": null }, "origen": "estandar" }
+  ]
+}

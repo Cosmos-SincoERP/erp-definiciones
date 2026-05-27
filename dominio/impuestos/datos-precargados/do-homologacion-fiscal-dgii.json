@@ -1,0 +1,42 @@
+{
+  "pais": "DO",
+  "catalogo": "HomologacionFiscal",
+  "autoridad": "DGII",
+  "version": "1.0",
+  "fechaActualizacion": "2026-05-26",
+  "fuente": "DGII — Normas Generales 06-2018 (NCF), 06-2021 (e-CF) y especificaciones técnicas de los formatos 606-609.",
+  "estructura": {
+    "totalEquivalencias": 18,
+    "porTributo": {
+      "ITBIS": 6,
+      "RITBIS": 3,
+      "ISR": 6,
+      "ISC": 1,
+      "OPERACION": 2
+    }
+  },
+  "entradas": [
+    { "valorInterno": "GRAV_ITBIS_18", "tributo": "ITBIS", "codigoAutoridad": "G", "nombreAutoridad": "Gravado ITBIS — Tarifa General 18%", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "GRAV_ITBIS_16", "tributo": "ITBIS", "codigoAutoridad": "G2", "nombreAutoridad": "Gravado ITBIS — Tarifa Reducida 16%", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "EXENTO_ITBIS", "tributo": "ITBIS", "codigoAutoridad": "E", "nombreAutoridad": "Exento de ITBIS", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "ITBIS_FACTURADO", "tributo": "ITBIS", "codigoAutoridad": "ITBIS-F", "nombreAutoridad": "ITBIS facturado en ventas", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "ITBIS_DEDUCIDO", "tributo": "ITBIS", "codigoAutoridad": "ITBIS-D", "nombreAutoridad": "ITBIS deducido en compras", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "ITBIS_EXPORTACION", "tributo": "ITBIS", "codigoAutoridad": "ITBIS-X", "nombreAutoridad": "ITBIS en operaciones de exportación", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "valorInterno": "RITBIS-30", "tributo": "RITBIS", "codigoAutoridad": "R-30", "nombreAutoridad": "Retención ITBIS 30%", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "RITBIS-100-PF", "tributo": "RITBIS", "codigoAutoridad": "R-100", "nombreAutoridad": "Retención ITBIS 100% — Persona Física", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "RITBIS-75", "tributo": "RITBIS", "codigoAutoridad": "R-75", "nombreAutoridad": "Retención ITBIS 75% — casos específicos", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "valorInterno": "ISR-HONORARIOS", "tributo": "ISR", "codigoAutoridad": "ISR-01", "nombreAutoridad": "Retención ISR — Honorarios profesionales", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "ISR-ALQUILERES", "tributo": "ISR", "codigoAutoridad": "ISR-02", "nombreAutoridad": "Retención ISR — Alquileres", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "ISR-DIVIDENDOS", "tributo": "ISR", "codigoAutoridad": "ISR-03", "nombreAutoridad": "Retención ISR — Dividendos", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "ISR-INTERESES", "tributo": "ISR", "codigoAutoridad": "ISR-04", "nombreAutoridad": "Retención ISR — Intereses", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "ISR-EXTERIOR", "tributo": "ISR", "codigoAutoridad": "ISR-EXT", "nombreAutoridad": "Retención ISR — Pagos al exterior", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "ISR-PREMIOS", "tributo": "ISR", "codigoAutoridad": "ISR-PR", "nombreAutoridad": "Retención ISR — Premios y ganancias fortuitas", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "valorInterno": "ISC_APLICABLE", "tributo": "ISC", "codigoAutoridad": "ISC", "nombreAutoridad": "ISC aplicable", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+
+    { "valorInterno": "OPERACION_LOCAL", "tributo": null, "codigoAutoridad": "01", "nombreAutoridad": "Operación local", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "OPERACION_EXTERIOR", "tributo": null, "codigoAutoridad": "02", "nombreAutoridad": "Operación con el exterior", "vigencia": { "fechaDesde": "2007-01-01", "fechaHasta": null }, "origen": "estandar" }
+  ]
+}
