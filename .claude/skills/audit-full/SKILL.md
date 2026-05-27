@@ -1,6 +1,6 @@
 ---
 name: audit-full
-description: "Orquestador de auditoría completa del modelo de dominio DDD/ES/EDA: ejecuta las 10 skills de auditoría en secuencia lógica (glossary → composition → state-machines → invariants → responsibilities → event-semantics → idempotency → sagas → open-decisions → sanity-check) y consolida un reporte unificado priorizado. Úsalo cuando el usuario pida una auditoría completa, un review general del modelo, o cuando se quiera validar el estado global del documento después de sesiones largas de edición."
+description: "Orquestador de auditoría completa del modelo de dominio DDD/ES/EDA: ejecuta las 11 skills de auditoría en secuencia lógica (glossary → composition → state-machines → invariants → responsibilities → event-semantics → contract-vs-internals → idempotency → sagas → open-decisions → sanity-check) y consolida un reporte unificado priorizado. Úsalo cuando el usuario pida una auditoría completa, un review general del modelo, o cuando se quiera validar el estado global del documento después de sesiones largas de edición."
 disable-model-invocation: false
 user-invocable: true
 allowed-tools: Read, Grep, Glob
@@ -8,7 +8,7 @@ allowed-tools: Read, Grep, Glob
 
 # Audit Full — Orquestador de Auditoría Completa
 
-Orquestador que ejecuta las 10 skills de auditoría especializadas en secuencia lógica, consolidando los hallazgos en un reporte unificado priorizado por severidad.
+Orquestador que ejecuta las 11 skills de auditoría especializadas en secuencia lógica, consolidando los hallazgos en un reporte unificado priorizado por severidad.
 
 ## Secuencia de ejecución
 
@@ -29,20 +29,21 @@ Ejecutar las skills en este orden preciso. Cada skill construye sobre el context
 |------|-------|----------------|
 | 5 | `/audit-behavior-responsibilities` | Diseño comportamental de agregados |
 | 6 | `/audit-behavior-event-semantics` | Semántica de eventos |
-| 7 | `/audit-behavior-idempotency` | Concurrencia e idempotencia |
+| 7 | `/audit-behavior-contract-vs-internals` | Coherencia entre contrato externo y flujo interno |
+| 8 | `/audit-behavior-idempotency` | Concurrencia e idempotencia |
 
 ### Capa 3 — Process (valida coordinación multi-agregado)
 
 | Paso | Skill | Razón del orden |
 |------|-------|----------------|
-| 8 | `/audit-process-sagas` | Procesos multi-agregado |
+| 9 | `/audit-process-sagas` | Procesos multi-agregado |
 
 ### Capa 4 — Quality (meta-auditoría sobre todo lo anterior)
 
 | Paso | Skill | Razón del orden |
 |------|-------|----------------|
-| 9 | `/audit-quality-open-decisions` | Inventario de pendientes |
-| 10 | `/audit-quality-sanity-check` | Último: coherencia global con todo lo anterior |
+| 10 | `/audit-quality-open-decisions` | Inventario de pendientes |
+| 11 | `/audit-quality-sanity-check` | Último: coherencia global con todo lo anterior |
 
 ## Procedimiento
 
@@ -81,16 +82,19 @@ Ejecutar las skills en este orden preciso. Cada skill construye sobre el context
 ### 6. Semántica de Eventos
 (reporte completo de audit-behavior-event-semantics)
 
-### 7. Idempotencia y Concurrencia
+### 7. Contrato vs Flujo Interno
+(reporte completo de audit-behavior-contract-vs-internals)
+
+### 8. Idempotencia y Concurrencia
 (reporte completo de audit-behavior-idempotency)
 
-### 8. Sagas y Procesos Multi-Agregado
+### 9. Sagas y Procesos Multi-Agregado
 (reporte completo de audit-process-sagas)
 
-### 9. Decisiones Abiertas
+### 10. Decisiones Abiertas
 (reporte completo de audit-quality-open-decisions)
 
-### 10. Sanity Check (Coherencia Cruzada)
+### 11. Sanity Check (Coherencia Cruzada)
 (reporte completo de audit-quality-sanity-check)
 
 ---
@@ -105,6 +109,7 @@ Ejecutar las skills en este orden preciso. Cada skill construye sobre el context
 | Invariantes | N | N | N | N |
 | Responsabilidades | N | N | N | N |
 | Semántica Eventos | N | N | N | N |
+| Contrato vs Flujo | N | N | N | N |
 | Idempotencia | N | N | N | N |
 | Sagas | N | N | N | N |
 | Decisiones Abiertas | N | N | N | N |

@@ -14,6 +14,7 @@ Definición de los sub-dominios de un ERP mediante documentos de diseño convers
 | `dominio/terceros/` | Terceros | Alcance v1.0, Modelo v1.0 — Listo para desarrollo |
 | `dominio/estructura-organizacional/` | Estructura Organizacional | Definición inicial |
 | `compartido/datos-referencia/` | Datos de Referencia (catálogos base del ERP) | Alcance v1.0, Especificación v1.0 — Listo para desarrollo |
+| `compartido/asistente-onboarding/` | Asistente de Onboarding (caso PUC en v1.0; transversal a otros casos futuros) | Alcance v1.0, Modelo v1.0, Caso PUC v1.0 — Listo para desarrollo (F1) |
 | *(pendiente)* | Tesorería | No iniciado |
 | *(pendiente)* | Emisión Electrónica | No iniciado |
 | *(pendiente)* | Recepción Electrónica | No iniciado |

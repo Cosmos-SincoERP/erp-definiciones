@@ -10,6 +10,8 @@ tributario.
 
 ¿Debe existir un catálogo centralizado o cada dominio gestiona el suyo?
 
+> **Nota sobre menciones conceptuales:** Algunos sub-dominios referenciados en este documento (ej: **Nómina**) son **menciones conceptuales en ideación** — se usan para ilustrar el patrón federado de catálogos pero **no forman parte del roadmap confirmado del ERP Cosmos**. No deben tomarse como referencias a sub-dominios que se van a construir, sino como ejemplos de cómo encajaría un sub-dominio de ese tipo en el modelo. Cuando aparezcan, se marcan con `(ideación)`.
+
 ## Decisión
 
 **Modelo federado: cada dominio de gestión es dueño de su catálogo.**
@@ -50,12 +52,12 @@ sea la fuente de verdad:
                    │ referencia (no duplicación)
      ┌─────────────┼─────────────┬──────────────┐
      ▼             ▼             ▼              ▼
-┌──────────┐ ┌──────────┐ ┌──────────┐ ┌──────────┐
-│ Catálogo │ │ Catálogo │ │ Catálogo │ │ Catálogo │
-│ Compras  │ │ OXP      │ │ Arrend.  │ │ Nómina   │
-│ Constr.  │ │ (gasto   │ │          │ │          │
-│          │ │ directo) │ │          │ │          │
-└──────────┘ └──────────┘ └──────────┘ └──────────┘
+┌──────────┐ ┌──────────┐ ┌──────────┐ ┌─────────────┐
+│ Catálogo │ │ Catálogo │ │ Catálogo │ │ Catálogo    │
+│ Compras  │ │ OXP      │ │ Arrend.  │ │ Nómina      │
+│ Constr.  │ │ (gasto   │ │          │ │ (ideación)  │
+│          │ │ directo) │ │          │ │             │
+└──────────┘ └──────────┘ └──────────┘ └─────────────┘
 ```
 
 Si Impuestos desactiva una clasificación tributaria, emite evento
@@ -69,7 +71,7 @@ según su criterio (alerta, bloqueo, etc.).
 | Compras Construcción | Ítems de construcción | unidadMedida, codigoUNSPC, categoriaAprovisionamiento | Compras → OXP |
 | OXP | Tipos de gasto directo | (mínimo — solo código y descripción) | OXP (modo directo) |
 | Arrendamiento | Conceptos de arrendamiento | tipoInmueble, periodicidad, porcentajeComision | Arrendamiento → OXP (gasto) y → CXC (ingreso) |
-| Nómina | Conceptos laborales | tipoNovedad, baseLiquidacion, topeLegal | Nómina → su módulo transaccional |
+| Nómina *(ideación)* | Conceptos laborales | tipoNovedad, baseLiquidacion, topeLegal | Nómina → su módulo transaccional |
 | Facturación / Ventas | Productos y servicios vendidos | (por definir) | Facturación → CXC |
 
 ## Estructura común obligatoria
