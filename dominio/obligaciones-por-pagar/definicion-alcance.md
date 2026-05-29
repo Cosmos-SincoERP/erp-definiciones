@@ -75,15 +75,15 @@ El diseño contempla escalabilidad para compañías con mayor volumen de transac
 | **OXP** | Obligación por Pagar. Registro que representa un compromiso de pago de la compañía. |
 | **OXP de Comercio** | Obligación por pagar originada por un hecho económico de egreso (compra, gasto o costo). Independiente del medio de pago: puede originarse en compra con tarjeta (crédito o débito), factura de proveedor a crédito, pago de contado u otro medio. La forma de pago se resuelve automáticamente durante la radicación (por los datos extraídos del soporte, por el contexto del tercero/concepto, o por asignación del usuario) y determina el flujo de resolución financiera dentro del sistema (vía extracto bancario o pago directo desde Tesorería). |
 | **OXP de Extracto** | Obligación por pagar consolidada que agrupa las OXP de comercio de un período, incluyendo las devoluciones y los cargos adicionales aplicables según el medio de pago. |
-| **Pagada (OXP de Extracto)** | Estado que indica que el sistema contable externo (SincoA&F) ha confirmado la ejecución del pago financiero correspondiente al extracto. |
+| **Pagada (OXP de Extracto)** | Estado que indica que el sistema contable ha confirmado la ejecución del pago financiero correspondiente al extracto. |
 | **Radicación** | Fase operativa inicial que comprende tres momentos: (1) **extracción** — obtención de datos estructurados desde el soporte documental, delegada a servicios de infraestructura transversal, (2) **clasificación** — determinación inteligente del origen de la obligación (directa o de sub-dominio de gestión) y resolución de las referencias fiscales (clasificacionTributaria, conceptoPago), (3) **registro** — incorporación al dominio OXP como obligación por pagar en estado pendiente. La extracción es un servicio de infraestructura transversal; la clasificación y el registro son responsabilidad del dominio OXP. La radicación puede iniciar con información parcial y contempla la completitud progresiva de datos y soportes requeridos. |
 | **Anticipo** | Obligación por pagar que puede o no contar con soportes preliminares (ej: cuenta de cobro) y requiere la entrega de dinero al comercio/proveedor. Tiene ciclo de vida independiente con tres fases: (1) **confirmación y causación contable** — el anticipo se confirma y se causa contablemente generando un asiento propio (Db Anticipos a proveedores · Cr CxP por anticipos), análogo al ciclo de OXP de Comercio; (2) **pago** — cómo se cubrió el desembolso (vinculación a extracto, pago directo o devolución); (3) **regularización** — contra qué OXP de Comercio se justifica el gasto. Estados: Vigente → Confirmada → Causada → (Pagado / Regularizado en cualquier orden) → Cerrado. También puede cancelarse completamente mediante reversa total si aún no tiene pagos ni regularizaciones aplicadas (estado Reversado, solo desde estados previos a la causación). Un anticipo también puede nacer automáticamente por excedente de devolución, en cuyo caso pasa por Confirmada y Causada en el mismo evento de creación (confirmación automática heredada del flujo de devolución) y entra directamente en estado Pagado. Se aplican políticas de plazo configurables para alertar sobre anticipos que excedan el tiempo permitido sin regularizar. Aplica para ambos medios de pago. |
 | **Regularización de Anticipos** | Proceso coordinado mediante el cual un anticipo se cruza contra una o más OXP de Comercio confirmadas del mismo tercero. Cada regularización reduce el saldo por regularizar del anticipo y aplica un pago sobre la OXP de Comercio destino. La regularización solo puede realizarse contra OXP de Comercio en estado Confirmada o posterior, donde el valor neto ya es estable. Un anticipo puede regularizarse contra múltiples OXP de Comercio en operaciones independientes (1:N). La regularización genera la información estructurada necesaria para la amortización contable. |
-| **Amortización del Anticipo** | Efecto contable mediante el cual el saldo del anticipo se reclasifica total o parcialmente a las cuentas de gasto o costo definitivas. La amortización es ejecutada por el sistema contable externo (SincoA&F) a partir de la información estructurada entregada por OXP. Equivale al concepto internacional de *Down Payment Clearing* (SAP). |
+| **Amortización del Anticipo** | Efecto contable mediante el cual el saldo del anticipo se reclasifica total o parcialmente a las cuentas de gasto o costo definitivas. La amortización es ejecutada por el sistema contable a partir de la información estructurada entregada por OXP. Equivale al concepto internacional de *Down Payment Clearing* (SAP). |
 | **Devolución** | Reintegro de dinero del comercio hacia la compañía. Se registra con valor positivo representando la magnitud del crédito; la naturaleza contable (nota crédito) la determina el tipo, no el signo. Tiene ciclo de vida independiente (Pendiente → Confirmada → Causada) y se clasifica en 3 tipos según el OXP origen: (1) **Comercio** — devuelve conceptos de gasto de una OXP de Comercio; el crédito se aplica contra el saldo pendiente de pago, y si lo excede, genera un anticipo por el excedente. (2) **Extracto** — devuelve cargos financieros cobrados en un extracto anterior. (3) **Anticipo** — reversa total de un anticipo sin pagos ni regularizaciones. La devolución puede aparecer en un período diferente al del OXP original. |
 | **Reversa de Anticipo** | Cancelación total de un anticipo que aún no tiene pagos ni regularizaciones aplicadas. Se formaliza mediante una devolución tipo Anticipo. Solo aplica cuando el anticipo está en estado Vigente sin cruces previos. El anticipo pasa a estado terminal Reversado. |
 | **Excedente de Devolución** | Cuando el valor de una devolución excede el saldo pendiente de pago de la OXP de Comercio origen, el sistema genera automáticamente un anticipo por la diferencia. Este anticipo nace en estado Pagado (ya cubierto por la devolución) y pendiente de regularización. |
-| **Pago Directo** | Pago de una OXP de Comercio confirmado por el sistema contable externo (SincoA&F) para formas de pago diferentes a tarjeta de crédito. Aplica únicamente sobre OXP en estado Causada. Complementa el flujo estándar de pago vía extracto bancario. |
+| **Pago Directo** | Pago de una OXP de Comercio confirmado por el sistema contable para formas de pago diferentes a tarjeta de crédito. Aplica únicamente sobre OXP en estado Causada. Complementa el flujo estándar de pago vía extracto bancario. |
 | **Nota Crédito** | Documento contable que representa una devolución o ajuste a favor de la compañía. Se genera al registrar una devolución. |
 | **Documento Soporte Electrónico** | Documento requerido por el ente regulador para respaldar compras que no generan factura electrónica, como por ejemplo compras en el exterior o proveedores informales. |
 | **TRM (Tasa Representativa del Mercado)** | Tasa de cambio oficial publicada por el Banco de la República de Colombia. Utilizada para valorar transacciones en moneda extranjera. |
@@ -94,6 +94,8 @@ El diseño contempla escalabilidad para compañías con mayor volumen de transac
 | **Concepto** | Componente estructurado de una OXP que representa un elemento con significado de negocio y destino contable. Una OXP puede contener múltiples conceptos de diferentes tipos. El dominio OXP es responsable de gestionar los conceptos y realizar su traducción contable mediante el servicio de Traducción Contable (cuenta, centro de costo, tercero, naturaleza). Equivale al término *Distribution* en Oracle ERP o *Line Item* en SAP. |
 | **Tipo de Concepto** | Clasificación que determina la naturaleza de un concepto dentro de una OXP. Tipos soportados: Gasto/Costo (compra principal), Impuesto, Retención, Diferencia en Cambio, Ajuste por Tolerancia, Cargo Financiero (4x1000, cuota de manejo, intereses). |
 | **Causación** | Registro contable en el sistema contable de la compañía de un documento del dominio OXP. Aplica a tres tipos de documento: (1) **OXP de Comercio** — reconoce el gasto/costo y la cuenta por pagar al proveedor; (2) **OXP de Extracto** — registra el total del extracto contra la entidad bancaria, incluyendo cargos adicionales y ajustes; (3) **Anticipo** — reconoce el activo "anticipos a proveedores" y la cuenta por pagar puente que será cruzada al desembolsarse el pago. Cada tipo se entrega a contabilidad por un canal independiente. |
+| **Sistema Contable** | Sub-dominio interno del ERP responsable de recibir los hechos económicos de OXP y traducirlos a registros contables. Funciona como punto único de entrega: el destino físico donde quedan registrados los asientos es configurable (sistema contable propio del ERP, SincoA&F como sistema legacy, u otros sistemas externos). OXP entrega las causaciones al Sistema Contable sin necesidad de conocer el destino final ni las cuentas contables específicas. |
+| **Tipo de Transacción Contable** | Etiqueta del hecho económico que OXP envía al Sistema Contable como parte de cada causación. Permite al Sistema Contable seleccionar la plantilla de asiento aplicable. No es una cuenta contable ni una naturaleza débito/crédito — es un identificador semántico del tipo de hecho económico. OXP emite cinco tipos según el documento que se causa: causación de gasto (OXP de Comercio y OXP de Extracto), anticipo a proveedor (Anticipo), nota crédito de proveedor (Devolución tipo Comercio y tipo Extracto) y reversa de anticipo (Devolución tipo Anticipo). La amortización del anticipo y la diferencia en cambio viajan como tipos de componente dentro de las líneas, no como tipos de transacción separados. |
 | **Fecha de Causación** | Fecha utilizada para el registro contable del gasto. Corresponde a la **fecha del soporte/factura**, respetando el principio de devengo (NIIF). Esto garantiza el reconocimiento del gasto en el período contable correcto, independientemente de cuándo se refleje en el extracto bancario. |
 | **Fecha de Compensación** | Fecha del extracto bancario utilizada exclusivamente para el asiento de pago (cruzar la cuenta por pagar contra la cuenta de banco). No afecta el período de reconocimiento del gasto. |
 | **Ventana de Validación de Duplicidad** | Período de 24 meses calendario contados hacia atrás desde la fecha de radicación, dentro del cual no se permite la repetición de un número de factura para un mismo proveedor. |
@@ -125,7 +127,7 @@ Cualquier usuario puede acceder a vistas de monitoreo (OXP pendientes, confirmad
 |-------|-------------|
 | **Entidad Bancaria** | Provee los extractos de las tarjetas de crédito y débito prepago en formato PDF o CSV, los cuales son cargados al sistema por un usuario. |
 | **SincoRE (Recepción Electrónica)** | Transforma facturas electrónicas en información estructurada y la expone mediante API para consumo del sistema OXP. |
-| **Sistema Contable** | Recibe automáticamente las causaciones de las OXP una vez estas son confirmadas. |
+| **Sistema Contable** | Sub-dominio del ERP que recibe automáticamente las causaciones de las OXP una vez estas son confirmadas, y las traduce a registros contables. El destino físico donde quedan registrados los asientos es configurable (sistema contable propio del ERP, SincoA&F como sistema legacy del ecosistema SincoERP, u otros sistemas externos según la empresa). |
 | **Sistema de Tesorería** | Gestiona los pagos de las OXP de extracto (tarjetas de crédito) y las recargas (tarjetas débito prepago). |
 | **Servicio de extracción de datos** | Servicio transversal de infraestructura que interpreta soportes documentales no electrónicos (PDF, imágenes) para extraer datos estructurados (tercero, valor, conceptos, tributos). Análogo a SincoRE para documentos que no son factura electrónica. Otros sub-dominios (CXC, etc.) podrán consumir el mismo servicio. |
 
@@ -193,9 +195,9 @@ El sistema OXP maneja cuatro flujos con ciclos de vida independientes:
 └─────────────────────────────────────────────────────────────────────────────────┘
 ```
 
-**OXP de Comercio:** Se radica, confirma y causa de forma independiente. El pago se registra cuando se vincula a una OXP de Extracto (conciliación), se regulariza un anticipo contra ella, se confirma un pago directo (SincoA&F), o se aplica una devolución. La OXP pasa a Pagada cuando su saldo pendiente de pago llega a cero.
+**OXP de Comercio:** Se radica, confirma y causa de forma independiente. El pago se registra cuando se vincula a una OXP de Extracto (conciliación), se regulariza un anticipo contra ella, se confirma un pago directo (notificado por el sistema contable), o se aplica una devolución. La OXP pasa a Pagada cuando su saldo pendiente de pago llega a cero.
 
-**OXP de Extracto:** Se radica, se concilia al 100% (vinculando OXP de Comercio, cubriendo con anticipos/devoluciones, o marcando partidas en disputa), se confirma, se causa contablemente, y finalmente se registra el pago cuando SincoA&F lo confirma.
+**OXP de Extracto:** Se radica, se concilia al 100% (vinculando OXP de Comercio, cubriendo con anticipos/devoluciones, o marcando partidas en disputa), se confirma, se causa contablemente, y finalmente se registra el pago cuando el sistema contable lo confirma.
 
 **Anticipo:** Se registra en estado Vigente con dos dimensiones de resolución independientes: pago (vinculación a extracto o pago directo) y regularización (cruce contra OXP de Comercio). Cuando ambas dimensiones se resuelven, pasa a Cerrado. Puede cancelarse completamente mediante reversa total si aún no tiene cruces.
 
@@ -220,7 +222,7 @@ Las **etapas** son las fases del ciclo de vida de la obligación; cada una agrup
 | Regularización | Pago aplicado vía anticipo | — | Regularizado | — |
 | Cierre | — | — | Cerrado (ambos saldos = 0) | — |
 | Reversa | — | — | Reversado | — |
-| Pago directo (SincoA&F) | Pagada (saldo = 0) | — | — | — |
+| Pago directo (notificado por el sistema contable) | Pagada (saldo = 0) | — | — | — |
 
 **Nota de configuración:** Según la configuración de la empresa, la causación puede ejecutarse de dos formas: (1) automáticamente como consecuencia directa de la confirmación, o (2) como una acción independiente realizada por un usuario sobre las OXP ya confirmadas.
 
@@ -276,11 +278,11 @@ Las **etapas** son las fases del ciclo de vida de la obligación; cada una agrup
 |---------|-------------|
 | **Disparador** | Documentos listos para confirmar: OXP de Comercio radicadas, OXP de Extracto con conciliación al 100%, o Anticipos registrados. |
 | **Entrada** | OXP de Comercio, OXP de Extracto y Anticipos pendientes de confirmación. |
-| **Proceso** | El confirmador revisa y confirma los documentos (o se confirman automáticamente según configuración de la empresa). La confirmación es la condición que habilita la transición hacia la causación e integra el proceso con el sistema contable (SincoA&F). Según la configuración de la empresa, la causación puede ejecutarse (1) automáticamente como consecuencia directa de la confirmación o (2) como una acción independiente realizada por un usuario sobre los documentos ya confirmados. |
+| **Proceso** | El confirmador revisa y confirma los documentos (o se confirman automáticamente según configuración de la empresa). La confirmación es la condición que habilita la transición hacia la causación e integra el proceso con el sistema contable. Según la configuración de la empresa, la causación puede ejecutarse (1) automáticamente como consecuencia directa de la confirmación o (2) como una acción independiente realizada por un usuario sobre los documentos ya confirmados. |
 | **Proceso - Rechazo** | Si el confirmador no aprueba una OXP de Comercio, esta pasa a estado **"Devuelta"** y retorna a la bandeja del radicador. El confirmador debe registrar obligatoriamente un **"Motivo de Rechazo"** que explique la razón de la devolución. El radicador puede entonces corregir la OXP y reenviarla a confirmación, o descartarla según corresponda. |
 | **Causación** | Se genera una causación individual por cada OXP de Comercio, una causación por cada OXP de Extracto y una causación por cada Anticipo. La causación de la OXP de Extracto tiene como propósito registrar el total del extracto contra la entidad bancaria o el medio de pago, incluyendo los cargos adicionales (4x1000, cuota de manejo, intereses). La causación del Anticipo reconoce el activo "anticipos a proveedores" contra una cuenta por pagar puente, que será cruzada posteriormente al desembolsarse el pago. Las tres causaciones son hechos contables independientes con naturaleza distinta — no representan doble causación entre sí. |
 | **Salida** | Documentos en estado confirmado. Causaciones registradas en el sistema contable externo. |
-| **Estado Causada** | Un documento (OXP de Comercio, OXP de Extracto o Anticipo) se considera **causado** cuando el sistema contable externo (SincoA&F) confirma el registro exitoso de la causación enviada por OXP. |
+| **Estado Causada** | Un documento (OXP de Comercio, OXP de Extracto o Anticipo) se considera **causado** cuando el sistema contable confirma el registro exitoso de la causación enviada por OXP. |
 | **Confirmación automática heredada** | Los Anticipos nacidos por excedente de devolución se confirman y causan automáticamente en el mismo evento de creación, sin requerir confirmador manual — la confirmación se hereda del flujo de devolución que los origina. |
 
 ---
@@ -291,9 +293,9 @@ Las **etapas** son las fases del ciclo de vida de la obligación; cada una agrup
 |---------|-------------|
 | **Disparador** | OXP de Extracto causada, o Anticipo causado pendiente de desembolso. |
 | **Entrada** | OXP de Extracto confirmada y causada, o Anticipo en estado Causada. |
-| **Proceso - OXP de Comercio** | La OXP de Comercio recibe pagos que reducen su saldo pendiente: vía vinculación con extracto, regularización de anticipo, aplicación de devolución o pago directo (SincoA&F para formas de pago diferentes a tarjeta de crédito). Cuando el saldo llega a cero, la OXP pasa a **Pagada**. |
-| **Proceso - OXP de Extracto** | El sistema contable externo (SincoA&F) gestiona la ejecución del pago (tarjeta de crédito) o la recarga (tarjeta débito prepago). El sistema OXP **únicamente monitorea** y registra el estado de pago consultando a SincoA&F. Las devoluciones de cargos financieros también reducen el saldo del extracto. |
-| **Proceso - Anticipo** | El Anticipo recibe pagos que reducen su saldo por pagar: vía vinculación con partida del extracto (tarjeta de crédito), pago directo confirmado por SincoA&F (formas de pago diferentes a TC), o cobertura por devolución origen (anticipos nacidos por excedente). Los pagos externos (extracto y pago directo) se aplican únicamente desde el estado **Causada** — SincoA&F paga sobre el asiento contable previamente generado por la causación del Anticipo. Los pagos de origen interno (devolución origen) se aplican desde Confirmada o nacen directo en Causada. Cuando `saldoPorPagar` llega a cero, el Anticipo pasa a **Pagado**. |
+| **Proceso - OXP de Comercio** | La OXP de Comercio recibe pagos que reducen su saldo pendiente: vía vinculación con extracto, regularización de anticipo, aplicación de devolución o pago directo (confirmado por el sistema contable para formas de pago diferentes a tarjeta de crédito). Cuando el saldo llega a cero, la OXP pasa a **Pagada**. |
+| **Proceso - OXP de Extracto** | El sistema contable gestiona la ejecución del pago (tarjeta de crédito) o la recarga (tarjeta débito prepago). El sistema OXP **únicamente monitorea** y registra el estado de pago consultando al sistema contable. Las devoluciones de cargos financieros también reducen el saldo del extracto. |
+| **Proceso - Anticipo** | El Anticipo recibe pagos que reducen su saldo por pagar: vía vinculación con partida del extracto (tarjeta de crédito), pago directo confirmado por el sistema contable (formas de pago diferentes a TC), o cobertura por devolución origen (anticipos nacidos por excedente). Los pagos externos (extracto y pago directo) se aplican únicamente desde el estado **Causada** — el sistema contable paga sobre el asiento contable previamente generado por la causación del Anticipo. Los pagos de origen interno (devolución origen) se aplican desde Confirmada o nacen directo en Causada. Cuando `saldoPorPagar` llega a cero, el Anticipo pasa a **Pagado**. |
 | **Salida** | OXP de Extracto marcada como **Pagada** una vez su saldo pendiente de pago llega a cero. Ciclo cerrado. Anticipo marcado como **Pagado** cuando su desembolso queda cubierto. |
 
 ---
@@ -306,7 +308,7 @@ Las **etapas** son las fases del ciclo de vida de la obligación; cada una agrup
 | **Entrada** | Anticipo + OXP de Comercio destino (en estado Confirmada o posterior). |
 | **Proceso** | El usuario selecciona un anticipo y una OXP de Comercio confirmada o posterior del mismo tercero. El sistema cruza ambos: reduce el saldo por regularizar del anticipo y aplica un pago sobre la OXP de Comercio. La OXP de Comercio destino debe estar en estado Confirmada o posterior, donde el valor neto ya es estable [R30]. |
 | **Variante - 1:N** | Un anticipo puede regularizarse contra múltiples OXP de Comercio en operaciones independientes (no necesariamente en una sola operación) [R29]. |
-| **Variante - Amortización** | Al completarse la regularización, el sistema genera la información estructurada necesaria para que SincoA&F ejecute la amortización contable (reclasificación de cuentas de anticipo a cuentas definitivas de gasto/costo). |
+| **Variante - Amortización** | Cuando una OXP de Comercio regulariza total o parcialmente un anticipo, la información de la amortización se entrega al sistema contable acompañando la causación de esa OXP. El sistema contable reclasifica el saldo del anticipo hacia las cuentas definitivas de gasto o costo en el mismo registro contable — no se genera un registro adicional para la amortización. |
 | **Salida** | Anticipo con saldo por regularizar reducido. Si llega a cero: estado Regularizado (o Cerrado si el saldo por pagar también es cero). OXP de Comercio con pago aplicado por el valor regularizado. |
 
 ---
@@ -333,10 +335,10 @@ El sistema OXP actúa como orquestador del proceso operativo de formalización d
 
 - **Registrar** transacciones con sus soportes documentales.
 - **Orquestar** el flujo de radicación-conciliación-confirmación.
-- **Traducir contablemente** los conceptos de obligaciones por pagar (comercio, extracto, anticipos, devoluciones, cargos) a cuentas, centros de costo, terceros y naturaleza contable. Esta traducción estructurada es el insumo que OXP entrega a SincoA&F para su registro.
+- **Traducir contablemente** los conceptos de obligaciones por pagar (comercio, extracto, anticipos, devoluciones, cargos) a cuentas, centros de costo, terceros y naturaleza contable. Esta traducción estructurada es el insumo que OXP entrega al sistema contable para su registro.
 - **Monitorear** el estado de las obligaciones consultando los sistemas externos.
 
-La **ejecución** de pagos, desembolsos y movimientos financieros es responsabilidad exclusiva de los sistemas externos integrados (SincoA&F). El sistema OXP no ejecuta desembolsos ni modifica saldos bancarios directamente.
+La **ejecución** de pagos, desembolsos y movimientos financieros es responsabilidad exclusiva del sistema contable y del módulo de pagos del destino configurado (SincoA&F como sistema legacy, u otros sistemas externos integrados). El sistema OXP no ejecuta desembolsos ni modifica saldos bancarios directamente.
 
 ### Ecosistema de integración
 
@@ -344,7 +346,7 @@ El sistema OXP se integrará con **SincoERP** como plataforma central, interactu
 
 | Módulo | Nombre | Función |
 |--------|--------|---------|
-| **SincoA&F** | Administrativo y Financiero | Sistema contable. Recibe causaciones, gestiona pagos y confirma estado de pago de las OXP. |
+| **SincoA&F** | Administrativo y Financiero | Módulo legacy del ecosistema SincoERP. Actúa como destino físico de las causaciones cuando se usa SincoA&F como sistema contable. Gestiona pagos y confirma estado de pago de las OXP. El sistema contable canónico es el sub-dominio Contabilidad del ERP, que opera SincoA&F como uno de los destinos configurables. |
 | **SincoRE** | Recepción Electrónica | Transforma facturas electrónicas colombianas en información estructurada y la expone mediante API. |
 | **SincoADPRO** | Compras y Contratación | Ratifica la formalización de compras que requieren validación en este módulo (no aplica para todas las compras). |
 
@@ -356,7 +358,7 @@ El sistema OXP se integrará con **SincoERP** como plataforma central, interactu
 |--------|-----------------|---------|----------------------|-------------|
 | **SincoRE** | Datos estructurados de facturas electrónicas colombianas | JSON | Consumo de API | Solo facturas electrónicas colombianas |
 | **SincoADPRO** | Ratificación de formalización de compras | JSON | Consumo de API | Solo para compras que requieren formalización en este módulo |
-| **SincoA&F** | Confirmación de pago de OXP de Extracto | JSON | Consumo de API | |
+| **Sistema Contable** | Confirmación de pago de OXP de Extracto | JSON | Consumo de API | Proviene del módulo de pagos del destino configurado (ej: SincoA&F) |
 | **Entidad Bancaria** | Extracto con transacciones y cargos del período | PDF, CSV | Carga manual de archivo por usuario | |
 | **Soportes documentales** | Recibos, facturas no electrónicas, comprobantes | PDF, Imágenes (JPG, PNG) | Carga manual de archivo por usuario | Compras del exterior u otras sin factura electrónica |
 
@@ -366,11 +368,13 @@ El sistema OXP se integrará con **SincoERP** como plataforma central, interactu
 
 | Destino | Datos enviados | Formato | Método de integración |
 |---------|----------------|---------|----------------------|
-| **SincoA&F** | Causación de OXP de Comercio (individual por cada OXP) | JSON | Consumo de API |
-| **SincoA&F** | Causación de OXP de Extracto | JSON | Consumo de API |
-| **SincoA&F** | Causación de Anticipo (individual por cada Anticipo) | JSON | Consumo de API |
-| **SincoA&F** | Nota Crédito por devoluciones | JSON | Consumo de API |
-| **SincoA&F** | Reclasificación contable por amortización de anticipos | JSON | Consumo de API |
+| **Sistema Contable** | Causación de OXP de Comercio (individual por cada OXP) | JSON | Consumo de API |
+| **Sistema Contable** | Causación de OXP de Extracto | JSON | Consumo de API |
+| **Sistema Contable** | Causación de Anticipo (individual por cada Anticipo) | JSON | Consumo de API |
+| **Sistema Contable** | Nota Crédito por devoluciones | JSON | Consumo de API |
+| **Sistema Contable** | Reclasificación contable por amortización de anticipos (se entrega junto con la causación de la OXP de Comercio que regulariza el anticipo, dentro del mismo registro contable) | JSON | Consumo de API |
+
+**Nota:** El Sistema Contable es el sub-dominio del ERP que recibe las causaciones; opera como punto único de entrega y traduce los hechos económicos a registros contables. El destino físico donde quedan registrados los asientos es configurable por empresa (sistema contable propio del ERP, SincoA&F como sistema legacy del ecosistema SincoERP, u otros sistemas externos).
 
 ---
 
@@ -385,9 +389,9 @@ El sistema OXP se integrará con **SincoERP** como plataforma central, interactu
                                              │ Carga manual
                                              ▼
 ┌─────────────────┐                ┌─────────────────┐                ┌─────────────────┐
-│    SincoRE      │───────────────▶│                 │───────────────▶│    SincoA&F     │
-│  (Facturas XML) │    API JSON    │   Sistema OXP   │    API JSON    │   (Contable)    │
-└─────────────────┘                │                 │◀───────────────│                 │
+│    SincoRE      │───────────────▶│                 │───────────────▶│  Sistema        │
+│  (Facturas XML) │    API JSON    │   Sistema OXP   │    API JSON    │  Contable       │
+└─────────────────┘                │                 │◀───────────────│  (Contabilidad) │
                                    │                 │  Confirmación  └─────────────────┘
 ┌─────────────────┐                │                 │     pago
 │   SincoADPRO    │───────────────▶│                 │
@@ -400,8 +404,8 @@ El sistema OXP se integrará con **SincoERP** como plataforma central, interactu
 ### Notas de la primera fase
 
 - No se tendrá integración directa con un sistema de tesorería independiente.
-- El módulo SincoA&F se encarga del procesamiento de pago a partir de la causación.
-- El sistema OXP consultará el servicio de SincoA&F para confirmar el estado de pago de las OXP.
+- El sistema contable (con SincoA&F como destino físico legacy soportado, según configuración de la empresa) se encarga del procesamiento de pago a partir de la causación.
+- El sistema OXP consultará al sistema contable para confirmar el estado de pago de las OXP.
 - Los detalles técnicos de los API (endpoints, estructura de datos, autenticación) se documentarán posteriormente.
 - **Formatos de extracto soportados:** En la primera fase, el sistema soporta formatos estructurados (CSV) y extractos PDF. Los extractos en formato PDF son interpretados por un agente inteligente que detecta patrones sobre la información relevante a extraer (transacciones, fechas, valores, cargos adicionales). Cuando un PDF no sea estructurable por el agente, el proceso se apoyará en CSV u otros mecanismos definidos por la operación.
 
@@ -455,8 +459,9 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 | R12 | Al confirmar un documento del dominio OXP (OXP de Comercio, OXP de Extracto o Anticipo), se genera automáticamente la integración con el sistema contable. La forma en que se ejecuta la causación (automática al confirmar o mediante acción de un usuario sobre documentos confirmados) es configurable por empresa, tal como se describe en la Etapa de Confirmación y Causación. | Sí (por empresa) |
 | R13 | Se genera una causación individual por cada OXP de comercio. | No |
 | R14 | Se genera una causación por cada OXP de extracto. | No |
-| R14b | Se genera una causación individual por cada Anticipo. La causación reconoce el activo "anticipos a proveedores" contra una cuenta por pagar puente que será cruzada posteriormente al desembolsarse el pago. Es un hecho contable independiente de la causación de la OXP de Comercio que eventualmente lo regularice y de la amortización contable. | No |
-| R15 | Al regularizar un anticipo, se genera la información para la amortización contable correspondiente. | No |
+| R14b | Se genera una causación individual por cada Anticipo. La causación reconoce el activo "anticipos a proveedores" contra una cuenta por pagar puente que será cruzada posteriormente al desembolsarse el pago. Es un hecho contable independiente de la causación de la OXP de Comercio que eventualmente lo regularice y de la amortización contable. Cada causación se entrega al Sistema Contable acompañada de un **tipo de transacción contable** que permite seleccionar la plantilla de asiento aplicable: causación de gasto (OXP de Comercio y OXP de Extracto), anticipo a proveedor (Anticipo), nota crédito de proveedor (Devolución tipo Comercio y tipo Extracto) o reversa de anticipo (Devolución tipo Anticipo). | No |
+| R14d | Cuando el Sistema Contable rechaza la entrega de una causación, el documento OXP permanece en estado Causada. La resolución del rechazo es responsabilidad del Sistema Contable: el contador reabre el caso en la consola de contabilización si el rechazo proviene del destino físico, o el equipo de producto corrige el catálogo de plantillas si el rechazo es por defectos de configuración. El sistema OXP es responsable de conservar la causación hasta confirmar su procesamiento exitoso mediante la notificación de aceptación del Sistema Contable. | No |
+| R15 | Cuando una OXP de Comercio regulariza un anticipo, la información de la amortización se entrega al sistema contable junto con la causación de esa OXP. Es un solo registro contable que reconoce el gasto y, al mismo tiempo, reclasifica el saldo del anticipo a las cuentas definitivas — no se generan dos registros separados. | No |
 | R16 | Al causar una devolución, se genera una nota crédito en el sistema contable. | No |
 
 ---
@@ -465,8 +470,8 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 
 | ID | Regla | Configurable |
 |----|-------|--------------|
-| R17 | Una OXP de Comercio recibe pagos de múltiples orígenes que reducen su saldo pendiente: vinculación con extracto (conciliación), regularización de anticipo, aplicación de devolución, o pago directo (SincoA&F). Cuando el saldo llega a cero, la OXP pasa a estado **Pagada**. La información de cada pago (cuenta, tercero, naturaleza) es la base que OXP traduce y entrega a SincoA&F para su registro contable. | No |
-| R18 | Una OXP de Extracto se considera **Pagada** cuando su saldo pendiente de pago llega a cero. El saldo se reduce por confirmación de pago de SincoA&F y por devoluciones de cargos financieros. El sistema OXP no ejecuta pagos; solo registra y monitorea su estado. | No |
+| R17 | Una OXP de Comercio recibe pagos de múltiples orígenes que reducen su saldo pendiente: vinculación con extracto (conciliación), regularización de anticipo, aplicación de devolución, o pago directo (confirmado por el sistema contable). Cuando el saldo llega a cero, la OXP pasa a estado **Pagada**. La información de cada pago (cuenta, tercero, naturaleza) es la base que OXP traduce y entrega al sistema contable para su registro. | No |
+| R18 | Una OXP de Extracto se considera **Pagada** cuando su saldo pendiente de pago llega a cero. El saldo se reduce por confirmación de pago del sistema contable y por devoluciones de cargos financieros. El sistema OXP no ejecuta pagos; solo registra y monitorea su estado. | No |
 
 ---
 
@@ -525,7 +530,7 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 
 | ID | Regla | Configurable |
 |----|-------|--------------|
-| R35 | **Pago directo:** Un pago confirmado por SincoA&F para formas de pago diferentes a tarjeta de crédito solo puede aplicarse sobre OXP de Comercio en estado Causada. Reduce el saldo pendiente de pago de la OXP. | No |
+| R35 | **Pago directo:** Un pago confirmado por el sistema contable para formas de pago diferentes a tarjeta de crédito solo puede aplicarse sobre OXP de Comercio en estado Causada. Reduce el saldo pendiente de pago de la OXP. | No |
 
 ---
 
@@ -545,13 +550,13 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 | **Ciclo de vida de anticipos** | Creación, pago (vinculación a extracto o pago directo), regularización contra OXP de Comercio, cierre y reversa total. Trazabilidad completa con dos dimensiones de saldo independientes. Generación de información para amortización contable. | F1 |
 | **Ciclo de vida de devoluciones** | Radicación, confirmación y causación de devoluciones de 3 tipos: comercio (conceptos de gasto), extracto (cargos financieros) y anticipo (reversa total). Aplicación automática de crédito sobre el OXP origen. | F1 |
 | **Excedente de devolución** | Generación automática de anticipo cuando la devolución excede el saldo pendiente de pago de una OXP de Comercio. | F1 |
-| **Pago directo** | Registro de pagos confirmados por SincoA&F para formas de pago diferentes a tarjeta de crédito. | F1 |
+| **Pago directo** | Registro de pagos confirmados por el sistema contable para formas de pago diferentes a tarjeta de crédito. | F1 |
 | **Regularización de anticipos** | Cruce coordinado de anticipos contra OXP de Comercio confirmadas del mismo tercero, con soporte 1:N. | F1 |
 | **Carga de extractos** | Carga manual de extractos bancarios en formato PDF o CSV. Extracción de transacciones y cargos adicionales. | F1 |
 | **Conciliación** | Cruce automático y asistido entre OXP de comercio y extractos bancarios. Aprendizaje de relaciones comercio-descripción. | F1 |
 | **Confirmación** | Flujo de confirmación manual o automático según configuración por empresa. | F1 |
-| **Causación** | Generación automática de causaciones individuales por OXP de comercio y OXP de extracto hacia SincoA&F. | F1 |
-| **Monitoreo de pago** | Consulta del estado de pago de OXP de extracto desde SincoA&F. | F1 |
+| **Causación** | Generación automática de causaciones individuales por OXP de comercio y OXP de extracto hacia el sistema contable. | F1 |
+| **Monitoreo de pago** | Consulta del estado de pago de OXP de extracto desde el sistema contable. | F1 |
 | **Integración con SincoADPRO** | Ratificación de compras que requieren formalización en este módulo. | F1 |
 | **Alertas** | Notificaciones de plazos de conciliación, montos que exceden límites configurados, y anticipos pendientes de regularización que superen el plazo establecido. | F1 |
 | **Vistas de monitoreo** | Consultas del estado de OXP (pendientes, confirmadas, causadas) según permisos de usuario. | F1 |
@@ -563,8 +568,8 @@ La arquitectura del sistema OXP está diseñada para servir como base para la mo
 
 | Área | Descripción | Observación |
 |------|-------------|-------------|
-| **Procesamiento de pagos** | El sistema OXP no ejecuta pagos ni recargas. | Esta responsabilidad es de SincoA&F y el módulo de tesorería existente. |
-| **Integración directa con tesorería** | No se integrará con un sistema de tesorería independiente en la primera fase. | SincoA&F gestiona el procesamiento de pago a partir de la causación. |
+| **Procesamiento de pagos** | El sistema OXP no ejecuta pagos ni recargas. | Esta responsabilidad es del sistema contable y del módulo de tesorería existente (ej: SincoA&F como destino legacy). |
+| **Integración directa con tesorería** | No se integrará con un sistema de tesorería independiente en la primera fase. | El sistema contable gestiona el procesamiento de pago a partir de la causación. |
 | **Gestión de comercios/proveedores** | Alta, baja o modificación de terceros. | Responsabilidad del servicio transversal de Gestión de Terceros. |
 | **Gestión de usuarios** | Creación de usuarios y asignación de permisos. | Se asume integración con sistema de gestión de identidad existente. |
 
@@ -579,7 +584,7 @@ El sistema OXP será el primer módulo de la nueva arquitectura del ERP. Para su
 | **Gestión de Terceros** | Servicio transversal que centraliza la información de comercios, proveedores y entidades externas. Incluye identificación tributaria, razón social, datos de contacto y clasificación. | El sistema OXP consumirá este servicio para identificar comercios/proveedores en las transacciones. |
 | **Tesorería - Medios de pago** | Componente que gestiona los datos maestros de tarjetas de crédito y débito prepago (número, tipo, fecha de corte, fecha de pago, límites, entidad bancaria). | Por ahora OXP gestiona el catálogo de medios de pago internamente como componente independiente dentro de su BC. Cuando se construya el sub-dominio de configuraciones transversales, este catálogo se extraerá para consumo de otros sub-dominios. |
 | **Sistema de cálculo de impuestos** | Sistema transversal que determina los impuestos aplicables a las transacciones según la normativa colombiana. | El sistema OXP consumirá este servicio para obtener los valores de impuestos en las OXP. |
-| **Reglas de traducción contable** | Lógica que convierte los conceptos de OXP (comercio, extracto, anticipos, devoluciones, cargos) en asientos contables para SincoA&F. | El sistema OXP aplicará estas reglas al generar las causaciones. |
+| **Reglas de traducción contable** | Lógica que convierte los conceptos de OXP (comercio, extracto, anticipos, devoluciones, cargos) en asientos contables para el sistema contable. | El sistema OXP aplicará estas reglas al generar las causaciones. |
 | **Servicio de extracción de datos** | Servicio transversal de infraestructura que interpreta documentos no electrónicos (PDF, imágenes) para extraer datos estructurados. Complementa a SincoRE que cubre facturas electrónicas XML. | El sistema OXP consumirá este servicio para obtener datos de soportes no electrónicos. Otros sub-dominios (CXC, etc.) podrán consumir el mismo servicio. |
 
 Cada una de estas dependencias requiere su propia definición de alcance independiente.
@@ -603,10 +608,12 @@ Cada una de estas dependencias requiere su propia definición de alcance indepen
          ▲                                         │
          │                                         ▼
 ┌─────────────────┐                    ┌─────────────────┐
-│  Tesorería      │                    │  SincoA&F       │
-│  (Medios de     │                    │  (Contable)     │
-│   pago)         │                    │                 │
+│  Tesorería      │                    │  Sistema        │
+│  (Medios de     │                    │  Contable       │
+│   pago)         │                    │  (Contabilidad) │
 └─────────────────┘                    └─────────────────┘
+                                       Destino físico configurable:
+                                       SincoA&F (legacy) u otros.
 ```
 
 Esta arquitectura de servicios desacoplados con responsabilidades claras permite:
@@ -693,7 +700,7 @@ La Fase 1 se considera operativa cuando:
 
 | Beneficio | Descripción |
 |-----------|-------------|
-| **Causación automática** | Eliminación de la doble digitación mediante integración directa con SincoA&F. |
+| **Causación automática** | Eliminación de la doble digitación mediante integración directa con el sistema contable. |
 | **Datos consistentes** | Consumo de servicios transversales (Terceros, Impuestos) que garantizan información unificada en todo el ecosistema. |
 | **Monitoreo de pagos** | Visibilidad del estado de pago consultando directamente el sistema contable. |
 
@@ -734,4 +741,7 @@ La Fase 1 se considera operativa cuando:
 | 1.1 | Febrero 2026 | Alineación con Modelo de Dominio v2.4. **Compensada** eliminada del glosario y referencias (absorbida por Pagada, ver D18). **Devolución** corregida: valor positivo representando magnitud del crédito (ver D19). Tabla de estados y salida de conciliación actualizadas. |
 | 1.2 | Marzo 2026 | Alineación con Modelo de Dominio v2.5. Glosario ampliado: Anticipo con ciclo de vida completo, Devolución con 3 tipos, nuevos términos (Reversa de Anticipo, Pago Directo, Excedente de Devolución). Flujo principal extendido con Etapa 5 (Regularización) y Etapa 6 (Devoluciones). Diagrama actualizado con 4 flujos. 8 nuevas reglas de negocio (R28–R35): anticipos, devoluciones y pago directo. Alcance actualizado con capacidades de ciclo de vida independiente de anticipos y devoluciones. |
 | 1.3 | Marzo 2026 | **Ampliación de alcance, integración fiscal y fases de implementación.** OXP de Comercio redefinida como independiente del medio de pago (no solo tarjetas). Contexto actual ampliado con facturas de proveedores a crédito (~1000/mes) y pagos de contado (~50/mes). Tres tipos de OXP por ciclo de vida documentados (Comercio, Extracto, Caja Menor). Medios de pago ampliado: gestión de características y propiedades de tarjetas, crédito y contado — componente independiente dentro del BC, extraíble a futuro. "Gestión de tarjetas" y "Otros medios de pago" eliminados de fuera del alcance. Dependencia "Tesorería - Medios de pago" actualizada con nota de gestión interna temporal. Nueva Sección 8: Estrategia de implementación por fases (F1: Comercio + Extracto, F2: Caja Menor + evaluaciones pendientes). Criterios de éxito de F1. Tabla de alcance con columna Fase (F1/F2). Sección de beneficios renumerada a Sección 9. **Integración fiscal:** Glosario de Radicación ampliado (extracción + clasificación + registro). Nuevo actor externo: Servicio de extracción de datos. Canales de entrada agnósticos en Etapa 1. Nuevas variantes: clasificación inteligente de origen y tributos declarados por el proveedor. Nuevas reglas R36 (clasificación inteligente de origen) y R37 (validación de tributos del proveedor). Radicación ampliada en tabla de alcance (extracción, clasificación, validación de tributos). Nueva dependencia: Servicio de extracción de datos. |
-| 1.4 | Mayo 2026 | **Causación contable del Anticipo.** El Anticipo se causa contablemente al confirmarse, replicando el patrón de OXP de Comercio. Nuevos hitos en el ciclo de vida del Anticipo: Vigente → Confirmada → Causada → Pago(s) / Regularización(es) → Cerrado. Causación reconoce el activo "anticipos a proveedores" contra una cuenta por pagar puente (asiento independiente de la amortización y de la causación de la OXP que lo regulariza). Glosario actualizado: "Anticipo" (ciclo de tres fases) y "Causación" (tres tipos de documento causables). Tabla de estados por etapa incluye Confirmación y Causación del Anticipo. Etapa 3 reescrita para cubrir los tres tipos de documento. Etapa 4 incluye pago del Anticipo desde estado Causada. R11 y R12 actualizadas para incluir Anticipo. Nueva regla R14b (causación individual por cada Anticipo). Nueva integración saliente a SincoA&F: "Causación de Anticipo". Cierra el hueco contable del anticipo entre desembolso y regularización; alinea OXP con la práctica de ERPs maduros (SAP Special G/L, Oracle Prepayment Invoice). |
+| 1.4 | Mayo 2026 | **Causación contable del Anticipo y aclaración de la amortización.** El Anticipo se causa contablemente al confirmarse, replicando el patrón de OXP de Comercio. Nuevos hitos en el ciclo de vida del Anticipo: Vigente → Confirmada → Causada → Pago(s) / Regularización(es) → Cerrado. Causación reconoce el activo "anticipos a proveedores" contra una cuenta por pagar puente (asiento independiente de la amortización y de la causación de la OXP que lo regulariza). Glosario actualizado: "Anticipo" (ciclo de tres fases) y "Causación" (tres tipos de documento causables). Tabla de estados por etapa incluye Confirmación y Causación del Anticipo. Etapa 3 reescrita para cubrir los tres tipos de documento. Etapa 4 incluye pago del Anticipo desde estado Causada. R11 y R12 actualizadas para incluir Anticipo. Nueva regla R14b (causación individual por cada Anticipo). Nueva integración saliente a SincoA&F: "Causación de Anticipo". **Aclaración de la amortización:** R15 reescrita para explicitar que cuando una OXP de Comercio regulariza un anticipo, la información de la amortización se entrega al sistema contable junto con la causación de esa OXP — un solo registro contable, no dos. Etapa 5 Variante Amortización aclarada con el mismo principio. Tabla de integraciones salientes aclara que la fila de reclasificación por amortización viaja embebida en la causación de la OXP de Comercio que regulariza. Cierra el hueco contable del anticipo entre desembolso y regularización; alinea OXP con la práctica de ERPs maduros (SAP Special G/L, Oracle Prepayment Invoice). |
+| 1.5 | Mayo 2026 | **Alineación con el sub-dominio Contabilidad.** Se generaliza la referencia al destino de las causaciones: el sub-dominio Contabilidad del ERP actúa como sistema contable canónico (gateway único). SincoA&F deja de ser destino fijo y queda mencionado como uno de los destinos físicos legacy configurables por empresa. Cambios: nueva entrada de glosario "Sistema Contable" (sub-dominio interno con destinos configurables); actualización del actor "Sistema Contable" en sección 3 con la misma definición; entrada del módulo SincoA&F redefinida como destino físico legacy del ecosistema SincoERP. Tabla de integraciones salientes con destino "Sistema Contable" en las 5 filas y nota al pie aclarando configurabilidad. Etapas 3, 4 y 5 generalizadas: "sistema contable externo (SincoA&F)" → "sistema contable". Glosario "Pagada (OXP de Extracto)", "Amortización del Anticipo", "Pago Directo" generalizados. Reglas R17, R18, R35 generalizadas. Tabla de "fuera del alcance", responsabilidad de "Traducir contablemente", notas de la primera fase y diagramas ASCII (sección 5 y arquitectura SincoERP) actualizados con la terminología canónica. SincoA&F se mantiene como ejemplo solo donde aporta valor ilustrativo (módulo legacy del ecosistema SincoERP). No hay cambios estructurales: la integración con el sub-dominio Contabilidad sigue el mismo contrato funcional (causaciones, confirmaciones de pago) — solo cambia el destino conceptual. |
+| 1.6 | Mayo 2026 | **Tipo de transacción contable en las causaciones (alineado con el Modelo de Dominio v3.2).** Cada causación que OXP envía al Sistema Contable incluye una etiqueta de "tipo de transacción contable" que permite al Sistema Contable seleccionar la plantilla de asiento aplicable. La etiqueta es semántica del hecho económico — no es cuenta ni naturaleza débito/crédito. **Cambios:** nueva entrada de glosario "Tipo de Transacción Contable" con los cinco tipos que OXP emite (causación de gasto, anticipo a proveedor, nota crédito de proveedor, reversa de anticipo, y nota sobre amortización y diferencia en cambio como componentes dentro de las líneas, no como tipos separados). Regla R14b ampliada con la cláusula del etiquetado para los tres tipos de documento causable y las tres variantes de devolución. Sin cambios estructurales — el contrato funcional con el Sistema Contable se enriquece con una etiqueta documentada, no se altera. |
+| 1.7 | Mayo 2026 | **Manejo de rechazos del Sistema Contable (alineado con el Modelo de Dominio v3.3).** Se formaliza qué hace OXP cuando el Sistema Contable rechaza una entrega: el documento OXP permanece en estado Causada y la resolución del rechazo es responsabilidad del Sistema Contable (el contador en la consola de contabilización para rechazos del destino físico; el equipo de producto para defectos de catálogo). OXP es responsable de conservar la causación hasta confirmar su procesamiento exitoso. **Cambios:** nueva regla R14d (permanencia en Causada ante rechazo + responsabilidades de resolución + responsabilidad de OXP de conservar la causación hasta confirmar procesamiento). Sin cambios estructurales — no se introduce un nuevo flujo operativo en OXP ni se altera el ciclo de vida de ningún documento. El detalle técnico del manejo (outbox pattern) vive en el modelo de dominio como sugerencia de implementación. |
