@@ -1655,7 +1655,7 @@ Los eventos de configuración siguen un patrón uniforme: el agregado se crea un
 
 Los tipos de transacción contable determinan qué plantilla de asiento aplica y con qué estructura de roles (débitos/créditos). Cada sub-dominio consumidor emite líneas de traducción con un tipo de transacción que el motor usa para seleccionar la plantilla correspondiente.
 
-El inventario completo de tipos de transacción y sus plantillas está documentado en `anexo-ejemplo-plantilla-de-asiento.md`, Sección 5.2, con 42 plantillas en 8 sub-dominios emisores:
+El inventario completo de tipos de transacción y sus plantillas está documentado en `anexo-ejemplo-plantilla-de-asiento.md`, Sección 5.2, con 42 plantillas en 8 sub-dominios emisores. La **especificación detallada por plantilla** (roles, componentes y `grupoPucEsperado`, lista para precarga) vive en `datos-precargados/plantillas-de-asiento.*` — a la fecha cubre las 4 plantillas de OXP; las demás se precargan al modelar cada sub-dominio emisor.
 
 | Sub-dominio emisor | Plantillas | Ejemplos principales |
 |---------------------|:----------:|---------------------|

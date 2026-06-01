@@ -2,7 +2,7 @@
 
 > **Fecha:** Marzo 2026
 > **Propósito:** Ejemplificar cómo los sub-dominios transaccionales emiten líneas de traducción mediante `lineasParaTraduccion()` y cómo el motor de traducción de Contabilidad las transforma en asientos contables mediante la cadena de resolución. Este anexo respalda las definiciones de *plantilla de asiento*, *línea de traducción* y *cadena de resolución* del glosario del sub-dominio de Contabilidad.
-> **Versión:** 1.1
+> **Versión:** 1.2
 
 ---
 
@@ -400,6 +400,8 @@ Sin intervención del usuario. El sistema ya sabe.
 
 Las plantillas de asiento son código del producto — no las configura el usuario. Cada sub-dominio emisor tiene un conjunto finito de tipos de transacción contable que generan asientos con estructura conocida.
 
+> **Nota sobre el carácter de este inventario:** Las 42 plantillas listadas en esta sección son un **planteamiento teórico inicial** que sirvió para dimensionar el alcance. No todas se implementarán necesariamente, ni en este número exacto: el conjunto real de cada sub-dominio se determina al modelarlo y refinarlo. La **especificación de verdad** de cada plantilla (roles, componentes y `grupoPucEsperado`) vive en `datos-precargados/plantillas-de-asiento.*` y se va alineando con cada refinamiento. Ejemplo ya alineado: **OXP** — al cruzar con su mapeo canónico real, emite **4** `tipoTransaccion` (`causacion_gasto`, `anticipo_a_proveedor`, `nota_credito_gasto`, `reversa_anticipo`), no las 6 estimadas aquí: lo que el inventario listaba como "nota débito a proveedor", "aplicación de anticipo" y "diferencia en cambio" no son plantillas propias (las dos últimas viajan como componentes de `causacion_gasto`), y faltaba "reversa de anticipo". Donde el catálogo precargado y este inventario difieran, **manda el catálogo precargado**.
+
 ### 5.1 Relación entre dominios de gestión, transaccionales y Contabilidad
 
 ```
@@ -532,7 +534,7 @@ Nómina ────────────────────────
 
 | Sub-dominio emisor | Plantillas | Principales |
 |---------------------|:----------:|-------------|
-| **OXP** | 6 | Causación de obligación, nota crédito proveedor, nota débito proveedor, anticipo a proveedor, aplicación de anticipo, diferencia en cambio |
+| **OXP** | 6 *(teórico; 4 reales — ver `datos-precargados/plantillas-de-asiento.*`)* | Causación de obligación, nota crédito proveedor, nota débito proveedor, anticipo a proveedor, aplicación de anticipo, diferencia en cambio |
 | **CXC** | 7 | Causación de ingreso, nota crédito/débito cliente, anticipo de cliente, aplicación de anticipo, diferencia en cambio, provisión cartera |
 | **Tesorería** | 8 | Pago a proveedor, cobro de cliente, transferencia, consignación, cargo bancario, abono bancario, conciliación, reembolso caja menor |
 | **Inventarios** | 6 | Entrada de mercancía, salida por venta (CMV), salida por consumo, transferencia entre bodegas, ajuste de inventario, variación de costo |
@@ -563,3 +565,4 @@ Nómina ────────────────────────
 |---------|-------|-------------|
 | 1.0 | Marzo 2026 | Versión inicial: patrón universal, contrato LineaTraduccion, 3 ejemplos OXP (causación, anticipo, nota crédito), cadena de resolución A → C → B, inventario de plantillas por sub-dominio emisor (8 sub-dominios, 42 plantillas). |
 | 1.1 | Mayo 2026 | Grupo del PUC esperado (issue #7). Nota explicativa de `grupoPucEsperado` en la Sección 1.3 y nueva columna "Grupo PUC esperado" en las tablas de plantilla de los 3 ejemplos (causación, anticipo, nota crédito). Alinea con `modelo-dominio.md` v1.3 [D12] y `definicion-alcance.md` v1.3 [R47]. Llenado del inventario completo (Sección 5) y confirmación del grupo del `inc` pendientes de revisión por consultor contable. |
+| 1.2 | Junio 2026 | Encuadre del inventario teórico (issue #7). Nota en la Sección 5 que aclara que las 42 plantillas son un planteamiento inicial de dimensionamiento — no todas se implementarán y el número real se determina al modelar cada sub-dominio; la fuente de verdad es `datos-precargados/plantillas-de-asiento.*`. Fila de OXP del resumen (5.3) marcada como "6 teórico; 4 reales". Acompaña la creación del catálogo precargado `datos-precargados/plantillas-de-asiento.md`/`.json` con las 4 plantillas reales de OXP. |

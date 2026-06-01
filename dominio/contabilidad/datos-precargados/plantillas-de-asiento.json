@@ -1,0 +1,160 @@
+{
+  "catalogo": "PlantillaDeAsiento",
+  "version": "1.0",
+  "fechaActualizacion": "2026-06-01",
+  "alcance": "Sub-dominio emisor OXP (Obligaciones por Pagar). 4 plantillas de las 42 del inventario (anexo-ejemplo-plantilla-de-asiento.md, Seccion 5.2).",
+  "fuente": "Mapeo canonico de eventos OXP -> tipoTransaccion contable (dominio/obligaciones-por-pagar/modelo-dominio.md, tabla de la seccion 'Integracion con sub-dominio Contabilidad') + estructura del agregado PlantillaDeAsiento (dominio/contabilidad/modelo-dominio.md, Seccion 3.7, [D12]).",
+  "nota": "grupoPucEsperado acota solo el Nivel B (inferencia) de la cadena de resolucion [D12]/[R47]. Codigos PUC referidos al Decreto 2650 (Colombia). Los items marcados porValidar:true requieren confirmacion de consultor contable y/o canonizacion en OXP (issue #10).",
+  "plantillas": [
+    {
+      "tipoTransaccion": "causacion_gasto",
+      "descripcion": "Causacion de una obligacion por pagar (gasto + tributos). Emitida por OxpComercioCausada y ExtractoCausado.",
+      "origen": "estandar",
+      "documentoFuenteObligatorio": false,
+      "roles": [
+        {
+          "nombre": "GASTO",
+          "naturaleza": "debito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "gasto", "grupoPucEsperado": ["51", "52", "53"], "porValidar": false }
+          ]
+        },
+        {
+          "nombre": "IMPUESTO",
+          "naturaleza": "debito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "iva", "grupoPucEsperado": ["2408"], "porValidar": false },
+            { "tipoComponente": "inc", "grupoPucEsperado": [], "porValidar": true, "notaValidacion": "El INC normalmente se reconoce como mayor valor del gasto/costo, no como impuesto descontable. Confirmar grupo o si se modela como rol propio." }
+          ]
+        },
+        {
+          "nombre": "RETENCION",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "retefuente", "grupoPucEsperado": ["2365"], "porValidar": false },
+            { "tipoComponente": "reteiva", "grupoPucEsperado": ["2367"], "porValidar": false },
+            { "tipoComponente": "reteica", "grupoPucEsperado": ["2368"], "porValidar": true, "notaValidacion": "Confirmar si OXP emite reteica como tipoComponente (issue #10)." }
+          ]
+        },
+        {
+          "nombre": "CARGO_FINANCIERO",
+          "naturaleza": "debito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "cargo_financiero", "grupoPucEsperado": ["5305"], "porValidar": true, "notaValidacion": "Nombre de tipoComponente descrito en prosa en OXP, sin canonizar (issue #10). Emitido por OxpExtracto." }
+          ]
+        },
+        {
+          "nombre": "DIFERENCIA_EN_CAMBIO",
+          "naturaleza": "debito_credito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "diferencia_en_cambio", "grupoPucEsperado": ["5305", "4215"], "porValidar": true, "notaValidacion": "Perdida -> gasto financiero (5305); ganancia -> ingreso financiero (4215). Nombre de tipoComponente sin canonizar en OXP (issue #10)." }
+          ]
+        },
+        {
+          "nombre": "CONTRAPARTIDA",
+          "naturaleza": "credito",
+          "esContrapartida": true,
+          "grupoPucEsperado": ["2205", "2335"],
+          "porValidar": false,
+          "notaContrapartida": "Generada por el motor. Sin tipoComponente. CxP proveedores nacionales (2205) o costos y gastos por pagar (2335)."
+        }
+      ]
+    },
+    {
+      "tipoTransaccion": "anticipo_a_proveedor",
+      "descripcion": "Registro de un anticipo a proveedor. Emitida por AnticipoCausado. Sin desglose fiscal [P1].",
+      "origen": "estandar",
+      "documentoFuenteObligatorio": false,
+      "roles": [
+        {
+          "nombre": "ANTICIPO",
+          "naturaleza": "debito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "anticipo", "grupoPucEsperado": ["1330"], "porValidar": false }
+          ]
+        },
+        {
+          "nombre": "CONTRAPARTIDA",
+          "naturaleza": "credito",
+          "esContrapartida": true,
+          "grupoPucEsperado": ["2205", "2335"],
+          "porValidar": false,
+          "notaContrapartida": "Generada por el motor. CxP por anticipos."
+        }
+      ]
+    },
+    {
+      "tipoTransaccion": "nota_credito_gasto",
+      "descripcion": "Nota credito de proveedor (devolucion). Emitida por DevolucionCausada (tipo Comercio y tipo Extracto). Inverso de causacion_gasto: las naturalezas se invierten.",
+      "origen": "estandar",
+      "documentoFuenteObligatorio": false,
+      "notaNombre": "OXP emite 'nota_credito_proveedor'; el nombre canonico acordado es 'nota_credito_gasto'. OXP debe alinear su mapeo (issue #10).",
+      "roles": [
+        {
+          "nombre": "GASTO",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "concepto_devuelto", "grupoPucEsperado": ["51", "52", "53"], "porValidar": false }
+          ]
+        },
+        {
+          "nombre": "IMPUESTO",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "iva", "grupoPucEsperado": ["2408"], "porValidar": true, "notaValidacion": "Componente de impuesto devuelto sin nombre canonico en OXP (issue #10)." }
+          ]
+        },
+        {
+          "nombre": "RETENCION",
+          "naturaleza": "debito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "retefuente", "grupoPucEsperado": ["2365"], "porValidar": true, "notaValidacion": "Componente de retencion devuelta sin nombre canonico en OXP (issue #10)." }
+          ]
+        },
+        {
+          "nombre": "CONTRAPARTIDA",
+          "naturaleza": "debito",
+          "esContrapartida": true,
+          "grupoPucEsperado": ["2205", "2335"],
+          "porValidar": false,
+          "notaContrapartida": "Generada por el motor. Reduce la CxP."
+        }
+      ]
+    },
+    {
+      "tipoTransaccion": "reversa_anticipo",
+      "descripcion": "Reversa total de un anticipo previamente causado, sin cruces previos. Emitida por DevolucionCausada (tipo Anticipo). Plantilla nueva en Contabilidad (no existia en el inventario). Inverso de anticipo_a_proveedor.",
+      "origen": "estandar",
+      "documentoFuenteObligatorio": false,
+      "porValidar": true,
+      "notaValidacion": "Plantilla definida desde cero a partir del efecto contable descrito en OXP (Db Anticipos / Cr CxP al causar; la reversa invierte). Requiere validacion de consultor contable y registro formal en el inventario de Contabilidad (issue #10).",
+      "roles": [
+        {
+          "nombre": "ANTICIPO",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "reversa_anticipo", "grupoPucEsperado": ["1330"], "porValidar": false }
+          ]
+        },
+        {
+          "nombre": "CONTRAPARTIDA",
+          "naturaleza": "debito",
+          "esContrapartida": true,
+          "grupoPucEsperado": ["2205", "2335"],
+          "porValidar": false,
+          "notaContrapartida": "Generada por el motor."
+        }
+      ]
+    }
+  ]
+}
