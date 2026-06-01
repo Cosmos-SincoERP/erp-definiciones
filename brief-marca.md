@@ -1,6 +1,6 @@
 # Brief de Marca — «Cosmos» (ecosistema agéntico empresarial)
 
-> **Estado:** Borrador v0.2 — definiciones de partida para maduración con el líder de diseño.
+> **Estado:** Borrador v0.3 — definiciones de partida para maduración con el líder de diseño.
 > **Propósito de este documento:** dar un punto de partida estratégico (no un manual cerrado) para que diseño ayude a madurar la identidad de marca. Lo que aquí se afirma como producto es real; lo que se propone como marca es **hipótesis a validar**.
 > **Fecha:** Junio 2026
 
@@ -78,12 +78,20 @@ Tres rasgos definen el "cómo" y deben permear la marca:
 ### 4.1. Inteligencia en cada módulo
 Cada aplicación tiene **su propia inteligencia**, desarrollada desde el aprendizaje y apalancada en IA, para **orientar al usuario sobre qué debe hacer** y reducir su carga operativa en tareas empresariales. No es una IA central única: es inteligencia distribuida, una por dominio.
 
-### 4.2. Asistente transversal de IA *(pendiente de detalle — ver nota)*
-Existe un **asistente de IA como eje transversal** que interactúa con el usuario:
-- Conoce las **intenciones predeterminadas** de cada proceso (sabe qué se suele hacer en cada punto).
-- Permite **capturar intenciones personalizadas por lenguaje natural** (el usuario pide lo que necesita en sus palabras).
+### 4.2. Asistente transversal de IA (✅ dado — validado con capturas del producto)
+Un **asistente de IA como eje transversal** acompaña al usuario en todo el ecosistema. Tres comportamientos observados en el producto actual:
 
-> 🖼️ **Pendiente:** esta sección se afina con las **capturas del asistente** que compartirá Alejandro. (El video no es procesable; se requieren imágenes.) Una vez recibidas, se describe el comportamiento real y se ajusta el lenguaje de esta sección.
+**a) Le dice al usuario qué hacer (orientación proactiva).**
+La pantalla de inicio recibe al usuario por su nombre ("Hola, Ana") y le presenta sus **tareas activas priorizadas y agrupadas por módulo** (Obligaciones por pagar, Facturación, Impuestos…), con su urgencia explícita ("6 tareas activas · 1 vence hoy", "la más antigua lleva 4 días sin corregir"). El asistente no espera que el usuario sepa qué hacer: **se lo propone**. Ejemplos reales: *corregir obligaciones devueltas, revisar extractos devueltos, emitir DSE DIAN, resolver duplicados, regularizar anticipos, confirmar obligaciones, adjuntar soporte.*
+
+**b) Captura intenciones — predeterminadas y por lenguaje natural.**
+- **Intenciones predeterminadas:** el asistente conoce los procesos típicos de cada módulo (ej. *"Registrar compra"*) y guía sus campos obligatorios y opcionales.
+- **Lenguaje natural:** una barra transversal **"Describe lo que necesitas…"** permite al usuario pedir lo que requiere en sus propias palabras; el asistente interpreta la intención, **valida los datos ingresados** en vivo y completa el proceso.
+
+**c) Extrae información de documentos con IA (OCR + comprensión).**
+El sistema lee documentos reales y **puebla los formularios automáticamente**. Ejemplo observado: a partir del **PDF del RUT de la DIAN**, extrae y completa el *perfil tributario* (NIT, régimen, tipo de persona, país, dirección fiscal, actividad económica CIIU, atributos fiscales), marcando cada dato como *"Extraído con IA"* para que el usuario solo confirme.
+
+> 🎨 **Para diseño:** estas tres capacidades (orientar, capturar intención, extraer) son el **lenguaje de interacción** central del ecosistema. La identidad de marca debe darle voz y presencia visual al asistente — es probablemente el punto de contacto más distintivo con el usuario.
 
 ### 4.3. Principios técnicos transversales (✅ dado)
 Toda funcionalidad se rige por el patrón **automatizar y facilitar**, con la tecnología que lo permita:
@@ -169,7 +177,7 @@ Pilares:
 - `README.md` — enfoque y filosofía del proyecto.
 - `dominio/` — modelos de los sub-dominios financieros (el "qué hace" real de esa parte).
 - Diferenciador de IA contable: `dominio/contabilidad/modelo-dominio.md` [D6] (categorización automática con IA).
-- 🖼️ *Pendiente:* capturas del asistente transversal de IA (las comparte Alejandro).
+- Capturas del asistente transversal de IA (perfil tributario extraído del RUT, inicio "Hola Ana" con tareas priorizadas, registro de compra por lenguaje natural) — incorporadas a la §4.2.
 
 ---
 
@@ -179,3 +187,4 @@ Pilares:
 |---------|-------|-------------|
 | 0.1 | Junio 2026 | Borrador inicial enfocado en el ERP financiero con IA contable. |
 | 0.2 | Junio 2026 | **Reposicionamiento a ecosistema agéntico.** Cosmos deja de ser "un ERP nuevo" y pasa a ser el ecosistema (nueva generación de SincoSoft que engloba los módulos de SincoERP). Cambios: equipo y patrocinadores (Alejandro Prieto, Carlos Cipagauta, Augusto Romero, Juan Paulo Arango); relación SincoSoft → SincoERP → Cosmos; catálogo de aplicaciones (ERP, inmobiliario, CRM, AdPro, Bitakora); inteligencia por módulo + asistente transversal de IA; principios OCR/MCP/RAG; arquitectura agéntica y orientada a eventos con caso de la factura por correo/PDF/XML. Sección del asistente de IA pendiente de afinar con capturas. ERP reposicionado como corazón del ecosistema, no como alcance total. |
+| 0.3 | Junio 2026 | **Asistente transversal de IA detallado con evidencia del producto.** Se reescribe la §4.2 a partir de tres capturas reales: (a) orientación proactiva — el inicio "Hola, Ana" presenta tareas priorizadas y agrupadas por módulo con su urgencia; (b) captura de intenciones predeterminadas (ej. "Registrar compra") y por lenguaje natural (barra "Describe lo que necesitas…") con validación en vivo; (c) extracción de documentos con IA (perfil tributario poblado desde el PDF del RUT de la DIAN, marcado "Extraído con IA"). Nota para diseño: el asistente es el lenguaje de interacción central y el punto de contacto más distintivo. |
