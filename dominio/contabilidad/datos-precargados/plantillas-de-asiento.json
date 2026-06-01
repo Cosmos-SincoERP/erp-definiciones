@@ -1,10 +1,10 @@
 {
   "catalogo": "PlantillaDeAsiento",
-  "version": "1.1",
+  "version": "1.2",
   "fechaActualizacion": "2026-06-01",
   "alcance": "Sub-dominio emisor OXP (Obligaciones por Pagar). 4 plantillas de las 42 del inventario (anexo-ejemplo-plantilla-de-asiento.md, Seccion 5.2).",
   "fuente": "Mapeo canonico de eventos OXP -> tipoTransaccion contable (dominio/obligaciones-por-pagar/modelo-dominio.md, tabla de la seccion 'Integracion con sub-dominio Contabilidad') + estructura del agregado PlantillaDeAsiento (dominio/contabilidad/modelo-dominio.md, Seccion 3.7, [D12], [D13]).",
-  "nota": "grupoPucEsperado acota solo el Nivel B (inferencia) de la cadena de resolucion [D12]/[R47]. llevaDescripcionConcepto indica si la partida del componente recibe la descripcionConcepto que envia el consumidor [D13]/[R48] (true en componentes de concepto de negocio; false en impuestos y retenciones). Codigos PUC referidos al Decreto 2650 (Colombia). Los items marcados porValidar:true requieren confirmacion de consultor contable y/o canonizacion en OXP (issue #10).",
+  "nota": "grupoPucEsperado acota solo el Nivel B (inferencia) de la cadena de resolucion [D12]/[R47]. llevaDescripcionConcepto indica si la partida del componente recibe la descripcionConcepto que envia el consumidor [D13]/[R48] (true en componentes de concepto de negocio; false en impuestos y retenciones). El atributo 'rol' de cada RolPartida es un codigo de conjunto cerrado (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA) que la partida del borrador hereda y se propaga a la entrega [D14]/[R49]. Codigos PUC referidos al Decreto 2650 (Colombia). Los items marcados porValidar:true requieren confirmacion de consultor contable y/o canonizacion en OXP (issue #10).",
   "plantillas": [
     {
       "tipoTransaccion": "causacion_gasto",
@@ -13,7 +13,7 @@
       "documentoFuenteObligatorio": false,
       "roles": [
         {
-          "nombre": "GASTO",
+          "rol": "GASTO",
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
@@ -21,7 +21,7 @@
           ]
         },
         {
-          "nombre": "IMPUESTO",
+          "rol": "IMPUESTO",
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
@@ -30,7 +30,7 @@
           ]
         },
         {
-          "nombre": "RETENCION",
+          "rol": "RETENCION",
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
@@ -40,7 +40,7 @@
           ]
         },
         {
-          "nombre": "CARGO_FINANCIERO",
+          "rol": "CARGO_FINANCIERO",
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
@@ -48,7 +48,7 @@
           ]
         },
         {
-          "nombre": "DIFERENCIA_EN_CAMBIO",
+          "rol": "DIFERENCIA_EN_CAMBIO",
           "naturaleza": "debito_credito",
           "esContrapartida": false,
           "componentes": [
@@ -56,7 +56,7 @@
           ]
         },
         {
-          "nombre": "CONTRAPARTIDA",
+          "rol": "CONTRAPARTIDA",
           "naturaleza": "credito",
           "esContrapartida": true,
           "grupoPucEsperado": ["2205", "2335"],
@@ -72,7 +72,7 @@
       "documentoFuenteObligatorio": false,
       "roles": [
         {
-          "nombre": "ANTICIPO",
+          "rol": "ANTICIPO",
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
@@ -80,7 +80,7 @@
           ]
         },
         {
-          "nombre": "CONTRAPARTIDA",
+          "rol": "CONTRAPARTIDA",
           "naturaleza": "credito",
           "esContrapartida": true,
           "grupoPucEsperado": ["2205", "2335"],
@@ -97,7 +97,7 @@
       "notaNombre": "OXP emite 'nota_credito_proveedor'; el nombre canonico acordado es 'nota_credito_gasto'. OXP debe alinear su mapeo (issue #10).",
       "roles": [
         {
-          "nombre": "GASTO",
+          "rol": "GASTO",
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
@@ -105,7 +105,7 @@
           ]
         },
         {
-          "nombre": "IMPUESTO",
+          "rol": "IMPUESTO",
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
@@ -113,7 +113,7 @@
           ]
         },
         {
-          "nombre": "RETENCION",
+          "rol": "RETENCION",
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
@@ -121,7 +121,7 @@
           ]
         },
         {
-          "nombre": "CONTRAPARTIDA",
+          "rol": "CONTRAPARTIDA",
           "naturaleza": "debito",
           "esContrapartida": true,
           "grupoPucEsperado": ["2205", "2335"],
@@ -139,7 +139,7 @@
       "notaValidacion": "Plantilla definida desde cero a partir del efecto contable descrito en OXP (Db Anticipos / Cr CxP al causar; la reversa invierte). Requiere validacion de consultor contable y registro formal en el inventario de Contabilidad (issue #10).",
       "roles": [
         {
-          "nombre": "ANTICIPO",
+          "rol": "ANTICIPO",
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
@@ -147,7 +147,7 @@
           ]
         },
         {
-          "nombre": "CONTRAPARTIDA",
+          "rol": "CONTRAPARTIDA",
           "naturaleza": "debito",
           "esContrapartida": true,
           "grupoPucEsperado": ["2205", "2335"],
