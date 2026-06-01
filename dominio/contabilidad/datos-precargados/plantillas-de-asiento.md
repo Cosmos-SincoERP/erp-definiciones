@@ -2,7 +2,7 @@
 
 **Sub-dominio emisor:** Obligaciones por Pagar (OXP)
 **Catálogo del modelo:** `PlantillaDeAsiento` (Sección 3.7 de `modelo-dominio.md`)
-**Versión:** 1.0
+**Versión:** 1.1
 **Fecha de actualización:** 2026-06-01
 **Archivo de datos:** [`plantillas-de-asiento.json`](plantillas-de-asiento.json)
 
@@ -38,32 +38,32 @@ Las plantillas de asiento son **contenido del producto** (`origen: estándar`) �
 
 ## 4. Plantillas
 
-> **Convención:** cada rol declara su naturaleza y los componentes que lo alimentan. El `grupoPucEsperado` es una lista de prefijos del código PUC (longitud variable). La **contrapartida** la genera el motor (sin `tipoComponente`) y declara su grupo a nivel de rol. Los ítems marcados ⚠️ están **por validar** (ver Sección 5).
+> **Convención:** cada rol declara su naturaleza y los componentes que lo alimentan. El `grupoPucEsperado` es una lista de prefijos del código PUC (longitud variable). El `llevaDescripcionConcepto` (✅/❌) indica si la partida resultante recibe la descripción de concepto que envía el consumidor (`[D13]`/`[R48]`) — ✅ en componentes de concepto de negocio, ❌ en impuestos/retenciones (la cuenta ya es autodescriptiva). La **contrapartida** la genera el motor (sin `tipoComponente`) y declara su grupo a nivel de rol. Los ítems marcados ⚠️ están **por validar** (ver Sección 5).
 
 ### 4.1. `causacion_gasto`
 
 Causación de una obligación por pagar. Emitida por `OxpComercioCausada` y `ExtractoCausado`.
 
-| Rol | Naturaleza | `tipoComponente` | `grupoPucEsperado` | |
-|-----|-----------|------------------|--------------------|---|
-| GASTO | Débito | `gasto` | `["51","52","53"]` | |
-| IMPUESTO | Débito | `iva` | `["2408"]` | |
-| IMPUESTO | Débito | `inc` | — | ⚠️ |
-| RETENCION | Crédito | `retefuente` | `["2365"]` | |
-| RETENCION | Crédito | `reteiva` | `["2367"]` | |
-| RETENCION | Crédito | `reteica` | `["2368"]` | ⚠️ |
-| CARGO_FINANCIERO | Débito | `cargo_financiero` | `["5305"]` | ⚠️ |
-| DIFERENCIA_EN_CAMBIO | Débito/Crédito | `diferencia_en_cambio` | `["5305","4215"]` | ⚠️ |
-| CONTRAPARTIDA | Crédito | — (genera el motor) | `["2205","2335"]` | |
+| Rol | Naturaleza | `tipoComponente` | `grupoPucEsperado` | `llevaDescripcionConcepto` | |
+|-----|-----------|------------------|--------------------|:--------------------------:|---|
+| GASTO | Débito | `gasto` | `["51","52","53"]` | ✅ | |
+| IMPUESTO | Débito | `iva` | `["2408"]` | ❌ | |
+| IMPUESTO | Débito | `inc` | — | ❌ | ⚠️ |
+| RETENCION | Crédito | `retefuente` | `["2365"]` | ❌ | |
+| RETENCION | Crédito | `reteiva` | `["2367"]` | ❌ | |
+| RETENCION | Crédito | `reteica` | `["2368"]` | ❌ | ⚠️ |
+| CARGO_FINANCIERO | Débito | `cargo_financiero` | `["5305"]` | ❌ | ⚠️ |
+| DIFERENCIA_EN_CAMBIO | Débito/Crédito | `diferencia_en_cambio` | `["5305","4215"]` | ❌ | ⚠️ |
+| CONTRAPARTIDA | Crédito | — (genera el motor) | `["2205","2335"]` | ❌ | |
 
 ### 4.2. `anticipo_a_proveedor`
 
 Registro de un anticipo a proveedor. Emitida por `AnticipoCausado`. Sin desglose fiscal (`[P1]`).
 
-| Rol | Naturaleza | `tipoComponente` | `grupoPucEsperado` | |
-|-----|-----------|------------------|--------------------|---|
-| ANTICIPO | Débito | `anticipo` | `["1330"]` | |
-| CONTRAPARTIDA | Crédito | — (genera el motor) | `["2205","2335"]` | |
+| Rol | Naturaleza | `tipoComponente` | `grupoPucEsperado` | `llevaDescripcionConcepto` | |
+|-----|-----------|------------------|--------------------|:--------------------------:|---|
+| ANTICIPO | Débito | `anticipo` | `["1330"]` | ✅ | |
+| CONTRAPARTIDA | Crédito | — (genera el motor) | `["2205","2335"]` | ❌ | |
 
 ### 4.3. `nota_credito_gasto`
 
@@ -71,21 +71,21 @@ Nota crédito de proveedor (devolución). Emitida por `DevolucionCausada` (tipo 
 
 > **Nombre:** OXP emite hoy `nota_credito_proveedor`; el nombre canónico acordado es `nota_credito_gasto`. OXP debe alinear su mapeo (issue #10).
 
-| Rol | Naturaleza | `tipoComponente` | `grupoPucEsperado` | |
-|-----|-----------|------------------|--------------------|---|
-| GASTO | Crédito | `concepto_devuelto` | `["51","52","53"]` | |
-| IMPUESTO | Crédito | `iva` | `["2408"]` | ⚠️ |
-| RETENCION | Débito | `retefuente` | `["2365"]` | ⚠️ |
-| CONTRAPARTIDA | Débito | — (genera el motor) | `["2205","2335"]` | |
+| Rol | Naturaleza | `tipoComponente` | `grupoPucEsperado` | `llevaDescripcionConcepto` | |
+|-----|-----------|------------------|--------------------|:--------------------------:|---|
+| GASTO | Crédito | `concepto_devuelto` | `["51","52","53"]` | ✅ | |
+| IMPUESTO | Crédito | `iva` | `["2408"]` | ❌ | ⚠️ |
+| RETENCION | Débito | `retefuente` | `["2365"]` | ❌ | ⚠️ |
+| CONTRAPARTIDA | Débito | — (genera el motor) | `["2205","2335"]` | ❌ | |
 
 ### 4.4. `reversa_anticipo`
 
 Reversa total de un anticipo sin cruces previos. Emitida por `DevolucionCausada` (tipo Anticipo). **Plantilla nueva** — no existía en el inventario de Contabilidad. Inverso de `anticipo_a_proveedor`.
 
-| Rol | Naturaleza | `tipoComponente` | `grupoPucEsperado` | |
-|-----|-----------|------------------|--------------------|---|
-| ANTICIPO | Crédito | `reversa_anticipo` | `["1330"]` | |
-| CONTRAPARTIDA | Débito | — (genera el motor) | `["2205","2335"]` | |
+| Rol | Naturaleza | `tipoComponente` | `grupoPucEsperado` | `llevaDescripcionConcepto` | |
+|-----|-----------|------------------|--------------------|:--------------------------:|---|
+| ANTICIPO | Crédito | `reversa_anticipo` | `["1330"]` | ✅ | |
+| CONTRAPARTIDA | Débito | — (genera el motor) | `["2205","2335"]` | ❌ | |
 
 ---
 
@@ -111,3 +111,4 @@ Los siguientes puntos requieren confirmación de **consultor contable** y/o **ca
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
 | 1.0 | Junio 2026 | Versión inicial. 4 plantillas de OXP (`causacion_gasto`, `anticipo_a_proveedor`, `nota_credito_gasto`, `reversa_anticipo`) con roles, componentes y `grupoPucEsperado`. Derivado del issue #7 (grupo del PUC en la plantilla). 8 ítems en revisión pendiente para consultor contable y sincronización con OXP (issue #10). |
+| 1.1 | Junio 2026 | Atributo `llevaDescripcionConcepto` por componente (issue #8). Marca qué componentes portan la descripción de concepto que envía el consumidor: ✅ en `gasto`, `anticipo`, `concepto_devuelto`, `reversa_anticipo`; ❌ en impuestos y retenciones. Nueva columna en las 4 plantillas. Alinea con `modelo-dominio.md` v1.4 [D13] y `definicion-alcance.md` v1.5 [R48]. |
