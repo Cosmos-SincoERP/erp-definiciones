@@ -1,7 +1,7 @@
-# Brief de Marca — ERP (nombre provisional: «Cosmos»)
+# Brief de Marca — «Cosmos» (ecosistema agéntico empresarial)
 
-> **Estado:** Borrador inicial v0.1 — definiciones de partida para maduración con el líder de diseño.
-> **Propósito de este documento:** dar un punto de partida estratégico (no un manual cerrado) para que diseño ayude a madurar la identidad de marca. Lo que aquí se afirma como producto es real (viene de los modelos de dominio); lo que se propone como marca es **hipótesis a validar**.
+> **Estado:** Borrador v0.2 — definiciones de partida para maduración con el líder de diseño.
+> **Propósito de este documento:** dar un punto de partida estratégico (no un manual cerrado) para que diseño ayude a madurar la identidad de marca. Lo que aquí se afirma como producto es real; lo que se propone como marca es **hipótesis a validar**.
 > **Fecha:** Junio 2026
 
 ---
@@ -10,107 +10,166 @@
 
 | Marca | Significa |
 |---|---|
-| ✅ **Dado** | Hecho del producto, ya definido en los modelos de dominio. No se discute aquí. |
+| ✅ **Dado** | Hecho del producto/negocio, ya definido o decidido. No se discute aquí. |
 | 💡 **Hipótesis** | Propuesta de marca/negocio para validar y madurar con diseño. |
 | ❓ **Abierto** | Decisión pendiente que necesita la mirada del líder de diseño. |
 
 ---
 
-## 1. Qué es el producto (✅ dado)
+## 1. Equipo y patrocinadores (✅ dado)
 
-Un **ERP multi-país y multi-tenant** (Colombia, República Dominicana, Panamá en F1; apertura a US/CA en F2), construido como un conjunto de microservicios independientes que se comunican por eventos. Cubre la operación financiera y contable de una empresa: obligaciones por pagar, impuestos, contabilidad, terceros, estructura organizacional y servicios transversales.
+| Persona | Rol |
+|---|---|
+| **Alejandro Prieto** | Líder del proyecto Cosmos. |
+| **Carlos Cipagauta** | Líder del equipo de diseño. Apoya la definición de interfaces, colores y la visión de la interacción de los usuarios con los productos. |
+| **Augusto Romero** | Gerente de Investigación y Desarrollo de SincoSoft. |
+| **Juan Paulo Arango** | CEO de SincoSoft. |
 
-**Diferenciador central (✅ dado, del modelo de Contabilidad):** la **categorización contable automática con IA**. El motor de traducción convierte hechos económicos en asientos contables sugiriendo la cuenta más probable y aprendiendo de cada decisión del contador — eliminando los catálogos manuales de miles de reglas que existen hoy en los ERPs tradicionales. Esta es la pieza que más distingue al producto y debería anclar la promesa de marca.
-
-**Otros rasgos del producto (✅ dado):**
-- Multi-país real: catálogos fiscales certificados por país, no un solo set "colombiano" adaptado.
-- Arquitectura event-driven con trazabilidad y auditoría naturales (cada hecho económico es reconstruible).
-- Pensado para minimizar "zonas grises": el producto se diseña con contratos de dominio explícitos.
-
----
-
-## 2. Naming (❓ abierto)
-
-**«Cosmos» es un nombre provisional** — aparece hoy en la documentación y rutas del proyecto, pero **no está confirmado como marca comercial**. El naming es una de las primeras decisiones que necesitamos del líder de diseño.
-
-Preguntas a resolver:
-- ¿«Cosmos» se mantiene, evoluciona o se reemplaza?
-- ¿La marca del producto es independiente o se ata a una marca paraguas existente (p. ej. el ecosistema SincoERP / SincoA&F que aparece como sistema legacy)?
-- Disponibilidad: dominio, redes, registro marcario en los tres países F1.
-
-💡 *Hipótesis para discutir:* si «Cosmos» evoca amplitud/orden de un universo complejo, conecta bien con la idea de "poner orden en la complejidad financiera multi-país". Pero es un nombre genérico y muy usado — validar diferenciación.
+> Este brief se elabora como insumo para que **Carlos Cipagauta** y su equipo de diseño ayuden a madurar la identidad de marca.
 
 ---
 
-## 3. Público objetivo (💡 hipótesis)
+## 2. Qué es Cosmos (✅ dado / 💡 hipótesis)
+
+**Cosmos es la nueva generación de SincoSoft: un ecosistema agéntico de aplicaciones empresariales que conviven en un mismo entorno.** (✅)
+
+La relación entre los nombres:
+
+```
+SincoSoft  (la empresa)
+    │
+    └── SincoERP  (la suite actual — catálogo de módulos en producción)
+            │
+            └── Cosmos  (la nueva generación — ecosistema agéntico que evoluciona
+                         y engloba todos los módulos bajo un mismo entorno)
+```
+
+**El giro de visión (✅, punto central de este brief):** Cosmos **no es "un ERP nuevo"**. Hoy lo financiero-contable está minimizado dentro de un catálogo de módulos mucho más amplio que resuelve necesidades muy distintas de la operación de una empresa. Cosmos es el **entorno donde todos esos módulos conviven**, cada uno con inteligencia propia, comunicándose entre sí.
+
+> **La tensión que la marca debe resolver:** no perder el rigor y la credibilidad del **ERP** (el corazón financiero, lo que da cumplimiento y confianza), pero **sin que parezca que solo hacemos eso**. El ERP es el ancla de madurez del ecosistema, no su límite.
+
+💡 *Por qué el nombre ayuda:* «Cosmos» = un universo **ordenado** donde muchos cuerpos coexisten en un sistema. Conecta naturalmente con "muchas aplicaciones, un solo entorno con orden". (Naming sigue ❓ abierto — ver sección 9.)
+
+---
+
+## 3. El ecosistema: catálogo de aplicaciones (✅ dado)
+
+SincoERP ya va mucho más allá de lo contable/financiero. Ejemplos reales de módulos que conviven en el ecosistema:
+
+| Módulo / aplicación | Necesidad que resuelve |
+|---|---|
+| **ERP financiero-contable** (OXP, Impuestos, Contabilidad, Terceros…) | Operación financiera, contable y tributaria multi-país. **Corazón del ecosistema.** |
+| **Gestión inmobiliaria — reparaciones locativas** | Reparaciones en inmuebles arrendados o en venta. |
+| **CRM inmobiliario** | Gestión comercial para venta y arriendo de inmuebles. |
+| **AdPro** | Módulo principal de **presupuestos y control**. |
+| **Bitakora** | Gestión de **nómina**. |
+| *(otros y futuros)* | El catálogo crece según las necesidades de las empresas. |
+
+**Principio de experiencia (💡):** cada empresa **activa los módulos que necesita** según el propósito de su operación. El usuario no compra "un ERP"; entra a un entorno y enciende lo que le sirve.
+
+❓ *Abierto para diseño:* ¿cómo se nombran y agrupan estas piezas — "módulos", "aplicaciones", "apps", "espacios"? La taxonomía del catálogo es decisión de marca/producto.
+
+---
+
+## 4. Cómo funciona el ecosistema (✅ dado)
+
+Tres rasgos definen el "cómo" y deben permear la marca:
+
+### 4.1. Inteligencia en cada módulo
+Cada aplicación tiene **su propia inteligencia**, desarrollada desde el aprendizaje y apalancada en IA, para **orientar al usuario sobre qué debe hacer** y reducir su carga operativa en tareas empresariales. No es una IA central única: es inteligencia distribuida, una por dominio.
+
+### 4.2. Asistente transversal de IA *(pendiente de detalle — ver nota)*
+Existe un **asistente de IA como eje transversal** que interactúa con el usuario:
+- Conoce las **intenciones predeterminadas** de cada proceso (sabe qué se suele hacer en cada punto).
+- Permite **capturar intenciones personalizadas por lenguaje natural** (el usuario pide lo que necesita en sus palabras).
+
+> 🖼️ **Pendiente:** esta sección se afina con las **capturas del asistente** que compartirá Alejandro. (El video no es procesable; se requieren imágenes.) Una vez recibidas, se describe el comportamiento real y se ajusta el lenguaje de esta sección.
+
+### 4.3. Principios técnicos transversales (✅ dado)
+Toda funcionalidad se rige por el patrón **automatizar y facilitar**, con la tecnología que lo permita:
+- **OCR** — captura y lectura de documentos.
+- **MCP** — interconexión de herramientas/agentes.
+- **RAG** — respuestas y orientación ancladas en el conocimiento del sistema.
+
+> El equipo de desarrollo ya tiene conocimiento en estas tecnologías.
+
+### 4.4. Arquitectura agéntica y orientada a eventos (✅ dado)
+Cosmos es un **sistema totalmente agéntico**: los módulos se comunican entre sí de forma **eventual** (event-driven). Los agentes reaccionan a hechos sin intervención manual.
+
+**Caso ilustrativo (úsese en la narrativa de marca):**
+> Llega una **factura de compra** por el correo empresarial — o el usuario tiene el **PDF/XML**. El sistema **la reconoce de inmediato** en el módulo contable, sin que nadie la digite. Un hecho del mundo real dispara, por eventos, la cadena de procesamiento correcta.
+
+---
+
+## 5. Público objetivo (💡 hipótesis)
 
 | Segmento | Quién | Qué le importa |
 |---|---|---|
-| **Usuario experto** | Contadores, analistas contables, auxiliares | Que el sistema les quite el trabajo repetitivo (clasificar cuentas) sin quitarles el control. Confianza y trazabilidad. |
-| **Decisor / comprador** | Gerentes financieros, dueños de PYME, CFOs | Cumplimiento fiscal multi-país sin dolor, menos errores, menos dependencia de expertos para configurar. |
-| **Implementador** | Consultores funcionales, equipo de onboarding | Que la puesta en marcha (carga de PUC, catálogos) sea guiada y rápida. |
+| **Usuario operativo** | Contadores, gestores inmobiliarios, nómina, comercial… (varía por módulo) | Que el sistema le diga qué hacer y le quite la operatividad repetitiva, sin quitarle el control. |
+| **Decisor / comprador** | Gerentes, dueños de empresa, CFOs | Cubrir varias necesidades de su operación en un solo entorno; menos herramientas dispersas; menos errores. |
+| **Implementador** | Consultores funcionales, equipo de onboarding | Activar módulos y ponerlos en marcha de forma guiada y rápida. |
 
-❓ *Abierto:* ¿el foco de mercado es PYME, empresa mediana, o grupos empresariales multi-país? El producto soporta consolidación de grupo, pero el segmento prioritario define todo el tono de marca.
+❓ *Abierto:* el público **ya no es solo financiero** — el ecosistema toca inmobiliario, nómina, comercial, presupuestos. ¿La marca le habla a un perfil transversal (la empresa como un todo) o mantiene vocería por módulo? Decisión clave para el tono.
 
 ---
 
-## 4. Propuesta de valor (💡 hipótesis)
+## 6. Propuesta de valor (💡 hipótesis)
 
 **Promesa central propuesta:**
-> *"Contabilidad y cumplimiento fiscal multi-país que se configuran solos y aprenden de ti."*
+> *"Un solo entorno inteligente que le dice a tu empresa qué hacer — y lo hace por ti."*
 
-Tres pilares de valor:
-1. **Inteligencia que elimina trabajo manual** — la IA categoriza, sugiere y aprende; el humano confirma. (Ancla en el diferenciador real.)
-2. **Multi-país sin reconfigurar** — un solo sistema que ya entiende los tributos de CO, RD y PA.
-3. **Confianza por diseño** — cada número es trazable a su origen; auditoría natural.
+Pilares:
+1. **Un ecosistema, no herramientas sueltas** — los módulos que tu empresa necesita, conviviendo y hablándose entre sí.
+2. **Inteligencia que reduce la operatividad** — cada módulo orienta y automatiza (IA, OCR, MCP, RAG); el humano decide, no digita.
+3. **Agéntico por diseño** — el sistema reacciona a los hechos del negocio por eventos, sin pasos manuales.
+4. **Con un corazón financiero sólido** — el ERP da el rigor, el cumplimiento multi-país y la confianza contable.
 
-❓ *Abierto:* ¿el eje principal de la marca es la **IA** (innovación), el **multi-país** (alcance) o la **confianza/cumplimiento** (tranquilidad)? Los tres son ciertos; el orden de prioridad define el posicionamiento.
-
----
-
-## 5. Atributos y personalidad de marca (💡 hipótesis)
-
-**Atributos propuestos** (qué debe transmitir la marca):
-- **Inteligente** — sin ser fría ni intimidante.
-- **Confiable** — rigor financiero, precisión, cumplimiento.
-- **Clara** — combate la complejidad; hace simple lo difícil.
-- **Cercana** — habla el idioma del contador latinoamericano, no el de un manual técnico.
-
-**Personalidad (arquetipo a explorar):** entre **el Sabio** (conocimiento, guía experta) y **el Mago** (transforma lo tedioso en automático). ❓ a validar con diseño.
-
-**Tono de voz propuesto:** profesional pero humano; español Colombia natural, sin anglicismos ni jerga técnica innecesaria (consistente con la convención del proyecto). Explica, no impone.
+❓ *Abierto:* ¿el eje #1 de la marca es **el ecosistema/entorno**, **lo agéntico/IA** o **la reducción de operatividad**? Los tres son ciertos; su orden define el posicionamiento.
 
 ---
 
-## 6. Posicionamiento (💡 hipótesis)
+## 7. Atributos y personalidad de marca (💡 hipótesis)
 
-**Contra quién competimos (✅ contexto del producto):** ERPs y sistemas contables tradicionales del mercado (SincoA&F legacy, Siigo, Alegra como destinos/competidores mencionados en el modelo) y suites globales (SAP, Oracle, NetSuite) en el segmento alto.
+**Atributos propuestos:**
+- **Inteligente** — orienta, anticipa, aprende.
+- **Orquestador** — pone orden donde hay muchas piezas (cosmos = orden).
+- **Confiable** — rigor financiero y cumplimiento como base.
+- **Cercano** — habla el idioma del usuario latinoamericano; explica, no impone.
+- **Proactivo** — no espera órdenes; propone y actúa.
+
+**Arquetipo a explorar:** entre **el Mago** (transforma lo tedioso en automático) y **el Sabio/Guía** (te dice qué hacer). 💡 a validar con diseño.
+
+**Tono de voz:** profesional pero humano; español Colombia natural, sin anglicismos ni jerga técnica innecesaria (consistente con la convención del proyecto).
+
+---
+
+## 8. Posicionamiento (💡 hipótesis)
 
 **Frase de posicionamiento propuesta:**
-> *Para empresas que operan en varios países de Latinoamérica y están cansadas de configurar reglas contables a mano, «Cosmos» es el ERP financiero que automatiza la contabilidad con IA y entiende los impuestos de cada país — a diferencia de los ERP tradicionales que exigen catálogos manuales interminables y un experto para cada cambio.*
+> *Para empresas que hoy operan con herramientas dispersas y procesos manuales, «Cosmos» es el ecosistema agéntico donde sus aplicaciones de negocio —finanzas, nómina, inmobiliario, presupuestos y más— conviven con IA que orienta y automatiza el trabajo, a diferencia de los ERP tradicionales y las suites de módulos desconectados que exigen que el usuario sepa qué hacer en cada paso.*
 
-❓ *Abierto:* ¿competimos por **precio/simplicidad** (vs Siigo/Alegra) o por **potencia/inteligencia** (vs suites globales)? Define el rango de mercado y la estética.
-
----
-
-## 7. Lo que necesitamos del líder de diseño
-
-Este brief busca arrancar la conversación. Pedimos ayuda para madurar:
-
-1. **Naming** — confirmar/evolucionar/reemplazar «Cosmos» (sección 2).
-2. **Priorización del eje de marca** — IA vs multi-país vs confianza (sección 4).
-3. **Segmento prioritario** — que aterrice el tono y la estética (sección 3).
-4. **Arquetipo y personalidad** — validar Sabio/Mago u otro (sección 5).
-5. **Territorio visual** — primera dirección de identidad (logo, paleta, tipografía, mood) una vez cerrado lo anterior.
+❓ *Abierto:* ¿competimos posicionando **amplitud** (ecosistema completo) o **inteligencia** (lo agéntico)? ¿Contra ERPs tradicionales, contra suites por módulos, o creando categoría propia?
 
 ---
 
-## 8. Insumos disponibles para diseño
+## 9. Lo que necesitamos del líder de diseño
 
-- `documento-consolidado-erp.md` — visión técnica y mapa de sub-dominios del producto.
+1. **Naming** — confirmar / evolucionar / reemplazar «Cosmos»; definir cómo se nombra el ecosistema vs los módulos; relación con la marca SincoSoft/SincoERP (paraguas, transición, convivencia). Disponibilidad (dominio, redes, registro en CO, RD, PA).
+2. **Eje principal de marca** — ecosistema vs agéntico/IA vs reducción de operatividad (sección 6).
+3. **Taxonomía del catálogo** — cómo se llaman y agrupan los módulos/apps (sección 3).
+4. **Vocería** — marca transversal de empresa vs marca por módulo (sección 5).
+5. **Arquetipo y personalidad** — validar Mago/Sabio u otro (sección 7).
+6. **Territorio visual** — primera dirección de identidad (logo, paleta, tipografía, mood, lenguaje de interacción del asistente de IA) una vez cerrado lo anterior.
+
+---
+
+## 10. Insumos disponibles para diseño
+
+- `documento-consolidado-erp.md` — visión técnica y mapa de sub-dominios del ERP (corazón financiero).
 - `README.md` — enfoque y filosofía del proyecto.
-- `dominio/` — modelos de cada sub-dominio (el "qué hace" real del producto).
-- Diferenciador de IA: ver `dominio/contabilidad/modelo-dominio.md` (decisión D6 — categorización contable con IA).
+- `dominio/` — modelos de los sub-dominios financieros (el "qué hace" real de esa parte).
+- Diferenciador de IA contable: `dominio/contabilidad/modelo-dominio.md` [D6] (categorización automática con IA).
+- 🖼️ *Pendiente:* capturas del asistente transversal de IA (las comparte Alejandro).
 
 ---
 
@@ -118,4 +177,5 @@ Este brief busca arrancar la conversación. Pedimos ayuda para madurar:
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
-| 0.1 | Junio 2026 | Borrador inicial. Definiciones de partida de marca y negocio para maduración con el líder de diseño. Naming «Cosmos» marcado como provisional. Mayoría de secciones son hipótesis a validar. |
+| 0.1 | Junio 2026 | Borrador inicial enfocado en el ERP financiero con IA contable. |
+| 0.2 | Junio 2026 | **Reposicionamiento a ecosistema agéntico.** Cosmos deja de ser "un ERP nuevo" y pasa a ser el ecosistema (nueva generación de SincoSoft que engloba los módulos de SincoERP). Cambios: equipo y patrocinadores (Alejandro Prieto, Carlos Cipagauta, Augusto Romero, Juan Paulo Arango); relación SincoSoft → SincoERP → Cosmos; catálogo de aplicaciones (ERP, inmobiliario, CRM, AdPro, Bitakora); inteligencia por módulo + asistente transversal de IA; principios OCR/MCP/RAG; arquitectura agéntica y orientada a eventos con caso de la factura por correo/PDF/XML. Sección del asistente de IA pendiente de afinar con capturas. ERP reposicionado como corazón del ecosistema, no como alcance total. |
