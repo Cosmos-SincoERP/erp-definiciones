@@ -167,8 +167,8 @@ Cada evento se documenta con esta estructura:
 
 | Componente | Tipo | Descripción | Atributos clave |
 |------------|------|-------------|-----------------|
-| — | Raíz | Atributos de la raíz BorradorContable | id (identificador del stream), estado (PENDIENTE/RESUELTO/DESCARTADO — derivado del stream) |
-| PartidaBorrador | Entidad | Línea individual del borrador con débito o crédito | cuenta (auxiliar, puede ser null si no resuelta), tercero, unidadOrganizacional, debito, credito, nivelResolucion (A/C/B/manual/null), esContrapartida (boolean, heredado del RolPartida de la plantilla) |
+| — | Raíz | Atributos de la raíz BorradorContable | id (identificador del stream), estado (PENDIENTE/RESUELTO/DESCARTADO — derivado del stream), descripcion (texto general del hecho económico, opcional — la envía el consumidor; si no la envía, queda vacía, ver [D13]) |
+| PartidaBorrador | Entidad | Línea individual del borrador con débito o crédito | cuenta (auxiliar, puede ser null si no resuelta), tercero, unidadOrganizacional, debito, credito, nivelResolucion (A/C/B/manual/null), rol (código del rol heredado del RolPartida de la plantilla: GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA — conjunto cerrado, ver [D14]), esContrapartida (boolean, heredado del RolPartida — equivale a rol == CONTRAPARTIDA), descripcionConcepto (narración del movimiento, opcional — solo en partidas cuyo componente la lleva, ver [D13]) |
 | ReferenciaOrigen | VO | Identificación única del hecho económico que originó el borrador | referenciaOrigen, subDominioOrigen, documentoFuente, referenciaHechoRelacionado (opcional — vincula devoluciones/notas crédito con el hecho original) |
 | InformacionTransaccion | VO | Contexto de la transacción | tipoTransaccion, empresa, moneda, fecha |
 | MotivoRechazo | VO | Motivo del rechazo del destino (si aplica) | motivo, fechaRechazo, entregaId, destino |
@@ -188,6 +188,7 @@ Cada evento se documenta con esta estructura:
 │  BorradorContable (Agregado)                                         │
 │                                                                      │
 │  estado: PENDIENTE (derivado del stream)                             │
+│  descripcion: "Honorarios auditoría externa" (opcional)             │
 │                                                                      │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ ReferenciaOrigen (VO)                                          │  │
@@ -202,13 +203,17 @@ Cada evento se documenta con esta estructura:
 │  └────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ PartidaBorrador #1 (Entidad)                                   │  │
+│  │  rol: GASTO · esContrapartida: false                          │  │
 │  │  cuenta: 5110-05-002 · tercero: 900123456 · undOrg: VTA-001   │  │
 │  │  debito: 600.000 · credito: 0 · nivelResolucion: C            │  │
+│  │  descripcionConcepto: "Honorarios auditoría externa"          │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────────────┐  │
-│  │ PartidaBorrador #2 (Entidad)                                   │  │
+│  │ PartidaBorrador #2 (Entidad) — retención (no lleva concepto)  │  │
+│  │  rol: RETENCION · esContrapartida: false                      │  │
 │  │  cuenta: null · tercero: 900123456 · undOrg: VTA-001           │  │
 │  │  debito: 0 · credito: 66.000 · nivelResolucion: null          │  │
+│  │  descripcionConcepto: — (su componente no lleva descripción)  │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ MotivoRechazo (VO) — solo si fue rechazado por el destino     │  │
@@ -450,8 +455,13 @@ Marcos custom (creados por usuario con permiso especial cuando aplique):
 | Componente | Tipo | Descripción | Atributos clave |
 |------------|------|-------------|-----------------|
 | — | Raíz | Atributo de la raíz PlantillaDeAsiento | tipoTransaccion (clave natural de la plantilla) |
-| RolPartida | Entidad | Un rol dentro de la plantilla | nombre (GASTO, IMPUESTO, RETENCION, CONTRAPARTIDA, etc.), naturaleza (debito/credito), tipoComponenteAsociado, esContrapartida (boolean) |
+| RolPartida | Entidad | Un rol dentro de la plantilla | rol (código del rol — conjunto cerrado: GASTO, IMPUESTO, RETENCION, CONTRAPARTIDA, etc.; es la clave natural del rol dentro de la plantilla), naturaleza (debito/credito), esContrapartida (boolean), grupoPucEsperado (lista de prefijos PUC de longitud variable — **solo aplica cuando esContrapartida = true**, ver [D12]) |
+| ComponenteDelRol | VO | Cada tipo de componente que alimenta un rol, con su acotación de cuenta. Un rol alimentado por líneas tiene uno o más. | tipoComponente, grupoPucEsperado (lista de prefijos PUC de longitud variable), llevaDescripcionConcepto (boolean — si true, la partida resultante recibe la descripcionConcepto que envía el consumidor; ver [D13]) |
 | ConfiguracionPlantilla | VO | Configuración adicional de la plantilla | documentoFuenteObligatorio (boolean) |
+
+**Sobre `grupoPucEsperado` y `ComponenteDelRol`:** Cada componente que alimenta un rol declara su `grupoPucEsperado` — los grupos del PUC (prefijos de código de cuenta, de longitud variable: clase, grupo o cuenta) a los que debe pertenecer la cuenta resuelta. El grupo vive en el componente, no en el rol, porque un mismo rol agrupa varios `tipoComponente` que caen en grupos distintos (ej: el rol RETENCION cubre `retefuente`→`2365` y `reteiva`→`2367`). La **contrapartida** es la excepción: se genera por el motor y carece de `tipoComponente` (ver paso 4 del ServicioDeTraduccion), por lo que su `grupoPucEsperado` se declara a nivel del rol. Detalle del concepto en [D12].
+
+**Sobre `llevaDescripcionConcepto`:** Cada `ComponenteDelRol` declara si la partida que genera debe recibir la `descripcionConcepto` del hecho económico. Es `true` solo en los componentes que portan concepto de negocio (`gasto`, `concepto_devuelto`, `anticipo`) y `false` en impuestos y retenciones, cuya cuenta ya es autodescriptiva (el nombre de la cuenta basta). Evita repetir el mismo texto en partidas donde no aporta. Detalle en [D13].
 
 **Diagrama de composición:**
 
@@ -469,23 +479,34 @@ Marcos custom (creados por usuario con permiso especial cuando aplique):
 │  └────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ RolPartida #1 (Entidad)                                        │  │
-│  │  nombre: GASTO · naturaleza: debito                            │  │
-│  │  tipoComponenteAsociado: gasto · esContrapartida: false        │  │
+│  │  rol: GASTO · naturaleza: debito · esContrapartida: false      │  │
+│  │  ComponenteDelRol:                                             │  │
+│  │   { tipoComponente: gasto · grupoPucEsperado:["51","52","53"]  │  │
+│  │     · llevaDescripcionConcepto: true }                         │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ RolPartida #2 (Entidad)                                        │  │
-│  │  nombre: IMPUESTO · naturaleza: debito                         │  │
-│  │  tipoComponenteAsociado: iva,inc · esContrapartida: false      │  │
+│  │  rol: IMPUESTO · naturaleza: debito · esContrapartida: false   │  │
+│  │  ComponenteDelRol:                                             │  │
+│  │   { tipoComponente: iva · grupoPucEsperado: ["2408"]           │  │
+│  │     · llevaDescripcionConcepto: false }                        │  │
+│  │   { tipoComponente: inc · grupoPucEsperado: [...] (a validar)  │  │
+│  │     · llevaDescripcionConcepto: false }                        │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ RolPartida #3 (Entidad)                                        │  │
-│  │  nombre: RETENCION · naturaleza: credito                       │  │
-│  │  tipoComponenteAsociado: retefuente,reteiva · esContra: false  │  │
+│  │  rol: RETENCION · naturaleza: credito · esContrapartida: false │  │
+│  │  ComponenteDelRol:                                             │  │
+│  │   { tipoComponente: retefuente · grupoPucEsperado: ["2365"]    │  │
+│  │     · llevaDescripcionConcepto: false }                        │  │
+│  │   { tipoComponente: reteiva    · grupoPucEsperado: ["2367"]    │  │
+│  │     · llevaDescripcionConcepto: false }                        │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ RolPartida #4 (Entidad)                                        │  │
-│  │  nombre: CONTRAPARTIDA · naturaleza: credito                   │  │
-│  │  tipoComponenteAsociado: — · esContrapartida: true             │  │
+│  │  rol: CONTRAPARTIDA · naturaleza: credito                      │  │
+│  │  esContrapartida: true                                         │  │
+│  │  grupoPucEsperado: ["2205","2335"]  (a nivel de rol)           │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────┘
 ```
@@ -757,9 +778,10 @@ En la arquitectura predeterminada moderna, ambos libros (Principal y Fiscal) apu
 |------|--------|---------------|----------------|
 | 1 | Validar unicidad de referenciaOrigen [R16]. Si ya existe un borrador con la misma referencia y está en PENDIENTE, se aplica R14 (reemplazo). Si ya no está en PENDIENTE, el motor rechaza el hecho económico con motivo estructurado y notifica al consumidor. | — (si reemplazo: BorradorReemplazado; si rechazo: notificación al consumidor con motivo, sin evento de dominio) | — |
 | 2 | Identificar tipoTransaccion → seleccionar PlantillaDeAsiento. Validar que cada tipoComponente recibido en las líneas tenga al menos un RolPartida que lo cubra en la plantilla [I27]. | — (si no existe plantilla o hay líneas sin rol, no se crea borrador y se notifica al consumidor con motivo estructurado) | — |
-| 3 | Para cada rol de la plantilla, resolver cuenta auxiliar mediante cadena: Nivel A (ReglaDeDerivacion) → Nivel C (Aprendizaje) → Nivel B (inferencia sobre PlanDeCuentas) [DD2]. En cada nivel, si la cuenta resuelta no está activa en el PUC, se descarta y se continúa al siguiente nivel [I24]. | — | — |
-| 4 | Generar contrapartida: tercero y unidad organizacional se asignan automáticamente del contexto de la transacción. La cuenta auxiliar se resuelve por la cadena como cualquier otro rol. [R01] | — | — |
-| 5 | Crear borrador con partidas resueltas o pendientes | BorradorCreado | borrador-contable-{id} |
+| 3 | Para cada rol de la plantilla, resolver cuenta auxiliar mediante cadena: Nivel A (ReglaDeDerivacion) → Nivel C (Aprendizaje) → Nivel B (inferencia sobre PlanDeCuentas) [DD2]. El **Nivel B se acota al `grupoPucEsperado`** del componente que alimenta el rol: solo considera cuentas auxiliares cuyo código inicia por alguno de los prefijos declarados [D12]. Los Niveles A y C no se acotan (resuelven la cuenta explícita/aprendida). En cada nivel, si la cuenta resuelta no está activa en el PUC, se descarta y se continúa al siguiente nivel [I24]. | — | — |
+| 4 | Generar contrapartida: tercero y unidad organizacional se asignan automáticamente del contexto de la transacción. La cuenta auxiliar se resuelve por la cadena como cualquier otro rol; al carecer de `tipoComponente`, su Nivel B se acota al `grupoPucEsperado` declarado a nivel del rol contrapartida [D12]. [R01] | — | — |
+| 4b | Asignar narración: a cada partida cuyo componente tiene `llevaDescripcionConcepto = true`, se le copia la `descripcionConcepto` de la línea de traducción que la originó; las demás partidas quedan sin `descripcionConcepto`. La `descripcion` general del hecho económico (si el consumidor la envió) se traslada al encabezado del borrador; si no vino, el borrador queda sin `descripcion` [D13]. | — | — |
+| 5 | Crear borrador con partidas resueltas o pendientes. Cada partida hereda el `rol` del `RolPartida` de la plantilla que la originó (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA) — queda registrado en la partida y se propaga a la entrega para que el destino (ej. SincoA&F) identifique las partidas tributarias [D14]. | BorradorCreado | borrador-contable-{id} |
 | 6 | Si todas las cuentas resueltas y balancea → BorradorResuelto (derivado por transición) | BorradorResuelto | borrador-contable-{id} |
 
 **Rechazos previos al borrador (motivos estructurados):**
@@ -770,7 +792,7 @@ Cuando el motor rechaza un hecho económico antes de crear el borrador (pasos 1 
 |--------|---------------|---------------------------------|------------------|
 | `REFERENCIA_ORIGEN_DUPLICADA_NO_REEMPLAZABLE` | Paso 1 — ya existe un borrador con la misma `referenciaOrigen` que no está en PENDIENTE [R14][R16]. | `referenciaOrigen`, estado actual del borrador existente, `referenciaDestino` si ya fue contabilizado. | Consumidor (idempotencia: reconoce que el hecho ya fue procesado). |
 | `TIPO_TRANSACCION_SIN_PLANTILLA` | Paso 2 — no existe `PlantillaDeAsiento` para el `tipoTransaccion` recibido. | `referenciaOrigen`, `tipoTransaccion` recibido. | Equipo de producto (corregir catálogo de plantillas). |
-| `LINEA_SIN_ROL_EN_PLANTILLA` | Paso 2 — al menos una línea trae un `tipoComponente` no cubierto por ningún `RolPartida.tipoComponenteAsociado` de la plantilla [I27]. | `referenciaOrigen`, `tipoTransaccion`, lista de `tipoComponente` no cubiertos. | Equipo de producto (ampliar plantilla) o consumidor (corregir contrato si envió un `tipoComponente` erróneo). |
+| `LINEA_SIN_ROL_EN_PLANTILLA` | Paso 2 — al menos una línea trae un `tipoComponente` no cubierto por ningún `ComponenteDelRol` de la plantilla [I27]. | `referenciaOrigen`, `tipoTransaccion`, lista de `tipoComponente` no cubiertos. | Equipo de producto (ampliar plantilla) o consumidor (corregir contrato si envió un `tipoComponente` erróneo). |
 
 La durabilidad del hecho económico mientras se resuelve la causa del rechazo es responsabilidad del consumidor emisor, que conserva el hecho en su propia bandeja de eventos hasta confirmar que fue procesado. El detalle del mecanismo técnico de notificación y reproceso está en [SI7].
 
@@ -873,7 +895,7 @@ Cada entrega tiene su propio stream que registra el ciclo completo: envío, resu
 |------|--------|---------------|----------------|
 | 1 | Escuchar BorradorResuelto | EntregaIniciada | entrega-contable-{id} |
 | 2 | Seleccionar adaptador según destino configurado [R13] | — | — |
-| 3 | Entregar borrador al destino en el formato que espera | — | — |
+| 3 | Entregar borrador al destino en el formato que espera. El payload incluye, por cada partida, su `rol` (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA) además de cuenta, tercero, unidad organizacional y débito/crédito — permite que el destino (ej. SincoA&F) identifique las partidas tributarias [D14]. El mapeo del `rol` al formato específico de cada destino es responsabilidad del adaptador [PD1]. | — | — |
 | 4a | Si destino acepta → registrar referencia del destino | EntregaAceptada | entrega-contable-{id} |
 | 4b | Si destino rechaza → registrar motivo | EntregaRechazada | entrega-contable-{id} |
 | 5a | Si aceptado → informar a consumidores | — | (consumidores escuchan EntregaAceptada) |
@@ -1187,7 +1209,7 @@ El bounded context de Contabilidad emite **55 eventos** distribuidos en 12 agreg
 | **Estado previo** | — (creación) |
 | **Estado resultante** | PENDIENTE (si faltan cuentas por resolver) o RESUELTO (si la cadena resolvió todo y balancea — en este caso se emite BorradorResuelto como derivado por transición). |
 | **Precondiciones** | Referencia de origen única [R16]. Datos maestros activos [R07]. Documento fuente según tipo de transacción [R08]. |
-| **Información capturada** | Partidas (cuenta o null, tercero, unidadOrganizacional, debito, credito, nivelResolucion, esContrapartida), referenciaOrigen, subDominioOrigen, documentoFuente, tipoTransaccion, empresa, moneda, fecha. |
+| **Información capturada** | Partidas (cuenta o null, tercero, unidadOrganizacional, debito, credito, nivelResolucion, rol, esContrapartida, descripcionConcepto), referenciaOrigen, subDominioOrigen, documentoFuente, descripcion, tipoTransaccion, empresa, moneda, fecha. |
 | **Efectos** | Si nace RESUELTO → emite BorradorResuelto (derivado por transición). Si nace de un consumidor → el borrador no es descartable [R09]. |
 
 #### CuentaResuelta
@@ -1355,7 +1377,7 @@ El bounded context de Contabilidad emite **55 eventos** distribuidos en 12 agreg
 | **Estado previo** | PENDIENTE |
 | **Estado resultante** | PENDIENTE (sin cambio de estado — toda la información se reemplaza). |
 | **Precondiciones** | Borrador en estado PENDIENTE [R14]. La referenciaOrigen coincide con la del borrador existente. Si el borrador ya no está en PENDIENTE, la re-emisión se rechaza. |
-| **Información capturada** | Datos nuevos completos del consumidor: partidas (cuenta o null, tercero, unidadOrganizacional, debito, credito, nivelResolucion, esContrapartida), tipoTransaccion, empresa, moneda, fecha, documentoFuente. El estado anterior no se captura — se reconstruye del stream (ES). |
+| **Información capturada** | Datos nuevos completos del consumidor: partidas (cuenta o null, tercero, unidadOrganizacional, debito, credito, nivelResolucion, rol, esContrapartida, descripcionConcepto), descripcion, tipoTransaccion, empresa, moneda, fecha, documentoFuente. El estado anterior no se captura — se reconstruye del stream (ES). |
 | **Efectos** | Las resoluciones de cuentas anteriores se pierden [R15]. El borrador vuelve a pasar por la cadena de resolución con los nuevos datos. |
 
 ---
@@ -1602,9 +1624,9 @@ Los eventos de configuración siguen un patrón uniforme: el agregado se crea un
 | # | Evento | Descripción | Información capturada | Reglas |
 |:---:|---|---|---|---|
 | 1 | `PlantillaDeAsientoCreada` | Se creó una plantilla para un tipo de transacción contable. | TipoTransaccion, documentoFuenteObligatorio. | [R08] |
-| 2 | `RolPartidaAgregado` | Se registró un nuevo rol dentro de la plantilla. | Nombre, naturaleza (debito/credito), tipoComponenteAsociado, esContrapartida. | — |
-| 3 | `RolPartidaModificado` | Se actualizaron atributos de un rol existente. | Nombre (identifica), campos modificados. | — |
-| 4 | `RolPartidaEliminado` | Se eliminó un rol de la plantilla. | Nombre. | — |
+| 2 | `RolPartidaAgregado` | Se registró un nuevo rol dentro de la plantilla. | rol (código), naturaleza (debito/credito), esContrapartida, componentes (lista de `{ tipoComponente, grupoPucEsperado, llevaDescripcionConcepto }`), grupoPucEsperado (a nivel de rol — solo cuando esContrapartida). | — |
+| 3 | `RolPartidaModificado` | Se actualizaron atributos de un rol existente. | rol (identifica), campos modificados. | — |
+| 4 | `RolPartidaEliminado` | Se eliminó un rol de la plantilla. | rol. | — |
 
 #### 5.3.5. LibroContable — 4 eventos
 
@@ -1646,7 +1668,7 @@ Los eventos de configuración siguen un patrón uniforme: el agregado se crea un
 
 Los tipos de transacción contable determinan qué plantilla de asiento aplica y con qué estructura de roles (débitos/créditos). Cada sub-dominio consumidor emite líneas de traducción con un tipo de transacción que el motor usa para seleccionar la plantilla correspondiente.
 
-El inventario completo de tipos de transacción y sus plantillas está documentado en `anexo-ejemplo-plantilla-de-asiento.md`, Sección 5.2, con 42 plantillas en 8 sub-dominios emisores:
+El inventario completo de tipos de transacción y sus plantillas está documentado en `anexo-ejemplo-plantilla-de-asiento.md`, Sección 5.2, con 42 plantillas en 8 sub-dominios emisores. La **especificación detallada por plantilla** (roles, componentes y `grupoPucEsperado`, lista para precarga) vive en `datos-precargados/plantillas-de-asiento.*` — a la fecha cubre las 4 plantillas de OXP; las demás se precargan al modelar cada sub-dominio emisor.
 
 | Sub-dominio emisor | Plantillas | Ejemplos principales |
 |---------------------|:----------:|---------------------|
@@ -1741,6 +1763,9 @@ Las decisiones previas (DD1-DD11) están documentadas en `anexo-decisiones-de-di
 | D9 | N1 tiene autoridad plena sobre el borrador — el contador puede modificar cualquier campo en estado PENDIENTE sin bloqueo ni matriz de restricción. Los campos se categorizan según su impacto [R43]: corrección contable natural (cuenta, tercero, unidad organizacional) y campos que afectan el hecho económico (valor, moneda, documento fuente, partidas). Cuando el contador modifica campos que afectan el hecho económico, el sistema advierte que la mejor práctica es solicitar al consumidor la re-emisión o un nuevo hecho [R44] — la advertencia no bloquea. Esta postura reconoce que el consumidor puede haber finalizado su ciclo de vida y no puede re-emitir, por lo que crear un bloqueo generaría un cuello de botella en la contabilización. La protección se garantiza por: (1) el borrador de consumidor no puede descartarse [R09], (2) re-emisión disponible en PENDIENTE [R14], (3) advertencia del sistema [R44], (4) cada modificación queda como evento individual (ES) con trazabilidad completa. Alternativa descartada: matriz de campos editables por sub-estado o bloqueo de campos sensibles. | [R09] [R14] [R43] [R44] [D2] |
 | D10 | Los agregados de N2 (Secciones 3.8–3.12) se especifican a nivel suficiente para entender la integración con N1. Su refinamiento completo se ejecuta al iniciar la construcción de F2. Varios puntos de operación avanzada (procesos automáticos de cierre, reclasificación) permanecen como pendientes (PD2, PD3). | Sección 8 del alcance |
 | D11 | Arquitectura PUC único + libros paralelos como caso típico moderno. Una empresa típica al onboardear opera con un PlanDeCuentas (PUC NIIF) y dos libros predeterminados (Principal y Fiscal) sobre el mismo PUC. Las diferencias entre tratamientos (NIIF vs ajustes fiscales) se modelan como asientos específicos del libro [R34], no como PUCs paralelos. El agregado MarcoContable identifica formalmente el PUC mediante un código estructurado (NIIF predeterminado + custom bajo demanda). El atributo `tipo` del LibroContable es texto libre con predeterminados Principal/Fiscal — el analista contable puede crear libros con tipos adicionales (Gerencial, Consolidación, sectoriales) según necesite la empresa. EquivalenciaPuc permanece para casos excepcionales (transición a NIIF, sectores regulados con PUC sectorial obligatorio, grupos empresariales con consolidación). Decisión basada en investigación de seis ERPs modernos (SAP S/4HANA, Oracle Fusion, Dynamics 365, NetSuite, Workday, Sage) que convergen hacia "Chart of Accounts único + ledgers paralelos sobre el mismo COA". | [R34] [R46] `anexo-marco-contable-y-arquitectura-puc.md` |
+| D12 | **Grupo del PUC esperado para acotar la inferencia.** Cada componente que alimenta un rol de la plantilla (`ComponenteDelRol`) declara `grupoPucEsperado`: una lista de uno o más prefijos del código PUC, de **longitud variable** (clase = 1 dígito, grupo = 2, cuenta = 4). El **Nivel B** (inferencia) solo considera cuentas auxiliares cuyo código inicia por alguno de los prefijos. La profundidad refleja qué tan determinístico es el componente: estables a 4 dígitos (`iva`→`["2408"]`, `retefuente`→`["2365"]`, `reteiva`→`["2367"]`); variables según la clasificación a grupos de 2 dígitos (`gasto`→`["51","52","53"]`). El grupo vive en el componente —no en el rol— porque un rol agrupa varios `tipoComponente` que caen en grupos distintos. La **contrapartida** es la excepción: se genera por el motor y carece de `tipoComponente`, por lo que su `grupoPucEsperado` se declara a nivel del rol (`["2205","2335"]` en `causacion_gasto`). `grupoPucEsperado` **no reemplaza la cadena de resolución**: el mapeo fino (tipoComponente × clasificacion × empresa → cuenta exacta) lo siguen haciendo el Nivel A (reglas) y el Nivel C (aprendizaje); el grupo solo orienta el Nivel B. Es obligatorio en todos los roles. Alternativa descartada: grupo por (rol × clasificación) — se rechazó porque la clasificación no vive en la plantilla (llega en cada línea, catálogo abierto) y duplicaría la función de la cadena de resolución. | [D6] [DD2] [R47] |
+| D13 | **Narración del borrador: descripción general + descripción de concepto por partida.** El borrador admite dos textos de narración, ambos **enviados por el consumidor** (no compuestos por el motor en esta fase): (1) `BorradorContable.descripcion` — descripción general del hecho económico, a nivel de encabezado; opcional, si el consumidor no la envía queda vacía. (2) `PartidaBorrador.descripcionConcepto` — narración del movimiento individual, que el motor asigna **solo** a las partidas cuyo `ComponenteDelRol` tiene `llevaDescripcionConcepto = true`. Este flag se declara en la plantilla y es `true` únicamente en los componentes que portan concepto de negocio (`gasto`, `concepto_devuelto`, `anticipo`) y `false` en impuestos y retenciones, cuya cuenta ya es autodescriptiva — evita repetir el mismo texto donde no aporta. La asignación ocurre en el paso 4b del ServicioDeTraduccion. Alternativa diferida (no en esta fase): que el motor **componga** la `descripcion` general a partir de las descripciones de concepto cuando el consumidor no la envíe. | [R48] |
+| D14 | **La partida del borrador hereda el `rol` de la plantilla y lo propaga a la entrega.** Cada `PartidaBorrador` registra el `rol` (código de conjunto cerrado: GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA) del `RolPartida` de la plantilla que la originó, asignado en el paso 5 del ServicioDeTraduccion. Antes, la partida solo heredaba `esContrapartida` (booleano), perdiendo la distinción entre impuesto, retención y gasto; como las cuentas se resuelven dinámicamente, el `rol` es la marca confiable del tipo de partida. El `rol` se propaga en el payload de `EntregaContable` para que el sistema contable de destino (caso **SincoA&F**) identifique las partidas tributarias y les dé tratamiento fiscal. El `rol` es un **código** (no texto descriptivo); por consistencia, el atributo del rol en `RolPartida` se renombró de `nombre` a `rol`, y `esContrapartida` se conserva como atajo equivalente a `rol == CONTRAPARTIDA`. El requisito específico de SincoA&F sobre los impuestos se confirma al implementar su adaptador [PD1]. No se propaga a N2 en esta fase (F2). | [R49] [PD1] |
 
 ---
 
@@ -1815,3 +1840,6 @@ Cada bounded context declara los recursos que protege y las acciones que expone 
 | 1.0 | Abril 2026 | Versión inicial. 12 secciones. 12 agregados (7 N1 + 5 N2), 55 eventos, 26 invariantes (18 Local + 8 Eventual), 10 decisiones (D1-D10), 7 premisas (P1-P7), 3 pendientes (PD1-PD3), 6 sugerencias de implementación (SI1-SI6), 17 permisos atómicos, 3 domain services. Resultado de: construcción iterativa del modelo, 3 auditorías (V1: 36 hallazgos, V2: 31 hallazgos, V3: 84 hallazgos — 49 aplicados, 35 descartados), 3 rondas de revisión. Reporte consolidado de auditoría en `auditoria/contabilidad-actual.md`. |
 | 1.1 | Mayo 2026 | Validación contractual del motor de traducción y formalización de rechazos previos al borrador. Cambios: (1) Paso 1 del ServicioDeTraduccion ajustado: el rechazo por referenciaOrigen no reemplazable se notifica al consumidor con motivo estructurado (sin evento de dominio). (2) Paso 2 del ServicioDeTraduccion ampliado: se valida que cada tipoComponente recibido tenga al menos un RolPartida en la plantilla. (3) Nueva invariante I27 (Local) — total ahora 27 invariantes (19 Local + 8 Eventual). (4) Tabla de motivos estructurados de rechazo previo al borrador (`REFERENCIA_ORIGEN_DUPLICADA_NO_REEMPLAZABLE`, `TIPO_TRANSACCION_SIN_PLANTILLA`, `LINEA_SIN_ROL_EN_PLANTILLA`) documentada en el ServicioDeTraduccion. (5) Nueva sugerencia de implementación SI7 — total ahora 7 sugerencias. (6) D5 sin cambios — el motor permanece como servicio sin estado; los rechazos pre-borrador se canalizan por mensajería (DLQ + logs + métricas) y la durabilidad la garantiza el outbox del consumidor emisor. Acompaña actualización de `definicion-alcance.md` v1.1 con la nueva regla R45. |
 | 1.2 | Mayo 2026 | Arquitectura PUC + Libro + Marco contable y replanteamiento de libros predeterminados. Cambios: (1) Nuevo agregado `MarcoContable` (N1, configuración) en sección 3.5 — total ahora 13 agregados (8 N1 + 5 N2). (2) Atributo `marcoContable` agregado a `PlanDeCuentas` como referencia inmutable al código del marco; payload de `PlanDeCuentasCreado` actualizado. (3) Nuevos eventos del MarcoContable (`MarcoContableCreado`, `MarcoContableModificado`, `MarcoContableDesactivado`, `MarcoContableReactivado`) — total ahora 59 eventos. (4) Atributo `tipo` del `LibroContable` cambia de enum cerrado (Principal/Local/NIIF/Gerencial) a texto libre con predeterminados sugeridos `Principal` y `Fiscal`. Payload de `LibroContableCreado` actualizado. (5) Nuevas invariantes I28-I32 sobre MarcoContable y la asociación PlanDeCuentas → MarcoContable — total ahora 32 invariantes (22 Local + 10 Eventual). (6) Nueva decisión D11 — arquitectura PUC único + libros paralelos como caso típico moderno. (7) Premisa P5 actualizada — libros predeterminados Principal y Fiscal sobre PUC NIIF. (8) Renumeración de las secciones 3.5-3.18 (3.6-3.19) por la inserción de MarcoContable como sección 3.5. (9) `EquivalenciaPuc` sin cambios estructurales — se agrega nota informativa sobre uso excepcional. (10) Nuevo anexo `anexo-marco-contable-y-arquitectura-puc.md` con investigación de seis ERPs modernos y justificación de la arquitectura. Acompaña actualización de `definicion-alcance.md` v1.2 con nueva regla R46, glosario actualizado y nuevo término "Marco contable". |
+| 1.3 | Mayo 2026 | Grupo del PUC esperado en la plantilla de asiento para acotar la inferencia (Nivel B) — issue #7. Cambios: (1) Nuevo VO `ComponenteDelRol` (`{ tipoComponente, grupoPucEsperado }`) en la composición de `PlantillaDeAsiento`: reemplaza el atributo plano `tipoComponenteAsociado` de `RolPartida` por una colección de componentes, cada uno con su grupo del PUC esperado. (2) Atributo `grupoPucEsperado` (lista de prefijos PUC de longitud variable) en `ComponenteDelRol` y, para la contrapartida, a nivel de `RolPartida`. (3) Paso 3 del `ServicioDeTraduccion` ampliado: el Nivel B se acota a las cuentas cuyo código inicia por algún prefijo de `grupoPucEsperado`; Niveles A y C no se acotan. (4) Paso 4 ampliado: la contrapartida acota su Nivel B con el grupo declarado a nivel de rol. (5) Diagrama de composición de `causacion_gasto` actualizado con los componentes y grupos (GASTO→`["51","52","53"]`, IMPUESTO iva→`["2408"]`/inc→a validar, RETENCION retefuente→`["2365"]`/reteiva→`["2367"]`, CONTRAPARTIDA→`["2205","2335"]`). (6) Payload de `RolPartidaAgregado` actualizado. (7) Nueva decisión D12 — total ahora 12 decisiones (D1-D12). Sin cambios en conteo de agregados (13), eventos (59) ni invariantes (32). Acompaña actualización de `definicion-alcance.md` v1.4 con nueva regla R47 y término de glosario "Grupo del PUC esperado" (entrada 27), y de `anexo-ejemplo-plantilla-de-asiento.md` v1.1 con los grupos esperados en los 3 ejemplos. Llenado completo del inventario de 42 plantillas queda pendiente de revisión por consultor contable (incluye confirmar el grupo del `inc`). |
+| 1.4 | Junio 2026 | Narración del borrador: descripción general y descripción de concepto por partida — issue #8. Cambios: (1) Nuevo atributo `descripcion` (opcional) en la raíz de `BorradorContable` — descripción general del hecho económico que envía el consumidor; si no la envía, queda vacía. (2) Nuevo atributo `descripcionConcepto` (opcional) en `PartidaBorrador` — narración del movimiento, asignada solo a partidas cuyo componente la lleva. (3) Nuevo atributo `llevaDescripcionConcepto` (boolean) en `ComponenteDelRol` — declara qué componentes portan descripción (`true` en gasto/concepto_devuelto/anticipo; `false` en impuestos y retenciones). (4) Nuevo paso 4b del `ServicioDeTraduccion`: asigna `descripcionConcepto` por partida según el flag y traslada la `descripcion` general al encabezado. (5) Payloads de `BorradorCreado` y `BorradorReemplazado` actualizados (`descripcion` + `descripcionConcepto` por partida); payload de `RolPartidaAgregado` actualizado (`llevaDescripcionConcepto`). (6) Diagramas de composición de `BorradorContable` y de la plantilla `causacion_gasto` actualizados. (7) Nueva decisión D13 — total ahora 13 decisiones (D1-D13). Sin cambios en conteo de agregados (13), eventos (59) ni invariantes (32). Depende de que OXP envíe `descripcion`/`descripcionConcepto` en `LineaTraduccion` (issue #10). Acompaña actualización de `definicion-alcance.md` v1.5 (nueva regla R48 + términos de glosario) y del catálogo `datos-precargados/plantillas-de-asiento.*` (flag `llevaDescripcionConcepto` por componente). |
+| 1.5 | Junio 2026 | Herencia del rol de la partida y propagación a la entrega — issue #9. Cambios: (1) Atributo del rol en `RolPartida` **renombrado de `nombre` a `rol`** (código de conjunto cerrado) — actualizado en composición, diagramas, payloads de `RolPartidaAgregado`/`RolPartidaModificado`/`RolPartidaEliminado`. (2) Nuevo atributo `rol` en `PartidaBorrador`, heredado del `RolPartida` de la plantilla; `esContrapartida` se conserva como atajo (rol == CONTRAPARTIDA). (3) Paso 5 del `ServicioDeTraduccion`: cada partida hereda el `rol`. (4) Paso 3 del flujo de `EntregaContable`: el payload al destino incluye el `rol` por partida (para que SincoA&F identifique partidas tributarias). (5) Payloads de `BorradorCreado` y `BorradorReemplazado` actualizados (`rol` por partida). (6) Diagramas de `BorradorContable` y plantilla `causacion_gasto` actualizados. (7) Nueva decisión D14 — total ahora 14 decisiones (D1-D14). Sin cambios en conteo de agregados (13), eventos (59) ni invariantes (32). Requisito específico de SincoA&F sobre impuestos se confirma al implementar el adaptador [PD1]; no se propaga a N2 (F2). Acompaña actualización de `definicion-alcance.md` v1.6 (nueva regla R49 + término de glosario "Rol de la partida") y del catálogo `datos-precargados/plantillas-de-asiento.*` (atributo `rol`). |

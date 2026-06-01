@@ -2,7 +2,7 @@
 
 > **Fecha:** Marzo 2026
 > **Propósito:** Ejemplificar cómo los sub-dominios transaccionales emiten líneas de traducción mediante `lineasParaTraduccion()` y cómo el motor de traducción de Contabilidad las transforma en asientos contables mediante la cadena de resolución. Este anexo respalda las definiciones de *plantilla de asiento*, *línea de traducción* y *cadena de resolución* del glosario del sub-dominio de Contabilidad.
-> **Versión:** 1.0
+> **Versión:** 1.2
 
 ---
 
@@ -88,6 +88,8 @@ Ejemplos de plantillas universales:
 | Diferencia en cambio (ganancia) | CONTRAPARTIDA-CXP (Débito), INGRESO-FINANCIERO (Crédito) | Ganancia cambiaria acredita ingreso financiero |
 
 Lo que **varía por empresa** es a qué cuenta auxiliar específica va cada rol. Eso lo resuelve la cadena de resolución.
+
+> **Grupo del PUC esperado (`grupoPucEsperado`):** Cada componente que alimenta un rol declara los grupos del PUC (prefijos de código de cuenta, de longitud variable) a los que debe pertenecer su cuenta. Esto **acota la inferencia (Nivel B)** a las cuentas cuyo código inicia por alguno de esos prefijos — formaliza lo que en los ejemplos de abajo se describe a mano ("busca cuentas… en el grupo 2408"). El grupo vive en el componente porque un rol agrupa varios `tipoComponente` que caen en grupos distintos (RETENCION: `retefuente`→`2365`, `reteiva`→`2367`); la contrapartida lo declara a nivel del rol. No reemplaza la cadena de resolución — solo orienta el Nivel B. Ver `modelo-dominio.md` [D12] y `definicion-alcance.md` [R47]. Los grupos mostrados en este anexo son ilustrativos para los ejemplos de OXP; el grupo del `inc` y el llenado del inventario completo (Sección 5) quedan pendientes de revisión por consultor contable.
 
 ### 1.4 Cadena de resolución de cuentas
 
@@ -177,12 +179,12 @@ La función aplana los componentes × destinos y produce líneas con el contrato
 
 El motor identifica `tipoTransaccion = causacion_gasto` y aplica la plantilla universal:
 
-| Rol | Naturaleza | Alimentado por | Descripción |
-|-----|-----------|----------------|-------------|
-| GASTO | Débito | Líneas con `tipoComponente = gasto` | Cuenta de gasto según clasificación |
-| IMPUESTO | Débito | Líneas con `tipoComponente = iva, inc, ...` | Cuenta de impuesto según tipo de tributo |
-| RETENCION | Crédito | Líneas con `tipoComponente = retefuente, reteiva, ...` | Cuenta de retención según tipo de tributo |
-| CONTRAPARTIDA | Crédito | Generada por el motor | Cuenta por pagar. Valor = suma(débitos) - suma(créditos anteriores) |
+| Rol | Naturaleza | Alimentado por | Grupo PUC esperado | Descripción |
+|-----|-----------|----------------|--------------------|-------------|
+| GASTO | Débito | Líneas con `tipoComponente = gasto` | `["51","52","53"]` | Cuenta de gasto según clasificación |
+| IMPUESTO | Débito | Líneas con `tipoComponente = iva, inc, ...` | `iva → ["2408"]` · `inc → [...]` (a validar) | Cuenta de impuesto según tipo de tributo |
+| RETENCION | Crédito | Líneas con `tipoComponente = retefuente, reteiva, ...` | `retefuente → ["2365"]` · `reteiva → ["2367"]` | Cuenta de retención según tipo de tributo |
+| CONTRAPARTIDA | Crédito | Generada por el motor | `["2205","2335"]` (a nivel de rol) | Cuenta por pagar. Valor = suma(débitos) - suma(créditos anteriores) |
 
 ### 2.4 Cadena de resolución — cuenta por cuenta
 
@@ -288,10 +290,10 @@ Línea única. Sin clasificación de gasto. Sin distribución compleja.
 
 El motor identifica `tipoTransaccion = anticipo_proveedor` y aplica:
 
-| Rol | Naturaleza | Alimentado por | Descripción |
-|-----|-----------|----------------|-------------|
-| ANTICIPO | Débito | Línea con `tipoComponente = anticipo` | Cuenta de anticipos a proveedores |
-| CONTRAPARTIDA | Crédito | Generada por el motor | Cuenta por pagar. Mismo valor. |
+| Rol | Naturaleza | Alimentado por | Grupo PUC esperado | Descripción |
+|-----|-----------|----------------|--------------------|-------------|
+| ANTICIPO | Débito | Línea con `tipoComponente = anticipo` | `anticipo → ["1330"]` | Cuenta de anticipos a proveedores |
+| CONTRAPARTIDA | Crédito | Generada por el motor | `["2205","2335"]` (a nivel de rol) | Cuenta por pagar. Mismo valor. |
 
 ### 3.4 Cadena de resolución
 
@@ -362,12 +364,12 @@ Los valores son positivos (D19). La plantilla de asiento invierte las naturaleza
 
 El motor identifica `tipoTransaccion = nota_credito_gasto` y aplica la plantilla inversa a la causación:
 
-| Rol | Naturaleza | Alimentado por | Descripción |
-|-----|-----------|----------------|-------------|
-| GASTO | **Crédito** | Líneas con `tipoComponente = concepto_devuelto` | Inverso: acredita la cuenta de gasto |
-| IMPUESTO | **Crédito** | Líneas con `tipoComponente = iva` | Inverso: acredita la cuenta de impuesto |
-| RETENCION | **Débito** | Líneas con `tipoComponente = retefuente` | Inverso: debita la cuenta de retención |
-| CONTRAPARTIDA | **Débito** | Generada por el motor | Reduce CxP |
+| Rol | Naturaleza | Alimentado por | Grupo PUC esperado | Descripción |
+|-----|-----------|----------------|--------------------|-------------|
+| GASTO | **Crédito** | Líneas con `tipoComponente = concepto_devuelto` | `["51","52","53"]` | Inverso: acredita la cuenta de gasto |
+| IMPUESTO | **Crédito** | Líneas con `tipoComponente = iva` | `iva → ["2408"]` | Inverso: acredita la cuenta de impuesto |
+| RETENCION | **Débito** | Líneas con `tipoComponente = retefuente` | `retefuente → ["2365"]` | Inverso: debita la cuenta de retención |
+| CONTRAPARTIDA | **Débito** | Generada por el motor | `["2205","2335"]` (a nivel de rol) | Reduce CxP |
 
 ### 4.4 Cadena de resolución
 
@@ -397,6 +399,8 @@ Sin intervención del usuario. El sistema ya sabe.
 ## 5. Inventario de plantillas por sub-dominio emisor
 
 Las plantillas de asiento son código del producto — no las configura el usuario. Cada sub-dominio emisor tiene un conjunto finito de tipos de transacción contable que generan asientos con estructura conocida.
+
+> **Nota sobre el carácter de este inventario:** Las 42 plantillas listadas en esta sección son un **planteamiento teórico inicial** que sirvió para dimensionar el alcance. No todas se implementarán necesariamente, ni en este número exacto: el conjunto real de cada sub-dominio se determina al modelarlo y refinarlo. La **especificación de verdad** de cada plantilla (roles, componentes y `grupoPucEsperado`) vive en `datos-precargados/plantillas-de-asiento.*` y se va alineando con cada refinamiento. Ejemplo ya alineado: **OXP** — al cruzar con su mapeo canónico real, emite **4** `tipoTransaccion` (`causacion_gasto`, `anticipo_a_proveedor`, `nota_credito_gasto`, `reversa_anticipo`), no las 6 estimadas aquí: lo que el inventario listaba como "nota débito a proveedor", "aplicación de anticipo" y "diferencia en cambio" no son plantillas propias (las dos últimas viajan como componentes de `causacion_gasto`), y faltaba "reversa de anticipo". Donde el catálogo precargado y este inventario difieran, **manda el catálogo precargado**.
 
 ### 5.1 Relación entre dominios de gestión, transaccionales y Contabilidad
 
@@ -530,7 +534,7 @@ Nómina ────────────────────────
 
 | Sub-dominio emisor | Plantillas | Principales |
 |---------------------|:----------:|-------------|
-| **OXP** | 6 | Causación de obligación, nota crédito proveedor, nota débito proveedor, anticipo a proveedor, aplicación de anticipo, diferencia en cambio |
+| **OXP** | 6 *(teórico; 4 reales — ver `datos-precargados/plantillas-de-asiento.*`)* | Causación de obligación, nota crédito proveedor, nota débito proveedor, anticipo a proveedor, aplicación de anticipo, diferencia en cambio |
 | **CXC** | 7 | Causación de ingreso, nota crédito/débito cliente, anticipo de cliente, aplicación de anticipo, diferencia en cambio, provisión cartera |
 | **Tesorería** | 8 | Pago a proveedor, cobro de cliente, transferencia, consignación, cargo bancario, abono bancario, conciliación, reembolso caja menor |
 | **Inventarios** | 6 | Entrada de mercancía, salida por venta (CMV), salida por consumo, transferencia entre bodegas, ajuste de inventario, variación de costo |
@@ -560,3 +564,5 @@ Nómina ────────────────────────
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
 | 1.0 | Marzo 2026 | Versión inicial: patrón universal, contrato LineaTraduccion, 3 ejemplos OXP (causación, anticipo, nota crédito), cadena de resolución A → C → B, inventario de plantillas por sub-dominio emisor (8 sub-dominios, 42 plantillas). |
+| 1.1 | Mayo 2026 | Grupo del PUC esperado (issue #7). Nota explicativa de `grupoPucEsperado` en la Sección 1.3 y nueva columna "Grupo PUC esperado" en las tablas de plantilla de los 3 ejemplos (causación, anticipo, nota crédito). Alinea con `modelo-dominio.md` v1.3 [D12] y `definicion-alcance.md` v1.3 [R47]. Llenado del inventario completo (Sección 5) y confirmación del grupo del `inc` pendientes de revisión por consultor contable. |
+| 1.2 | Junio 2026 | Encuadre del inventario teórico (issue #7). Nota en la Sección 5 que aclara que las 42 plantillas son un planteamiento inicial de dimensionamiento — no todas se implementarán y el número real se determina al modelar cada sub-dominio; la fuente de verdad es `datos-precargados/plantillas-de-asiento.*`. Fila de OXP del resumen (5.3) marcada como "6 teórico; 4 reales". Acompaña la creación del catálogo precargado `datos-precargados/plantillas-de-asiento.md`/`.json` con las 4 plantillas reales de OXP. |
