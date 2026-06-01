@@ -1,6 +1,6 @@
 {
   "catalogo": "PlantillaDeAsiento",
-  "version": "1.2",
+  "version": "1.3",
   "fechaActualizacion": "2026-06-01",
   "alcance": "Sub-dominio emisor OXP (Obligaciones por Pagar). 4 plantillas de las 42 del inventario (anexo-ejemplo-plantilla-de-asiento.md, Seccion 5.2).",
   "fuente": "Mapeo canonico de eventos OXP -> tipoTransaccion contable (dominio/obligaciones-por-pagar/modelo-dominio.md, tabla de la seccion 'Integracion con sub-dominio Contabilidad') + estructura del agregado PlantillaDeAsiento (dominio/contabilidad/modelo-dominio.md, Seccion 3.7, [D12], [D13]).",
@@ -53,6 +53,22 @@
           "esContrapartida": false,
           "componentes": [
             { "tipoComponente": "diferencia_en_cambio", "grupoPucEsperado": ["5305", "4215"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Perdida -> gasto financiero (5305); ganancia -> ingreso financiero (4215). Nombre de tipoComponente sin canonizar en OXP (issue #10)." }
+          ]
+        },
+        {
+          "rol": "AMORTIZACION_ANTICIPO",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "amortizacion_anticipo", "grupoPucEsperado": ["1330"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Reclasificacion del anticipo al regularizarlo: Cr Anticipos a proveedores (1330), ver [D26] de OXP. Viaja dentro de causacion_gasto. Confirmar grupo con consultor." }
+          ]
+        },
+        {
+          "rol": "AJUSTE_TOLERANCIA",
+          "naturaleza": "debito_credito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "ajuste_tolerancia", "grupoPucEsperado": ["5305", "4210"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Ajuste por diferencia dentro de tolerancia al conciliar (OxpExtracto). Pequena perdida/ganancia. Grupo tentativo: gasto financiero (5305) / ingreso financiero (4210). Por validar con consultor contable." }
           ]
         },
         {

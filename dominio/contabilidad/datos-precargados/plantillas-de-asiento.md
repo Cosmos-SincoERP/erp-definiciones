@@ -2,7 +2,7 @@
 
 **Sub-dominio emisor:** Obligaciones por Pagar (OXP)
 **Catálogo del modelo:** `PlantillaDeAsiento` (Sección 3.7 de `modelo-dominio.md`)
-**Versión:** 1.2
+**Versión:** 1.3
 **Fecha de actualización:** 2026-06-01
 **Archivo de datos:** [`plantillas-de-asiento.json`](plantillas-de-asiento.json)
 
@@ -54,6 +54,8 @@ Causación de una obligación por pagar. Emitida por `OxpComercioCausada` y `Ext
 | RETENCION | Crédito | `reteica` | `["2368"]` | ❌ | ⚠️ |
 | CARGO_FINANCIERO | Débito | `cargo_financiero` | `["5305"]` | ❌ | ⚠️ |
 | DIFERENCIA_EN_CAMBIO | Débito/Crédito | `diferencia_en_cambio` | `["5305","4215"]` | ❌ | ⚠️ |
+| AMORTIZACION_ANTICIPO | Crédito | `amortizacion_anticipo` | `["1330"]` | ❌ | ⚠️ |
+| AJUSTE_TOLERANCIA | Débito/Crédito | `ajuste_tolerancia` | `["5305","4210"]` | ❌ | ⚠️ |
 | CONTRAPARTIDA | Crédito | — (genera el motor) | `["2205","2335"]` | ❌ | |
 
 ### 4.2. `anticipo_a_proveedor`
@@ -103,6 +105,8 @@ Los siguientes puntos requieren confirmación de **consultor contable** y/o **ca
 | 6 | Nombre `nota_credito_gasto` vs `nota_credito_proveedor` | OXP debe alinear su mapeo al nombre canónico `nota_credito_gasto`. |
 | 7 | `reversa_anticipo` (plantilla completa) | Plantilla definida desde cero a partir del efecto contable descrito en OXP (Db Anticipos / Cr CxP). Validar estructura y registrar formalmente en el inventario. |
 | 8 | Amortización de anticipo | OXP indica que viaja como `tipoComponente` dentro de `causacion_gasto` (`[D26]`) sin nombre canónico. Definir si requiere un rol/componente propio en esta plantilla. |
+| 9 | `amortizacion_anticipo` (grupo PUC) | Rol nuevo agregado por coordinación cruzada con OXP #10. Grupo `["1330"]` (Anticipos a proveedores, por `[D26]` de OXP). Confirmar con consultor. |
+| 10 | `ajuste_tolerancia` (grupo PUC) | Rol nuevo agregado por coordinación cruzada con OXP #10. Grupo tentativo `["5305","4210"]` (gasto/ingreso financiero). Es una sugerencia — validar con consultor contable. |
 
 ---
 
@@ -113,3 +117,4 @@ Los siguientes puntos requieren confirmación de **consultor contable** y/o **ca
 | 1.0 | Junio 2026 | Versión inicial. 4 plantillas de OXP (`causacion_gasto`, `anticipo_a_proveedor`, `nota_credito_gasto`, `reversa_anticipo`) con roles, componentes y `grupoPucEsperado`. Derivado del issue #7 (grupo del PUC en la plantilla). 8 ítems en revisión pendiente para consultor contable y sincronización con OXP (issue #10). |
 | 1.1 | Junio 2026 | Atributo `llevaDescripcionConcepto` por componente (issue #8). Marca qué componentes portan la descripción de concepto que envía el consumidor: ✅ en `gasto`, `anticipo`, `concepto_devuelto`, `reversa_anticipo`; ❌ en impuestos y retenciones. Nueva columna en las 4 plantillas. Alinea con `modelo-dominio.md` v1.4 [D13] y `definicion-alcance.md` v1.5 [R48]. |
 | 1.2 | Junio 2026 | Atributo del rol renombrado de `nombre` a `rol` (issue #9), consistente con la herencia del rol a la partida del borrador y su propagación a la entrega. El `rol` es un código de conjunto cerrado (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA). Alinea con `modelo-dominio.md` v1.5 [D14] y `definicion-alcance.md` v1.6 [R49]. |
+| 1.3 | Junio 2026 | Dos roles nuevos en `causacion_gasto` por **ajuste cruzado con OXP** (issue #10): `AMORTIZACION_ANTICIPO` (`amortizacion_anticipo` → `["1330"]`) y `AJUSTE_TOLERANCIA` (`ajuste_tolerancia` → tentativo `["5305","4210"]`). OXP los emite como `tipoComponente`; se agregan al catálogo para preservar la coincidencia 1:1. Ambos `porValidar` (ítems 9 y 10 de revisión pendiente). |
