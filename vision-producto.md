@@ -62,6 +62,19 @@ El resultado: operación lenta, propensa a errores, dependiente de expertos y de
 
 **El reto:** estas soluciones son potentes pero funcionan como módulos relativamente independientes. La siguiente generación las convierte en un **ecosistema que conversa**.
 
+### 3.1. El alcance ya es multi-sector (✅ dado — dato clave para el segmento)
+
+El producto se compone de **dos capas con naturalezas distintas**, y esto define a quién le sirve:
+
+- **Núcleo transversal (horizontal):** lo financiero, contable, facturación, recaudo y **cobros** no depende del sector. **Ya hoy** atiende sectores muy distintos a la construcción. Ejemplos reales:
+  - **SincoADC (cobros):** empresas temporales de nómina, **servicios públicos**, **suscripciones de software** (el propio SincoSoft que arrienda su software; Camacol cobrando suscripciones a constructoras), **gestión aeroportuaria** de operación regulada.
+  - **SincoM&E:** el negocio de **transporte**.
+- **Verticales especializados:** gestión de obra, inmobiliario, infraestructura, concesiones — donde están los **25 años de expertise** y el reconocimiento de marca.
+
+**El dato más importante:** todas esas soluciones —de cualquier sector— **ya entregan su información al núcleo de facturación y contabilidad.** La integración por eventos del ecosistema **no es teórica: ya ocurre**. Es la base real sobre la que se construye Cosmos.
+
+> **Implicación para el segmento:** Cosmos apalanca el **reconocimiento vertical** (construcción/inmobiliario) como ancla de credibilidad, mientras el **núcleo transversal** —ya probado en servicios públicos, transporte, aeroportuario y suscripciones— habilita la **expansión a nuevos sectores**. No es "el software de constructores": es un ecosistema cuyo núcleo sirve a cualquier sector y cuyos verticales aportan profundidad donde se necesita.
+
 ---
 
 ## 4. La visión: el ecosistema agéntico «Cosmos» (💡)
@@ -78,6 +91,14 @@ SincoSoft  (la empresa)
 ```
 
 **El principio de experiencia:** cada empresa **activa las soluciones que necesita** según su operación. El usuario no compra "un ERP"; entra a un entorno y enciende lo que le sirve — y todo lo que enciende se entiende entre sí.
+
+### 4.1. Cada producto tiene identidad propia y puede ser multi-actor (💡)
+
+Pertenecer al ecosistema **no significa que todos los productos se vean y se sientan igual.** Cada solución tiene **identidad, lenguaje y experiencia propios**, ajustados a sus usuarios — porque los públicos son radicalmente distintos. Y muchas soluciones son **multi-actor**: sirven a varios tipos de usuario a la vez, no solo al "empleado de la empresa cliente".
+
+> **Ejemplo — plataforma de reparaciones locativas:** conviven tres actores con necesidades distintas: el **arrendatario o propietario** (reporta y sigue la reparación), el **agente de la inmobiliaria** (coordina y autoriza) y el **proveedor o contratista** (ejecuta y cobra). Esta plataforma vive **dentro del ecosistema** (alimenta finanzas, comparte la inteligencia común), pero tiene **su propia identidad y enfoque** — el contratista nunca verá "un ERP"; verá una herramienta que le resuelve su trabajo.
+
+**Por qué importa:** el valor del ecosistema (que los sistemas se comuniquen y compartan inteligencia) **convive** con la libertad de que cada producto le hable bien a su público. La forma exacta de equilibrar ecosistema e identidad propia es una decisión de **arquitectura de marca** → se trabaja en `brief-marca.md`.
 
 💡 *Por qué el nombre encaja:* «Cosmos» = un universo **ordenado** donde muchos cuerpos coexisten en un sistema. Conecta con "muchas soluciones, un solo entorno con orden". (Naming sigue ❓ — se decide en el brief de marca.)
 
@@ -105,8 +126,10 @@ Para lograrlo, el ecosistema incorpora **toda tecnología que sirva a ese fin** 
 
 > El norte no es "tener IA": es **que el usuario haga menos y entienda más**.
 
-### 5.2. IA en cada solución (✅ dado)
-Cada solución tiene **su propia inteligencia**, desarrollada desde el aprendizaje y apalancada en IA, para orientar al usuario y reducir su carga operativa. No es una IA central única: es **inteligencia distribuida, una por dominio** (ej. la categorización contable automática del módulo de Contabilidad; el "Modo Crucero" de Bitákora).
+### 5.2. IA en cada solución (💡 visión — con evidencia inicial)
+La visión es que **cada solución tenga su propia inteligencia**, apalancada en IA y en el aprendizaje, para orientar al usuario y reducir su carga operativa — **inteligencia distribuida, una por dominio**, no una IA central única.
+
+Hoy esto es **evidencia inicial, no estado generalizado:** ya existe en la categorización contable automática del módulo de **Contabilidad** y en el *"Modo Crucero"* de **Bitákora**. El resto de soluciones lo incorpora progresivamente — es parte de lo que Cosmos lleva a todo el ecosistema.
 
 ### 5.3. El asistente transversal de IA (✅ dado — validado en el producto)
 Un asistente de IA cruza todo el ecosistema. Tres comportamientos ya observados en lo construido:
@@ -148,18 +171,20 @@ El comportamiento agéntico se apoya en piezas de arquitectura concretas y recon
 
 ---
 
-## 6. La evolución de la idea (💡 hipótesis para alinear al equipo)
+## 6. La ruta de madurez hacia la autonomía (💡)
 
-El cambio de fondo es un **desplazamiento del rol del usuario**: de operar a supervisar.
+**El destino de la visión es un ecosistema autónomo** — agentes que ejecutan el trabajo y mantienen al humano en el centro de las decisiones que importan (etapa 4). "Autónomo" no significa "sin humano": en finanzas y contabilidad hay responsabilidad legal, por lo que el **human-in-the-loop** es parte del diseño, no una limitación temporal.
+
+Las cuatro etapas **no son opciones de "hasta dónde llegar"** — son la **ruta de madurez** hacia ese mismo destino. El cambio de fondo es un **desplazamiento del rol del usuario**: de operar a supervisar.
 
 | Etapa | El sistema… | El usuario… |
 |---|---|---|
-| **1. Hoy — Asiste** | Orienta (muestra tareas y prioridades), extrae datos de documentos y entiende lo que el usuario quiere hacer. | **Ejecuta cada paso.** El sistema acompaña, no actúa por él. |
+| **1. Asiste** *(donde está hoy)* | Orienta (muestra tareas y prioridades), extrae datos de documentos y entiende lo que el usuario quiere hacer. | **Ejecuta cada paso.** El sistema acompaña, no actúa por él. |
 | **2. Propone** | Prepara el trabajo hecho (la factura ya registrada, la conciliación armada, la nómina calculada). | **Solo confirma.** El formulario desaparece detrás de una propuesta lista. |
 | **3. Actúa con autonomía supervisada** | Ejecuta de punta a punta los procesos rutinarios y de bajo riesgo, bajo políticas definidas; **escala solo las excepciones**. | **Supervisa y decide** las excepciones. |
-| **4. Agentes que colaboran** | Los agentes de los módulos se coordinan entre sí (compras ↔ contabilidad ↔ tesorería ↔ nómina). | Queda en el **centro de las decisiones que importan**; la operación fluye como una conversación entre agentes. |
+| **4. Agentes que colaboran** *(destino)* | Los agentes de los módulos se coordinan entre sí (compras ↔ contabilidad ↔ tesorería ↔ nómina). | Queda en el **centro de las decisiones que importan**; la operación fluye como una conversación entre agentes. |
 
-> De *digitar y navegar formularios* → a *confirmar propuestas* → a *supervisar agentes*. Ese desplazamiento es la historia más poderosa que el producto puede contar — y el criterio de diseño de cada funcionalidad nueva.
+> El eje es el desplazamiento del usuario: de *digitar y navegar formularios* → a *confirmar propuestas* → a *supervisar agentes*. Es el criterio con el que se diseña cada funcionalidad nueva.
 
 ---
 
@@ -177,9 +202,9 @@ Esta visión se materializa, pieza por pieza, en los **modelos de dominio** que 
 
 ## 8. Preguntas abiertas para el equipo (❓)
 
-1. **Alcance de la primera materialización** — ¿qué módulos inauguran el ecosistema agéntico y en qué orden?
+1. **Alcance de la primera materialización** — ¿qué soluciones inauguran el ecosistema agéntico y en qué orden? *(Es una pregunta de roadmap, no de visión: el destino —autonomía, §6— no está en discusión; lo que se prioriza es el camino.)*
 2. **Relación con SincoERP actual** — ¿Cosmos convive con SincoERP, lo reemplaza progresivamente, o es una capa nueva sobre lo existente?
-3. **Hasta qué etapa de la evolución (§6) apuntamos en el corto plazo** — ¿nos quedamos en "Asiste/Propone" o ya pilotamos "Actúa con autonomía supervisada" en algún proceso?
+3. **Nuevos sectores objetivo** — ¿a qué sectores nuevos (más allá de construcción/inmobiliario y de los ya atendidos por el núcleo) apunta la expansión?
 4. **Naming y marca** — se trabaja en `brief-marca.md`.
 
 ---
@@ -202,4 +227,4 @@ Los conceptos técnicos de esta visión (§5.4) se apoyan en arquitecturas y tra
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
-| 0.1 | Junio 2026 | Primera versión de la visión de producto. Separa el "qué/por qué" del ecosistema agéntico (antes mezclado en el brief de marca): problema que resuelve, producto actual SincoERP/Bitákora como punto de partida, visión del ecosistema, los cuatro ejes diferenciales (sin formularios, IA por solución, asistente transversal, agéntico/eventual), la evolución en 4 etapas y la relación con la especificación de dominio. Cada idea agéntica se respalda con la tecnología que la resuelve (EDA, patrones de agentes de Anthropic, RAG, MCP, human-in-the-loop) y una sección de referencias técnicas. «Cosmos» como nombre provisional. |
+| 0.1 | Junio 2026 | Primera versión de la visión de producto. Separa el "qué/por qué" del ecosistema agéntico (antes mezclado en el brief de marca): problema que resuelve, producto actual SincoERP/Bitákora, modelo de segmento de dos capas (núcleo transversal multi-sector ya probado en servicios públicos/transporte/aeroportuario/suscripciones + verticales de expertise + expansión), identidad propia por producto y multi-actor (ej. reparaciones locativas con tres actores), los cuatro ejes diferenciales, la ruta de madurez hacia la autonomía y la relación con la especificación de dominio. Cada idea agéntica se respalda con la tecnología que la resuelve (EDA, patrones de agentes de Anthropic, RAG, MCP, human-in-the-loop) y referencias técnicas. «Cosmos» como nombre provisional. |
