@@ -122,14 +122,29 @@ Un asistente de IA cruza todo el ecosistema. Tres comportamientos ya observados 
 ### 5.4. Agéntico y orientado a eventos (✅ dado + 💡 visión)
 Cada solución es (o tiende a ser) un **agente** que percibe, decide y actúa, comunicándose con las demás de forma **eventual** (event-driven) — sin llamadas manuales ni pasos que el usuario deba orquestar.
 
-**Qué significa "agéntico" aquí** (no es un chatbot):
+**Qué significa "agéntico" aquí** (no es un chatbot): sigue el paradigma clásico de agentes inteligentes **percibir → decidir → actuar**, cerrado en un bucle con el entorno.
 - **Percibe** hechos del negocio vengan de donde vengan (correo, documento, WhatsApp, evento de otro módulo).
 - **Decide** qué corresponde, con su inteligencia de dominio y el aprendizaje acumulado.
 - **Actúa** ejecutando o proponiendo el siguiente paso, y le cuenta al usuario qué hizo o qué revisar.
 - **Colabora** con otros agentes: un hecho en un módulo dispara la cadena correcta en los demás.
 
-**Caso ilustrativo:**
-> Llega una **factura de compra** por el correo empresarial — o por **WhatsApp**, o el usuario tiene el **PDF/XML**. El sistema **la reconoce de inmediato**, extrae sus datos, la registra en el módulo contable y avisa al responsable solo si necesita una decisión. Nadie la digitó; un hecho del mundo real disparó, por eventos, toda la cadena.
+**Cómo se construye técnicamente (no es una idea superficial):**
+
+El comportamiento agéntico se apoya en piezas de arquitectura concretas y reconocidas en la industria:
+
+| Capacidad | Cómo se resuelve técnicamente | Respaldo |
+|---|---|---|
+| **Que los módulos reaccionen sin intervención** | **Arquitectura orientada a eventos (EDA)**: cada hecho del negocio es un evento publicado en un bus; los módulos interesados lo consumen y reaccionan. Es la misma arquitectura sobre la que ya se modela el dominio (Event Sourcing + EDA). | Patrón establecido de sistemas distribuidos; ya presente en `dominio/`. |
+| **Que el agente decida y use herramientas** | Combinación de **workflows** (rutas predefinidas para procesos deterministas — ej. "causar una factura") y **agents** (el modelo dirige dinámicamente los pasos cuando el caso es abierto). Patrones: *routing* (clasificar y derivar), *orchestrator-workers* (un coordinador delega en agentes especializados). | Anthropic, *Building Effective Agents* (2024). |
+| **Que entienda documentos y lenguaje natural** | **LLMs** con *tool use* + **OCR** para documentos; captura de intención por lenguaje natural. | Estándar actual de IA aplicada. |
+| **Que responda anclado en datos reales (sin inventar)** | **RAG (Retrieval-Augmented Generation)**: el agente recupera el conocimiento real del sistema/empresa antes de responder o actuar, reduciendo alucinaciones y dando trazabilidad. | Lewis et al., *Retrieval-Augmented Generation* (2020). |
+| **Que los agentes se conecten a herramientas y entre sí** | **MCP (Model Context Protocol)**: estándar abierto para conectar agentes con sistemas de datos y herramientas de forma uniforme. | Anthropic, Model Context Protocol (2024). |
+| **Que la autonomía sea segura** | **Human-in-the-loop**: puntos de control donde el agente pausa para confirmación humana, y condiciones de parada. La autonomía crece por proceso según su riesgo (ver §6). | Anthropic, *Building Effective Agents* (2024). |
+
+> En síntesis: **EDA** da el sistema nervioso (los eventos), los **patrones de agentes** dan la toma de decisiones, **RAG + MCP** dan conocimiento y conexión, y el **human-in-the-loop** mantiene el control. No es "ponerle IA a un ERP": es una arquitectura agéntica de extremo a extremo.
+
+**Caso ilustrativo (con la tecnología que lo resuelve en cada paso):**
+> Llega una **factura de compra** por el correo empresarial — o por **WhatsApp**, o el usuario tiene el **PDF/XML**. → *(EDA)* la llegada es un **evento**. → *(OCR + LLM)* el agente **extrae** sus datos. → *(RAG)* los **contrasta** con el proveedor, el plan de cuentas y reglas de la empresa. → *(workflow de causación)* la **registra** en el módulo contable. → *(EDA)* publica el hecho, que otros módulos (tesorería, impuestos) consumen. → *(human-in-the-loop)* avisa al responsable **solo si necesita una decisión**. Nadie la digitó; un hecho del mundo real disparó toda la cadena.
 
 ---
 
@@ -169,8 +184,22 @@ Esta visión se materializa, pieza por pieza, en los **modelos de dominio** que 
 
 ---
 
+## 9. Fundamento y referencias técnicas
+
+Los conceptos técnicos de esta visión (§5.4) se apoyan en arquitecturas y trabajos reconocidos, no en ideas sueltas:
+
+- **Anthropic — *Building Effective Agents* (2024).** Distingue *workflows* (rutas de código predefinidas) de *agents* (el modelo dirige dinámicamente sus pasos); define patrones (*prompt chaining, routing, parallelization, orchestrator-workers, evaluator-optimizer*) y el rol del *human-in-the-loop*. Fundamenta cómo Cosmos combina procesos deterministas con autonomía.
+- **Patrick Lewis et al. — *Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks* (2020).** Introduce **RAG**: combina la memoria del modelo con una base de conocimiento externa para responder anclado en datos reales y reducir alucinaciones. Fundamenta que el agente actúe sobre el conocimiento real de la empresa.
+- **Anthropic — Model Context Protocol (MCP) (2024).** Estándar abierto para conectar agentes de IA con herramientas y fuentes de datos de forma uniforme. Fundamenta la interconexión entre agentes y sistemas.
+- **Arquitectura orientada a eventos (Event-Driven Architecture) y Event Sourcing.** Patrón establecido de sistemas distribuidos; es la base sobre la que ya se modela el dominio del proyecto (ver `dominio/`) y el sustrato que permite que los agentes reaccionen a hechos.
+- **Paradigma de agentes inteligentes percibir–decidir–actuar** (sense–plan–act), base conceptual de los sistemas autónomos.
+
+> Estas referencias dan respaldo a las decisiones de producto y permiten que el equipo de desarrollo aterrice la visión sobre tecnología concreta y probada.
+
+---
+
 ## Control de versiones
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
-| 0.1 | Junio 2026 | Primera versión de la visión de producto. Separa el "qué/por qué" del ecosistema agéntico (antes mezclado en el brief de marca): problema que resuelve, producto actual SincoERP/Bitákora como punto de partida, visión del ecosistema, los cuatro ejes diferenciales (sin formularios, IA por solución, asistente transversal, agéntico/eventual), la evolución en 4 etapas y la relación con la especificación de dominio. «Cosmos» como nombre provisional. |
+| 0.1 | Junio 2026 | Primera versión de la visión de producto. Separa el "qué/por qué" del ecosistema agéntico (antes mezclado en el brief de marca): problema que resuelve, producto actual SincoERP/Bitákora como punto de partida, visión del ecosistema, los cuatro ejes diferenciales (sin formularios, IA por solución, asistente transversal, agéntico/eventual), la evolución en 4 etapas y la relación con la especificación de dominio. Cada idea agéntica se respalda con la tecnología que la resuelve (EDA, patrones de agentes de Anthropic, RAG, MCP, human-in-the-loop) y una sección de referencias técnicas. «Cosmos» como nombre provisional. |
