@@ -112,7 +112,24 @@ Pilares (cada uno conecta con un eje diferencial de la visión):
 
 💡 *A validar con diseño:* ¿Cosmos lidera como **Mago** (la magia de la automatización) o como **Sabio** (la guía experta)? El arquetipo dominante define tono, símbolo y narrativa.
 
-**Tono de voz:** ❓ *pendiente de definir con ejemplos.* La descripción "profesional pero humano" es insuficiente (la usa cualquiera). Diseño debe definirlo con **microcopy real del asistente**: cómo saluda, cómo propone una acción, cómo pide confirmación, cómo reporta un error. Restricción dada: español Colombia natural, sin anglicismos ni jerga técnica (convención del proyecto). En soluciones multi-actor, el tono se adapta al actor (no le hablo igual a un CFO que a un contratista).
+**Tono de voz (propuesta concreta).** En vez de la fórmula vacía "profesional pero humano", lo definimos con **cuatro principios + microcopy de ejemplo** (diseño los refina, pero parten de algo, no de cero):
+
+| Principio | Qué significa | Antiejemplo (lo que NO) |
+|---|---|---|
+| **Claro antes que técnico** | Dice qué pasó y qué sigue en lenguaje de negocio. | ❌ "Error de validación en el payload del registro." |
+| **Propone, no ordena** | Sugiere la acción y deja la decisión al usuario. | ❌ "Debe registrar la factura ahora." |
+| **Breve y accionable** | Una idea por mensaje, con la acción a un clic. | ❌ Párrafos explicando el proceso interno. |
+| **Reconoce al humano** | Trata al usuario como quien decide, no como operario. | ❌ "Tarea asignada. Complete los campos obligatorios." |
+
+**Microcopy de ejemplo (a validar/ampliar por diseño):**
+- *Saludo / orientación:* «Hola, Ana. Tienes 6 tareas; una vence hoy. ¿Empezamos por las obligaciones devueltas?»
+- *Propuesta de acción:* «Ya preparé el registro de esta factura con los datos que extraje. ¿La confirmas o ajustas algo?»
+- *Pedir confirmación:* «Voy a causar esta compra por $5.321.000 a Almacenes Éxito. ¿Procedo?»
+- *Reportar un problema:* «El soporte que adjuntaste no corresponde a esta factura. ¿Quieres revisarlo o adjuntar otro?»
+
+**Restricciones:** español Colombia natural, sin anglicismos ni jerga técnica (convención del proyecto). En soluciones **multi-actor**, el registro se adapta al actor — no se le habla igual a un CFO que a un contratista, aunque los cuatro principios se mantienen.
+
+❓ *Para diseño:* refinar el microcopy, definir cómo "firma" el asistente (¿tiene nombre/persona?) y el límite entre cercanía y profesionalismo según el actor.
 
 ---
 

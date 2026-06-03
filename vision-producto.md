@@ -25,6 +25,7 @@ Este proyecto nació como **especificación de dominio** (los modelos de cada su
 POR QUÉ / QUÉ   →  📄 Visión de Producto   (este documento — para todo el equipo)
 CÓMO SE SIENTE  →  📄 Brief de Marca        (brief-marca.md — para diseño)
 QUÉ HACE        →  📄 Especificación de dominio (dominio/, documento-consolidado-erp.md — para desarrollo)
+MIRADA EXTERNA  →  📄 Benchmark de Mercado  (benchmark-mercado.md — mercado y competencia)
 DE DÓNDE VENIMOS→  Producto actual SincoERP/Bitákora (insumo — ver §3)
 ```
 
@@ -169,6 +170,16 @@ El comportamiento agéntico se apoya en piezas de arquitectura concretas y recon
 **Caso ilustrativo (con la tecnología que lo resuelve en cada paso):**
 > Llega una **factura de compra** por el correo empresarial — o por **WhatsApp**, o el usuario tiene el **PDF/XML**. → *(EDA)* la llegada es un **evento**. → *(OCR + LLM)* el agente **extrae** sus datos. → *(RAG)* los **contrasta** con el proveedor, el plan de cuentas y reglas de la empresa. → *(workflow de causación)* la **registra** en el módulo contable. → *(EDA)* publica el hecho, que otros módulos (tesorería, impuestos) consumen. → *(human-in-the-loop)* avisa al responsable **solo si necesita una decisión**. Nadie la digitó; un hecho del mundo real disparó toda la cadena.
 
+### 5.5. Onboarding guiado: dar de alta cada aplicación sin fricción (✅ dado + 💡 visión)
+
+El mismo principio de "sin formularios, con IA que orienta" aplica al **momento más crítico y costoso** del ciclo de vida: la **puesta en marcha**. Hoy, dar de alta una empresa en un ERP exige a un consultor senior repetir, cliente por cliente, el mismo análisis manual — y es donde más implementaciones fracasan (ver `benchmark-mercado.md`).
+
+La visión: que el **consultor o el propio usuario** pueda dar de alta la mayoría de las aplicaciones de forma **práctica y guiada**, con un **asistente de onboarding** que compara contra estructuras de referencia, aplica reglas heurísticas, **aprende de cada implementación** para mejorar la siguiente, y presenta sugerencias iterativas que el usuario solo confirma.
+
+> **Ya materializado (✅):** el **onboarding del PUC** (`compartido/asistente-onboarding/`) hace exactamente esto: toma el plan de cuentas heredado del sistema anterior, detecta sus problemas típicos (cuentas duplicadas por tercero/ciudad, atributos fiscales mezclados), propone un PUC limpio y aprende de las decisiones del consultor. **Es el patrón a generalizar** a todas las aplicaciones del ecosistema (terceros, estructura organizacional, saldos iniciales, configuración fiscal…).
+
+**Por qué es estratégico:** el onboarding guiado **baja la barrera de entrada** (más clientes activados, más rápido, con menos consultoría senior), ataca directamente la causa #1 de fracaso de ERPs, y es **multiplicador del ecosistema**: cada nueva aplicación que se suma se vuelve fácil de adoptar.
+
 ---
 
 ## 6. La ruta de madurez hacia la autonomía (💡)
@@ -188,7 +199,28 @@ Las cuatro etapas **no son opciones de "hasta dónde llegar"** — son la **ruta
 
 ---
 
-## 7. Relación con la especificación de dominio (✅ dado)
+## 7. Modelo de negocio: cómo se cobra (💡 patrón a adoptar por todos los productos)
+
+El ecosistema necesita un **patrón de monetización común** para que cada producto lo aplique de forma coherente. El principio: **el precio escala con el valor que el cliente obtiene**, medido por la **unidad de crecimiento propia de cada negocio**.
+
+**Patrón de precios (tres componentes):**
+
+| Componente | Qué es | Ejemplo |
+|---|---|---|
+| **1. Precio base** | Un piso de entrada por activar la solución. Da acceso al producto y a la infraestructura común del ecosistema. | Tarifa mensual mínima por tener la app de arriendos activa. |
+| **2. Unidad de crecimiento del negocio** | La métrica que crece junto con el valor que el cliente recibe. **Cada producto define la suya.** A más unidad, más paga — alineando precio y valor. | Arriendos: **# de inmuebles administrados**. Cobros (ADC): # de obligaciones gestionadas. Nómina (Bitákora): # de empleados liquidados. |
+| **3. Consumo de capacidades avanzadas** *(opcional)* | Uso intensivo de capacidades que tienen costo marginal real (ej. procesamiento de documentos con IA, canales como WhatsApp). | Volumen de documentos procesados con OCR/IA por encima de un cupo. |
+
+**Principios del patrón:**
+- **Alineación valor-precio:** el cliente paga más solo cuando su negocio crece (más inmuebles, más empleados, más transacciones). No hay penalización por adoptar; hay acompañamiento al crecimiento.
+- **Entrada baja, expansión natural:** el precio base permite empezar pequeño; el ecosistema crece en facturación a medida que el cliente activa más soluciones y crece su operación (modelo *land and expand*).
+- **Cada producto declara su unidad de crecimiento** explícitamente, pero todos siguen la misma estructura de tres componentes — para que el cliente entienda el ecosistema como un todo coherente y no como tarifas dispares.
+
+> **Para definir (❓):** valores concretos, cupos y si el ecosistema ofrece un esquema de "suscripción al ecosistema" con descuento por activar varias soluciones. El **patrón** queda fijo; los **números** los define negocio.
+
+---
+
+## 8. Relación con la especificación de dominio (✅ dado)
 
 Esta visión se materializa, pieza por pieza, en los **modelos de dominio** que ya construye el proyecto (DDD / Event Sourcing / EDA). La arquitectura **orientada a eventos** de esos modelos es, precisamente, lo que habilita el comportamiento agéntico descrito en §5.4.
 
@@ -200,7 +232,7 @@ Esta visión se materializa, pieza por pieza, en los **modelos de dominio** que 
 
 ---
 
-## 8. Preguntas abiertas para el equipo (❓)
+## 9. Preguntas abiertas para el equipo (❓)
 
 1. **Alcance de la primera materialización** — ¿qué soluciones inauguran el ecosistema agéntico y en qué orden? *(Es una pregunta de roadmap, no de visión: el destino —autonomía, §6— no está en discusión; lo que se prioriza es el camino.)*
 2. **Relación con SincoERP actual** — ¿Cosmos convive con SincoERP, lo reemplaza progresivamente, o es una capa nueva sobre lo existente?
@@ -209,7 +241,7 @@ Esta visión se materializa, pieza por pieza, en los **modelos de dominio** que 
 
 ---
 
-## 9. Fundamento y referencias técnicas
+## 10. Fundamento y referencias técnicas
 
 Los conceptos técnicos de esta visión (§5.4) se apoyan en arquitecturas y trabajos reconocidos, no en ideas sueltas:
 
@@ -227,4 +259,4 @@ Los conceptos técnicos de esta visión (§5.4) se apoyan en arquitecturas y tra
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
-| 0.1 | Junio 2026 | Primera versión de la visión de producto. Separa el "qué/por qué" del ecosistema agéntico (antes mezclado en el brief de marca): problema que resuelve, producto actual SincoERP/Bitákora, modelo de segmento de dos capas (núcleo transversal multi-sector ya probado en servicios públicos/transporte/aeroportuario/suscripciones + verticales de expertise + expansión), identidad propia por producto y multi-actor (ej. reparaciones locativas con tres actores), los cuatro ejes diferenciales, la ruta de madurez hacia la autonomía y la relación con la especificación de dominio. Cada idea agéntica se respalda con la tecnología que la resuelve (EDA, patrones de agentes de Anthropic, RAG, MCP, human-in-the-loop) y referencias técnicas. «Cosmos» como nombre provisional. |
+| 0.1 | Junio 2026 | Primera versión de la visión de producto. Separa el "qué/por qué" del ecosistema agéntico (antes mezclado en el brief de marca): problema que resuelve, producto actual SincoERP/Bitákora, modelo de segmento de dos capas (núcleo transversal multi-sector ya probado en servicios públicos/transporte/aeroportuario/suscripciones + verticales de expertise + expansión), identidad propia por producto y multi-actor (ej. reparaciones locativas con tres actores), los cuatro ejes diferenciales, la ruta de madurez hacia la autonomía y la relación con la especificación de dominio. Cada idea agéntica se respalda con la tecnología que la resuelve (EDA, patrones de agentes de Anthropic, RAG, MCP, human-in-the-loop) y referencias técnicas. Incluye el eje de **onboarding guiado** (con el caso PUC como patrón materializado) y el **modelo de negocio** (patrón de cobro: precio base + unidad de crecimiento del negocio + consumo de capacidades). Se acompaña del análisis de mercado en `benchmark-mercado.md`. «Cosmos» como nombre provisional. |
