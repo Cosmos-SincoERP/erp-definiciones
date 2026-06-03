@@ -61,7 +61,7 @@ El detalle (problema, producto actual, ejes diferenciales, evolución) está en 
 - **Verticales de expertise** — construcción, inmobiliario, infraestructura, concesiones viales. Son el **ancla de credibilidad** (25 años de reconocimiento).
 - **Núcleo transversal** — finanzas, contabilidad, facturación, cobros, nómina. Es **agnóstico de sector** y ya atiende servicios públicos, transporte, gestión aeroportuaria y suscripciones. Es la **puerta de expansión** a nuevos sectores.
 
-> La marca debe **apalancar el reconocimiento vertical sin quedar encerrada en él.** No es "el software de constructores"; es un ecosistema cuyo núcleo sirve a cualquier sector. *(Hallazgo de auditoría resuelto: el segmento ya no es ambiguo.)*
+> La marca debe **apalancar el reconocimiento vertical sin quedar encerrada en él.** No es "el software de constructores"; es un ecosistema cuyo núcleo sirve a cualquier sector.
 
 **Tipos de usuario (varían por solución y pueden ser multi-actor):**
 
@@ -87,7 +87,7 @@ Pilares (cada uno conecta con un eje diferencial de la visión):
 3. **Agéntico por diseño** — reacciona a los hechos del negocio por eventos, sin pasos manuales.
 4. **Con un corazón financiero sólido** — el rigor contable y el cumplimiento dan la confianza.
 
-> **Promesa = destino, con honestidad (decisión tomada).** La promesa *"lo hace por ti"* describe la **visión autónoma** (etapa 4 de la ruta de madurez), no el estado de hoy (que *asiste*). Es una decisión consciente: la marca vende el destino, **pero la comunicación no debe sugerir que ya está todo automatizado.** El relato correcto es *"vamos hacia que lo haga por ti, y hoy ya orienta, extrae y propone"* — aspiracional sin sobrepromesa. *(Hallazgo de auditoría resuelto: la brecha promesa/presente queda explícita.)*
+> **Promesa = destino, con honestidad (decisión tomada).** La promesa *"lo hace por ti"* describe la **visión autónoma** (etapa 4 de la ruta de madurez), no el estado de hoy (que *asiste*). Es una decisión consciente: la marca vende el destino, **pero la comunicación no debe sugerir que ya está todo automatizado.** El relato correcto es *"vamos hacia que lo haga por ti, y hoy ya orienta, extrae y propone"* — aspiracional sin sobrepromesa.
 
 ❓ *Abierto:* ¿el eje #1 de la marca es **el ecosistema**, **lo agéntico/IA** o **la reducción de operatividad**? Los tres son ciertos; su orden define el posicionamiento.
 
@@ -95,7 +95,7 @@ Pilares (cada uno conecta con un eje diferencial de la visión):
 
 ## 6. Atributos y personalidad de marca (💡 hipótesis)
 
-**Atributos — derivados del diferencial, no adjetivos universales.** *(Hallazgo de auditoría resuelto: se descartan "Inteligente / Confiable / Cercano" porque los reclama cualquier software B2B y no diferencian. Cada atributo de abajo se ata a algo que Cosmos hace y la competencia no.)*
+**Atributos — derivados del diferencial, no adjetivos universales.** Se descartan "Inteligente / Confiable / Cercano" porque los reclama cualquier software B2B y no diferencian. Cada atributo de abajo se ata a algo que Cosmos hace y la competencia no.
 
 | Atributo | De qué hecho del producto nace | Por qué diferencia |
 |---|---|---|
