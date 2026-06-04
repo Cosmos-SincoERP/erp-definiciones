@@ -35,6 +35,9 @@ Conversación con IA para construir `definicion-alcance.md`: necesidades del neg
 ### Fase 2 — Modelo de dominio (conversacional + auditoría)
 Conversación con IA para construir `modelo-dominio.md` a partir del alcance. Proceso iterativo: cada cambio se confirma manualmente. Al llegar a un punto maduro, ejecutar `/audit <archivo>` para auditoría completa (10 skills). Los hallazgos se revisan uno a uno y se aplican o descartan con el usuario.
 
+### Refinamiento — issue-driven (post-auditoría)
+Una vez el modelo queda cerrado y auditado (fin de la Fase 2), el sub-dominio entra en **refinamiento**: ajustes y pendientes postergados que surgen de consultas del equipo de desarrollo o de cruces entre sub-dominios. **El punto de corte es el fin de la Auditoría:** antes se edita el `.md` en conversación; después cada cambio se maneja como **issue** (`subdominio: <nombre>` + `tipo: refinamiento`) → rama → PR que cierra el issue. Usar la skill `issues-crear`. Un cambio cruzado vive en el sub-dominio que lo origina; su PR puede tocar más de uno.
+
 ### Fase 3 — EventCatalog (pendiente)
 Skills especializadas para generar EventCatalog desde el modelo de dominio. No iniciado.
 

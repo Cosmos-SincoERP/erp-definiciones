@@ -38,6 +38,28 @@ No hay código aquí. Hay **contratos de dominio**: lo que el negocio hace, cóm
 
 Cada sub-dominio atraviesa estas fases. Los artefactos quedan versionados en el repo como fuente de verdad.
 
+### Dos modos de trabajo según la madurez del sub-dominio
+
+Las tres fases describen la **construcción** de un sub-dominio. Una vez el modelo
+queda cerrado y auditado, la forma de trabajar cambia:
+
+```
+  CONSTRUCCIÓN (Fases 1-3)          │   REFINAMIENTO (post-auditoría)
+                                    │
+  Markdown-first / conversacional   │   Issue-driven
+  · El .md se edita libre en        │   · Cada ajuste o pendiente
+    conversación con IA             │     postergado = un issue
+  · Cambios confirmados y           │   · Issue → rama → PR
+    commiteados al cerrar el hito   │   · Etiquetas: subdominio: + tipo:
+                                    │
+  ─────────── punto de corte: fin de la Auditoría ───────────▶
+```
+
+Mientras el modelo se construye cambia mucho: editarlo en conversación es lo ágil.
+Una vez auditado, el modelo es **contrato** para el equipo de desarrollo; de ahí
+en adelante cada cambio se maneja como issue para que quede trazable y justificado
+(ver la skill `issues-crear` y los issues #5, #7-#10 como ejemplo).
+
 ---
 
 ## 📦 Qué hay hoy en el repo
@@ -180,6 +202,12 @@ Los anexos viven junto al sub-dominio al que pertenecen y se nombran con prefijo
 
 ### B) Para contribuir a un sub-dominio existente
 
+Antes de tocar nada, ubica en qué etapa está el sub-dominio — eso define cómo se
+trabaja el cambio.
+
+**B.1 — El modelo aún está en construcción** (todavía no ha pasado la Auditoría):
+trabajo conversacional, edición directa del `.md`.
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │  1. Lee el alcance y el modelo actuales                      │
@@ -190,6 +218,24 @@ Los anexos viven junto al sub-dominio al que pertenecen y se nombran con prefijo
 │  6. Commit con el formato de changelog del repo              │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+**B.2 — El modelo ya está cerrado y auditado** (en refinamiento): cada ajuste o
+pendiente postergado se maneja como **issue**, no como edición suelta.
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  1. Crea un issue por cada tema (skill issues-crear):        │
+│       etiquetas  subdominio: <nombre>  +  tipo: refinamiento │
+│  2. Trabaja el cambio en una rama dedicada                   │
+│  3. La IA propone el cambio en el .md → tú apruebas          │
+│  4. Si el cambio reabre el modelo, /audit el archivo tocado  │
+│  5. PR que referencia y cierra el issue (#7, #8, #9, #10…)   │
+└─────────────────────────────────────────────────────────────┘
+```
+
+> **Punto de corte:** un sub-dominio pasa de B.1 a B.2 al terminar la Auditoría.
+> Un cambio cruzado (ej. el issue #10 de OXP que tocó el catálogo de Contabilidad)
+> vive en el sub-dominio que lo origina; su PR puede tocar más de un sub-dominio.
 
 > **Regla clave:** ningún cambio se aplica sin confirmación explícita. La IA propone, tú decides.
 

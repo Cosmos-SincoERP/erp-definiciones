@@ -61,9 +61,9 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Propósito:** Gestionar el ciclo de vida completo de las obligaciones de egreso de la empresa: desde que se recibe una factura o extracto hasta que se paga y se contabiliza.
 
-| Agregados | Eventos | Domain Services | Invariantes | Decisiones | Premisas | Pendientes |
-|:---------:|:-------:|:---------------:|:-----------:|:----------:|:--------:|:----------:|
-| 5 | 51 | 3 | 18 | 24 | 3 | 4 |
+| Agregados | Eventos | Domain Services | Invariantes | Decisiones | Premisas | Pendientes | Sugerencias |
+|:---------:|:-------:|:---------------:|:-----------:|:----------:|:--------:|:----------:|:-----------:|
+| 5 | 53 | 3 | 18 | 28 (D1-D28) | 3 | 4 | 6 |
 
 **Componentes:**
 
@@ -81,7 +81,9 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **3 domain services:** ServicioDeConciliacion (vinculación extracto ↔ comercio), ServicioDeRegularizacion (cruce anticipos ↔ comercio), ServicioDeAplicacionDevolucion (3 ramas por tipo de devolución).
 
-**Estado:** Alcance aprobado, modelo v2.9, 3 rondas de auditoría. Pendiente: refinamientos de conceptos, soportes, ubicaciones e integración con Contabilidad.
+**Integración con Contabilidad (cerrada):** causación del Anticipo (D25), generalización terminológica hacia "sistema contable" (D26), mapeo `tipoTransaccion` evento → plantilla de asiento (D27), canonización de `tipoComponente` con código fiscal específico (`iva`/`inc`/`retefuente`/`reteiva`/`reteica`) 1:1 con el catálogo de Contabilidad, y manejo de rechazos del sistema contable vía outbox del consumidor (D28).
+
+**Estado:** Alcance v1.7, modelo v3.4, 3 rondas de auditoría. Integración OXP ↔ Contabilidad **cerrada**. Pendiente: refinamientos de conceptos (catálogo de gasto), soportes documentales y esquema de ubicaciones hacia Impuestos.
 
 > Detalle: [`dominio/obligaciones-por-pagar/modelo-dominio.md`](dominio/obligaciones-por-pagar/modelo-dominio.md)
 
@@ -91,9 +93,9 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Propósito:** Centralizar la configuración fiscal, el cálculo de tributos y el registro de hechos fiscales confirmados. Es la fuente de verdad tributaria del ERP.
 
-| Agregados | Eventos | Domain Services | Invariantes | Decisiones | Premisas | Pendientes |
-|:---------:|:-------:|:---------------:|:-----------:|:----------:|:--------:|:----------:|
-| 12 | 57 | 2 + flujo orquestado + read model | 23 | 15 | 6 | 11 |
+| Agregados | Eventos | Domain Services | Invariantes | Decisiones | Premisas | Pendientes | Sugerencias |
+|:---------:|:-------:|:---------------:|:-----------:|:----------:|:--------:|:----------:|:-----------:|
+| 12 | 57 | 2 + flujo orquestado + read model | 28 | 15 | 6 | 12 | 3 |
 
 > El BC tiene 16 elementos: 12 agregados con eventos (9 de configuración + 3 transaccionales) + 2 servicios de dominio (`MotorDeCalculo`, `CargaAsistida`) + 1 flujo orquestado (`ConfirmacionTributaria`) + 1 read model (`CatalogoJurisdiccional`).
 
@@ -123,9 +125,11 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 - **F1 — LatAm completo:** CO/DO/PA con regímenes territoriales y empresariales precargados.
 - **F2 — Apertura US/CA:** activación de tipos `distrito-fiscal-especial` y `soberania-tributaria`, resolución de jurisdicción por dirección/geocoding, decisión arquitectónica proveedor fiscal externo vs catálogo propio (ver `[PD11]`).
 
-**Estado:** Alcance v1.2, modelo v2.0 (mayo 2026). Modelo completo.
+**Catálogos fiscales precargados (F1):** 27 pares de archivos (`.md` + `.json`), 962 entradas que cubren los 3 países F1 (CO: 493, DO: 260, PA: 209). Son **parte del producto** (`origen: estándar`) — pendiente refinamiento por consultores fiscales (cada `.md` lleva sección "Revisión pendiente").
 
-> Detalle: [`dominio/impuestos/modelo-dominio.md`](dominio/impuestos/modelo-dominio.md), [`dominio/impuestos/anexo-catalogo-regimenes-especiales.md`](dominio/impuestos/anexo-catalogo-regimenes-especiales.md)
+**Estado:** Alcance v1.4, modelo v2.0.4 (junio 2026). Modelo completo + catálogos F1 entregados — refinamiento por consultores fiscales en curso (es el sub-dominio más avanzado en el hito de refinamiento).
+
+> Detalle: [`dominio/impuestos/modelo-dominio.md`](dominio/impuestos/modelo-dominio.md), [`dominio/impuestos/datos-precargados/`](dominio/impuestos/datos-precargados/)
 
 ---
 
@@ -135,7 +139,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 | Agregados | Eventos | Domain Services | Invariantes | Decisiones | Premisas | Pendientes | Sugerencias | Permisos |
 |:---------:|:-------:|:---------------:|:-----------:|:----------:|:--------:|:----------:|:-----------:|:--------:|
-| 13 | 59 | 3 | 32 (22 L + 10 E) | 11 | 7 | 3 | 7 | 17 |
+| 13 | 59 | 3 | 32 (22 L + 10 E) | 14 (D1-D14) | 7 | 3 | 7 | 17 |
 
 **Componentes:**
 
@@ -168,7 +172,9 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **17 permisos atómicos** definidos con convención `accion_recurso`.
 
-**Estado:** Alcance v1.2, modelo v1.2 (mayo 2026). Listo para desarrollo F1.
+**Refinamientos aplicados (integración con OXP):** grupo del PUC esperado por componente para acotar la inferencia Nivel B (D12), narración del borrador — descripción general + descripción de concepto por partida (D13), herencia del `rol` de la partida desde la plantilla y propagación a la entrega (D14).
+
+**Estado:** Alcance v1.6, modelo v1.5 (junio 2026). Listo para desarrollo F1 — refinamiento con el equipo de desarrollo en curso.
 
 > Detalle: [`dominio/contabilidad/modelo-dominio.md`](dominio/contabilidad/modelo-dominio.md), [`dominio/contabilidad/anexo-marco-contable-y-arquitectura-puc.md`](dominio/contabilidad/anexo-marco-contable-y-arquitectura-puc.md)
 
@@ -212,7 +218,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **19 permisos atómicos** todos N1 (Terceros es dominio de una sola capacidad).
 
-**Estado:** Alcance v1.0, modelo v1.0. Auditoría de 10 skills + 5 rondas del comité de POs. Listo para desarrollo F1.
+**Estado:** Alcance v1.0, modelo v1.0. Auditoría de 10 skills + rondas de refinamiento aplicadas. Listo para desarrollo F1.
 
 > Detalle: [`dominio/terceros/modelo-dominio.md`](dominio/terceros/modelo-dominio.md), [`dominio/terceros/anexo-decision-orquestacion-registro.md`](dominio/terceros/anexo-decision-orquestacion-registro.md)
 
@@ -222,13 +228,17 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Propósito:** Estructura centralizada de las unidades de la empresa a las que se imputan transacciones para control de gestión (centros de costo, proyectos, sucursales, departamentos). Fuente de verdad de la pregunta "¿a qué unidad de la organización pertenece esta transacción?".
 
-**Dos niveles:**
-- **Grupo organizacional:** Agrupador para presentación en reportes. No recibe transacciones.
-- **Unidad organizacional:** Nivel de detalle donde se imputan transacciones.
+| Agregados raíz | Entidad interna | Value Objects | Eventos | Invariantes | Decisiones | Premisas | Pendientes | Sugerencias | Permisos |
+|:--------------:|:---------------:|:-------------:|:-------:|:-----------:|:----------:|:--------:|:----------:|:-----------:|:--------:|
+| 2 | 1 | 5 | 18 | 16 | 14 (+4 heredadas) | 5 | 3 | 10 | 23 |
 
-**FSM de 4 estados:** `Borrador` (creada desde consumidor, pendiente de aprobación del administrador) → `Activa` → `Suspendida` (operable parcialmente) → `Inactiva` (terminal).
+**Dos niveles (dos agregados raíz):**
+- **GrupoOrganizacional:** Agrupador para presentación en reportes. No recibe transacciones. FSM de 2 estados.
+- **UnidadOrganizacional:** Nivel de detalle donde se imputan transacciones. FSM de 5 estados.
 
-**Gestiona:** Creación, jerarquía versionada por fecha efectiva, tipos de unidad, ciclo de vida de 4 estados, reestructuración (fusión, división, traslado como eventos de primera clase).
+**FSM de la unidad (5 estados, 7 transiciones):** `Borrador` (creada desde consumidor, pendiente de aprobación) o `Activa` (según flujo de creación) → opera → `Suspendida` (pausada) → reactivable → `Inactiva` (reabrible) → reabrir, o `Descartada` (único terminal estricto, antes de operar). `GrupoOrganizacional` admite `GrupoModificado` en estado `Inactivo`; la unidad no, porque participa en historial transaccional.
+
+**Gestiona:** Creación, jerarquía versionada por fecha efectiva, tipos de unidad heredados del grupo raíz, ciclo de vida, reestructuración (fusión, división, traslado como eventos de primera clase con respaldo IFRS 8).
 
 **Cuatro decisiones arquitectónicas (anexo dedicado):**
 1. **Codificación plana + jerarquía versionada aparte** — código alfanumérico plano (sin embeber jerarquía en el código). Rompe con el patrón posicional de SincoA&F que tenía techo combinatorio y bloqueaba reestructuraciones.
@@ -240,7 +250,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Patrón EDA:** publica eventos `UnidadCreada`, `UnidadActualizada`, `UnidadSuspendida`, `UnidadReactivada`, `UnidadInactivada`, `UnidadFusionada`, `UnidadDividida`, `UnidadTrasladada`. Reestructuración dispara reacciones en consumidores (Contabilidad reclasifica, etc.).
 
-**Estado:** Alcance v0.3 — en construcción. Secciones 1-3 cerradas (21 términos en glosario, 2 actores internos), Sección 4 con Familia 1 (Creación) escrita; Familias 2-4 (Ciclo de vida, Reestructuración, Consulta) pendientes. Modelo de dominio pendiente.
+**Estado:** Alcance v1.2, modelo v1.4 (junio 2026). Auditoría completa (101 hallazgos) + rondas de refinamiento aplicadas. Listo para desarrollo F1.
 
 > Detalle: [`dominio/estructura-organizacional/definicion-alcance.md`](dominio/estructura-organizacional/definicion-alcance.md), [`dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md`](dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md), [`dominio/estructura-organizacional/anexo-orquestacion-creacion.md`](dominio/estructura-organizacional/anexo-orquestacion-creacion.md)
 
@@ -347,7 +357,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 > **Nota:** Este mapa es parcial. Las integraciones formalizadas corresponden a los sub-dominios con modelo completo (OXP, Impuestos, Contabilidad, Terceros, Datos de Referencia, Direcciones). Las marcadas como "Futuro" son integraciones esperadas según referencias en los modelos existentes, pero sus contratos aún no están definidos.
 >
-> **Sub-dominios sin integraciones definidas aún:** Estructura Organizacional (solo patrón EDA general), Tesorería, Activos Fijos, Arrendamientos. Sus integraciones se formalizarán cuando se construyan sus definiciones de alcance y modelo de dominio.
+> **Sub-dominios sin integraciones definidas aún:** Tesorería, Activos Fijos, Arrendamientos. Sus integraciones se formalizarán cuando se construyan sus definiciones de alcance y modelo de dominio.
 
 | Origen | Destino | Tipo | Contrato | Estado |
 |--------|---------|------|----------|--------|
@@ -356,7 +366,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 | Contabilidad | OXP | Evento | EntregaAceptada: consecutivo del asiento en destino | Formalizado |
 | Terceros | OXP, Impuestos, Contabilidad, CXC, RRHH | Eventos EDA | `TerceroActivado`, `TerceroInactivado`, `TerceroReactivado`, `TerceroRolAsignado`, `TerceroRolRemovido`, actualizaciones de identidad. Consumidores se suscriben a `TerceroActivado` para apertura de registros de rol (D13) | Formalizado v1.0 |
 | Direcciones | Terceros | Evento | Confirmación asíncrona de creación de dirección fiscal → dispara `TerceroActivado` (D13) | Formalizado v1.0 |
-| Estructura Org | OXP, Contabilidad | Eventos EDA | UnidadCreada/Activada/Suspendida/Reactivada/Inactivada + Fusionada/Dividida/Trasladada. Patrón BFF + estado `Borrador` para creación desde consumidores. | Alcance v0.3 — en diseño |
+| Estructura Org | OXP, Contabilidad | Eventos EDA | UnidadCreada/Activada/Suspendida/Reactivada/Inactivada + Fusionada/Dividida/Trasladada. Patrón BFF + estado `Borrador` para creación desde consumidores. | Formalizado — modelo v1.4 |
 | Datos de Referencia | Todos | Lectura | Catálogos estáticos (países, divisiones, monedas, tipos doc., tasas de cambio) | Formalizado v1.0 |
 | Direcciones | Terceros, Estructura Org, Emisión Electrónica | Lectura + eventos | Validación de direcciones por país + eventos de creación/modificación | Formalizado v1.0 |
 | Recepción Electrónica | OXP | Evento | Documento validado → radicación automática | Futuro |
@@ -395,24 +405,24 @@ Datos de Referencia ──► Direcciones ──► Terceros ──► Estructur
 | Datos de Referencia | Todos | Ninguno | **v1.0 — listo para desarrollo** |
 | Direcciones | Terceros, Estructura Org, Emisión Electrónica | Datos de Referencia | **v1.0 — listo para desarrollo** |
 | Terceros | OXP, Impuestos, Contabilidad, CXC, RRHH | Datos de Referencia, Direcciones | **v1.0 — listo para desarrollo** |
-| Estructura Org | OXP, Contabilidad | Datos de Referencia | Alcance v0.3 — en construcción |
-| Impuestos | OXP (cálculo tributario) | Terceros, Datos de Referencia | **v2.0 — modelo completo** |
-| Contabilidad | OXP (confirmación de asiento) | Terceros, Estructura Org, Datos de Referencia | **v1.2 — listo para desarrollo F1** |
-| OXP | — | Impuestos, Contabilidad, Terceros, Estructura Org, Datos de Referencia | v2.9 — refinamientos pendientes |
+| Estructura Org | OXP, Contabilidad | Datos de Referencia | **v1.4 — listo para desarrollo F1** |
+| Impuestos | OXP (cálculo tributario) | Terceros, Datos de Referencia | **v2.0.4 — modelo completo + catálogos F1** |
+| Contabilidad | OXP (confirmación de asiento) | Terceros, Estructura Org, Datos de Referencia | **v1.5 — listo para desarrollo F1** |
+| OXP | — | Impuestos, Contabilidad, Terceros, Estructura Org, Datos de Referencia | v3.4 — integración Contabilidad cerrada; refinamientos OXP pendientes |
 
 ### Estado actual de construcción
 
 - ✅ **Datos de Referencia** — v1.0 listo.
 - ✅ **Direcciones** — v1.0 listo.
-- ✅ **Terceros** — v1.0 listo (auditoría + 5 rondas de POs aplicadas).
-- ✅ **Impuestos** — modelo v2.0 completo (LatAm F1, apertura US/CA F2).
-- ✅ **Contabilidad** — v1.2 listo F1 (MarcoContable + arquitectura PUC + Libro + Marco).
-- 🚧 **Estructura Organizacional** — alcance v0.3 en construcción (Secciones 1-3 cerradas, Familia 1 de Sección 4 escrita).
-- 🔄 **OXP** — v2.9 con refinamientos pendientes (integración con Contabilidad, ubicaciones, soportes).
+- ✅ **Terceros** — v1.0 listo (auditoría + rondas de refinamiento).
+- ✅ **Impuestos** — modelo v2.0.4 completo + catálogos F1 (LatAm CO/DO/PA, apertura US/CA F2).
+- ✅ **Estructura Organizacional** — modelo v1.4 listo F1 (2 agregados raíz, reestructuración como eventos de primera clase).
+- ✅ **Contabilidad** — v1.5 listo F1 (MarcoContable + arquitectura PUC + grupo PUC esperado + narración del borrador).
+- 🔄 **OXP** — v3.4. Integración con Contabilidad **cerrada**; quedan refinamientos del modelo (catálogo de conceptos, soportes documentales, esquema de ubicaciones).
 
 ### Siguiente paso
 
-**Cerrar el alcance de Estructura Organizacional** (Familias 2-4 de Sección 4 y secciones restantes) y construir su modelo de dominio. Es el único sub-dominio transversal base pendiente. Una vez terminado, el ciclo transaccional F1 (OXP → Impuestos → Contabilidad) queda plenamente desbloqueado.
+La cadena de bloqueo está **desbloqueada**: los 3 sub-dominios base (Terceros, Estructura Org, Datos de Referencia/Direcciones) y los 3 transaccionales (OXP, Impuestos, Contabilidad) tienen modelo completo. El frente restante son los **refinamientos de OXP** (conceptos, soportes, ubicaciones), el **refinamiento con el equipo de desarrollo** del resto de sub-dominios y los **transversales del ERP** (EventCatalog, infraestructura, UX). Ver el plan de trabajo activo para el detalle priorizado.
 
 ---
 
@@ -424,7 +434,7 @@ Datos de Referencia ──► Direcciones ──► Terceros ──► Estructur
 | **Impuestos** | Configuración fiscal multi-país LatAm (CO/DO/PA, 11+5+4 tributos preconfigurados), motor de cálculo, perfiles tributarios con actividad económica por jurisdicción, carga asistida, registro tributario, gestión de jurisdicciones fiscales (incluido Puerto Libre San Andrés), regímenes especiales empresariales (zonas francas, monopolios departamentales CO, ZEEs panameñas) | Reportes de información (exógena, DGII), certificados tributarios, homologación fiscal, apertura multi-país a US/CA (distritos fiscales especiales, soberanías tributarias, resolución por dirección/geocoding) |
 | **Contabilidad** | N1: Motor de traducción + entrega a SincoA&F. Cadena de resolución 3 niveles. Consola de contabilización. Aprendizaje. **MarcoContable** + arquitectura PUC único + libros paralelos (Principal, Fiscal). Validación contractual del motor (rechazos pre-borrador). | N2: Sistema contable propio (asientos, períodos, libros, numeración). Libros adicionales bajo demanda. Adaptadores adicionales (Siigo, Alegra). |
 | **Terceros** | **Núcleo del BC:** registro de identidad, gestión de roles, contactos, historial. **Habilitadores con dependencias:** activación del tercero (requiere Direcciones), notificación a consumidores, solicitud desde consumidores (BFF), vista consolidada de completitud, aprovechamiento de documentos de soporte, importación masiva, registro automático desde SincoRE. | Resolución de duplicados tardíos (fusión), recepción electrónica adicional |
-| **Estructura Org** | Grupos, unidades con codificación plana + jerarquía versionada, FSM de 4 estados, creación desde consumidores con patrón BFF + Borrador, fusión/división/traslado como eventos de primera clase, eventos EDA | Multi-dimensionalidad expuesta (más allá de la dimensión inicial) |
+| **Estructura Org** | Grupos, unidades con codificación plana + jerarquía versionada, FSM de 5 estados de la unidad, creación desde consumidores con patrón BFF + Borrador, fusión/división/traslado como eventos de primera clase, eventos EDA | Multi-dimensionalidad expuesta (más allá de la dimensión inicial) |
 | **Datos de Referencia** | 5 catálogos base (países, divisiones, monedas, tipos de documento, tasas de cambio), estrategia Seed + Sync + Extend | Extensiones por país, validación avanzada |
 | **Direcciones** | Catálogos de tipos, formatos por país, códigos postales, validación estructurada | Validación externa (Google Address, Loqate, SmartyStreets) |
 
@@ -716,7 +726,7 @@ Un cliente puede empezar con un producto y escalar sin fricción. Cada módulo s
 | [`dominio/terceros/definicion-alcance.md`](dominio/terceros/definicion-alcance.md) | Alcance Terceros: glosario, reglas, flujos, fases |
 | [`dominio/terceros/modelo-dominio.md`](dominio/terceros/modelo-dominio.md) | Modelo Terceros: agregado, eventos, invariantes, FSM, D13 registro en dos fases |
 | [`dominio/terceros/anexo-decision-orquestacion-registro.md`](dominio/terceros/anexo-decision-orquestacion-registro.md) | Decisión BFF/API Composition para orquestación del registro |
-| [`dominio/estructura-organizacional/definicion-alcance.md`](dominio/estructura-organizacional/definicion-alcance.md) | Alcance Estructura Organizacional (v0.3 en construcción): glosario, actores, flujos |
+| [`dominio/estructura-organizacional/definicion-alcance.md`](dominio/estructura-organizacional/definicion-alcance.md) | Alcance Estructura Organizacional (v1.2): glosario, actores, flujos, reglas |
 | [`dominio/estructura-organizacional/anexo-definicion-contexto-inicial.md`](dominio/estructura-organizacional/anexo-definicion-contexto-inicial.md) | Definición inicial de contexto (preexistente al alcance formal) |
 | [`dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md`](dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md) | Cuatro decisiones arquitectónicas: codificación plana + jerarquía versionada, FSM 4 estados, fusión/división/traslado como eventos, multi-dimensionalidad |
 | [`dominio/estructura-organizacional/anexo-orquestacion-creacion.md`](dominio/estructura-organizacional/anexo-orquestacion-creacion.md) | Patrón BFF + estado `Borrador` para creación de unidades desde sub-dominios consumidores |
@@ -732,7 +742,7 @@ Un cliente puede empezar con un producto y escalar sin fricción. Cada módulo s
 
 ## 8. Avance por sub-dominio
 
-> Snapshot al **20 de mayo de 2026**. Refleja completitud de los artefactos de diseño que habilitan el inicio de desarrollo, no el avance de la implementación en código.
+> Snapshot al **3 de junio de 2026**. Refleja completitud de los artefactos de diseño que habilitan el inicio de desarrollo, no el avance de la implementación en código.
 
 ### Metodología
 
@@ -757,7 +767,7 @@ El porcentaje de avance combina cinco hitos. Cada hito tiene un peso fijo y se e
 | **Refinamiento** | 30% | Consultas del equipo de diseño y del equipo de desarrollo resueltas y aplicadas. |
 | **Listo para F1** | 10% | Catálogos precargados disponibles, contratos con consumidores cerrados |
 
-> **Nota — peso del Refinamiento (30%):** Refleja que ningún artefacto puede considerarse listo para desarrollo hasta que sea validado por los dos equipos que lo van a usar. La auditoría asegura coherencia interna del modelo; el refinamiento asegura coherencia con la realidad operativa del diseño y la viabilidad técnica. Hoy **sólo Impuestos** tiene refinamiento en progreso; los demás sub-dominios completaron Alcance + Modelo + Auditoría pero aún no han pasado por la ronda de consultas con diseño/desarrollo.
+> **Nota — peso del Refinamiento (30%):** Refleja que ningún artefacto puede considerarse listo para desarrollo hasta que sea validado por el equipo de desarrollo que lo va a usar. La auditoría asegura coherencia interna del modelo; el refinamiento asegura coherencia con la realidad operativa del diseño y la viabilidad técnica. Hoy **Impuestos, Contabilidad y OXP** tienen refinamiento en progreso (consultas del equipo de desarrollo aplicadas — ej: issues #7/#8/#9/#10); los demás completaron Alcance + Modelo + Auditoría pero aún no han pasado por la ronda con el equipo de desarrollo.
 
 ### Tabla de avance
 
@@ -766,43 +776,50 @@ El porcentaje de avance combina cinco hitos. Cada hito tiene un peso fijo y se e
 | Datos de Referencia | ✅ | ✅ | — | ⬜ | ⬜ | **60%** |
 | Direcciones | ✅ | ✅ | — | ⬜ | ⬜ | **60%** |
 | Terceros | ✅ | ✅ | ✅ | ⬜ | ⬜ | **60%** |
-| Contabilidad | ✅ | ✅ | ✅ | ⬜ | ⬜ | **60%** |
-| Impuestos | ✅ | ✅ | ✅ | 🟡 (75%) | ⬜ | **83%** |
-| OXP | ✅ | 🟡 (85%) | ✅ | ⬜ | ⬜ | **56%** |
-| Estructura Organizacional | 🟡 (65%) | ⬜ | ⬜ | ⬜ | ⬜ | **13%** |
+| Estructura Organizacional | ✅ | ✅ | ✅ | ⬜ | ⬜ | **60%** |
+| OXP | ✅ | 🟡 (90%) | ✅ | 🟡 (30%) | ⬜ | **67%** |
+| Contabilidad | ✅ | ✅ | ✅ | 🟡 (50%) | ⬜ | **75%** |
+| Impuestos | ✅ | ✅ | ✅ | 🟡 (80%) | ⬜ | **84%** |
 
 **Lectura del cuadro:**
-- **Impuestos lidera** con 83% — único sub-dominio que comenzó la ronda de refinamiento con diseño/desarrollo.
-- **Cuatro sub-dominios en 60%** — Datos de Referencia, Direcciones, Terceros y Contabilidad completaron su diseño formal pero esperan validación de equipos. Es el grupo más cercano a desbloquearse: cualquier sesión de consultas los puede subir rápido.
-- **OXP en 56%** — además del refinamiento, debe cerrar pendientes del modelo (integración Contabilidad, ubicaciones, soportes).
-- **Estructura Organizacional en 13%** — todavía en construcción del propio alcance.
+- **Impuestos lidera** con 84% — refinamiento por consultores fiscales más avanzado, catálogos F1 entregados.
+- **Contabilidad (75%) y OXP (67%)** ya tienen refinamiento del equipo de desarrollo en progreso (issues #7/#8/#9 en Contabilidad, #10 en OXP). OXP además debe cerrar pendientes del modelo (conceptos, soportes, ubicaciones).
+- **Cuatro sub-dominios en 60%** — Datos de Referencia, Direcciones, Terceros y Estructura Organizacional completaron Alcance + Modelo/Especificación (+ Auditoría los dos últimos) pero esperan la ronda de refinamiento con el equipo de desarrollo. Es el grupo más cercano a desbloquearse.
+- **Estructura Organizacional saltó de 13% a 60%** — cerró alcance (v1.2), modelo (v1.4) y auditoría (101 hallazgos) desde el snapshot anterior.
 
 ### Detalle de los parciales
 
-**Impuestos — 83%**
-- ✅ Alcance v1.2, Modelo v2.0, Auditoría aplicada (2 rondas).
-- 🟡 Refinamiento en progreso (~75%) — la mayor parte de las consultas del equipo de diseño y desarrollo están resueltas; restan ajustes menores antes de cerrar el hito.
+**Impuestos — 84%**
+- ✅ Alcance v1.4, Modelo v2.0.4, Auditoría aplicada (2 rondas).
+- 🟡 Refinamiento en progreso (~80%) — catálogos fiscales F1 entregados (962 entradas CO/DO/PA); resta el refinamiento por consultores fiscales sobre las secciones "Revisión pendiente".
 - ⬜ Listo F1 — depende del cierre del refinamiento.
-- **Cálculo:** 20 + 25 + 15 + (30 × 0.75) + 0 = 82.5 ≈ **83%**.
+- **Cálculo:** 20 + 25 + 15 + (30 × 0.80) + 0 = 84 ≈ **84%**.
 
-**OXP — 56%**
-- ✅ Alcance aprobado, Auditoría: 3 rondas aplicadas.
-- 🟡 Modelo v2.9 con tres frentes abiertos: (1) integración formal OXP ↔ Contabilidad (líneas de traducción y confirmación de asiento), (2) ubicaciones de gasto, (3) soportes documentales.
-- ⬜ Refinamiento no iniciado.
-- ⬜ Listo F1 — bloqueado por el modelo y el refinamiento.
-- **Cálculo:** 20 + (25 × 0.85) + 15 + 0 + 0 = 56.25 ≈ **56%**.
+**Contabilidad — 75%**
+- ✅ Alcance v1.6, Modelo v1.5, Auditoría aplicada.
+- 🟡 Refinamiento en progreso (~50%) — issues #7/#8/#9 del equipo de desarrollo aplicados (grupo PUC esperado, narración del borrador, herencia del rol). Restan más consultas del equipo de desarrollo.
+- ⬜ Listo F1 — depende del cierre del refinamiento.
+- **Cálculo:** 20 + 25 + 15 + (30 × 0.50) + 0 = 75 ≈ **75%**.
 
-**Estructura Organizacional — 13%**
-- 🟡 Alcance v0.3: Secciones 1-3 cerradas (definición, glosario de 21 términos, actores) + 2 anexos arquitectónicos avanzados (4 decisiones formalizadas + patrón BFF + Borrador). Sección 4 con Familia 1 escrita; Familias 2-4 y Secciones 5-9 pendientes.
-- ⬜ Modelo, Auditoría, Refinamiento y Listo F1 sin iniciar.
-- **Cálculo:** (20 × 0.65) + 0 + 0 + 0 + 0 = 13 ≈ **13%**.
+**OXP — 67%**
+- ✅ Alcance v1.7, Auditoría: 3 rondas aplicadas.
+- 🟡 Modelo v3.4 (~90%): integración OXP ↔ Contabilidad **cerrada**; quedan tres frentes del modelo — (1) catálogo de conceptos, (2) soportes documentales, (3) esquema de ubicaciones hacia Impuestos.
+- 🟡 Refinamiento en progreso (~30%) — issue #10 (canonización de `tipoComponente`) aplicado.
+- ⬜ Listo F1 — bloqueado por el cierre del modelo y el refinamiento.
+- **Cálculo:** 20 + (25 × 0.90) + 15 + (30 × 0.30) + 0 = 66.5 ≈ **67%**.
+
+**Estructura Organizacional — 60%**
+- ✅ Alcance v1.2, Modelo v1.4, Auditoría completa (101 hallazgos).
+- ⬜ Refinamiento con el equipo de desarrollo — pendiente.
+- ⬜ Listo F1 — depende del refinamiento.
+- **Cálculo:** 20 + 25 + 15 + 0 + 0 = **60%**.
 
 ### Camino crítico restante
 
-Para que el paquete F1 transversal del ERP llegue al 100% hacen falta tres frentes en este orden:
+Para que el paquete F1 transversal del ERP llegue al 100% hacen falta tres frentes:
 
-1. **Refinamiento de los cinco sub-dominios ya cerrados** (Datos de Referencia, Direcciones, Terceros, Contabilidad, Impuestos): agendar rondas de consultas con diseño y desarrollo, resolver cada consulta y aplicar los ajustes. Es el frente con mayor retorno por tiempo invertido — sube cinco sub-dominios de 60-83% hacia 90-100%.
-2. **Estructura Organizacional**: cerrar Familias 2-4 de Sección 4, escribir Secciones 5-9, construir modelo, auditar y refinar.
-3. **OXP**: cerrar refinamientos del modelo (integración con Contabilidad, ubicaciones, soportes), auditar el cierre y refinar.
+1. **Cerrar los refinamientos del modelo de OXP** (catálogo de conceptos, soportes documentales, esquema de ubicaciones hacia Impuestos): es el único sub-dominio transaccional con frentes del modelo abiertos. Auditar el cierre.
+2. **Ronda de refinamiento con el equipo de desarrollo** para los sub-dominios que aún no la tienen (Datos de Referencia, Direcciones, Terceros, Estructura Organizacional) y completar la de los que están en curso (Impuestos, Contabilidad, OXP). Es el frente con mayor retorno por tiempo invertido — sube cuatro sub-dominios de 60% y cierra el hito en los otros tres.
+3. **Transversales del ERP**: EventCatalog (Fase 3), dependencias de infraestructura, diseño UX por capas.
 
 Una vez completados, los sub-dominios futuros (CXC, Tesorería, Emisión Electrónica, Recepción Electrónica) heredarán el patrón ya validado en F1.
