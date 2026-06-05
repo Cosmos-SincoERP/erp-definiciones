@@ -2,8 +2,8 @@
 
 **Sub-dominio emisor:** Obligaciones por Pagar (OXP)
 **Catálogo del modelo:** `PlantillaDeAsiento` (Sección 3.7 de `modelo-dominio.md`)
-**Versión:** 1.3
-**Fecha de actualización:** 2026-06-01
+**Versión:** 1.4
+**Fecha de actualización:** 2026-06-05
 **Archivo de datos:** [`plantillas-de-asiento.json`](plantillas-de-asiento.json)
 
 ---
@@ -56,7 +56,10 @@ Causación de una obligación por pagar. Emitida por `OxpComercioCausada` y `Ext
 | DIFERENCIA_EN_CAMBIO | Débito/Crédito | `diferencia_en_cambio` | `["5305","4215"]` | ❌ | ⚠️ |
 | AMORTIZACION_ANTICIPO | Crédito | `amortizacion_anticipo` | `["1330"]` | ❌ | ⚠️ |
 | AJUSTE_TOLERANCIA | Débito/Crédito | `ajuste_tolerancia` | `["5305","4210"]` | ❌ | ⚠️ |
+| CRUCE_OBLIGACION | Débito | `cruce_obligacion` | `["2205","2335"]` | ❌ | |
 | CONTRAPARTIDA | Crédito | — (genera el motor) | `["2205","2335"]` | ❌ | |
+
+> **Nota — rol `CRUCE_OBLIGACION`:** lo alimenta solo `ExtractoCausado` (una línea por `Vinculacion` del extracto; `OxpComercioCausada` no emite este componente). Es un débito a la cuenta por pagar del proveedor de la compra cruzada — la reclasificación de la deuda hacia el banco/emisor (la contrapartida acredita la CxP del banco). Su unidad organizacional se rinde según la política de empresa **`[I33]`** (igual que la contrapartida): distribuida con la distribución de origen que envía OXP, consolidada en una unidad general, o sin unidad. Ver `[D29]` de OXP.
 
 ### 4.2. `anticipo_a_proveedor`
 
@@ -118,3 +121,4 @@ Los siguientes puntos requieren confirmación de **consultor contable** y/o **ca
 | 1.1 | Junio 2026 | Atributo `llevaDescripcionConcepto` por componente (issue #8). Marca qué componentes portan la descripción de concepto que envía el consumidor: ✅ en `gasto`, `anticipo`, `concepto_devuelto`, `reversa_anticipo`; ❌ en impuestos y retenciones. Nueva columna en las 4 plantillas. Alinea con `modelo-dominio.md` v1.4 [D13] y `definicion-alcance.md` v1.5 [R48]. |
 | 1.2 | Junio 2026 | Atributo del rol renombrado de `nombre` a `rol` (issue #9), consistente con la herencia del rol a la partida del borrador y su propagación a la entrega. El `rol` es un código de conjunto cerrado (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA). Alinea con `modelo-dominio.md` v1.5 [D14] y `definicion-alcance.md` v1.6 [R49]. |
 | 1.3 | Junio 2026 | Dos roles nuevos en `causacion_gasto` por **ajuste cruzado con OXP** (issue #10): `AMORTIZACION_ANTICIPO` (`amortizacion_anticipo` → `["1330"]`) y `AJUSTE_TOLERANCIA` (`ajuste_tolerancia` → tentativo `["5305","4210"]`). OXP los emite como `tipoComponente`; se agregan al catálogo para preservar la coincidencia 1:1. Ambos `porValidar` (ítems 9 y 10 de revisión pendiente). |
+| 1.4 | Junio 2026 | Rol nuevo `CRUCE_OBLIGACION` (Débito, `cruce_obligacion` → `["2205","2335"]`) en `causacion_gasto` por **ajuste cruzado con OXP** (issue #18). Lo alimenta solo `ExtractoCausado` (una línea por `Vinculacion`): salda la cuenta por pagar del proveedor de la compra cruzada, reclasificando la deuda hacia el banco/emisor. Su unidad organizacional se rinde según `[I33]` (igual que la contrapartida). Alinea con `modelo-dominio.md` de OXP v3.5 [D29]. |
