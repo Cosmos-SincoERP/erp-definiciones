@@ -2,7 +2,7 @@
 
 **Sub-dominio emisor:** Obligaciones por Pagar (OXP)
 **Catálogo del modelo:** `PlantillaDeAsiento` (Sección 3.7 de `modelo-dominio.md`)
-**Versión:** 1.4
+**Versión:** 1.5
 **Fecha de actualización:** 2026-06-05
 **Archivo de datos:** [`plantillas-de-asiento.json`](plantillas-de-asiento.json)
 
@@ -80,7 +80,11 @@ Nota crédito de proveedor (devolución). Emitida por `DevolucionCausada` (tipo 
 |-----|-----------|------------------|--------------------|:--------------------------:|---|
 | GASTO | Crédito | `concepto_devuelto` | `["51","52","53"]` | ✅ | |
 | IMPUESTO | Crédito | `iva` | `["2408"]` | ❌ | ⚠️ |
+| IMPUESTO | Crédito | `inc` | — | ❌ | ⚠️ |
 | RETENCION | Débito | `retefuente` | `["2365"]` | ❌ | ⚠️ |
+| RETENCION | Débito | `reteiva` | `["2367"]` | ❌ | ⚠️ |
+| RETENCION | Débito | `reteica` | `["2368"]` | ❌ | ⚠️ |
+| CARGO_FINANCIERO | Crédito | `cargo_financiero` | `["5305"]` | ❌ | ⚠️ |
 | CONTRAPARTIDA | Débito | — (genera el motor) | `["2205","2335"]` | ❌ | |
 
 ### 4.4. `reversa_anticipo`
@@ -104,7 +108,7 @@ Los siguientes puntos requieren confirmación de **consultor contable** y/o **ca
 | 2 | `reteica` (rol RETENCION) | ¿OXP emite `reteica` como `tipoComponente`? Confirmar y validar grupo `2368`. |
 | 3 | `cargo_financiero` | Nombre de `tipoComponente` aún descrito en prosa en OXP (entidad `CargoFinanciero`). Canonizar en OXP. Validar grupo `5305`. |
 | 4 | `diferencia_en_cambio` | Nombre sin canonizar en OXP. Validar grupos: pérdida → `5305` (gasto financiero), ganancia → `4215` (ingreso financiero). |
-| 5 | Componentes devueltos (`nota_credito_gasto`) | El impuesto y la retención devueltos no tienen nombre canónico en OXP — se asumen `iva` y `retefuente`. Canonizar en OXP. |
+| 5 | Componentes devueltos (`nota_credito_gasto`) | Los impuestos y retenciones devueltos reutilizan los nombres de la causación (`iva`, `inc`, `retefuente`, `reteiva`, `reteica`) y `cargo_financiero` para la nota crédito de extracto. Confirmar los grupos del PUC con consultor contable (igual que sus equivalentes en `causacion_gasto`). |
 | 6 | Nombre `nota_credito_gasto` vs `nota_credito_proveedor` | OXP debe alinear su mapeo al nombre canónico `nota_credito_gasto`. |
 | 7 | `reversa_anticipo` (plantilla completa) | Plantilla definida desde cero a partir del efecto contable descrito en OXP (Db Anticipos / Cr CxP). Validar estructura y registrar formalmente en el inventario. |
 | 8 | Amortización de anticipo | OXP indica que viaja como `tipoComponente` dentro de `causacion_gasto` (`[D26]`) sin nombre canónico. Definir si requiere un rol/componente propio en esta plantilla. |
@@ -122,3 +126,4 @@ Los siguientes puntos requieren confirmación de **consultor contable** y/o **ca
 | 1.2 | Junio 2026 | Atributo del rol renombrado de `nombre` a `rol` (issue #9), consistente con la herencia del rol a la partida del borrador y su propagación a la entrega. El `rol` es un código de conjunto cerrado (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA). Alinea con `modelo-dominio.md` v1.5 [D14] y `definicion-alcance.md` v1.6 [R49]. |
 | 1.3 | Junio 2026 | Dos roles nuevos en `causacion_gasto` por **ajuste cruzado con OXP** (issue #10): `AMORTIZACION_ANTICIPO` (`amortizacion_anticipo` → `["1330"]`) y `AJUSTE_TOLERANCIA` (`ajuste_tolerancia` → tentativo `["5305","4210"]`). OXP los emite como `tipoComponente`; se agregan al catálogo para preservar la coincidencia 1:1. Ambos `porValidar` (ítems 9 y 10 de revisión pendiente). |
 | 1.4 | Junio 2026 | Rol nuevo `CRUCE_OBLIGACION` (Débito, `cruce_obligacion` → `["2205","2335"]`) en `causacion_gasto` por **ajuste cruzado con OXP** (issue #18). Lo alimenta solo `ExtractoCausado` (una línea por `Vinculacion`): salda la cuenta por pagar del proveedor de la compra cruzada, reclasificando la deuda hacia el banco/emisor. Su unidad organizacional se rinde según `[I33]` (igual que la contrapartida). Alinea con `modelo-dominio.md` de OXP v3.5 [D29]. |
+| 1.5 | Junio 2026 | Plantilla `nota_credito_gasto` completada con los componentes que OXP emite y faltaban (issue #20). Se agregan: `inc` al rol IMPUESTO; `reteiva` y `reteica` al rol RETENCION; y un rol nuevo `CARGO_FINANCIERO` (Crédito, `cargo_financiero` → `["5305"]`) — inverso del de `causacion_gasto`, lo emite la nota crédito de un extracto (`CargoFinancieroDevuelto`). Antes la plantilla era un inverso simplificado (solo `concepto_devuelto`/`iva`/`retefuente`) y habría rechazado líneas válidas (`LINEA_SIN_ROL_EN_PLANTILLA`, I27). Los grupos del PUC quedan `porValidar`, igual que sus equivalentes en `causacion_gasto`. No requiere cambios en OXP — su catálogo ya declara estos componentes para `nota_credito_gasto`. |

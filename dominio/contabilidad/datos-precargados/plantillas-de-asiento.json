@@ -1,6 +1,6 @@
 {
   "catalogo": "PlantillaDeAsiento",
-  "version": "1.4",
+  "version": "1.5",
   "fechaActualizacion": "2026-06-01",
   "alcance": "Sub-dominio emisor OXP (Obligaciones por Pagar). 4 plantillas de las 42 del inventario (anexo-ejemplo-plantilla-de-asiento.md, Seccion 5.2).",
   "fuente": "Mapeo canonico de eventos OXP -> tipoTransaccion contable (dominio/obligaciones-por-pagar/modelo-dominio.md, tabla de la seccion 'Integracion con sub-dominio Contabilidad') + estructura del agregado PlantillaDeAsiento (dominio/contabilidad/modelo-dominio.md, Seccion 3.7, [D12], [D13]).",
@@ -133,7 +133,8 @@
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "iva", "grupoPucEsperado": ["2408"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Componente de impuesto devuelto sin nombre canonico en OXP (issue #10)." }
+            { "tipoComponente": "iva", "grupoPucEsperado": ["2408"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Componente de impuesto devuelto sin nombre canonico en OXP (issue #10)." },
+            { "tipoComponente": "inc", "grupoPucEsperado": [], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Inverso del inc en causacion_gasto. El INC normalmente se reconoce como mayor valor del gasto/costo. Confirmar grupo o si se modela como rol propio (issue #10)." }
           ]
         },
         {
@@ -141,7 +142,17 @@
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "retefuente", "grupoPucEsperado": ["2365"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Componente de retencion devuelta sin nombre canonico en OXP (issue #10)." }
+            { "tipoComponente": "retefuente", "grupoPucEsperado": ["2365"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Componente de retencion devuelta sin nombre canonico en OXP (issue #10)." },
+            { "tipoComponente": "reteiva", "grupoPucEsperado": ["2367"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Inverso del reteiva en causacion_gasto. Retencion de IVA devuelta (issue #10)." },
+            { "tipoComponente": "reteica", "grupoPucEsperado": ["2368"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Inverso del reteica en causacion_gasto. Confirmar si OXP emite reteica como tipoComponente (issue #10)." }
+          ]
+        },
+        {
+          "rol": "CARGO_FINANCIERO",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "cargo_financiero", "grupoPucEsperado": ["5305"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Inverso del cargo_financiero en causacion_gasto. Lo emite la nota credito de un extracto (CargoFinancieroDevuelto). Confirmar grupo 5305 con consultor contable." }
           ]
         },
         {
