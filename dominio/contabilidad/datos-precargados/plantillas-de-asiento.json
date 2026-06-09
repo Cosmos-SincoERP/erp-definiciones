@@ -1,6 +1,6 @@
 {
   "catalogo": "PlantillaDeAsiento",
-  "version": "1.5",
+  "version": "1.6",
   "fechaActualizacion": "2026-06-01",
   "alcance": "Sub-dominio emisor OXP (Obligaciones por Pagar). 4 plantillas de las 42 del inventario (anexo-ejemplo-plantilla-de-asiento.md, Seccion 5.2).",
   "fuente": "Mapeo canonico de eventos OXP -> tipoTransaccion contable (dominio/obligaciones-por-pagar/modelo-dominio.md, tabla de la seccion 'Integracion con sub-dominio Contabilidad') + estructura del agregado PlantillaDeAsiento (dominio/contabilidad/modelo-dominio.md, Seccion 3.7, [D12], [D13]).",
@@ -188,6 +188,30 @@
           "grupoPucEsperado": ["2205", "2335"],
           "porValidar": false,
           "notaContrapartida": "Generada por el motor."
+        }
+      ]
+    },
+    {
+      "tipoTransaccion": "amortizacion_anticipo",
+      "descripcion": "Amortizacion de un anticipo cuando el cruce con la OXP de Comercio ocurre despues de causarla (Caso B de [D26] de OXP). Emitida por PagoOxpComercioViaAnticipoAplicado cuando la OXP ya esta en estado Causada. Salda la CxP del proveedor contra la cuenta de anticipos (patron SAP F-54). En el Caso A (cruce pre/durante causacion) la amortizacion viaja como tipoComponente amortizacion_anticipo dentro de causacion_gasto, no usa esta plantilla.",
+      "origen": "estandar",
+      "documentoFuenteObligatorio": false,
+      "roles": [
+        {
+          "rol": "AMORTIZACION_ANTICIPO",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "amortizacion_anticipo", "grupoPucEsperado": ["1330"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Cr Anticipos a proveedores (1330) al consumir el anticipo contra la OXP ya causada. Confirmar grupo con consultor contable." }
+          ]
+        },
+        {
+          "rol": "CONTRAPARTIDA",
+          "naturaleza": "debito",
+          "esContrapartida": true,
+          "grupoPucEsperado": ["2205", "2335"],
+          "porValidar": false,
+          "notaContrapartida": "Generada por el motor. Db CxP del proveedor (2205/2335): reduce la cuenta por pagar saldada por el anticipo. Su unidad organizacional sigue la politica de empresa [I33]."
         }
       ]
     }

@@ -2,8 +2,8 @@
 
 **Sub-dominio emisor:** Obligaciones por Pagar (OXP)
 **Catálogo del modelo:** `PlantillaDeAsiento` (Sección 3.7 de `modelo-dominio.md`)
-**Versión:** 1.5
-**Fecha de actualización:** 2026-06-05
+**Versión:** 1.6
+**Fecha de actualización:** 2026-06-09
 **Archivo de datos:** [`plantillas-de-asiento.json`](plantillas-de-asiento.json)
 
 ---
@@ -28,11 +28,11 @@ Las plantillas de asiento son **contenido del producto** (`origen: estándar`) �
 
 | Concepto | Cantidad |
 |---|---|
-| Plantillas de OXP | 4 |
+| Plantillas de OXP | 5 |
 | Plantillas del inventario total (8 sub-dominios) | 42 |
-| `tipoTransaccion` cubiertos | `causacion_gasto`, `anticipo_a_proveedor`, `nota_credito_gasto`, `reversa_anticipo` |
+| `tipoTransaccion` cubiertos | `causacion_gasto`, `anticipo_a_proveedor`, `nota_credito_gasto`, `reversa_anticipo`, `amortizacion_anticipo` |
 
-**Alcance de este archivo:** solo las 4 plantillas de **OXP** (único sub-dominio transaccional modelado a la fecha). Las 38 restantes del inventario (CXC, Tesorería, Inventarios, Activos Fijos, Nómina, Arrendamientos, GL) se precargarán cuando esos sub-dominios se modelen.
+**Alcance de este archivo:** solo las 5 plantillas de **OXP** (único sub-dominio transaccional modelado a la fecha). Las restantes del inventario (CXC, Tesorería, Inventarios, Activos Fijos, Nómina, Arrendamientos, GL) se precargarán cuando esos sub-dominios se modelen.
 
 ---
 
@@ -96,6 +96,17 @@ Reversa total de un anticipo sin cruces previos. Emitida por `DevolucionCausada`
 | ANTICIPO | Crédito | `reversa_anticipo` | `["1330"]` | ✅ | |
 | CONTRAPARTIDA | Débito | — (genera el motor) | `["2205","2335"]` | ❌ | |
 
+### 4.5. `amortizacion_anticipo`
+
+Amortización de un anticipo cuando el cruce con la OXP de Comercio ocurre **después** de causarla (Caso B de `[D26]` de OXP). **Plantilla nueva.** Emitida por `PagoOxpComercioViaAnticipoAplicado` cuando la OXP ya está en estado Causada. Salda la cuenta por pagar del proveedor contra la cuenta de anticipos — patrón SAP F-54 (Down Payment Clearing). Cuando el cruce es pre/durante la causación (Caso A), la amortización **no** usa esta plantilla: viaja como `tipoComponente` `amortizacion_anticipo` dentro de `causacion_gasto`.
+
+| Rol | Naturaleza | `tipoComponente` | `grupoPucEsperado` | `llevaDescripcionConcepto` | |
+|-----|-----------|------------------|--------------------|:--------------------------:|---|
+| AMORTIZACION_ANTICIPO | Crédito | `amortizacion_anticipo` | `["1330"]` | ❌ | ⚠️ |
+| CONTRAPARTIDA | Débito | — (genera el motor) | `["2205","2335"]` | ❌ | |
+
+> Espejo de `anticipo_a_proveedor` (que hace Db Anticipos · Cr CxP). La unidad organizacional de la contrapartida (CxP) sigue la política de empresa `[I33]`. Grupo del `amortizacion_anticipo` `porValidar` con consultor contable.
+
 ---
 
 ## 5. Revisión pendiente
@@ -126,4 +137,5 @@ Los siguientes puntos requieren confirmación de **consultor contable** y/o **ca
 | 1.2 | Junio 2026 | Atributo del rol renombrado de `nombre` a `rol` (issue #9), consistente con la herencia del rol a la partida del borrador y su propagación a la entrega. El `rol` es un código de conjunto cerrado (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA). Alinea con `modelo-dominio.md` v1.5 [D14] y `definicion-alcance.md` v1.6 [R49]. |
 | 1.3 | Junio 2026 | Dos roles nuevos en `causacion_gasto` por **ajuste cruzado con OXP** (issue #10): `AMORTIZACION_ANTICIPO` (`amortizacion_anticipo` → `["1330"]`) y `AJUSTE_TOLERANCIA` (`ajuste_tolerancia` → tentativo `["5305","4210"]`). OXP los emite como `tipoComponente`; se agregan al catálogo para preservar la coincidencia 1:1. Ambos `porValidar` (ítems 9 y 10 de revisión pendiente). |
 | 1.4 | Junio 2026 | Rol nuevo `CRUCE_OBLIGACION` (Débito, `cruce_obligacion` → `["2205","2335"]`) en `causacion_gasto` por **ajuste cruzado con OXP** (issue #18). Lo alimenta solo `ExtractoCausado` (una línea por `Vinculacion`): salda la cuenta por pagar del proveedor de la compra cruzada, reclasificando la deuda hacia el banco/emisor. Su unidad organizacional se rinde según `[I33]` (igual que la contrapartida). Alinea con `modelo-dominio.md` de OXP v3.5 [D29]. |
+| 1.6 | Junio 2026 | Nueva plantilla `amortizacion_anticipo` por ajuste cruzado con OXP (issue #25). La emite `PagoOxpComercioViaAnticipoAplicado` cuando la OXP de Comercio ya está Causada (cruce post-causación, Caso B de `[D26]` de OXP): Db CxP proveedor · Cr Anticipos a proveedores (espejo de `anticipo_a_proveedor`, patrón SAP F-54). Cuando el cruce es pre/durante la causación, la amortización sigue viajando como `tipoComponente` dentro de `causacion_gasto` (Caso A). Cobertura OXP: 4 → 5 plantillas. Grupo del `amortizacion_anticipo` `porValidar`. |
 | 1.5 | Junio 2026 | Plantilla `nota_credito_gasto` completada con los componentes que OXP emite y faltaban (issue #20). Se agregan: `inc` al rol IMPUESTO; `reteiva` y `reteica` al rol RETENCION; y un rol nuevo `CARGO_FINANCIERO` (Crédito, `cargo_financiero` → `["5305"]`) — inverso del de `causacion_gasto`, lo emite la nota crédito de un extracto (`CargoFinancieroDevuelto`). Antes la plantilla era un inverso simplificado (solo `concepto_devuelto`/`iva`/`retefuente`) y habría rechazado líneas válidas (`LINEA_SIN_ROL_EN_PLANTILLA`, I27). Los grupos del PUC quedan `porValidar`, igual que sus equivalentes en `causacion_gasto`. No requiere cambios en OXP — su catálogo ya declara estos componentes para `nota_credito_gasto`. |
