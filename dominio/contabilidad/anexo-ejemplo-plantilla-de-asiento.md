@@ -559,6 +559,40 @@ Nómina ────────────────────────
 
 ---
 
+## 7. Ejemplo 4 — Extracto de cruce puro (origen del tercero de la contrapartida)
+
+> Se ubica aquí, después del resumen, por ser un ejemplo añadido en un refinamiento posterior (issue #28); conceptualmente acompaña a los ejemplos 1–3.
+
+Caso: el extracto de la tarjeta de **Bancolombia (890.903.938)** del mes cruza dos compras **ya causadas** —proveedor **A (901.090.486)** por 600.000 y proveedor **B (860.533.413)** por 400.000— **sin cargos financieros, diferencia en cambio ni ajustes por tolerancia**. OXP emite solo dos líneas `cruce_obligacion` (`[D29]` de OXP). Ilustra de dónde sale el tercero de la contrapartida.
+
+### 7.1 lineasParaTraduccion() + terceroPrincipal
+
+**A nivel del hecho económico:** `tipoTransaccion = causacion_gasto`, `terceroPrincipal = 890903938` (Bancolombia — el `InformacionTercero` raíz del extracto).
+
+| # | tipoComponente | tercero (de la línea) | unidadOrg | valor | moneda |
+|---|---------------|-----------------------|-----------|-------|--------|
+| 1 | cruce_obligacion | 901090486 (Prov A) | — | 600.000 | COP |
+| 2 | cruce_obligacion | 860533413 (Prov B) | — | 400.000 | COP |
+
+El banco **no aparece en ninguna línea** — solo está como `terceroPrincipal`. (La unidad organizacional de la CxP se rinde según `[I33]`; en este ejemplo, consolidada sin unidad.)
+
+### 7.2 Plantilla y resolución
+
+El motor aplica `causacion_gasto`. Las líneas `cruce_obligacion` alimentan el rol **CRUCE_OBLIGACION** (Db CxP del proveedor de **cada línea**, su propio tercero). La **CONTRAPARTIDA** (Cr CxP) toma su tercero del **`terceroPrincipal`** del hecho (Bancolombia), no de las líneas (paso 4 del `ServicioDeTraduccion`).
+
+### 7.3 Asiento contable resultante
+
+| Partida | Cuenta | Tercero | Débito | Crédito |
+|---------|--------|---------|--------|---------|
+| 1 | 2205-… CxP proveedor | 901090486 (Prov A) | 600.000 | |
+| 2 | 2205-… CxP proveedor | 860533413 (Prov B) | 400.000 | |
+| 3 | 2205-… CxP banco/emisor | 890903938 (Bancolombia) | | 1.000.000 |
+| | | **Totales** | **1.000.000** | **1.000.000** |
+
+Sin `terceroPrincipal`, el motor no tendría de dónde tomar el tercero del banco (no está en ninguna línea): la contrapartida quedaría sin tercero, el borrador no resolvería (la CxP exige tercero por `obligatoriedadTercero`) y el contador lo completaría a mano en la consola. Con `terceroPrincipal`, queda automático.
+
+---
+
 ## Control de versiones
 
 | Versión | Fecha | Descripción |
@@ -566,3 +600,4 @@ Nómina ────────────────────────
 | 1.0 | Marzo 2026 | Versión inicial: patrón universal, contrato LineaTraduccion, 3 ejemplos OXP (causación, anticipo, nota crédito), cadena de resolución A → C → B, inventario de plantillas por sub-dominio emisor (8 sub-dominios, 42 plantillas). |
 | 1.1 | Mayo 2026 | Grupo del PUC esperado (issue #7). Nota explicativa de `grupoPucEsperado` en la Sección 1.3 y nueva columna "Grupo PUC esperado" en las tablas de plantilla de los 3 ejemplos (causación, anticipo, nota crédito). Alinea con `modelo-dominio.md` v1.3 [D12] y `definicion-alcance.md` v1.3 [R47]. Llenado del inventario completo (Sección 5) y confirmación del grupo del `inc` pendientes de revisión por consultor contable. |
 | 1.2 | Junio 2026 | Encuadre del inventario teórico (issue #7). Nota en la Sección 5 que aclara que las 42 plantillas son un planteamiento inicial de dimensionamiento — no todas se implementarán y el número real se determina al modelar cada sub-dominio; la fuente de verdad es `datos-precargados/plantillas-de-asiento.*`. Fila de OXP del resumen (5.3) marcada como "6 teórico; 4 reales". Acompaña la creación del catálogo precargado `datos-precargados/plantillas-de-asiento.md`/`.json` con las 4 plantillas reales de OXP. |
+| 1.3 | Junio 2026 | Nuevo **Ejemplo 4 — Extracto de cruce puro** (Sección 7, issue #28): ilustra de dónde sale el tercero de la contrapartida cuando las líneas traen varios proveedores y el banco/emisor no viaja en ninguna. Muestra el uso de `terceroPrincipal` (tercero del documento a nivel del hecho económico) para la contrapartida (CxP del banco) y el tercero por línea para los cruces. Se ubica como Sección 7 (tras el resumen) para no renumerar las secciones existentes ni romper referencias cruzadas. Alinea con `modelo-dominio.md` v1.8 (`InformacionTransaccion` con `terceroPrincipal`, paso 4 del `ServicioDeTraduccion`). |
