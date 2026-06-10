@@ -580,7 +580,18 @@ El Nivel A puede alcanzarse sin esperar al Nivel B; el Nivel B madura progresiva
 
 ## Sección 9: Beneficios esperados
 
-*(En construcción)*
+| # | Beneficio | Problema que resuelve |
+|---|-----------|----------------------|
+| 1 | **Identidad del tercero sin corromper:** cada dato vive en su dominio dueño (perfil tributario en Impuestos, condiciones en OXP/CXC, datos laborales en RRHH) y la bodega solo consolida — ningún módulo vuelve a extender la entidad de otro. | Corrupción de la entidad (Problema 1) |
+| 2 | **Vista unificada del tercero:** por primera vez existe un lugar donde el tercero se ve completo — qué figuras tiene, en qué dominios y empresas opera, con qué contactos, con qué perfil tributario y en qué estado. | Sin vista unificada (Problema 2) |
+| 3 | **Duplicados y divergencias con dueño y proceso:** la deuda de calidad de datos deja de estar oculta — la bodega la detecta, la presenta como casos con evidencia y la conciliación la resuelve con trazabilidad y memoria. | Sin detección ni conciliación (Problema 3) |
+| 4 | **Los dominios se enteran solos:** la señal global y las resoluciones llegan publicadas y cada dominio las aplica automáticamente — nadie descubre un cambio cuando una operación falla. | Sin eventos de cambio (Problema 4) |
+| 5 | **Contactos estandarizados desde el origen:** la estructura empaquetada y el vocabulario compartido de roles hacen que todos los dominios capturen contactos de la misma forma, y la bodega los consolide por tercero. | Contactos sin estandarizar (Problema 5) |
+| 6 | **La operación nunca se encadena:** ningún dominio necesita a la bodega para operar — el acoplamiento de disponibilidad que motivó el replanteamiento desaparece por diseño. | Acoplamiento de disponibilidad (Problema 6) |
+| 7 | **Reportes fiscales por tercero canónico:** los auxiliares contables, la información exógena y los certificados de retención se presentan por el tercero canónico — sin saldos fragmentados entre duplicados ni sanciones por identificaciones cruzadas. | *Integridad fiscal* |
+| 8 | **Captura asistida y más rápida:** al digitar una identificación, el formulario advierte duplicados y ofrece precargar los datos consolidados — menos digitación, menos errores, menos duplicados nuevos. | *Reducción de captura manual* |
+| 9 | **Historial de identidad preservado:** un cambio de razón social o de documento no rompe los registros históricos — cada transacción se interpreta con la identificación vigente en su momento. | *Trazabilidad* |
+| 10 | **La calidad de datos como operación continua:** la conciliación convierte la limpieza de terceros en un proceso permanente con herramientas y responsable — no en migraciones de choque cada pocos años. | *Sostenibilidad estratégica* |
 
 ---
 
