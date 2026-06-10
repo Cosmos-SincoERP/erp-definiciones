@@ -517,7 +517,64 @@ La bodega consolidadora mantiene la vista unificada de los terceros a partir de 
 
 ## Sección 8: Estrategia de implementación por fases
 
-*(En construcción)*
+La Fase 1 constituye el alcance funcional objetivo del sub-dominio. Se organiza en dos bloques:
+
+- **Núcleo de la bodega:** capacidades que el equipo del BC Terceros construye solo, contra la información estándar de la figura — sin esperar a ningún otro equipo.
+- **Habilitadores con dependencias externas:** capacidades que requieren que otros equipos publiquen, apliquen o integren. Maduran progresivamente sin bloquear la salida técnica del núcleo.
+
+### Fase 1 — Núcleo de la bodega
+
+| Capacidad | Descripción |
+|-----------|-------------|
+| Consolidación de figuras | Recepción de eventos de figura, agrupación por clave natural, creación y actualización del consolidado (R01-R08). |
+| Detección de señales | Duplicados por número + razón social canónica (R09); divergencias en datos de identidad compartidos (R14). |
+| Casos de conciliación | Apertura con evidencia, resolución humana (fusión / homonimia / dato correcto), memoria de conciliación, trazabilidad (R10-R13). |
+| Publicación de decisiones | Mapa canónico, resoluciones de corrección, señal global — avisos que los dominios aplican por su cuenta (R27, R30). |
+| Señal global | Inactivación/reactivación del consolidado con motivo (R16-R20). |
+| Vista consolidada | Ficha del tercero de solo lectura, local a la bodega (Flujo 6). |
+| Historial de identidad | Cambios de identificación y razón social del consolidado (R06). |
+
+### Fase 1 — Habilitadores con dependencias externas
+
+| Capacidad | Dependencia | Descripción |
+|-----------|-------------|-------------|
+| Primera fuente real | OXP (figura Proveedor) | OXP publica su figura con la información estándar; la bodega la consolida. |
+| Asistencia de captura en formularios | Interfaces de los dominios | La consulta la expone la bodega; la experiencia (advertir, precargar, continuar si no responde) la construye cada dominio en su formulario. |
+| Aplicación automática de decisiones | Cada dominio fuente | Los dominios aplican la señal global y las resoluciones de conciliación en sus figuras, de forma autónoma. |
+| Perfil tributario en la vista | Impuestos | Impuestos publica el perfil por identificación legal y la bodega lo refleja en la ficha. |
+| Reportes por tercero canónico | Contabilidad | Contabilidad consume el mapa canónico y presenta auxiliares, exógena y certificados por el tercero canónico. |
+| Carga histórica | Migración por dominios | Los dominios cargan sus figuras desde SincoERP; la bodega consolida y atiende el volumen inicial de casos con **resolución por lotes** (herramienta del administrador). |
+| Contratos de eventos formalizados | EventCatalog (Fase 3 del proyecto) | La información estándar de la figura y los avisos de la bodega quedan como contratos formales. |
+
+### Fase 2 — Capacidades de extensión
+
+| Capacidad | Descripción |
+|-----------|-------------|
+| Detección ampliada de duplicados | Criterios adicionales de similitud: coincidencia de contactos, direcciones u otros datos entre consolidados distintos. |
+| Verificación contra registros oficiales | Consulta de registros públicos (tipo RUES/DIAN) como evidencia externa para la conciliación. No bloqueante. |
+
+> **Las nuevas fuentes no son una fase:** cuando CXC, RRHH o Tesorería se construyan, se integran publicando la misma información estándar de la figura — la bodega no requiere cambios. Es crecimiento continuo, no extensión del alcance.
+
+### Criterio de éxito de la Fase 1
+
+**Nivel A — Salida técnica del núcleo**
+
+1. La bodega consolida figuras recibidas, creando y actualizando consolidados por clave natural.
+2. Detecta duplicados y divergencias según los criterios definidos y abre casos con su evidencia.
+3. El administrador resuelve casos: la fusión publica el mapa canónico; la homonimia queda en memoria; la divergencia publica la corrección.
+4. La señal global se administra con motivo y trazabilidad y se publica.
+5. La ficha consolidada se consulta con identidad, figuras, contactos y estado.
+
+**Nivel B — Experiencia funcional completa de F1**
+
+6. OXP publica su figura Proveedor y la bodega la consolida — primera fuente real de extremo a extremo.
+7. La asistencia de captura opera desde el formulario de OXP: advierte, precarga, y **si la bodega no responde la captura continúa**.
+8. OXP aplica automáticamente la señal global y las resoluciones de conciliación en sus figuras.
+9. Impuestos enriquece la ficha con el perfil tributario.
+10. Contabilidad presenta sus reportes por tercero usando el mapa canónico.
+11. La carga histórica de OXP queda consolidada y el volumen inicial de casos se gestiona con la resolución por lotes.
+
+El Nivel A puede alcanzarse sin esperar al Nivel B; el Nivel B madura progresivamente sin recrear el desarrollo del núcleo.
 
 ---
 
