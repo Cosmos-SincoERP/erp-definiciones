@@ -202,7 +202,7 @@ Los Nuggets se distribuyen como **un único paquete versionado** para todo el ER
 
 ### Datos de Referencia
 
-Deja de ser un servicio de consulta de reglas y catálogos estables, y se convierte en **el taller del custodio**: produce, cura y versiona los datos que los Nuggets embeben. Conserva como capacidad propia de servicio únicamente los **datos vivos** (tasas de cambio vía Sync), que por el filtro 4 no caben en un Nugget.
+Deja de ser un servicio de consulta de reglas y catálogos estables, y su capacidad principal pasa a ser la **producción de catálogos**: producir, verificar y versionar los datos que los Nuggets embeben, ejercida por el custodio. Conserva como capacidad propia de servicio únicamente los **datos vivos** (tasas de cambio vía Sync), que por el filtro 4 no caben en un Nugget.
 
 ### Direcciones
 

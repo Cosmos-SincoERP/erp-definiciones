@@ -10,7 +10,7 @@
 
 La **Moneda** es la referencia a una moneda mediante su código ISO 4217, con sus datos estables: nombre y número de decimales (la precisión con que la moneda representa montos).
 
-**Paso por los filtros de admisión:** transversal (todo dominio que capture o muestre dinero); sin identidad ni ciclo de vida (código semántico inmutable); autocontenida y estable (154 monedas, cambian por versión del producto); mínima (un concepto); su fuente es el catálogo de Datos de Referencia, producido por el taller del custodio.
+**Paso por los filtros de admisión:** transversal (todo dominio que capture o muestre dinero); sin identidad ni ciclo de vida (código semántico inmutable); autocontenida y estable (154 monedas, cambian por versión del producto); mínima (un concepto); su fuente es el catálogo de Datos de Referencia, producido por el custodio (producción de catálogos).
 
 **Relación con un futuro `ValorMonetario`:** este Nugget aporta la moneda y su precisión; el concepto compuesto monto + moneda quedó **diferido** del catálogo (se re-propondrá al intervenir OXP/Contabilidad — ver diferidos del catálogo). Mientras tanto, los dominios que manejan montos usan `Moneda` para validar la divisa y su escala.
 

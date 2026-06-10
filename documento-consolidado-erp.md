@@ -280,7 +280,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 > Detalle: [`compartido/datos-referencia/definicion-alcance.md`](compartido/datos-referencia/definicion-alcance.md)
 >
-> ⚠️ **Superado parcialmente (junio 2026):** el alcance pasó a v2.0 con el replanteamiento de Nuggets — taller del custodio + tasas de cambio por evento. Esta sección describe la v1.0 y se actualizará con el consolidado.
+> ⚠️ **Superado parcialmente (junio 2026):** el alcance pasó a v2.0 con el replanteamiento de Nuggets — producción de catálogos + tasas de cambio por evento. Esta sección describe la v1.0 y se actualizará con el consolidado.
 
 ---
 
@@ -734,7 +734,7 @@ Un cliente puede empezar con un producto y escalar sin fricción. Cada módulo s
 | [`dominio/estructura-organizacional/anexo-definicion-contexto-inicial.md`](dominio/estructura-organizacional/anexo-definicion-contexto-inicial.md) | Definición inicial de contexto (preexistente al alcance formal) |
 | [`dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md`](dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md) | Cuatro decisiones arquitectónicas: codificación plana + jerarquía versionada, FSM 4 estados, fusión/división/traslado como eventos, multi-dimensionalidad |
 | [`dominio/estructura-organizacional/anexo-orquestacion-creacion.md`](dominio/estructura-organizacional/anexo-orquestacion-creacion.md) | Patrón BFF + estado `Borrador` para creación de unidades desde sub-dominios consumidores |
-| [`compartido/datos-referencia/definicion-alcance.md`](compartido/datos-referencia/definicion-alcance.md) | Alcance Datos de Referencia (v2.0 — taller del custodio + tasas de cambio) |
+| [`compartido/datos-referencia/definicion-alcance.md`](compartido/datos-referencia/definicion-alcance.md) | Alcance Datos de Referencia (v2.0 — producción de catálogos + tasas de cambio) |
 | [`compartido/nuggets/gobernanza-nuggets.md`](compartido/nuggets/gobernanza-nuggets.md) | Gobernanza de Nuggets: filtros de admisión, proceso con custodio, versionado |
 | [`compartido/nuggets/catalogo-nuggets.md`](compartido/nuggets/catalogo-nuggets.md) | Catálogo de Nuggets (7 aceptados en borrador) |
 | [`compartido/anexo-decision-i18n-l10n.md`](compartido/anexo-decision-i18n-l10n.md) | Decisión transversal de internacionalización/localización |

@@ -92,7 +92,7 @@ Todas las reglas se evalúan al construir la instancia, en el orden indicado, **
 
 ## Sección 6: Datos embebidos
 
-Los datos viajan dentro del paquete (carpeta [`datos/`](datos/)) y los produce **Datos de Referencia** en su rol de taller del custodio. Se congelan en cada versión del paquete; actualizarlos es una versión **menor** (Sección 7 de la gobernanza).
+Los datos viajan dentro del paquete (carpeta [`datos/`](datos/)) y los produce **Datos de Referencia** en su capacidad de producción de catálogos (rol custodio de la gobernanza). Se congelan en cada versión del paquete; actualizarlos es una versión **menor** (Sección 7 de la gobernanza).
 
 | Archivo | Contenido | Estado |
 |---------|-----------|--------|

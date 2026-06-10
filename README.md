@@ -82,7 +82,7 @@ en adelante cada cambio se maneja como issue para que quede trazable y justifica
 | Servicio | Estado |
 |----------|--------|
 | [Nuggets](compartido/nuggets/) (VOs transversales empaquetados: identificación legal, dirección física, teléfono, correo, país, moneda, división territorial) | 🟡 Gobernanza v1.0 + catálogo v1.5 (7 especificaciones en borrador) |
-| [Datos de Referencia](compartido/datos-referencia/) (taller del custodio + tasas de cambio) | 🟡 Alcance v2.0 (replanteamiento jun-2026) |
+| [Datos de Referencia](compartido/datos-referencia/) (producción de catálogos + tasas de cambio) | 🟡 Alcance v2.0 (replanteamiento jun-2026) |
 | ~~Direcciones~~ | ⚫ Eliminado (jun-2026) — reemplazado por el Nugget [`DireccionFisica`](compartido/nuggets/direccion-fisica/especificacion.md) |
 
 > Los servicios compartidos viven en el *application plane* pero no son dominio de negocio. Se consumen desde los sub-dominios.

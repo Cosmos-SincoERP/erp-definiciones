@@ -12,7 +12,7 @@ El **País** es la referencia a un país del mundo mediante su código ISO 3166-
 
 Es la **fuente única de datos de país dentro del paquete de Nuggets**: `IdentificacionLegal` (`[V01]`), `DireccionFisica` (`[V01]`) y `Telefono` (indicativos en `[V01]`) validan contra el catálogo que este Nugget embebe — un solo archivo de países en el paquete, no una copia por Nugget.
 
-**Paso por los filtros de admisión:** transversal (lo consumen todos los sub-dominios y tres Nuggets); sin identidad ni ciclo de vida (el código es un valor semántico inmutable — política ya establecida para los catálogos del producto); autocontenido y estable (195 países cambian por versión del producto, no por operación); mínimo (un concepto); el catálogo de Datos de Referencia es su fuente, no su duplicado — Datos de Referencia lo produce como taller del custodio.
+**Paso por los filtros de admisión:** transversal (lo consumen todos los sub-dominios y tres Nuggets); sin identidad ni ciclo de vida (el código es un valor semántico inmutable — política ya establecida para los catálogos del producto); autocontenido y estable (195 países cambian por versión del producto, no por operación); mínimo (un concepto); el catálogo de Datos de Referencia es su fuente, no su duplicado — Datos de Referencia lo produce en su capacidad de producción de catálogos.
 
 **Origen:** catálogo `paises.json` de Datos de Referencia v1.0 (195 países, ISO 3166-1, con `indicativoTelefonico` y `monedaPrincipal`).
 

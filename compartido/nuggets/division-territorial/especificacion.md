@@ -12,7 +12,7 @@ La **División Territorial** es la referencia a una subdivisión político-admin
 
 Es la **fuente única de la jerarquía territorial dentro del paquete**, con dos consumidores de naturaleza distinta: `DireccionFisica` la compone para estructurar direcciones, e **Impuestos la consume directamente** para resolver jurisdicción fiscal (los tributos municipales — ICA, RICA — se resuelven por municipio, criticidad alta). Separarla de `DireccionFisica` evita que la jurisdicción fiscal dependa del Nugget de direcciones — el mismo patrón por el que `Pais` se separó de sus consumidores.
 
-**Paso por los filtros:** transversal (direcciones, jurisdicción fiscal, reportes por territorio); sin identidad ni ciclo de vida (códigos oficiales inmutables: DIVIPOLA/DANE para CO); autocontenida y estable (cambios excepcionales — nuevo municipio, reestructuración — por versión del producto); mínima; su fuente es el catálogo de Datos de Referencia, producido por el taller del custodio.
+**Paso por los filtros:** transversal (direcciones, jurisdicción fiscal, reportes por territorio); sin identidad ni ciclo de vida (códigos oficiales inmutables: DIVIPOLA/DANE para CO); autocontenida y estable (cambios excepcionales — nuevo municipio, reestructuración — por versión del producto); mínima; su fuente es el catálogo de Datos de Referencia, producido por el custodio (producción de catálogos).
 
 **Origen:** catálogo de divisiones territoriales de Datos de Referencia v1.0 (3 archivos por país).
 
