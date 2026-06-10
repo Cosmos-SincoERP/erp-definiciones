@@ -275,11 +275,46 @@ CXC: "XYZ Ltda"  ───┤ F1 detecta divergencia en dato compartido
 
 ### Flujo 5 — Administración de la señal global
 
-*(En construcción)*
+1. El **administrador de terceros** decide el cese global de la relación con un tercero consolidado (fraude, listas restrictivas, cierre definitivo de la relación comercial y laboral) — o su reactivación si la relación se retoma.
+2. La bodega cambia el estado del consolidado (**Activo → Inactivo**, o el inverso), registrando **motivo y trazabilidad** (quién, cuándo, por qué).
+3. La bodega **publica la señal global** como mensaje.
+4. Cada dominio con figuras de ese tercero la **aplica localmente y de forma automática**: impide nuevas operaciones con su figura según su propia regla. El historial queda intacto — los registros y reportes existentes no se tocan.
+5. La vista consolidada muestra el estado global y su motivo.
+
+> **La señal global no reemplaza la inactivación por figura:** un dominio puede inactivar su propia figura sin tocar las demás (el proveedor deja de serlo en OXP; el cliente sigue activo en CXC). La señal global es para el cese de la relación **completa** — y es la única decisión de alcance global, por eso vive en la bodega: el único lugar donde el tercero existe completo.
+
+```
+ADMINISTRADOR                  BODEGA                       DOMINIOS
+┌──────────────────┐   ┌─────────────────────┐
+│ 1. Cese global   │──►│ 2. Activo→Inactivo  │
+│   (fraude, lista │   │    + motivo + traza │
+│    restrictiva)  │   │ 3. Publica señal ───┼──► OXP: bloquea nuevas ops
+└──────────────────┘   └─────────────────────┘    CXC: bloquea nuevas ops
+                                                  RRHH: según su regla
+                                                  (histórico intacto)
+```
 
 ### Flujo 6 — Consulta de la vista consolidada
 
-*(En construcción)*
+1. Un usuario (operativo o administrador) abre la **ficha del tercero** — desde la interfaz de la bodega o navegando desde cualquier dominio.
+2. La bodega entrega la **vista consolidada completa**: identidad compartida (identificación legal, razón social, tipo de persona), estado global con su motivo, **figuras por dominio y empresa** con el estado que cada dominio informó, contactos consolidados, perfil tributario (informado por Impuestos) y casos de conciliación abiertos o resueltos.
+3. La vista es **de solo lectura**: para actuar sobre una figura, el usuario navega al dominio dueño. Para actuar sobre la conciliación o la señal global, el administrador opera en la bodega.
+4. A diferencia de la v1.0, la ficha **no se compone consultando en vivo a cada dominio**: la bodega ya tiene los datos, consolidados por los eventos recibidos. Si la bodega no está disponible, la ficha no se puede consultar — pero **ninguna operación se afecta** (la vista es informativa; los dominios operan con sus propios datos).
+
+```
+            ┌─── FICHA DEL TERCERO (NIT 900123456) ───────────┐
+            │ Identidad: Suministros XYZ S.A.S. · organización │
+            │ Estado global: ACTIVO                            │
+            │ ─────────────────────────────────────────────── │
+            │ Figuras:  Proveedor (OXP)  · activa · Empresa A  │
+            │           Cliente   (CXC)  · activa · Empresa B  │
+            │ Perfil tributario (Impuestos): CO completo       │
+            │ Contactos: María Pérez (rep. legal) ✉ ☎          │
+            │ Conciliación: sin casos abiertos                 │
+            └──────────────────────────────────────────────────┘
+              ▲ lectura local a la bodega (sin consultas en vivo
+                a los dominios — los datos ya están consolidados)
+```
 
 ---
 
