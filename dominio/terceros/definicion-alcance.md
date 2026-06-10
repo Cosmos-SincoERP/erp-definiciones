@@ -88,7 +88,50 @@ Se evaluaron varios términos antes de adoptar **Terceros** como nombre oficial:
 
 ## Sección 3: Actores del sistema
 
-*(En construcción)*
+### Actores internos (usuarios del sistema)
+
+| Actor | Descripción | Responsabilidades |
+|-------|-------------|-------------------|
+| **Administrador de terceros** | Usuario encargado de operar la bodega consolidadora. **Ya no crea terceros** — la captura vive en los dominios operativos. | Resolver la conciliación: decidir sobre duplicados (fusionar o marcar homonimia legítima) y divergencias (indicar el dato correcto y el dominio que debe corregir). Administrar la señal global del tercero (inactivar ante cese de relación, fraude o listas restrictivas; reactivar). Supervisar la calidad de la consolidación. |
+| **Usuario operativo** | Usuario de cualquier dominio que trabaja con terceros desde su propio módulo. **No captura nada en Terceros** — captura su figura en su dominio. | Consultar la vista consolidada del tercero (la ficha completa: figuras, empresas, contactos, estado). Al capturar en su dominio, recibir y decidir sobre la asistencia de captura (advertencia no bloqueante de posibles duplicados). |
+
+### Actores externos (sistemas integrados)
+
+La bodega tiene dos relaciones de naturaleza distinta con los dominios: **fuentes** que la alimentan y **consumidores** que escuchan lo que ella publica. Un mismo dominio suele ser ambas cosas.
+
+**Como fuentes (alimentan la bodega):**
+
+| Sistema | Figura / dato que aporta | Relación |
+|---------|--------------------------|----------|
+| **OXP** | Figura **Proveedor** (agregado propio del dominio, definido en el replanteamiento) | Publica los eventos de creación, actualización e inactivación de su figura, con la identificación legal y los datos de captura validados localmente por los Nuggets. |
+| **CXC** *(futuro)* | Figura **Cliente** | Mismo patrón. |
+| **RRHH** *(futuro)* | Figura **Empleado** | Mismo patrón. |
+| **Impuestos** | **Perfil tributario** por identificación legal | Publica los eventos del perfil — enriquecen la vista consolidada del tercero. |
+
+**Como consumidores (escuchan la bodega):**
+
+| Sistema | Dato que consume | Relación |
+|---------|------------------|----------|
+| **Todos los dominios con figuras** | Señal global de estado (Activo/Inactivo) | Cada dominio la aplica localmente: bloquea nuevas operaciones con su figura según su propia regla. |
+| **Interfaces de captura de los dominios** | Asistencia de captura | Consulta no bloqueante al capturar una identificación: ¿ya existe?, ¿se parece a una existente? El usuario decide. |
+| **Contabilidad** | Señal global de estado + **resultados de conciliación** (mapa identificación → tercero canónico) | Mantiene copia local de la señal para evaluar sus reglas de datos maestros al crear borradores, y aplica el mapa canónico **en sus proyecciones por tercero** (auxiliares, información exógena, certificados de retención) — los asientos permanecen inmutables, la vista por tercero se canoniza al leer. Sin consulta en caliente. |
+| **Emisión Electrónica** | Contactos consolidados (ej: representante legal para firma) | Consulta la vista consolidada. |
+
+### Quiénes dejan de ser actores (cambio frente a v1.0)
+
+| Actor v1.0 | Por qué sale |
+|------------|--------------|
+| **Datos de Referencia** | La validación de tipos de documento y países ya no se consulta en ejecución — viaja empaquetada en los Nuggets (`IdentificacionLegal`, `Pais`). |
+| **Direcciones** | El servicio desapareció en el replanteamiento; las direcciones se capturan en cada dominio con el Nugget `DireccionFisica`. |
+
+> **Nota — Contabilidad cambió de naturaleza, no salió:** en la v1.0 era un consumidor que "validaba el tercero activo" contra Terceros como fuente de verdad. En la v2.0 su certificación es **eventual y por suscripción**: la calidad de la captura la garantizan los Nuggets en el origen, la vigencia la da la señal global (copia local), y la canonicidad llega por los resultados de conciliación aplicados en sus proyecciones — donde el dato fiscal realmente se reporta. Requiere un ajuste cruzado en los documentos de Contabilidad (issue al cerrar este alcance).
+
+### Formatos de entrada soportados
+
+| Formato | Origen | Contenido |
+|---------|--------|-----------|
+| Eventos de integración | Dominios operativos (OXP, CXC, RRHH, Impuestos) | Figuras del tercero y sus cambios: identificación legal, razón social, tipo de persona, direcciones, contactos, estado de la figura. |
+| Comandos de conciliación | UI de la bodega (administrador de terceros) | Resoluciones de duplicados y divergencias; administración de la señal global. |
 
 ---
 
