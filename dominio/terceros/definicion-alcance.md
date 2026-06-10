@@ -320,7 +320,80 @@ ADMINISTRADOR                  BODEGA                       DOMINIOS
 
 ## Sección 5: Integraciones
 
-*(En construcción)*
+### Principio de responsabilidad
+
+La bodega no produce datos de negocio: **consolida lo que los dominios informan** y produce únicamente las decisiones de alcance global (resoluciones de conciliación, señal global, mapa canónico). Todo intercambio ocurre mediante **avisos que cada parte recibe y aplica por su cuenta, sin esperar a la otra**; el único contacto directo es la asistencia de captura, que ayuda cuando está disponible y nunca bloquea (Flujo 2).
+
+### Integraciones de entrada
+
+| Origen | Dato | Propósito |
+|--------|------|-----------|
+| **OXP** (hoy) · **CXC, RRHH** (futuros) | Eventos de la figura: creada, actualizada, inactivada — con identificación legal, razón social, tipo de persona, direcciones, contactos y empresa | Alimentar la consolidación (Flujo 1) |
+| **Impuestos** | Eventos del perfil tributario, por identificación legal | Enriquecer la vista consolidada |
+
+> **Los Nuggets no son una integración de entrada:** el paquete viaja incluido en cada dominio (también en la bodega, que valida con las mismas reglas al consolidar). Nadie consulta nada al capturar.
+
+### Integraciones de salida
+
+| Destino | Dato | Cómo llega | Propósito |
+|---------|------|------------|-----------|
+| Todos los dominios con figuras | **Señal global** (Activo/Inactivo + motivo) | Aviso que cada dominio recibe y aplica por su cuenta | Cada dominio impide nuevas operaciones según su regla (Flujo 5) |
+| Dominios con el dato errado | **Resolución de conciliación** (dato compartido corregido) | Aviso que el dominio aplica automáticamente en su figura | Corrección en el origen (Flujo 4) |
+| **Contabilidad** y demás interesados en reportes por tercero | **Mapa canónico** (resultado de fusiones: identificación → tercero canónico) | Aviso; cada interesado lo aplica en sus vistas y reportes | Que los auxiliares, la información exógena y los certificados se presenten por el tercero canónico (Flujo 3) |
+| Interfaces de captura de los dominios | **Asistencia de captura** | Consulta en línea con tiempo de espera corto; si la bodega no responde, la captura continúa | Advertir duplicados al capturar (Flujo 2) |
+| Usuarios y dominios lectores (Emisión Electrónica) | **Vista consolidada** (ficha del tercero, contactos) | Consulta de lectura | Ficha completa del tercero (Flujo 6) |
+
+### Datos propios de la bodega
+
+- El **tercero consolidado**: la vista unificada, su estado global con motivo, sus marcas de conciliación.
+- Los **casos de conciliación**: evidencia, decisiones, trazabilidad.
+- La **memoria de conciliación**: homonimias legítimas marcadas (las señales no se reabren).
+- El **mapa canónico**: resultado acumulado de las fusiones.
+
+### Datos que NO son responsabilidad de la bodega
+
+| Dato | Responsable |
+|------|-------------|
+| Las figuras y todos sus datos de captura (el original) | El dominio dueño — la bodega guarda la copia consolidada |
+| Perfil tributario | Impuestos |
+| Cuentas bancarias | Tesorería (pendiente de definir) |
+| Condiciones comerciales | OXP / CXC |
+| Datos laborales | RRHH |
+| Reglas de validación de identificación, dirección, teléfono, correo | Nuggets (paquete custodiado por Datos de Referencia) |
+
+### Diagrama de integraciones
+
+```
+  OXP            CXC           RRHH         IMPUESTOS
+(Proveedor)   (Cliente)     (Empleado)      (Perfil)
+    │ eventos      │ eventos     │ eventos      │ eventos
+    └──────────────┴─────┬───────┴──────────────┘
+                         ▼
+              ┌─────────────────────┐
+              │  BODEGA (Terceros)  │◄──── asistencia de captura
+              │  consolida·concilia │      (consulta en línea desde los
+              └──────────┬──────────┘       formularios; si no responde,
+                         │                  la captura continúa)
+                         │ avisos que cada dominio aplica por su cuenta
+         ┌───────────────┼────────────────────┐
+         ▼               ▼                    ▼
+   señal global    resoluciones de      mapa canónico
+   (todos los      conciliación         (Contabilidad: reportes
+   dominios        (dominios corrigen   por tercero presentados
+   aplican)        su figura)           por el canónico)
+
+   Lectura: ficha consolidada → usuarios, Emisión Electrónica
+```
+
+### Notas de la primera fase
+
+- La única fuente disponible al arranque es **OXP** (figura Proveedor, agregado del replanteamiento). CXC y RRHH se integran cuando esos sub-dominios se construyan — la bodega no requiere cambios para recibir nuevas fuentes que informen la misma información estándar de la figura.
+- La **carga histórica** (los ~70.000 terceros de SincoERP) entra por los dominios — cada uno carga sus figuras y la bodega consolida. El detalle se trata en las Secciones 7 y 8.
+
+### Visión a futuro
+
+- Nuevas fuentes con la misma información estándar: Tesorería (cuentas bancarias por tercero), otros dominios con figuras propias.
+- **Verificación de identidades contra registros oficiales** (tipo RUES/DIAN): capacidad aparte y no bloqueante, con el mismo principio — enriquece la conciliación, nunca condiciona la operación.
 
 ---
 
