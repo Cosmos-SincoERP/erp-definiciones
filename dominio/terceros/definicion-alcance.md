@@ -20,9 +20,9 @@
 
 ### Definición
 
-Terceros es la **bodega consolidadora** de las personas y empresas con las que la organización tiene relación: proveedores, clientes, empleados, entidades financieras y cualquier otra parte. Construye y mantiene la **vista unificada** de cada tercero a partir de lo que los sub-dominios operativos informan, la consolida por su **clave natural** (la identificación legal: tipo de documento + número + país, validada por el Nugget `IdentificacionLegal`) y detecta duplicados y divergencias para resolverlos por conciliación.
+Terceros es la **bodega consolidadora** de las personas y empresas con las que la organización tiene relación: proveedores, clientes, empleados, entidades financieras y cualquier otra parte. Construye y mantiene la **vista unificada** de cada tercero a partir de lo que los sub-dominios operativos informan, la consolida por su **clave natural** (la identificación legal: tipo de documento + número + país) y detecta duplicados y divergencias para resolverlos por conciliación.
 
-El modelo invierte la premisa de la versión anterior: **Terceros no es la autoridad que registra y autoriza** — es el consolidador que escucha. Cada sub-dominio crea y opera sus propias figuras (el Proveedor en OXP, el Cliente en CXC, el Empleado en RRHH) garantizando la calidad de la captura con los **Nuggets** (identificación legal, dirección física, teléfono, correo — validación local empaquetada, sin consultar servicios). Al operar, cada dominio publica sus eventos y la bodega consolida: un mismo tercero que es proveedor y cliente aparece como **una sola entidad consolidada** con presencia en ambos contextos.
+El modelo invierte la premisa de la versión anterior: **Terceros no es la autoridad que registra y autoriza** — es el consolidador que escucha. Cada sub-dominio crea y opera sus propias figuras (el Proveedor en OXP, el Cliente en CXC, el Empleado en RRHH) garantizando la calidad de la captura con las **validaciones empaquetadas** del producto (identificación legal, dirección física, teléfono, correo — validan localmente, sin consultar servicios). Al operar, cada dominio publica sus eventos y la bodega consolida: un mismo tercero que es proveedor y cliente aparece como **una sola entidad consolidada** con presencia en ambos contextos.
 
 **Terceros nunca es prerrequisito para operar.** Si la bodega no está disponible, los dominios siguen creando proveedores, clientes y empleados; la consolidación se pone al día cuando la bodega procesa los eventos pendientes. La asistencia de duplicados al capturar es **no bloqueante**: advierte, no impide.
 
@@ -70,8 +70,8 @@ Se evaluaron varios términos antes de adoptar **Terceros** como nombre oficial:
 | 2 | **Bodega consolidadora** | Naturaleza del sub-dominio: recibe los eventos de los dominios operativos, agrupa por clave natural y mantiene la vista unificada del tercero. Nunca es prerrequisito para que un dominio opere. |
 | 3 | **Figura** | La materialización del tercero en un dominio operativo: el Proveedor en OXP, el Cliente en CXC, el Empleado en RRHH. Cada figura la crea y la gobierna su dominio dueño; la bodega la registra como parte de la vista consolidada. |
 | 4 | **Clave natural** | La identificación legal con la que la bodega agrupa figuras en un tercero consolidado: tipo de documento + número + país. |
-| 5 | **Identificación legal** | Identidad documental emitida o reconocida por una autoridad (tipo de documento + número + país, con DV cuando aplica). Validada localmente en cada dominio por el Nugget `IdentificacionLegal`. |
-| 6 | **Nugget** | Pieza transversal empaquetada y versionada (estructura + reglas + datos estables embebidos) con la que cada dominio garantiza la calidad de la captura sin consultar servicios en ejecución. Gobernados en `compartido/nuggets/`. |
+| 5 | **Identificación legal** | Identidad documental emitida o reconocida por una autoridad (tipo de documento + número + país, con DV cuando aplica). Se valida localmente en cada dominio al capturarla, con la validación empaquetada. |
+| 6 | **Validación empaquetada** | Pieza del producto que viaja incluida en cada dominio, con la estructura, las reglas y los datos estables para validar un dato transversal al capturarlo (identificación legal, dirección física, teléfono, correo) — sin consultar servicios. *En la arquitectura este empaque se llama "Nugget" y se gobierna en `compartido/nuggets/`; este documento usa el nombre funcional.* |
 | 7 | **Consolidación** | Proceso por el cual la bodega agrupa las figuras que comparten clave natural en un tercero consolidado y compone su vista unificada. |
 | 8 | **Duplicado** | Dos terceros consolidados que corresponden a la misma entidad del mundo real pese a tener claves naturales distintas (ej: la misma persona con CC y con NIT). La bodega lo detecta; se resuelve por conciliación. |
 | 9 | **Divergencia** | Desacuerdo entre figuras del mismo tercero en un dato compartido (ej: razones sociales distintas entre OXP y CXC para el mismo NIT). La bodega la detecta; se resuelve por conciliación. |
@@ -81,8 +81,8 @@ Se evaluaron varios términos antes de adoptar **Terceros** como nombre oficial:
 | 13 | **Razón social** | Nombre legal registrado del tercero. Personas naturales: nombres y apellidos; jurídicas: nombre de la empresa. |
 | 14 | **Tipo de persona** | Clasificación base: persona (individuo) u organización (entidad constituida). Dato de identidad; la clasificación tributaria detallada es responsabilidad del perfil tributario en Impuestos. |
 | 15 | **Rol** | Función que el tercero cumple dentro del ERP (proveedor, cliente, empleado, entidad financiera). **Se deriva de las figuras**: un tercero es proveedor porque tiene figura de Proveedor en OXP. No se asigna en Terceros. |
-| 16 | **Contacto** | Persona asociada al tercero en una relación, con rol de contacto (representante legal, tesorero, comercial, técnico, facturación, notificaciones). La captura cada dominio junto con su figura — con estructura empaquetada (Nugget `Contacto`, propuesto en el issue #35) — y la bodega la consolida. El ciclo de vida y la designación de principal viven donde se captura y se consolidan en la bodega. |
-| 17 | **DV (Dígito de Verificación)** | Carácter que verifica la integridad del número de documento. Las reglas y algoritmos por país viven en el Nugget `IdentificacionLegal`, con políticas de rechazo o advertencia según el tipo de documento. |
+| 16 | **Contacto** | Persona asociada al tercero en una relación, con rol de contacto (representante legal, tesorero, comercial, técnico, facturación, notificaciones). La captura cada dominio junto con su figura — con estructura empaquetada propuesta como validación del producto (issue #35) — y la bodega la consolida. El ciclo de vida y la designación de principal viven donde se captura y se consolidan en la bodega. |
+| 17 | **DV (Dígito de Verificación)** | Carácter que verifica la integridad del número de documento. Las reglas y algoritmos por país viven en la validación empaquetada de la identificación, con políticas de rechazo o advertencia según el tipo de documento. |
 
 ---
 
@@ -103,7 +103,7 @@ La bodega tiene dos relaciones de naturaleza distinta con los dominios: **fuente
 
 | Sistema | Figura / dato que aporta | Relación |
 |---------|--------------------------|----------|
-| **OXP** | Figura **Proveedor** (agregado propio del dominio, definido en el replanteamiento) | Publica los eventos de creación, actualización e inactivación de su figura, con la identificación legal y los datos de captura validados localmente por los Nuggets. |
+| **OXP** | Figura **Proveedor** (agregado propio del dominio, definido en el replanteamiento) | Publica los eventos de creación, actualización e inactivación de su figura, con la identificación legal y los datos de captura validados localmente al capturar. |
 | **CXC** *(futuro)* | Figura **Cliente** | Mismo patrón. |
 | **RRHH** *(futuro)* | Figura **Empleado** | Mismo patrón. |
 | **Impuestos** | **Perfil tributario** por identificación legal | Publica los eventos del perfil — enriquecen la vista consolidada del tercero. |
@@ -121,10 +121,10 @@ La bodega tiene dos relaciones de naturaleza distinta con los dominios: **fuente
 
 | Actor v1.0 | Por qué sale |
 |------------|--------------|
-| **Datos de Referencia** | La validación de tipos de documento y países ya no se consulta en ejecución — viaja empaquetada en los Nuggets (`IdentificacionLegal`, `Pais`). |
-| **Direcciones** | El servicio desapareció en el replanteamiento; las direcciones se capturan en cada dominio con el Nugget `DireccionFisica`. |
+| **Datos de Referencia** | La validación de tipos de documento y países ya no se consulta en ejecución — viaja empaquetada con el producto en cada dominio. |
+| **Direcciones** | El servicio desapareció en el replanteamiento; las direcciones se capturan en cada dominio con la validación empaquetada de direcciones. |
 
-> **Nota — Contabilidad cambió de naturaleza, no salió:** en la v1.0 era un consumidor que "validaba el tercero activo" contra Terceros como fuente de verdad. En la v2.0 su certificación es **eventual y por suscripción**: la calidad de la captura la garantizan los Nuggets en el origen, la vigencia la da la señal global (copia local), y la canonicidad llega por los resultados de conciliación aplicados en sus proyecciones — donde el dato fiscal realmente se reporta. Requiere un ajuste cruzado en los documentos de Contabilidad (issue al cerrar este alcance).
+> **Nota — Contabilidad cambió de naturaleza, no salió:** en la v1.0 era un consumidor que "validaba el tercero activo" contra Terceros como fuente de verdad. En la v2.0 su certificación es **eventual y por suscripción**: la calidad de la captura la garantizan las validaciones empaquetadas en el origen, la vigencia la da la señal global (copia local), y la canonicidad llega por los resultados de conciliación aplicados en sus vistas y reportes por tercero — donde el dato fiscal realmente se reporta. Requiere un ajuste cruzado en los documentos de Contabilidad (issue al cerrar este alcance).
 
 ### Formatos de entrada soportados
 
@@ -152,7 +152,7 @@ El sub-dominio de Terceros opera en seis flujos:
 
 ### Flujo 1 — Consolidación de una figura (dominios operativos → bodega)
 
-1. Un usuario operativo crea o modifica su figura en su dominio (ej: el Proveedor en OXP), con la captura validada localmente por los Nuggets (identificación legal, dirección física, teléfono, correo).
+1. Un usuario operativo crea o modifica su figura en su dominio (ej: el Proveedor en OXP), con la captura validada localmente por las validaciones empaquetadas (identificación legal, dirección física, teléfono, correo).
 2. El dominio publica el evento de integración de su figura (creada, actualizada, inactivada) con la identificación legal, los datos de captura y los contactos.
 3. La bodega recibe el evento y extrae la **clave natural** (tipo de documento + número + país).
 4. Si no existe un tercero consolidado con esa clave, la bodega **lo crea** con esa primera figura. Si ya existe, **suma o actualiza la figura** en el consolidado.
@@ -164,8 +164,9 @@ DOMINIO OPERATIVO (ej: OXP)                BODEGA CONSOLIDADORA (Terceros)
 ┌─────────────────────────┐
 │ 1. Captura de la figura │
 │    Proveedor            │
-│    (Nuggets validan     │
-│    localmente, sin red) │
+│    (validación local    │
+│    empaquetada — sin    │
+│    consultar a nadie)   │
 └───────────┬─────────────┘
             │ 2. Evento: figura creada/actualizada
             ▼
@@ -191,7 +192,7 @@ DOMINIO OPERATIVO (ej: OXP)                BODEGA CONSOLIDADORA (Terceros)
    - **Existe similar** (posible duplicado): advertencia con los candidatos; el usuario decide continuar con su captura o usar el existente.
    - **No existe:** la captura sigue sin más.
 4. **Camino degradado — la bodega no responde a tiempo o no está disponible:** la interfaz lo indica discretamente ("asistencia no disponible") y **permite continuar la captura sin advertencias**. La captura nunca se bloquea.
-5. En ambos caminos, el dominio registra su figura con la validación local de los Nuggets y la operación sigue su curso normal.
+5. En ambos caminos, el dominio registra su figura con su validación local y la operación sigue su curso normal.
 6. **Red de seguridad:** al consolidar (Flujo 1), la bodega detecta el duplicado que la asistencia no alcanzó a advertir y abre el caso de conciliación (Flujo 3).
 
 ```
@@ -204,7 +205,8 @@ FORMULARIO DEL DOMINIO            BODEGA
    ¿Responde la bodega?
    ├─ SÍ ──► existe exacto  → muestra/precarga datos      ┐
    │        existe similar → advierte, usuario decide     │ 5. El dominio registra
-   │        no existe      → captura sigue                │    su figura (Nuggets)
+   │        no existe      → captura sigue                │    su figura (validación
+   │                                                      │    local)
    └─ NO ──► 4. "asistencia no disponible"                │    La operación continúa
              captura continúa SIN advertencias ───────────┘
                                       │
@@ -331,7 +333,7 @@ La bodega no produce datos de negocio: **consolida lo que los dominios informan*
 | **OXP** (hoy) · **CXC, RRHH** (futuros) | Eventos de la figura: creada, actualizada, inactivada — con identificación legal, razón social, tipo de persona, direcciones, contactos y empresa | Alimentar la consolidación (Flujo 1) |
 | **Impuestos** | Eventos del perfil tributario, por identificación legal | Enriquecer la vista consolidada |
 
-> **Los Nuggets no son una integración de entrada:** el paquete viaja incluido en cada dominio (también en la bodega, que valida con las mismas reglas al consolidar). Nadie consulta nada al capturar.
+> **Las validaciones empaquetadas no son una integración de entrada:** viajan incluidas en cada dominio (también en la bodega, que valida con las mismas reglas al consolidar). Nadie consulta nada al capturar.
 
 ### Integraciones de salida
 
@@ -359,7 +361,7 @@ La bodega no produce datos de negocio: **consolida lo que los dominios informan*
 | Cuentas bancarias | Tesorería (pendiente de definir) |
 | Condiciones comerciales | OXP / CXC |
 | Datos laborales | RRHH |
-| Reglas de validación de identificación, dirección, teléfono, correo | Nuggets (paquete custodiado por Datos de Referencia) |
+| Reglas de validación de identificación, dirección, teléfono, correo | Validaciones empaquetadas del producto (custodiadas por Datos de Referencia) |
 
 ### Diagrama de integraciones
 
