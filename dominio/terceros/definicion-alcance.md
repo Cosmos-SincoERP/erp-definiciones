@@ -112,7 +112,7 @@ La bodega tiene dos relaciones de naturaleza distinta con los dominios: **fuente
 
 | Sistema | Dato que consume | Relación |
 |---------|------------------|----------|
-| **Todos los dominios con figuras** | Señal global de estado (Activo/Inactivo) | Cada dominio la aplica localmente: bloquea nuevas operaciones con su figura según su propia regla. |
+| **Todos los dominios con figuras** | Señal global de estado (Activo/Inactivo) y **resoluciones de conciliación** (correcciones de datos compartidos) | Cada dominio las aplica localmente y de forma automática: bloquea nuevas operaciones según su propia regla y corrige su figura al recibir una resolución. Injerencia por mensajes — desacoplada, nunca escritura remota. |
 | **Interfaces de captura de los dominios** | Asistencia de captura | Consulta no bloqueante al capturar una identificación: ¿ya existe?, ¿se parece a una existente? El usuario decide. |
 | **Contabilidad** | Señal global de estado + **resultados de conciliación** (mapa identificación → tercero canónico) | Mantiene copia local de la señal para evaluar sus reglas de datos maestros al crear borradores, y aplica el mapa canónico **en sus proyecciones por tercero** (auxiliares, información exógena, certificados de retención) — los asientos permanecen inmutables, la vista por tercero se canoniza al leer. Sin consulta en caliente. |
 | **Emisión Electrónica** | Contactos consolidados (ej: representante legal para firma) | Consulta la vista consolidada. |
@@ -215,11 +215,63 @@ FORMULARIO DEL DOMINIO            BODEGA
 
 ### Flujo 3 — Detección y conciliación de duplicados
 
-*(En construcción)*
+1. Al consolidar (Flujo 1, paso 5), la bodega detecta una **señal de duplicado**: dos terceros consolidados con claves naturales distintas parecen ser la misma entidad. Criterios heredados de la v1.0 (R01b): mismo número de documento con tipo o país distinto, y razón social equivalente en su forma canónica (ignorando mayúsculas, tildes, puntuación).
+2. La bodega **abre un caso de conciliación** de tipo duplicado, con los candidatos y la evidencia. Ningún dominio se entera todavía: ambos consolidados siguen operando y visibles, marcados "en conciliación".
+3. El **administrador de terceros** revisa el caso: las figuras de cada candidato, sus dominios, sus datos.
+4. Decide una de dos:
+   - **Fusionar:** designa el tercero canónico. La bodega fusiona las vistas y **publica el resultado de conciliación con el mapa canónico** (identificación → tercero canónico). Los consumidores lo aplican en sus proyecciones (Contabilidad canoniza auxiliares y exógena al leer). Si el duplicado nació de un error de captura (se registró CC donde era NIT), la resolución incluye la **corrección del dato**, que los dominios con la figura errada aplican automáticamente — misma mecánica de resolución publicada del Flujo 4.
+   - **Homonimia legítima:** marca que son entidades distintas. La marca queda como **memoria de conciliación**: la señal no se reabre por los mismos criterios.
+5. El caso cierra con trazabilidad completa: quién decidió, cuándo y con qué motivo.
+
+```
+F1 (consolidación)
+     │ señal: NIT 900123456 ≈ CC 900123456
+     │        + razón social canónica equivalente
+     ▼
+┌─────────────────────────┐     ┌──────────────────────────────────┐
+│ 2. Caso de conciliación │ ──► │ 3. Administrador revisa evidencia │
+│    (tipo: duplicado)    │     └────────────┬─────────────────────┘
+└─────────────────────────┘                  │ 4. decide
+                         ┌───────────────────┴───────────────────┐
+                         ▼                                       ▼
+              FUSIONAR                              HOMONIMIA LEGÍTIMA
+              · designa canónico                    · entidades distintas
+              · publica mapa canónico ──► proyecc.  · memoria de conciliación
+              · publica corrección del dato           (no se reabre)
+                si hubo error de captura (F4)
+```
 
 ### Flujo 4 — Detección y conciliación de divergencias
 
-*(En construcción)*
+> Aplica solo a los **datos de identidad compartidos** (identificación legal, razón social, tipo de persona). Los datos propios de cada relación (direcciones de uso, contactos, condiciones) **pueden diferir legítimamente entre figuras** y no son divergencias.
+
+1. Al consolidar, la bodega detecta que una figura entrante informa un **dato compartido distinto** al de la vista consolidada (ej: OXP dice "Suministros XYZ S.A.S." y CXC dice "Suministros XYZ Ltda" para el mismo NIT).
+2. La vista consolidada **muestra el valor más reciente con marca visible de divergencia** — no se oculta el desacuerdo, pero tampoco se bloquea nada.
+3. La bodega abre el **caso de conciliación** de tipo divergencia, con las versiones y su fuente (qué dominio informó qué y cuándo).
+4. El administrador determina el **dato correcto** y la bodega **publica la resolución de la conciliación** como mensaje: clave natural, dato en disputa y valor correcto.
+5. Cada dominio con el dato errado **aplica la corrección automáticamente en su figura** al consumir la resolución — de forma desacoplada y distribuida: la bodega nunca escribe sobre las figuras ni exige sincronía; publica, y cada dominio aplica con sus propios medios. La figura corregida regresa por el flujo normal (Flujo 1) y, cuando las figuras convergen, la bodega **cierra el caso automáticamente**.
+
+```
+OXP: "XYZ S.A.S." ──┐                       (mismo NIT)
+CXC: "XYZ Ltda"  ───┤ F1 detecta divergencia en dato compartido
+                    ▼
+       ┌──────────────────────────┐
+       │ 2. Vista: valor reciente │
+       │    + marca de divergencia│
+       │ 3. Caso de conciliación  │
+       └───────────┬──────────────┘
+                   ▼
+       4. Administrador define el dato correcto
+          └─► la bodega PUBLICA la resolución (mensaje)
+                   │
+                   ▼
+       5. Dominio(s) con el dato errado la aplican
+          automáticamente en su figura (desacoplado)
+                   └─► F1 ──► figuras convergen
+                            └─► caso cierra solo
+```
+
+> **Principio de injerencia por mensajes:** la bodega sí tiene injerencia sobre los dominios operativos (correcciones de conciliación, señal global), pero siempre **publicando mensajes que cada dominio aplica de forma autónoma** — nunca escritura directa sobre las figuras, nunca dependencia síncrona.
 
 ### Flujo 5 — Administración de la señal global
 
