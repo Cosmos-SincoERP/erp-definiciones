@@ -470,7 +470,48 @@ Las reglas se organizan en cinco frentes funcionales:
 
 ## Sección 7: Qué está dentro y fuera del alcance
 
-*(En construcción)*
+La bodega consolidadora mantiene la vista unificada de los terceros a partir de lo que los dominios operativos informan, concilia duplicados y divergencias, y administra la única decisión de alcance global (la señal Activo/Inactivo). Todo lo demás — capturar, validar, operar, autorizar — vive en los dominios.
+
+### Dentro del alcance
+
+> Las fases F1 y F2 se definen en la Sección 8.
+
+| Área | Descripción | Fase |
+|------|-------------|:----:|
+| **Consolidación de figuras** | Recepción de los eventos de figuras de los dominios, agrupación por clave natural, creación y actualización del tercero consolidado. | F1 |
+| **Detección de duplicados y divergencias** | Evaluación de señales al consolidar: claves naturales distintas que parecen la misma entidad; datos de identidad compartidos que difieren entre figuras. | F1 |
+| **Conciliación con resolución humana** | Casos de conciliación con evidencia; fusión con publicación del mapa canónico; homonimia legítima con memoria; resolución de divergencias con corrección publicada al dominio de origen. | F1 |
+| **Señal global del tercero** | Inactivación y reactivación del consolidado con motivo y trazabilidad; publicación para aplicación local en cada dominio. | F1 |
+| **Asistencia de captura** | Consulta en línea desde los formularios de los dominios: existentes, similares, datos para precargar. Con tiempo de espera corto y sin bloquear jamás. | F1 |
+| **Vista consolidada del tercero** | La ficha completa: identidad, estado global, figuras por dominio y empresa, contactos, perfil tributario, casos de conciliación. Solo lectura, local a la bodega. | F1 |
+| **Consolidación de contactos** | Contactos informados por las figuras, presentados en la vista con su figura de origen y sus principales. | F1 |
+| **Historial de identidad** | Conservación de los cambios de identificación y razón social del consolidado, para interpretar registros históricos con la identificación vigente al momento de cada transacción. | F1 |
+| **Arranque y carga histórica** | La bodega arranca vacía y se llena consolidando las figuras que los dominios cargan en su propia migración (los ~70.000 terceros de SincoERP entran por OXP y los demás dominios, no por la bodega). Ver la nota de carga histórica. | F1 |
+| **Detección ampliada de duplicados** | Criterios adicionales de similitud más allá del número + razón social canónica (ej: coincidencia de contactos o direcciones entre consolidados distintos). | F2 |
+| **Verificación contra registros oficiales** | Consulta de registros públicos (tipo RUES/DIAN) para enriquecer la conciliación con evidencia externa. No bloqueante. | F2 |
+
+> **Nota — carga histórica:** al migrar, la conciliación detectará de golpe los duplicados que ya existen en SincoERP (años de registros con CC/NIT cruzados, razones sociales divergentes entre módulos). Ese volumen inicial de casos es **esperado y deseable** — es la deuda de calidad de datos saliendo a la luz — pero exige prever capacidad operativa del administrador y herramientas de resolución por lotes. El detalle operativo se trata en la Sección 8 y en el modelo de dominio.
+
+### Fuera del alcance del sub-dominio de Terceros
+
+| Área | Descripción | Observación |
+|------|-------------|-------------|
+| **Captura y creación de terceros** | El alta de proveedores, clientes, empleados y sus datos. | Vive en cada dominio operativo con su figura. La bodega solo consolida. |
+| **Datos de negocio del tercero** | Perfil tributario, condiciones comerciales, cuentas bancarias, datos laborales. | Impuestos, OXP/CXC, Tesorería, RRHH — cada uno es dueño en su contexto. |
+| **Reglas de validación de captura** | Formato, DV, tipos de documento por país, estructura de direcciones, teléfonos y correos. | Validaciones empaquetadas del producto, custodiadas por Datos de Referencia. |
+| **Autorización para operar y completitud** | Decidir si un tercero puede usarse en una operación o si está "completo". | Cada dominio valida con sus propios datos (R28, R29). |
+| **Corrección de transacciones históricas** | Reescribir registros de los dominios tras una fusión o corrección. | Los registros no se reescriben; los reportes por tercero aplican el mapa canónico al leer (R12). |
+| **Experiencia de captura** | Los formularios y pantallas donde se capturan figuras y contactos. | De cada dominio; la bodega solo expone la consulta de asistencia. |
+
+### Dependencias externas
+
+| Dependencia | Descripción | Impacto |
+|-------------|-------------|---------|
+| **OXP — figura Proveedor** | Primera fuente de la bodega (agregado del replanteamiento). | Sin figuras publicadas no hay qué consolidar: el arranque funcional de la bodega depende de esta integración. |
+| **Validaciones empaquetadas** | Paquete del producto con las reglas de identificación, dirección, teléfono y correo (custodio: Datos de Referencia). | La bodega verifica con las mismas reglas con que los dominios capturan. Incluye la estructura de contacto propuesta (issue #35). |
+| **Contratos de los eventos de figura** | La información estándar que toda fuente publica. | Se formalizan con el modelo de dominio y el EventCatalog (Fase 3 del proyecto). |
+
+> Frente a la v1.0 salen de esta sección: el servicio de Direcciones (desapareció), la capa de composición para la vista (la ficha se lee de la bodega) y la "resolución de duplicados" como capacidad diferida a F2 (la conciliación es ahora el corazón del sub-dominio en F1).
 
 ---
 
