@@ -401,7 +401,40 @@ La bodega no produce datos de negocio: **consolida lo que los dominios informan*
 
 ## Sección 6: Reglas de negocio
 
-*(En construcción)*
+Las reglas se organizan en cinco frentes funcionales:
+
+| Frente | Alcance | Reglas |
+|--------|---------|:------:|
+| 6.1 Identidad y consolidación | Clave natural, agrupación de figuras, historial | 8 |
+| 6.2 Conciliación y asistencia de captura | Duplicados, divergencias, resolución humana, asistencia | 7 |
+| 6.3 Señal global y estado | Cese global, aplicación local, reactivación | *(en construcción)* |
+| 6.4 Contactos | Captura en los dominios, consolidación, contacto principal | *(en construcción)* |
+| 6.5 Separación de responsabilidades | Frontera bodega ↔ dominios | *(en construcción)* |
+
+### 6.1 Identidad y consolidación
+
+| ID | Regla | Configurable |
+|----|-------|:------------:|
+| **R01** | **Clave natural de consolidación:** La combinación tipo de documento + número + país agrupa las figuras en un solo tercero consolidado. Dos figuras con la misma clave natural son el mismo tercero, sin importar el dominio o la empresa donde se capturaron. | No |
+| **R02** | **Un solo consolidado por clave natural:** En la bodega no pueden existir dos terceros consolidados con la misma clave natural. *(La unicidad de la v1.0, que era un rechazo al usuario, ahora es una garantía interna de la bodega.)* | No |
+| **R03** | **Validación en el origen:** Cada dominio valida la identificación legal al capturarla, con la validación empaquetada: tipo de documento válido para el país, formato del número y DV según la política del tipo (rechazo o advertencia). La calidad de la captura se garantiza donde se captura. | No |
+| **R04** | **La bodega nunca rechaza:** Toda figura recibida se consolida. Si la bodega encuentra una anomalía al verificar (con las mismas reglas empaquetadas), la convierte en caso de conciliación — nunca en rechazo ni bloqueo del dominio. | No |
+| **R05** | **El DV no es parte de la clave natural:** El dígito de verificación se almacena y valida, pero la consolidación agrupa por tipo + número + país. | No |
+| **R06** | **Historial de identidad conservado:** Los cambios de identificación o razón social quedan en el historial del consolidado, para que los registros históricos de los dominios sigan siendo interpretables con la identificación vigente al momento de cada transacción. | No |
+| **R07** | **Tipo de persona como dato de identidad:** Persona (individuo) u organización (entidad constituida). La clasificación tributaria detallada (Natural/Física/Moral, ESAL, subtipos por país) es responsabilidad del perfil tributario en Impuestos. | No |
+| **R08** | **Un solo tercero, múltiples roles:** El tercero consolidado es único aunque cumpla varias funciones. Los roles se derivan de sus figuras — no existen como dato administrado en la bodega. | No |
+
+### 6.2 Conciliación y asistencia de captura
+
+| ID | Regla | Configurable |
+|----|-------|:------------:|
+| **R09** | **Detección de posibles duplicados:** Cuando el número de identificación coincide con el de otro consolidado de clave natural distinta (otro tipo de documento u otro país) y la razón social es equivalente en su forma canónica (ignorando mayúsculas, tildes, puntuación, espacios), la bodega abre un caso de conciliación. Nunca rechaza ni impide la operación. | No |
+| **R10** | **La conciliación la decide un humano:** Solo el administrador de terceros resuelve fusiones, homonimias legítimas y datos correctos. La bodega detecta, reúne evidencia y propone — no decide sola. | No |
+| **R11** | **Memoria de conciliación:** Una homonimia legítima marcada no vuelve a generar caso por los mismos criterios. Las decisiones de conciliación quedan con trazabilidad completa (quién, cuándo, motivo). | No |
+| **R12** | **Toda fusión publica el mapa canónico:** Al fusionar duplicados, la bodega publica la correspondencia identificación → tercero canónico. Los interesados en reportes por tercero (Contabilidad: auxiliares, exógena, certificados) la aplican en sus vistas. Los registros históricos de los dominios **no se reescriben**. | No |
+| **R13** | **El dato se corrige en el origen:** El dato compartido errado se corrige en el dominio que lo capturó, mediante la resolución que la bodega publica y el dominio aplica automáticamente en su figura. La bodega nunca modifica figuras directamente. | No |
+| **R14** | **Divergencia solo sobre datos de identidad compartidos:** Identificación legal, razón social y tipo de persona. Los datos propios de cada relación (direcciones de uso, contactos, condiciones) pueden diferir legítimamente entre figuras y no constituyen divergencia. | No |
+| **R15** | **La asistencia de captura nunca bloquea:** Ayuda cuando está disponible (advierte existentes y similares, ofrece precargar). Si no responde a tiempo, la captura continúa sin advertencias y el respaldo es la conciliación posterior. | No |
 
 ---
 
