@@ -407,9 +407,9 @@ Las reglas se organizan en cinco frentes funcionales:
 |--------|---------|:------:|
 | 6.1 Identidad y consolidación | Clave natural, agrupación de figuras, historial | 8 |
 | 6.2 Conciliación y asistencia de captura | Duplicados, divergencias, resolución humana, asistencia | 7 |
-| 6.3 Señal global y estado | Cese global, aplicación local, reactivación | *(en construcción)* |
-| 6.4 Contactos | Captura en los dominios, consolidación, contacto principal | *(en construcción)* |
-| 6.5 Separación de responsabilidades | Frontera bodega ↔ dominios | *(en construcción)* |
+| 6.3 Señal global y estado | Cese global, aplicación local, reactivación | 5 |
+| 6.4 Contactos | Captura en los dominios, consolidación, contacto principal | 5 |
+| 6.5 Separación de responsabilidades | Frontera bodega ↔ dominios | 5 |
 
 ### 6.1 Identidad y consolidación
 
@@ -435,6 +435,36 @@ Las reglas se organizan en cinco frentes funcionales:
 | **R13** | **El dato se corrige en el origen:** El dato compartido errado se corrige en el dominio que lo capturó, mediante la resolución que la bodega publica y el dominio aplica automáticamente en su figura. La bodega nunca modifica figuras directamente. | No |
 | **R14** | **Divergencia solo sobre datos de identidad compartidos:** Identificación legal, razón social y tipo de persona. Los datos propios de cada relación (direcciones de uso, contactos, condiciones) pueden diferir legítimamente entre figuras y no constituyen divergencia. | No |
 | **R15** | **La asistencia de captura nunca bloquea:** Ayuda cuando está disponible (advierte existentes y similares, ofrece precargar). Si no responde a tiempo, la captura continúa sin advertencias y el respaldo es la conciliación posterior. | No |
+
+### 6.3 Señal global y estado
+
+| ID | Regla | Configurable |
+|----|-------|:------------:|
+| **R16** | **El consolidado nace Activo:** Todo tercero consolidado se crea a partir de figuras que ya operan — no existe un estado intermedio de registro. Los estados del consolidado son **Activo** e **Inactivo**. | No |
+| **R17** | **Inactivación global con motivo:** La señal Inactivo es decisión del administrador de terceros ante el cese global de la relación (fraude, listas restrictivas, cierre definitivo), siempre con motivo obligatorio y trazabilidad. | No |
+| **R18** | **Aplicación local de la señal:** Cada dominio recibe la señal global y la aplica según su propia regla, impidiendo nuevas operaciones con su figura. La bodega no autoriza ni bloquea operación por operación. | No |
+| **R19** | **El historial queda intacto:** La inactivación global no modifica registros históricos ni reportes existentes en ningún dominio. | No |
+| **R20** | **Reactivación permitida — y la señal no reemplaza la inactivación por figura:** El administrador puede reactivar un tercero inactivo (se publica y aplica igual). Cada dominio sigue gobernando el estado de su propia figura: dejar de ser proveedor en OXP no toca al cliente en CXC. La señal global existe solo para el cese de la relación **completa**. | No |
+
+### 6.4 Contactos
+
+| ID | Regla | Configurable |
+|----|-------|:------------:|
+| **R21** | **Contactos capturados en el origen:** Cada dominio captura los contactos junto con su figura, con la estructura empaquetada del producto (propuesta en el issue #35). La bodega los consolida en la vista del tercero. | No |
+| **R22** | **Rol del contacto como dato de la relación:** El rol (representante legal, tesorero, comercial, técnico, facturación, notificaciones, otro) califica la relación del contacto con la figura, y se captura en el dominio usando el vocabulario compartido del producto. | No |
+| **R23** | **Datos mínimos del contacto:** Todo contacto debe tener rol y al menos un medio de comunicación (correo o teléfono). El nombre es opcional al capturar y se recomienda completarlo. *(Hereda la v1.0; la exige la estructura empaquetada en el origen.)* | No |
+| **R24** | **Ciclo de vida del contacto en el origen:** Crear, actualizar o inactivar un contacto es del dominio que lo capturó; la bodega refleja el cambio en la vista consolidada, indicando la figura de origen de cada contacto. | No |
+| **R25** | **Contacto principal por figura:** Cada dominio designa el contacto principal de su figura según sus necesidades (con correo y teléfono obligatorios). La bodega muestra los principales de cada figura — **no impone un principal global del tercero**. | No |
+
+### 6.5 Separación de responsabilidades
+
+| ID | Regla | Configurable |
+|----|-------|:------------:|
+| **R26** | **Alcance de la bodega:** Consolidación, conciliación, señal global y vista unificada — nada más. Los datos de negocio del tercero viven en sus dominios dueños (perfil tributario en Impuestos, condiciones comerciales en OXP/CXC, cuentas bancarias en Tesorería, datos laborales en RRHH). | No |
+| **R27** | **Las figuras son soberanas — injerencia solo por mensajes:** Cada dominio es dueño del ciclo de vida y los datos de su figura. La bodega influye únicamente publicando resoluciones de conciliación y la señal global, que los dominios aplican automáticamente y de forma autónoma. Nunca escritura directa, nunca dependencia en línea. | No |
+| **R28** | **La bodega nunca es prerrequisito:** Ningún dominio necesita a la bodega para operar. Su indisponibilidad solo degrada la asistencia de captura y la consulta de la ficha — jamás la operación. | No |
+| **R29** | **Cada dominio define "listo para operar":** La bodega no certifica completitud ni autoriza operaciones. Cada dominio decide qué necesita para operar con su figura y lo valida con sus propios datos. | No |
+| **R30** | **Todo cambio relevante se publica:** Los dominios publican los cambios de sus figuras; la bodega publica sus decisiones (señal global, resoluciones, mapa canónico). Las únicas consultas en línea son las de lectura no bloqueante (asistencia y ficha). | No |
 
 ---
 
