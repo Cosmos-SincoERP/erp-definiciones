@@ -1,7 +1,0 @@
-[
-  { "codigo": "FSC", "nombre": "Fiscal", "activo": true },
-  { "codigo": "COM", "nombre": "Comercial", "activo": true },
-  { "codigo": "COR", "nombre": "Correspondencia", "activo": true },
-  { "codigo": "ENT", "nombre": "Entrega", "activo": true },
-  { "codigo": "SUC", "nombre": "Sucursal", "activo": true }
-]
