@@ -278,11 +278,15 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Estado:** Alcance v1.0, especificación de servicio v1.0. Listo para desarrollo.
 
-> Detalle: [`compartido/datos-referencia/definicion-alcance.md`](compartido/datos-referencia/definicion-alcance.md), [`compartido/datos-referencia/especificacion-servicio.md`](compartido/datos-referencia/especificacion-servicio.md)
+> Detalle: [`compartido/datos-referencia/definicion-alcance.md`](compartido/datos-referencia/definicion-alcance.md)
+>
+> ⚠️ **Superado parcialmente (junio 2026):** el alcance pasó a v2.0 con el replanteamiento de Nuggets — taller del custodio + tasas de cambio por evento. Esta sección describe la v1.0 y se actualizará con el consolidado.
 
 ---
 
 ### 2.7 Direcciones (servicio compartido)
+
+> ⚠️ **Superado (junio 2026):** el servicio fue eliminado en el replanteamiento arquitectónico — lo reemplaza el Nugget [`DireccionFisica`](compartido/nuggets/direccion-fisica/especificacion.md) (validación local empaquetada, sin servicio en ejecución). Esta sección describe la v1.0 y se actualizará con el consolidado.
 
 **Propósito:** Servicio compartido que gestiona estructura, configuración y validación de direcciones, con reglas adaptables por país. Centraliza la complejidad de validación de direcciones para que los módulos del ERP no la dupliquen.
 
@@ -302,9 +306,9 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Relación con Terceros (D13):** el servicio de Direcciones emite la confirmación asíncrona de creación de la dirección fiscal, que dispara la transición de Tercero en `EnRegistro` a `Activo`. Ver anexo de orquestación en Terceros.
 
-**Estado:** Alcance v1.0, especificación de servicio v1.0. Listo para desarrollo.
+**Estado:** Eliminado (junio 2026). Documentos y catálogos conservados en el historial del repositorio.
 
-> Detalle: [`compartido/direcciones/definicion-alcance.md`](compartido/direcciones/definicion-alcance.md), [`compartido/direcciones/especificacion-servicio.md`](compartido/direcciones/especificacion-servicio.md)
+> Detalle: [`compartido/nuggets/direccion-fisica/especificacion.md`](compartido/nuggets/direccion-fisica/especificacion.md)
 
 ---
 
@@ -730,10 +734,9 @@ Un cliente puede empezar con un producto y escalar sin fricción. Cada módulo s
 | [`dominio/estructura-organizacional/anexo-definicion-contexto-inicial.md`](dominio/estructura-organizacional/anexo-definicion-contexto-inicial.md) | Definición inicial de contexto (preexistente al alcance formal) |
 | [`dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md`](dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md) | Cuatro decisiones arquitectónicas: codificación plana + jerarquía versionada, FSM 4 estados, fusión/división/traslado como eventos, multi-dimensionalidad |
 | [`dominio/estructura-organizacional/anexo-orquestacion-creacion.md`](dominio/estructura-organizacional/anexo-orquestacion-creacion.md) | Patrón BFF + estado `Borrador` para creación de unidades desde sub-dominios consumidores |
-| [`compartido/datos-referencia/definicion-alcance.md`](compartido/datos-referencia/definicion-alcance.md) | Alcance Datos de Referencia |
-| [`compartido/datos-referencia/especificacion-servicio.md`](compartido/datos-referencia/especificacion-servicio.md) | Especificación del servicio de Datos de Referencia |
-| [`compartido/direcciones/definicion-alcance.md`](compartido/direcciones/definicion-alcance.md) | Alcance Direcciones |
-| [`compartido/direcciones/especificacion-servicio.md`](compartido/direcciones/especificacion-servicio.md) | Especificación del servicio de Direcciones |
+| [`compartido/datos-referencia/definicion-alcance.md`](compartido/datos-referencia/definicion-alcance.md) | Alcance Datos de Referencia (v2.0 — taller del custodio + tasas de cambio) |
+| [`compartido/nuggets/gobernanza-nuggets.md`](compartido/nuggets/gobernanza-nuggets.md) | Gobernanza de Nuggets: filtros de admisión, proceso con custodio, versionado |
+| [`compartido/nuggets/catalogo-nuggets.md`](compartido/nuggets/catalogo-nuggets.md) | Catálogo de Nuggets (7 aceptados en borrador) |
 | [`compartido/anexo-decision-i18n-l10n.md`](compartido/anexo-decision-i18n-l10n.md) | Decisión transversal de internacionalización/localización |
 | [`integraciones/entre-dominios/catalogo-conceptos-por-dominio.md`](integraciones/entre-dominios/catalogo-conceptos-por-dominio.md) | Modelo federado de catálogos, contratos entre dominios |
 | [`plan-trabajo-abril.md`](plan-trabajo-abril.md) | Plan de ejecución con orden de prioridad |

@@ -6,7 +6,7 @@
 | **Versión** | 0.1 |
 | **Gobernanza** | [gobernanza-nuggets.md](../gobernanza-nuggets.md) |
 | **Catálogo** | [catalogo-nuggets.md](../catalogo-nuggets.md) |
-| **Hereda de** | Servicio de Direcciones v1.0 (`compartido/direcciones/`) — ver Sección 8 |
+| **Hereda de** | Servicio de Direcciones v1.0 (eliminado en el replanteamiento de jun-2026; conservado en el historial del repositorio) — ver Sección 8 |
 
 ## Tabla de contenido
 
@@ -91,13 +91,13 @@ Se evalúan al construir, en orden, sin salir del proceso (filtro 3 de la gobern
 
 ## Sección 6: Datos embebidos
 
-Por producir por el custodio (Datos de Referencia) a partir de las fuentes existentes — las cinco primeras ya están construidas y validadas en el servicio de Direcciones (`compartido/direcciones/configuracion/`) y en Datos de Referencia:
+Por producir por el custodio (Datos de Referencia) a partir de las fuentes heredadas — las cinco primeras ya están construidas y validadas en el servicio de Direcciones v1.0 (su carpeta `configuracion/` fue eliminada junto con el servicio; los archivos fuente se conservan en el historial del repositorio) y en Datos de Referencia:
 
 | Archivo | Contenido | Fuente | Ajuste requerido |
 |---------|-----------|--------|------------------|
 | `perfiles-direccion.json` | Perfil por país: niveles territoriales y su obligatoriedad, formato y obligatoriedad del código postal, habilitación de captura estructurada, etiquetas de presentación. 5 países: CO, DO, PA, MX, US. | `formatos-direccion.json` (5 países) | ⚠️ **Corregir el perfil CO**: `tipoVia`/`numeroVia`/`numeroPredio` pasan de obligatorios a **modo de captura opcional**, y `codigoPostal` pasa a **opcional** — la exigencia documentada no corresponde al Anexo Técnico FE v1.9 (ver Sección 8). |
 | Divisiones territoriales | `[V02]` valida contra el catálogo del Nugget [`DivisionTerritorial`](../division-territorial/especificacion.md) (CO 1.188 / DO 221 / PA 108) — fuente única de la jerarquía territorial dentro del paquete (jun-2026). | Vía Nugget `DivisionTerritorial`. Corregimientos PA: pendiente transferido a ese Nugget. |
-| `tipos-via-co.json` | 21 tipos de vía (catálogo DIAN: CL, CR, DG, TV, AC, AK…) | `compartido/direcciones/configuracion/` | Sin cambios — pasa a servir la captura estructurada opcional. |
+| `tipos-via-co.json` | 21 tipos de vía (catálogo DIAN: CL, CR, DG, TV, AC, AK…) | `configuracion/` del servicio eliminado (historial del repositorio) | Sin cambios — pasa a servir la captura estructurada opcional. |
 | `tipos-complemento.json` | 16 tipos (APT, TRR, PIS, OFC, LOC, BDG, BLQ, INT, CSA, LTE, ETP, CNJ, URB, BRR, EDF, UND) | ídem | Sin cambios. |
 | `tipos-direccion.json` | 5 tipos de uso (FSC, COM, COR, ENT, SUC) — **vocabulario compartido para los consumidores**, no atributo del VO (Sección 9). | ídem | Sin cambios. |
 | `codigos-postales-co.json` | 248 códigos de las 10 ciudades principales (de 3.685 totales DIAN/4-72) | ídem | Alimenta la política `advertencia` de `[V04]`. El catálogo completo y los de otros países son datos vivos — fuera del paquete (Sección 9). |
@@ -165,7 +165,7 @@ La misma dirección capturada como texto (`lineaDireccion` directa, sin `captura
 
 ## Sección 8: Herencia del servicio de Direcciones
 
-El servicio de Direcciones v1.0 (`compartido/direcciones/`) resolvió este problema en abril 2026 con un diseño que este Nugget hereda casi completo. El paralelo:
+El servicio de Direcciones v1.0 resolvió este problema en abril 2026 con un diseño que este Nugget hereda casi completo. Sus documentos y catálogos fueron eliminados del repositorio en el replanteamiento (jun-2026) para evitar confusión con el modelo vigente; se conservan en el historial de git. El paralelo:
 
 | Componente del servicio | Destino en el Nugget |
 |---|---|
