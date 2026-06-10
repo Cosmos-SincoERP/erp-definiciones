@@ -137,6 +137,96 @@ La bodega tiene dos relaciones de naturaleza distinta con los dominios: **fuente
 
 ## Sección 4: Flujo principal
 
+El sub-dominio de Terceros opera en seis flujos:
+
+| # | Flujo | Naturaleza |
+|---|-------|-----------|
+| 1 | Consolidación de una figura | Entrada — los dominios alimentan la bodega |
+| 2 | Asistencia de captura | Servicio no bloqueante a los dominios |
+| 3 | Detección y conciliación de duplicados | Conciliación — resolución humana |
+| 4 | Detección y conciliación de divergencias | Conciliación — resolución humana |
+| 5 | Administración de la señal global | Decisión global — aplicada localmente por cada dominio |
+| 6 | Consulta de la vista consolidada | Salida — lectura de la bodega |
+
+> Frente a la v1.0: el Flujo de creación se invierte (ya no hay registro en Terceros — Flujo 1); la validación de duplicados pasa de rechazo a advertencia (Flujo 2) y de prevención a conciliación (Flujos 3 y 4); la gestión de roles desaparece (el rol se deriva de las figuras) y la de contactos entra por la consolidación (se capturan en los dominios).
+
+### Flujo 1 — Consolidación de una figura (dominios operativos → bodega)
+
+1. Un usuario operativo crea o modifica su figura en su dominio (ej: el Proveedor en OXP), con la captura validada localmente por los Nuggets (identificación legal, dirección física, teléfono, correo).
+2. El dominio publica el evento de integración de su figura (creada, actualizada, inactivada) con la identificación legal, los datos de captura y los contactos.
+3. La bodega recibe el evento y extrae la **clave natural** (tipo de documento + número + país).
+4. Si no existe un tercero consolidado con esa clave, la bodega **lo crea** con esa primera figura. Si ya existe, **suma o actualiza la figura** en el consolidado.
+5. La bodega evalúa señales de duplicado (¿otra clave natural parece ser la misma entidad?) y de divergencia (¿las figuras informan distinto un dato compartido?). Si hay señal, **abre un caso de conciliación** (Flujos 3 y 4) — sin afectar la operación del dominio.
+6. La vista consolidada queda actualizada.
+
+```
+DOMINIO OPERATIVO (ej: OXP)                BODEGA CONSOLIDADORA (Terceros)
+┌─────────────────────────┐
+│ 1. Captura de la figura │
+│    Proveedor            │
+│    (Nuggets validan     │
+│    localmente, sin red) │
+└───────────┬─────────────┘
+            │ 2. Evento: figura creada/actualizada
+            ▼
+   ┌──────────────────────────────────────────────┐
+   │ 3. Extrae clave natural (ej: NIT 900123456)  │
+   │ 4. ¿Existe tercero consolidado?              │
+   │    ├─ No → crea el consolidado con la figura │
+   │    └─ Sí → suma/actualiza la figura          │
+   │ 5. ¿Señales de duplicado o divergencia?      │
+   │    └─ Sí → abre caso de conciliación (F3/F4) │
+   │ 6. Vista consolidada actualizada             │
+   └──────────────────────────────────────────────┘
+```
+
+> **Si la bodega no está disponible**, los eventos de los dominios quedan pendientes de entrega y se procesan cuando vuelva. La operación de los dominios nunca se entera.
+
+### Flujo 2 — Asistencia de captura (no bloqueante, con degradación controlada)
+
+1. El usuario digita la identificación de un tercero en el formulario de **su dominio** (ej: nuevo proveedor en OXP).
+2. La interfaz consulta la asistencia de la bodega con un **tiempo de espera corto**.
+3. **Camino normal — la bodega responde:**
+   - **Existe exacto:** la interfaz muestra el tercero conocido y puede ofrecer **precargar** los datos consolidados (razón social, contactos), reduciendo la captura.
+   - **Existe similar** (posible duplicado): advertencia con los candidatos; el usuario decide continuar con su captura o usar el existente.
+   - **No existe:** la captura sigue sin más.
+4. **Camino degradado — la bodega no responde a tiempo o no está disponible:** la interfaz lo indica discretamente ("asistencia no disponible") y **permite continuar la captura sin advertencias**. La captura nunca se bloquea.
+5. En ambos caminos, el dominio registra su figura con la validación local de los Nuggets y la operación sigue su curso normal.
+6. **Red de seguridad:** al consolidar (Flujo 1), la bodega detecta el duplicado que la asistencia no alcanzó a advertir y abre el caso de conciliación (Flujo 3).
+
+```
+FORMULARIO DEL DOMINIO            BODEGA
+┌────────────────────┐
+│ 1. Digita NIT      │
+└───────┬────────────┘
+        │ 2. Consulta (espera corta)
+        ▼
+   ¿Responde la bodega?
+   ├─ SÍ ──► existe exacto  → muestra/precarga datos      ┐
+   │        existe similar → advierte, usuario decide     │ 5. El dominio registra
+   │        no existe      → captura sigue                │    su figura (Nuggets)
+   └─ NO ──► 4. "asistencia no disponible"                │    La operación continúa
+             captura continúa SIN advertencias ───────────┘
+                                      │
+                                      ▼
+             6. La consolidación posterior (F1) detecta
+                lo que la asistencia no advirtió → F3
+```
+
+### Flujo 3 — Detección y conciliación de duplicados
+
+*(En construcción)*
+
+### Flujo 4 — Detección y conciliación de divergencias
+
+*(En construcción)*
+
+### Flujo 5 — Administración de la señal global
+
+*(En construcción)*
+
+### Flujo 6 — Consulta de la vista consolidada
+
 *(En construcción)*
 
 ---
