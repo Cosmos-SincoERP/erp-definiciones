@@ -1,6 +1,6 @@
 # Definición de Alcance — Terceros
 
-> ℹ️ **v2.0 — En construcción (junio 2026).** Reescritura por el replanteamiento arquitectónico (issue #31): Terceros pasa de autoridad de registro a **bodega consolidadora**. La v1.0 se conserva como referencia en [`definicion-alcance_bk.md`](definicion-alcance_bk.md) mientras dura la construcción.
+> ℹ️ **v2.0 — Alcance completo (junio 2026).** Reescritura por el replanteamiento arquitectónico (issue #31): Terceros pasa de autoridad de registro a **bodega consolidadora**. El modelo de dominio v2.0 está en construcción; la v1.0 se conserva como referencia en [`definicion-alcance_bk.md`](definicion-alcance_bk.md) hasta el cierre del issue #33.
 
 ## Tabla de contenido
 
@@ -218,7 +218,7 @@ FORMULARIO DEL DOMINIO            BODEGA
 
 ### Flujo 3 — Detección y conciliación de duplicados
 
-1. Al consolidar (Flujo 1, paso 5), la bodega detecta una **señal de duplicado**: dos terceros consolidados con claves naturales distintas parecen ser la misma entidad. Criterios heredados de la v1.0 (R01b): mismo número de documento con tipo o país distinto, y razón social equivalente en su forma canónica (ignorando mayúsculas, tildes, puntuación).
+1. Al consolidar (Flujo 1, paso 5), la bodega detecta una **señal de duplicado**: dos terceros consolidados con claves naturales distintas parecen ser la misma entidad. Los criterios son los de la regla R09 (herederos de la R01b de la v1.0): mismo número de documento con tipo o país distinto, y razón social equivalente en su forma canónica (ignorando mayúsculas, tildes, puntuación, espacios).
 2. La bodega **abre un caso de conciliación** de tipo duplicado, con los candidatos y la evidencia. Ningún dominio se entera todavía: ambos consolidados siguen operando y visibles, marcados "en conciliación".
 3. El **administrador de terceros** revisa el caso: los roles de cada candidato, sus dominios, sus datos.
 4. Decide una de dos:
@@ -500,7 +500,7 @@ La bodega consolidadora mantiene la vista unificada de los terceros a partir de 
 | **Captura y creación de terceros** | El alta de proveedores, clientes, empleados y sus datos. | Vive en cada dominio operativo, con el rol que gobierna. La bodega solo consolida. |
 | **Datos de negocio del tercero** | Perfil tributario, condiciones comerciales, cuentas bancarias, datos laborales. | Impuestos, OXP/CXC, Tesorería, RRHH — cada uno es dueño en su contexto. |
 | **Reglas de validación de captura** | Formato, DV, tipos de documento por país, estructura de direcciones, teléfonos y correos. | Validaciones empaquetadas del producto, custodiadas por Datos de Referencia. |
-| **Autorización para operar y completitud** | Decidir si un tercero puede usarse en una operación o si está "completo". | Cada dominio valida con sus propios datos (R28, R29). |
+| **Autorización para operar y completitud** | Decidir si un tercero puede usarse en una operación o si está "completo". | Cada dominio valida con sus propios datos (R18, R29). |
 | **Corrección de transacciones históricas** | Reescribir registros de los dominios tras una fusión o corrección. | Los registros no se reescriben; los reportes por tercero aplican el mapa canónico al leer (R12). |
 | **Experiencia de captura** | Los formularios y pantallas donde se capturan los roles del tercero y sus contactos. | De cada dominio; la bodega solo expone la consulta de asistencia. |
 
@@ -600,5 +600,5 @@ El Nivel A puede alcanzarse sin esperar al Nivel B; el Nivel B madura progresiva
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
-| 2.0 | Junio 2026 | **Reescritura por el replanteamiento arquitectónico (#31, #33):** Terceros pasa de autoridad de registro a bodega consolidadora. En construcción. |
+| 2.0 | Junio 2026 | **Reescritura completa por el replanteamiento arquitectónico (#31, #33):** Terceros pasa de autoridad de registro a **bodega consolidadora** — consolidación de roles por clave natural, conciliación de duplicados y divergencias con resolución humana e injerencia por mensajes (correcciones aplicadas automáticamente por los dominios), señal global Activo/Inactivo, asistencia de captura no bloqueante con degradación controlada, vista consolidada de lectura local. 9 secciones, 16 términos, 6 flujos con diagrama, 30 reglas en 5 frentes, fases F1 (núcleo + habilitadores) y F2. Terminología: "rol" unificado (absorbe "figura"); "validación empaquetada" como nombre funcional del empaque transversal. Contabilidad pasa a certificación eventual por suscripción (señal global + mapa canónico en sus reportes por tercero). |
 | 1.0 | Abril 2026 | Versión inicial (autoridad de registro). Conservada en `definicion-alcance_bk.md`. |
