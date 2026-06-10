@@ -7,6 +7,8 @@
 
 ## Decisión
 
+> ⚠️ **Reinterpretado por el alcance v2.0 (junio 2026):** la estrategia evolucionó con el replanteamiento de Nuggets — **Seed** pasa a ser el empaquetado de datos dentro de los Nuggets (sin seeds por servicio), **Sync** queda solo para tasas de cambio (distribuidas por evento), y **Extend** cambia de actor: agregar un país es una versión del paquete publicada por el custodio, no una tarea del administrador del cliente. Ver el mapa de disposición en [`definicion-alcance.md`](definicion-alcance.md) Sección 2.
+
 Los catálogos de datos de referencia se gestionan con una estrategia **híbrida (Seed + Sync + Extend)**, alineada con la práctica de la industria de ERPs y plataformas SaaS.
 
 ---

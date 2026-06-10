@@ -1,5 +1,7 @@
 # Especificación del Servicio — Direcciones
 
+> ⚠️ **Superado (junio 2026).** El replanteamiento arquitectónico convirtió este servicio en el Nugget [`DireccionFisica`](../nuggets/direccion-fisica/especificacion.md). La estructura de datos, los perfiles por país y los catálogos de `configuracion/` se heredan como datos embebidos del Nugget; la persistencia centralizada, la API y los eventos de sincronización desaparecen. Se conserva como referencia histórica.
+
 ## Tabla de contenido
 
 1. [Propósito y relación con otros documentos](#sección-1-propósito)

@@ -1,5 +1,7 @@
 # Especificación del Servicio — Datos de Referencia
 
+> ⚠️ **Parcialmente superada (junio 2026 — alcance v2.0).** Los 4 catálogos estáticos (secciones 2.1–2.4) se distribuyen ahora como Nuggets (`Pais`, `Moneda`, `IdentificacionLegal`, `DivisionTerritorial`) y su API de consulta (Sección 3) y caché (Sección 4) quedaron eliminadas. **Sigue vigente** lo relativo a tasas de cambio (2.5, V8/V9, PD1), reformulado en el [alcance v2.0](definicion-alcance.md) con distribución por evento. Las validaciones referenciales V2–V7 pasaron a verificación de construcción del paquete (taller del custodio). Se conserva como referencia histórica y fuente de las estructuras heredadas.
+
 ## Tabla de contenido
 
 1. [Propósito y relación con otros documentos](#sección-1-propósito)

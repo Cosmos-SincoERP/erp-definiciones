@@ -1,5 +1,7 @@
 # Definición de Alcance — Direcciones
 
+> ⚠️ **Superado (junio 2026).** El replanteamiento arquitectónico convirtió este servicio en el Nugget [`DireccionFisica`](../nuggets/direccion-fisica/especificacion.md), que hereda su estructura, perfiles por país y catálogos (ver Sección 8 de esa especificación para el paralelo completo y una corrección normativa verificada). Este documento se conserva como referencia histórica y fuente del diseño heredado.
+
 ## Tabla de contenido
 
 1. [Definición y justificación](#sección-1-definición-y-justificación)

@@ -1,5 +1,7 @@
 # Anexo — Decisión de diseño: Modelo de direcciones
 
+> ⚠️ **Superado (junio 2026).** La Alternativa D (servicio con persistencia centralizada) quedó reemplazada por el Nugget [`DireccionFisica`](../nuggets/direccion-fisica/especificacion.md) — en esencia, la Alternativa B reevaluada: sus dos razones de descarte ya no aplican bajo la gobernanza de Nuggets (la validación se empaqueta una sola vez, y el replanteamiento eliminó deliberadamente la fuente central). La decisión 4 (estructura genérica + configuración por país) **sigue vigente** y es la base del Nugget. Nota: la justificación para descartar la Alternativa A ("la DIAN exige tipos de vía codificados") resultó incorrecta al verificarla contra el Anexo Técnico FE v1.9 — ver Sección 8 de la especificación del Nugget.
+
 > **Fecha:** Abril 2026
 > **Propósito:** Documentar las decisiones de diseño del servicio de Direcciones, las alternativas evaluadas, la justificación de cada decisión y el flujo de sincronización entre módulos.
 
