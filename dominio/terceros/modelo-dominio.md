@@ -282,7 +282,7 @@ Materializa `[I1]`/`[R02]`: índice único sobre (tipo de documento, número, pa
 Normalización para la comparación de `[R09]`: mayúsculas, tildes, puntuación y espacios. Se calcula al consolidar y se usa solo para detección — nunca se muestra ni reemplaza el valor informado. Análoga al `[SI9]` de la v1.0.
 
 #### `[SI3]` Idempotencia y orden de los eventos de rol
-El contrato de entrada trae (`referenciaOrigen`, `secuencia`) — ver Sección 5.1. La bodega aplica cada evento una sola vez y descarta secuencias anteriores a la última aplicada por esa referencia. El mecanismo técnico (deduplicación, reintentos) es de plataforma (`[D11]`).
+El contrato de entrada trae (`referenciaOrigen`, `secuencia`) — ver Sección 5.2. La bodega aplica cada evento una sola vez y descarta secuencias anteriores a la última aplicada por esa referencia. El mecanismo técnico (deduplicación, reintentos) es de plataforma (`[D11]`).
 
 #### `[SI4]` Proyección del mapa canónico
 Acumulado de los eventos `TercerosFusionados`: correspondencia identificación → tercero canónico. Consultable por los interesados en reportes por tercero (Contabilidad) y usada por el `ServicioDeConsolidacion` para enrutar eventos de rol que lleguen con claves de terceros absorbidos.
@@ -747,7 +747,7 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 
 | ID | Pendiente | Owner | Criterio / momento de cierre |
 |----|-----------|-------|------------------------------|
-| `[PD1]` | Veredicto del custodio sobre la estructura empaquetada del contacto (issue #35). Si la estructura cambia, ajustar el contrato de entrada (Sección 5.1). | Custodio (Datos de Referencia) | Resolución del issue #35, antes del desarrollo F1 del contrato. |
+| `[PD1]` | Veredicto del custodio sobre la estructura empaquetada del contacto (issue #35). Si la estructura cambia, ajustar el contrato de entrada (Sección 5.2). | Custodio (Datos de Referencia) | Resolución del issue #35, antes del desarrollo F1 del contrato. |
 | `[PD2]` | Criterios ampliados de detección de duplicados (F2): contactos o direcciones coincidentes entre consolidados. | Producto + consultores | Diseño de F2 — no bloquea F1. |
 | `[PD3]` | Ratificar el catálogo de motivos de inactivación global (Sección 6.4) con el comité de producto. | Producto | Antes del desarrollo F1 de la señal global. |
 | `[PD4]` | Issue cruzado de refinamiento en Contabilidad: actualizar R07 y las menciones "Terceros como fuente de verdad que valida" al modelo de copia local + reportes canonizados (alcance v2.0, Sección 3). | Este sub-dominio (origina el cambio) | Crear el issue al fusionar el PR del #33. |
