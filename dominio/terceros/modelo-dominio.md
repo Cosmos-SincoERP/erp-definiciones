@@ -384,9 +384,19 @@ Nace `Abierta` con la detección. Los duplicados cierran con la decisión; las d
 
 ## 5. Catálogo de eventos
 
-**16 eventos de dominio** (8 del `Tercero`, 8 de `Conciliacion`) + **1 evento de integración derivado** (`DatoDeIdentidadCorregido`) + el **contrato de entrada** (el evento de rol que publican los dominios).
+### 5.1. Resumen por agregado
 
-### 5.1. Contrato de entrada — el evento de rol
+| Agregado | Tipo | Eventos |
+|----------|------|:-------:|
+| Tercero | Transaccional | 8 |
+| Conciliacion | Transaccional | 8 |
+| | **Total dominio** | **16** |
+| *(Integración de salida derivado)* | `DatoDeIdentidadCorregido` | 1 |
+| *(Integración de entrada)* | Contrato del evento de rol (Sección 5.2) | — |
+
+> **Nota sobre timestamps:** el timestamp de ocurrencia de cada evento vive en la metadata del stream de Event Sourcing, no en el payload. Los payloads descritos a continuación solo incluyen los datos de negocio.
+
+### 5.2. Contrato de entrada — el evento de rol
 
 Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Empleado) en cada creación, actualización o inactivación de su registro del tercero. Es la "información estándar del rol" del alcance (Secciones 3 y 5).
 
@@ -404,7 +414,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 - `secuencia` es creciente por `referenciaOrigen`; la bodega aplica una sola vez y descarta secuencias viejas (`[SI3]`).
 - La entrega es "al menos una vez" (`[P2]`); la idempotencia la garantiza la bodega, no el publicador.
 
-### 5.2. Eventos del agregado Tercero
+### 5.3. Eventos del agregado Tercero
 
 #### `TerceroCreado`
 
@@ -416,7 +426,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado previo** | No existe. |
 | **Estado resultante** | `Activo` (`[R16]`). |
 | **Precondiciones** | Clave natural sin tercero vigente (`[R01]`, `[R02]`, `[SI1]`). |
-| **Información capturada** | `terceroId`, `identificacionLegal`, `razonSocial`, `tipoPersona`, dominio y referencia del primer rol. |
+| **Información capturada** | `terceroId` (UUID); `identificacionLegal` { tipoDocumento, numero, pais, digitoVerificacion? }; `razonSocial`; `tipoPersona` (Persona / Organizacion); primer rol: { rol, dominio, empresa, referenciaOrigen }. |
 | **Efectos** | `RolIncorporado` en el mismo append (derivado por transición) — el tercero nace con su primer rol (`[I2]`). |
 
 #### `RolIncorporado`
@@ -429,7 +439,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado previo** | `Activo` o `Inactivo` (progreso — la consolidación no se detiene por la señal). |
 | **Estado resultante** | Sin cambio. |
 | **Precondiciones** | No existe rol con la misma combinación (`rol`, `dominio`, `empresa`) (`[I3]`). |
-| **Información capturada** | El estado completo del rol según el contrato de entrada: rol, dominio, empresa, `referenciaOrigen`, `estadoEnOrigen`, direcciones, contactos con su principal, `secuencia`. |
+| **Información capturada** | El estado completo del rol según el contrato de entrada: { rol (código del catálogo 6.1), dominio, empresa, referenciaOrigen, estadoEnOrigen (Activo / Inactivo), secuencia }; `direcciones` [ { DireccionFisica, tipoUso } ]; `contactos` [ { nombre?, rolContacto (código del catálogo 6.2), correos [CorreoElectronico], telefonos [Telefono], esPrincipal } ]; `fechaDelHecho`. |
 | **Efectos** | El servicio evalúa señales de duplicado y divergencia (paso 4 del `ServicioDeConsolidacion`). |
 
 #### `RolActualizado`
@@ -441,7 +451,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Agregado** | `Tercero`. |
 | **Estado previo / resultante** | `Activo` o `Inactivo` / sin cambio (progreso). |
 | **Precondiciones** | El rol existe; `secuencia` mayor a la última aplicada (`[SI3]`). |
-| **Información capturada** | Estado completo del rol (contrato `[D5]`). |
+| **Información capturada** | El estado completo del rol (misma estructura de `RolIncorporado`, contrato `[D5]`): { rol, dominio, empresa, referenciaOrigen, estadoEnOrigen, secuencia }; direcciones; contactos; `fechaDelHecho`. |
 | **Efectos** | Posible `DivergenciaDetectada` (si trae un dato compartido distinto) o cierre por convergencia (`DivergenciaSuperada` / `ConvergenciaConfirmada`). |
 
 #### `RolInactivado`
@@ -453,7 +463,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Agregado** | `Tercero`. |
 | **Estado previo / resultante** | `Activo` o `Inactivo` / sin cambio (progreso). |
 | **Precondiciones** | El rol existe. |
-| **Información capturada** | (`rol`, `dominio`, `empresa`), `referenciaOrigen`, fecha del hecho. |
+| **Información capturada** | Identidad del rol: { rol, dominio, empresa }; `referenciaOrigen`; `secuencia`; `fechaDelHecho`. |
 | **Efectos** | La ficha muestra el rol inactivo en su origen. |
 
 #### `IdentidadActualizada`
@@ -465,7 +475,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Agregado** | `Tercero`. |
 | **Estado previo / resultante** | `Activo` o `Inactivo` / sin cambio (progreso). |
 | **Precondiciones** | Si cambia la clave natural: verificación de colisión (`[SI9]`). |
-| **Información capturada** | Dato cambiado, valor anterior, valor nuevo, origen del cambio (consolidación o `conciliacionId`). |
+| **Información capturada** | `dato` (enum: RazonSocial / TipoPersona / IdentificacionLegal); `valorAnterior`; `valorNuevo`; `origenDelCambio` (Consolidacion \| `conciliacionId`). |
 | **Efectos** | El historial de identidad queda en el stream (`[R06]`); si cambió la clave natural, el índice `[SI1]` se actualiza. |
 
 #### `TerceroInactivado`
@@ -478,7 +488,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado previo** | `Activo`. |
 | **Estado resultante** | `Inactivo`. |
 | **Precondiciones** | Motivo obligatorio; solo administrador de terceros (`[I4]`). |
-| **Información capturada** | Motivo, decisor, fecha. |
+| **Información capturada** | `motivo` { codigo (catálogo 6.4), descripcion }; `usuarioId`; `fecha`. |
 | **Efectos** | **Se publica como aviso de integración** — cada dominio lo aplica localmente (`[R18]`). El historial de los dominios queda intacto (`[R19]`). |
 
 #### `TerceroReactivado`
@@ -490,7 +500,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Agregado** | `Tercero`. |
 | **Estado previo / resultante** | `Inactivo` / `Activo`. |
 | **Precondiciones** | Motivo obligatorio; solo administrador. |
-| **Información capturada** | Motivo, decisor, fecha. |
+| **Información capturada** | `motivo` { codigo, descripcion }; `usuarioId`; `fecha`. |
 | **Efectos** | Se publica como aviso de integración; los dominios vuelven a permitir operaciones según su regla. |
 
 #### `TerceroAbsorbido`
@@ -503,10 +513,10 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado previo** | `Activo` o `Inactivo`. |
 | **Estado resultante** | `Fusionado` ■ (terminal). |
 | **Precondiciones** | Fusión decidida en una `Conciliacion` (`[I7]`). |
-| **Información capturada** | `terceroCanonicoId`, `conciliacionId`. |
+| **Información capturada** | `terceroCanonicoId` (UUID); `conciliacionId` (UUID). |
 | **Efectos** | Sus roles se incorporan al canónico (`RolIncorporado`, efecto inter-agregado); su clave natural queda asociada al canónico en el mapa (`[SI4]`); eventos de rol futuros con esa clave se enrutan al canónico. |
 
-### 5.3. Eventos del agregado Conciliacion
+### 5.4. Eventos del agregado Conciliacion
 
 #### `PosibleDuplicadoDetectado`
 
@@ -517,7 +527,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Agregado** | `Conciliacion`. |
 | **Estado previo / resultante** | No existe / `Abierta`. |
 | **Precondiciones** | Criterio de `[R09]` cumplido; sin homonimia previa por el mismo criterio sobre los mismos terceros (`[I9]`, `[SI5]`). |
-| **Información capturada** | `candidatos` (instantáneas), `criterioDeteccion`. |
+| **Información capturada** | `conciliacionId` (UUID); `candidatos` [ { terceroId, claveNatural { tipoDocumento, numero, pais }, razonSocial, roles [ { rol, dominio, empresa } ] } ]; `criterioDeteccion` (enum: NumeroIgualRazonEquivalente / ClaveIdenticaPorCorreccion `[SI9]` / criterios F2 `[PD2]`). |
 | **Efectos** | Los candidatos se marcan "en conciliación" en la ficha (`[SI6]`). Ningún dominio se entera; nada se bloquea. |
 
 #### `DivergenciaDetectada`
@@ -529,7 +539,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Agregado** | `Conciliacion`. |
 | **Estado previo / resultante** | No existe / `Abierta`. |
 | **Precondiciones** | Dato compartido con ≥2 valores vigentes distintos entre fuentes (`[I6]`). |
-| **Información capturada** | `terceroId`, `datoEnDisputa`, `versiones` (valor + dominio + fecha). |
+| **Información capturada** | `conciliacionId` (UUID); `terceroId`; `datoEnDisputa` (enum: RazonSocial / TipoPersona / IdentificacionLegal); `versiones` [ { valor, dominio, fechaDelEvento } ]. |
 | **Efectos** | La ficha muestra el valor más reciente con marca de divergencia (Flujo 4, paso 2). |
 
 #### `NotaAgregada`
@@ -540,7 +550,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Causalidad** | Directa (comando `AgregarNota`). |
 | **Agregado** | `Conciliacion`. |
 | **Estado previo / resultante** | `Abierta` o `EnCorreccion` / sin cambio (progreso). |
-| **Información capturada** | Texto, autor, fecha. |
+| **Información capturada** | `texto`; `usuarioId`; `fecha`. |
 | **Efectos** | Trazabilidad de la revisión. |
 
 #### `TercerosFusionados`
@@ -553,7 +563,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado previo** | `Abierta` (tipo `duplicado`). |
 | **Estado resultante** | `Cerrada` ■ (`motivoCierre = fusion`). |
 | **Precondiciones** | El canónico es uno de los candidatos (`[I7]`); decisor + motivo (`[I8]`). |
-| **Información capturada** | `terceroCanonicoId`, terceros absorbidos, correspondencia de claves, corrección del dato si el duplicado nació de un error de captura, decisor, motivo. |
+| **Información capturada** | `terceroCanonicoId`; `absorbidos` [terceroId]; `correspondencias` [ { claveNatural → terceroCanonicoId } ]; `correccionDeDato`? { dato, valorCorrecto, dominiosACorregir [dominio] } (solo si el duplicado nació de un error de captura); `usuarioId`; `motivo`. |
 | **Efectos** | `TerceroAbsorbido` en cada absorbido y `RolIncorporado` en el canónico (efectos inter-agregado); mapa canónico actualizado (`[SI4]`); **se publica como aviso de integración** (Contabilidad lo aplica en sus reportes por tercero); si hay corrección de dato, se publica `DatoDeIdentidadCorregido`. |
 
 #### `HomonimiaMarcada`
@@ -565,7 +575,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Agregado** | `Conciliacion`. |
 | **Estado previo / resultante** | `Abierta` (tipo `duplicado`) / `Cerrada` ■ (`motivoCierre = homonimia`). |
 | **Precondiciones** | Decisor + motivo (`[I8]`). |
-| **Información capturada** | Pares de terceros, criterio, decisor, motivo. |
+| **Información capturada** | `pares` [ { terceroIdA, terceroIdB } ]; `criterio`; `usuarioId`; `motivo`. |
 | **Efectos** | Memoria de conciliación (`[SI5]`): la señal no se reabre por el mismo criterio (`[I9]`, `[R11]`). |
 
 #### `DivergenciaResuelta`
@@ -578,7 +588,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado previo** | `Abierta` (tipo `divergencia`). |
 | **Estado resultante** | `EnCorreccion` — la decisión está tomada; falta que los dominios converjan. |
 | **Precondiciones** | Valor correcto determinado — una de las versiones u otro valor con evidencia (`[D12]`); decisor + motivo (`[I8]`). |
-| **Información capturada** | `datoEnDisputa`, valor correcto, evidencia, dominios a corregir, decisor, motivo. |
+| **Información capturada** | `datoEnDisputa`; `valorCorrecto`; `evidencia` (texto + referencias documentales, obligatoria si el valor es externo a las versiones `[D12]`); `dominiosACorregir` [dominio]; `usuarioId`; `motivo`. |
 | **Efectos** | **Se publica `DatoDeIdentidadCorregido`** (integración) a los dominios cuyo valor difiere — lo aplican automáticamente (`[R27]`); `IdentidadActualizada` en el `Tercero` (efecto inter-agregado: la vista consolidada refleja el valor decidido sin esperar el regreso). |
 
 #### `ConvergenciaConfirmada`
@@ -589,7 +599,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Causalidad** | Derivada (el servicio la detecta al consolidar las correcciones que regresan, paso 5). |
 | **Agregado** | `Conciliacion`. |
 | **Estado previo / resultante** | `EnCorreccion` / `Cerrada` ■ (`motivoCierre = convergencia`). |
-| **Información capturada** | Confirmación por dominio (qué evento de rol trajo cada corrección). |
+| **Información capturada** | `confirmaciones` [ { dominio, referenciaOrigen, secuencia del evento de rol que trajo la corrección } ]. |
 | **Efectos** | Caso cerrado con trazabilidad completa. |
 
 #### `DivergenciaSuperada`
@@ -600,10 +610,10 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Causalidad** | Derivada (servicio, paso 5). |
 | **Agregado** | `Conciliacion`. |
 | **Estado previo / resultante** | `Abierta` (tipo `divergencia`) / `Cerrada` ■ (`motivoCierre = superada`). |
-| **Información capturada** | Valor final y los eventos de rol que produjeron la convergencia. |
+| **Información capturada** | `valorFinal`; `convergencias` [ { dominio, referenciaOrigen, secuencia } ]. |
 | **Efectos** | Caso cerrado sin intervención (`[I10]`). |
 
-### 5.4. Integración de salida
+### 5.5. Integración de salida
 
 La bodega publica **sus decisiones, nunca los datos de los roles** (`[D4]`):
 
