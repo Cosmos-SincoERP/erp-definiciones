@@ -167,7 +167,48 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 
 ### 3.2. Agregado: Tercero
 
-*(En construcción)*
+**Descripción:** La entidad consolidada del tercero. Agrupa bajo una clave natural los roles que los dominios operativos informan, mantiene la identidad compartida (identificación legal, razón social, tipo de persona) y administra la señal global. **No se crea ni se edita por comando de usuario:** nace cuando el `ServicioDeConsolidacion` procesa el primer evento de rol con una clave natural nueva (`[R16]` — nace Activo), y sus datos solo cambian por consolidación de eventos de rol o por resolución de conciliación. Los únicos comandos que acepta son los del administrador sobre la señal global (`InactivarTercero`, `ReactivarTercero`, con motivo obligatorio `[R17]`).
+
+**Identidad del agregado:** el `Tercero` tiene **identificador propio** (`terceroId`), con **índice único por clave natural** (tipo de documento + número + país). La clave natural **no puede ser** la identidad del agregado porque es corregible: el caso CC→NIT (una conciliación corrige el tipo de documento) cambiaría la clave, y una fusión hace que dos claves apunten al mismo tercero. Con identificador propio, el historial sobrevive a ambas. *(Ver `[D##]` en Sección 9 y su `[SI##]` de índice.)*
+
+**Composición:**
+
+**Raíz — datos de identidad compartidos:**
+
+| Atributo | Tipo | Notas |
+|----------|------|-------|
+| `terceroId` | Identificador | Identidad del agregado, estable ante correcciones y fusiones. |
+| `identificacionLegal` | VO `IdentificacionLegal` *(paquete transversal)* | Tipo + número + país + DV. Define la clave natural (sin DV, `[R05]`). |
+| `razonSocial` | Texto | Dato compartido — sujeto a divergencia (`[R14]`). |
+| `tipoPersona` | `persona` \| `organizacion` | Dato compartido (`[R07]`). |
+| `estado` | `Activo` \| `Inactivo` | Señal global. Nace Activo (`[R16]`). |
+| `motivoEstado` | Texto | Obligatorio al inactivar/reactivar (`[R17]`). |
+
+**Entidad interna — `Rol` (colección 1..N):**
+
+| Atributo | Tipo | Notas |
+|----------|------|-------|
+| Identidad de la entidad | (`rol`, `dominio`, `empresa`) | Un tercero no puede tener dos veces el mismo rol del mismo dominio en la misma empresa. |
+| `rol` | Del catálogo de roles (Sección 6) | proveedor, cliente, empleado, entidad financiera, otro. |
+| `dominio` | Identificador del dominio fuente | OXP, CXC, RRHH… |
+| `empresa` | Referencia | La empresa donde el rol opera. |
+| `referenciaOrigen` | Identificador externo | El identificador del registro en el dominio dueño (ej: el `proveedorId` de OXP) — la correlación entre la bodega y el origen: permite que las resoluciones de conciliación lleguen al registro exacto y que la ficha enlace "navegar al dominio". |
+| `estadoEnOrigen` | `activo` \| `inactivo` | Lo que el dominio informó (`[R20]`); la bodega no lo decide. |
+| `direcciones` | Colección VO `DireccionFisica` + tipo de uso | Como llegaron en el evento de rol. |
+| `contactos` | Colección `Contacto` | Estructura del paquete (issue #35): nombre, rol del contacto, correo, teléfono, marca de principal (`[R25]` — principal por rol). |
+
+**Lo que NO es atributo (y dónde vive):**
+
+| Concepto | Dónde vive |
+|----------|-----------|
+| Historial de identidad (`[R06]`) | Derivado del stream de eventos — no se persiste como atributo *(mismo criterio `[D3]` de la v1.0)*. |
+| Marca "en conciliación" / marca de divergencia | Proyección que cruza el tercero con sus `Conciliacion` abiertas — el agregado no la duplica. |
+| Mapa canónico | Proyección acumulada de los eventos `TercerosFusionados`. |
+| Completitud / "listo para operar" | No existe en la bodega (`[R29]`). |
+
+**Eventos que emite:** `TerceroCreado`, `RolIncorporado`, `RolActualizado`, `RolInactivado`, `IdentidadActualizada` (consolidación); `TerceroInactivado`, `TerceroReactivado` (señal global); y participa en la fusión (`TercerosFusionados` — la mecánica exacta entre `Tercero` y `Conciliacion` se define en la Sección 5).
+
+**Qué protege (anticipo de invariantes, Sección 7):** unicidad por clave natural (`[R02]`, eventual vía índice); nace Activo con al menos un rol; un solo rol por (`rol`, `dominio`, `empresa`); cambio de señal global solo por administrador con motivo; ningún dato de identidad se edita directamente en la bodega — solo consolidación o resolución (`[R13]`).
 
 ### 3.3. Agregado: Conciliacion
 
