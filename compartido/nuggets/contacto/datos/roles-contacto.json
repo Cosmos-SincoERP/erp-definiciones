@@ -1,0 +1,9 @@
+[
+  { "codigo": "representante_legal", "nombre": "Representante legal", "activo": true },
+  { "codigo": "tesorero", "nombre": "Tesorero", "activo": true },
+  { "codigo": "comercial", "nombre": "Comercial", "activo": true },
+  { "codigo": "tecnico", "nombre": "Técnico", "activo": true },
+  { "codigo": "facturacion", "nombre": "Contacto de facturación", "activo": true },
+  { "codigo": "notificaciones", "nombre": "Contacto de notificaciones", "activo": true },
+  { "codigo": "otro", "nombre": "Otro", "activo": true }
+]
