@@ -243,7 +243,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 |----------|-------|
 | `terceroId` | El tercero (uno solo) cuyas fuentes discrepan. |
 | `datoEnDisputa` | Cuál dato de identidad compartido: razón social, tipo de persona o componente de la identificación (`[R14]`). |
-| `versiones` (VO `VersionDeDato`, colección 2..N) | Cada valor informado + el dominio que lo informó + cuándo. |
+| `versiones` (VO `VersionDeDato`, colección 2..N) | Cada valor informado + el registro que lo informó (`dominio`, `referenciaOrigen`, `empresa`) + cuándo. |
 | Decisión posible | **Determinar el dato correcto** — el valor elegido puede ser una de las versiones **o un valor distinto respaldado por evidencia** (ej: el certificado RUES trae la razón social vigente y ningún dominio la tenía bien, ver `[D12]`). La resolución publica la corrección a los registros exactos cuyo valor difiera del correcto (`dominio` + `referenciaOrigen`). |
 
 **Comandos (solo administrador de terceros, `[R10]`):** `FusionarTerceros`, `MarcarHomonimia`, `ResolverDivergencia`, `AgregarNota`. No existe comando de apertura (la abre el servicio) ni de cierre por convergencia (lo detecta el servicio al consolidar las correcciones).
@@ -271,7 +271,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 | VO | Dónde | Composición |
 |----|-------|-------------|
 | `Candidato` | `Conciliacion` (duplicados) | `terceroId` + instantánea al detectar: clave natural, razón social, **estado global**, lista de (rol, dominio, empresa). El estado visible permite al administrador ver un veto vigente antes de fusionar (`[I14]`). |
-| `VersionDeDato` | `Conciliacion` (divergencias) | Valor informado + dominio que lo informó + fecha del evento que lo trajo. |
+| `VersionDeDato` | `Conciliacion` (divergencias) | Valor informado + **el registro que lo informó** (`dominio`, `referenciaOrigen`, `empresa`) + fecha del evento que lo trajo. La granularidad de registro permite distinguir qué informó cada uno cuando un dominio tiene roles homólogos, y derivar `registrosACorregir` con exactitud. |
 
 ### 3.5. Sugerencias de implementación
 
@@ -559,7 +559,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Agregado** | `Conciliacion`. |
 | **Estado previo / resultante** | No existe / `Abierta`. |
 | **Precondiciones** | Dato compartido con ≥2 valores vigentes distintos entre fuentes (`[I6]`). |
-| **Información capturada** | `conciliacionId` (UUID); `terceroId`; `datoEnDisputa` (enum: RazonSocial / TipoPersona / IdentificacionLegal); `versiones` [ { valor, dominio, fechaDelEvento } ]. |
+| **Información capturada** | `conciliacionId` (UUID); `terceroId`; `datoEnDisputa` (enum: RazonSocial / TipoPersona / IdentificacionLegal); `versiones` [ { valor, dominio, referenciaOrigen, empresa, fechaDelEvento } ]. |
 | **Efectos** | La ficha muestra el valor más reciente con marca de divergencia (Flujo 4, paso 2). |
 
 #### `NotaAgregada`
