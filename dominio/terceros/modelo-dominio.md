@@ -270,7 +270,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 
 | VO | Dónde | Composición |
 |----|-------|-------------|
-| `Candidato` | `Conciliacion` (duplicados) | `terceroId` + instantánea al detectar: clave natural, razón social, lista de (rol, dominio, empresa). |
+| `Candidato` | `Conciliacion` (duplicados) | `terceroId` + instantánea al detectar: clave natural, razón social, **estado global**, lista de (rol, dominio, empresa). El estado visible permite al administrador ver un veto vigente antes de fusionar (`[I14]`). |
 | `VersionDeDato` | `Conciliacion` (divergencias) | Valor informado + dominio que lo informó + fecha del evento que lo trajo. |
 
 ### 3.5. Sugerencias de implementación
@@ -483,11 +483,11 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | Aspecto | Detalle |
 |---------|---------|
 | **Descripción** | El administrador decretó el cese global de la relación con el tercero (`[R17]`). |
-| **Causalidad** | Directa (comando `InactivarTercero`). |
+| **Causalidad** | Directa (comando `InactivarTercero`) o efecto inter-agregado (herencia de señal en una fusión, `[I14]`). |
 | **Agregado** | `Tercero`. |
 | **Estado previo** | `Activo`. |
 | **Estado resultante** | `Inactivo`. |
-| **Precondiciones** | Motivo obligatorio; solo administrador de terceros (`[I4]`). |
+| **Precondiciones** | Motivo obligatorio; solo administrador de terceros (`[I4]`) — en la herencia de fusión, el decisor y el motivo se heredan de la fusión que la deriva. |
 | **Información capturada** | `motivo` { codigo (catálogo 6.4), descripcion }; `usuarioId`; `fecha`. |
 | **Efectos** | **Se publica como aviso de integración** — cada dominio lo aplica localmente (`[R18]`). El historial de los dominios queda intacto (`[R19]`). |
 
@@ -527,7 +527,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Agregado** | `Conciliacion`. |
 | **Estado previo / resultante** | No existe / `Abierta`. |
 | **Precondiciones** | Criterio de `[R09]` cumplido; sin homonimia previa por el mismo criterio sobre los mismos terceros (`[I9]`, `[SI5]`). |
-| **Información capturada** | `conciliacionId` (UUID); `candidatos` [ { terceroId, claveNatural { tipoDocumento, numero, pais }, razonSocial, roles [ { rol, dominio, empresa } ] } ]; `criterioDeteccion` (enum: NumeroIgualRazonEquivalente / ClaveIdenticaPorCorreccion `[SI9]` / criterios F2 `[PD2]`). |
+| **Información capturada** | `conciliacionId` (UUID); `candidatos` [ { terceroId, claveNatural { tipoDocumento, numero, pais }, razonSocial, estado (Activo / Inactivo), roles [ { rol, dominio, empresa } ] } ]; `criterioDeteccion` (enum: NumeroIgualRazonEquivalente / ClaveIdenticaPorCorreccion `[SI9]` / criterios F2 `[PD2]`). |
 | **Efectos** | Los candidatos se marcan "en conciliación" en la ficha (`[SI6]`). Ningún dominio se entera; nada se bloquea. |
 
 #### `DivergenciaDetectada`
@@ -564,7 +564,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado resultante** | `Cerrada` ■ (`motivoCierre = fusion`). |
 | **Precondiciones** | El canónico es uno de los candidatos (`[I7]`); decisor + motivo (`[I8]`). |
 | **Información capturada** | `terceroCanonicoId`; `absorbidos` [terceroId]; `correspondencias` [ { claveNatural → terceroCanonicoId } ]; `correccionDeDato`? { dato, valorCorrecto, registrosACorregir [ { dominio, referenciaOrigen } ] } (solo si el duplicado nació de un error de captura); `usuarioId`; `motivo`. |
-| **Efectos** | `TerceroAbsorbido` en cada absorbido y `RolIncorporado` en el canónico (efectos inter-agregado); mapa canónico actualizado (`[SI4]`); **se publica como aviso de integración** (Contabilidad lo aplica en sus reportes por tercero); si hay corrección de dato, se publica `DatoDeIdentidadCorregido`. |
+| **Efectos** | `TerceroAbsorbido` en cada absorbido y `RolIncorporado` en el canónico (efectos inter-agregado); mapa canónico actualizado (`[SI4]`); **herencia de señal (`[I14]`):** si algún candidato está `Inactivo` y el canónico está `Activo`, se deriva `TerceroInactivado` en el canónico (efecto inter-agregado, motivo heredado y trazado a la `conciliacionId`) y se publica como siempre; **se publica como aviso de integración** (Contabilidad lo aplica en sus reportes por tercero); si hay corrección de dato, se publica `DatoDeIdentidadCorregido`. |
 
 #### `HomonimiaMarcada`
 
@@ -695,6 +695,7 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 | `[I11]` | Ningún evento de rol recibido se descarta: termina aplicado a un tercero o representado en una conciliación (`[R04]`). | Eventual | Pasos 1-4 del `ServicioDeConsolidacion` + reintento de plataforma (`[D11]`). |
 | `[I12]` | Un tercero `Fusionado` es terminal: no consolida más roles ni cambia de señal. | Local | FSM (Sección 4.1). |
 | `[I13]` | Los eventos de rol con clave de un tercero absorbido se aplican al canónico. | Eventual | Enrutamiento por el mapa canónico (`[SI4]`, paso 2 del servicio). |
+| `[I14]` | El canónico de una fusión hereda la señal global más restrictiva de los candidatos: si alguno está `Inactivo`, el resultado queda `Inactivo` (con motivo heredado, trazado a la fusión). El veto nunca desaparece por fusionar. | Local | Verificación al fusionar: `TercerosFusionados` deriva `TerceroInactivado` en el canónico cuando aplica. |
 
 ---
 
@@ -723,7 +724,7 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 | `[D4]` | **La bodega publica decisiones, no datos.** Direcciones y contactos entran en los eventos de rol y se consultan en la ficha; nunca se re-publican. | Si la bodega re-emitiera datos, cada cambio de teléfono rebotaría por el ERP y la bodega se volvería un repetidor — acoplamiento informativo. |
 | `[D5]` | **El contrato de entrada lleva el estado completo del rol (no delta), con `secuencia` por `referenciaOrigen`.** | La consolidación tolera pérdida y desorden de mensajes: el evento más reciente siempre deja el rol correcto. El criterio de "delta" del proyecto aplica a eventos de dominio dentro de un agregado, no a contratos de integración entre BCs. |
 | `[D6]` | **La detección es del servicio; la decisión es humana; la apertura no tiene evento propio.** `PosibleDuplicadoDetectado` y `DivergenciaDetectada` son a la vez detección y apertura. | Un evento "CasoAbierto" separado no agrega información — la detección es el hecho de negocio (`[R10]`). |
-| `[D7]` | **Fusión por absorción:** el canónico incorpora los roles del absorbido; el absorbido pasa a `Fusionado` (terminal) y sus claves enrutan al canónico. Tras la fusión, los roles homólogos (mismo rol, dominio y empresa) **coexisten** en el canónico, diferenciados por su `referenciaOrigen` — reflejo de que en el origen siguen siendo dos registros. | Los streams de ambos terceros se preservan completos (nada se reescribe, `[R12]`); el enrutamiento garantiza que los dominios no necesiten enterarse de la fusión para seguir publicando. |
+| `[D7]` | **Fusión por absorción:** el canónico incorpora los roles del absorbido; el absorbido pasa a `Fusionado` (terminal) y sus claves enrutan al canónico. Tras la fusión, los roles homólogos (mismo rol, dominio y empresa) **coexisten** en el canónico, diferenciados por su `referenciaOrigen` — reflejo de que en el origen siguen siendo dos registros. El canónico **hereda la señal global más restrictiva** de los candidatos (`[I14]`): un veto por fraude nunca desaparece por fusionar; si la inactivación era errónea, el camino es reactivar primero (`[R20]`). | Los streams de ambos terceros se preservan completos (nada se reescribe, `[R12]`); el enrutamiento garantiza que los dominios no necesiten enterarse de la fusión para seguir publicando. |
 | `[D8]` | **Resolución ≠ cierre en divergencias:** la divergencia resuelta queda `EnCorreccion` hasta que los dominios convergen (`ConvergenciaConfirmada`). | Fidelidad al Flujo 4 del alcance: el caso supervisa que la corrección publicada efectivamente se aplicó — visibilidad operativa de lo pendiente. |
 | `[D9]` | **El perfil tributario no es parte del agregado `Tercero`** — alimenta la proyección de la ficha directamente. | Impuestos es el dueño; la bodega solo lo muestra. Meterlo al agregado lo convertiría en dato compartido sujeto a divergencia, y no lo es. |
 | `[D10]` | **Injerencia por mensajes (`[R27]`) como contrato:** la bodega publica `DatoDeIdentidadCorregido` y la señal global; cada dominio los aplica automáticamente en sus registros, de forma autónoma. | Decisión del usuario (alcance, Flujo 4): corrección automática sí, pero desacoplada y distribuida — nunca escritura remota ni dependencia en línea. |
