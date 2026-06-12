@@ -210,6 +210,8 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 
 **Eventos que emite:** `TerceroCreado`, `RolIncorporado`, `RolActualizado`, `RolInactivado`, `IdentidadActualizada` (consolidación); `TerceroInactivado`, `TerceroReactivado` (señal global); `TerceroAbsorbido` (fusión: el absorbido pasa al estado terminal `Fusionado` y sus roles se incorporan al canónico — ver `[D7]` y Sección 5).
 
+**Comportamiento — consolidar la identidad compartida:** ante un cambio de identidad informado por un registro, **el agregado decide**: si todos sus roles provienen del mismo registro que trae el cambio (única fuente, a granularidad de registro), acepta `IdentidadActualizada`; si existen otras fuentes con el valor anterior, el cambio no se aplica — es señal de divergencia (paso 4 del servicio). El servicio entrega el dato; el `Tercero` decide.
+
 **Qué protege (anticipo de invariantes, Sección 7):** unicidad por clave natural (`[R02]`, eventual vía índice); nace Activo con al menos un rol; un solo rol por (`dominio`, `referenciaOrigen`); cambio de señal global solo por administrador con motivo; ningún dato de identidad se edita directamente en la bodega — solo consolidación o resolución (`[R13]`).
 
 ### 3.3. Agregado: Conciliacion
@@ -250,7 +252,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 
 **Comandos (solo administrador de terceros, `[R10]`):** `FusionarTerceros`, `MarcarHomonimia`, `ResolverDivergencia`, `AgregarNota`. No existe comando de apertura (la abre el servicio) ni de cierre por convergencia (lo detecta el servicio al consolidar las correcciones).
 
-**Eventos que emite:** `PosibleDuplicadoDetectado` y `DivergenciaDetectada` (apertura); `TercerosFusionados`, `HomonimiaMarcada`, `DivergenciaResuelta` (decisión); `ConvergenciaConfirmada` (cierre de divergencia resuelta cuando los dominios convergieron); `DivergenciaSuperada` (cierre sin decisión humana: convergieron solos); `NotaAgregada` (progreso).
+**Eventos que emite:** `PosibleDuplicadoDetectado` y `DivergenciaDetectada` (apertura); `TercerosFusionados`, `HomonimiaMarcada`, `DivergenciaResuelta` (decisión); `ConvergenciaConfirmada` (cierre de divergencia resuelta cuando los dominios convergieron); `DivergenciaSuperada` (cierre sin decisión humana: convergieron solos); `VersionAgregada` y `NotaAgregada` (progreso).
 
 **Qué protege (anticipo de invariantes):** un duplicado exige ≥2 candidatos y una divergencia exige ≥2 versiones del mismo tercero; el canónico de una fusión debe ser uno de los candidatos; toda resolución lleva decisor, fecha y motivo; una homonimia marcada no se reabre por el mismo criterio sobre los mismos terceros; `EnCorreccion` y los cierres por convergencia solo aplican a divergencias.
 
@@ -314,8 +316,8 @@ Si una corrección de clave natural (aplicada por un dominio y consolidada de re
 |---|------|----------------------|---------|
 | 1 | **Verificar** el evento con las reglas empaquetadas. Una anomalía no rechaza: se registra como evidencia para conciliación (`[R04]`). | — | — |
 | 2 | **Resolver la clave natural** y buscar el tercero por el índice (`[SI1]`), pasando por el mapa canónico (`[SI4]`) si la clave pertenece a un absorbido. | `Tercero` | — |
-| 3 | **Consolidar:** si no existe → crear (`TerceroCreado` + `RolIncorporado`, mismo append). Si existe → incorporar o actualizar el rol (`RolIncorporado` / `RolActualizado` / `RolInactivado`); si el evento trae identidad compartida distinta y es la única fuente, actualizarla (`IdentidadActualizada`). **Creación concurrente:** si el índice (`[SI1]`) rechaza la creación porque otro evento ganó la carrera con la misma clave, el servicio vuelve al paso 2, encuentra al tercero recién creado y consolida sobre él — el evento nunca se descarta (`[I11]`). | `Tercero` | Consolidación |
-| 4 | **Evaluar señales:** duplicado (`[R09]`, consultando la memoria `[SI5]`) y divergencia (`[R14]`, comparando los datos compartidos entre fuentes). Si hay señal → abrir `Conciliacion` (`PosibleDuplicadoDetectado` / `DivergenciaDetectada`). Caso especial de colisión de claves: `[SI9]`. | `Conciliacion` | Apertura |
+| 3 | **Consolidar:** si no existe → crear (`TerceroCreado` + `RolIncorporado`, mismo append). Si existe → incorporar o actualizar el rol (`RolIncorporado` / `RolActualizado` / `RolInactivado` según la regla de emisión de 5.3); si el evento trae identidad compartida distinta, **el agregado decide** (comportamiento de 3.2): la acepta (`IdentidadActualizada`) cuando es la única fuente; si hay otras, queda como señal de divergencia para el paso 4. **Creación concurrente:** si el índice (`[SI1]`) rechaza la creación porque otro evento ganó la carrera con la misma clave, el servicio vuelve al paso 2, encuentra al tercero recién creado y consolida sobre él — el evento nunca se descarta (`[I11]`). | `Tercero` | Consolidación |
+| 4 | **Evaluar señales:** duplicado (`[R09]`, consultando la memoria `[SI5]`) y divergencia (`[R14]`, comparando los datos compartidos entre fuentes). Si hay señal y no existe caso por ella → abrir `Conciliacion` (`PosibleDuplicadoDetectado` / `DivergenciaDetectada`); si ya existe → enriquecerlo (`VersionAgregada`, `[I15]`). Caso especial de colisión de claves: `[SI9]`. | `Conciliacion` | Apertura |
 | 5 | **Detectar convergencia:** si el tercero tiene divergencias `Abiertas` o `EnCorreccion` y los datos de las fuentes ya coinciden → cerrarlas (`DivergenciaSuperada` / `ConvergenciaConfirmada`). | `Conciliacion` | Cierre |
 
 **Eventos de perfil tributario (Impuestos):** no tocan los agregados — alimentan directamente la proyección de la ficha (`[SI6]`, ver `[D9]`).
@@ -388,17 +390,18 @@ Nace `Abierta` con la detección. Los duplicados cierran con la decisión; las d
    PosibleDuplicadoDetectado / DivergenciaDetectada
                          │
                          ▼
-                  ┌─────────────┐  TercerosFusionados (duplicado)
-                  │   ABIERTA   │  HomonimiaMarcada (duplicado)     ┌────────────┐
-                  │             │ ────────────────────────────────► │ CERRADA ■  │
-                  │ · NotaAgregada  DivergenciaSuperada             │ motivoCierre:│
-                  └──────┬──────┘  (divergencia, sin decisión)      │ fusion │    │
-                         │                                     ┌──► │ homonimia │ │
+                  ┌──────────────┐  TercerosFusionados (duplicado)
+                  │   ABIERTA    │  HomonimiaMarcada (duplicado)    ┌────────────┐
+                  │              │ ───────────────────────────────► │ CERRADA ■  │
+                  │ · NotaAgregada   DivergenciaSuperada            │ motivoCierre:│
+                  │ · VersionAgregada (divergencia, sin decisión)   │ fusion │    │
+                  └──────┬───────┘                             ┌──► │ homonimia │ │
                          │ DivergenciaResuelta                 │    │ convergencia│
                          ▼ (divergencia)                       │    │ superada    │
                   ┌──────────────┐  ConvergenciaConfirmada     │    └────────────┘
                   │ ENCORRECCION │ ─────────────────────────────┘
                   │ · NotaAgregada│  (los dominios convergieron)
+                  │ · VersionAgregada
                   └──────────────┘
 ```
 
@@ -411,8 +414,8 @@ Nace `Abierta` con la detección. Los duplicados cierran con la decisión; las d
 | Agregado | Tipo | Eventos |
 |----------|------|:-------:|
 | Tercero | Transaccional | 8 |
-| Conciliacion | Transaccional | 8 |
-| | **Total dominio** | **16** |
+| Conciliacion | Transaccional | 9 |
+| | **Total dominio** | **17** |
 | *(Integración de salida derivado)* | `DatoDeIdentidadCorregido` | 1 |
 | *(Integración de entrada)* | Contrato del evento de rol (Sección 5.2) | — |
 
@@ -470,7 +473,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 
 | Aspecto | Detalle |
 |---------|---------|
-| **Descripción** | El dominio informó cambios en un rol ya incorporado (datos, direcciones, contactos o su estado completo más reciente). |
+| **Descripción** | El dominio informó cambios en un rol ya incorporado — cualquier cambio **distinto de la transición activo→inactivo del `estadoEnOrigen`** (esa emite `RolInactivado`), incluida la actualización de datos de un rol ya inactivo. |
 | **Causalidad** | Directa (servicio). |
 | **Agregado** | `Tercero`. |
 | **Estado previo / resultante** | `Activo` o `Inactivo` / sin cambio (progreso). |
@@ -482,11 +485,11 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 
 | Aspecto | Detalle |
 |---------|---------|
-| **Descripción** | El dominio informó que su rol dejó de operar (ej: el proveedor se inactivó en OXP). La bodega lo refleja — no lo decide (`[R20]`). |
+| **Descripción** | El dominio informó que su rol dejó de operar (ej: el proveedor se inactivó en OXP). La bodega lo refleja — no lo decide (`[R20]`). **Regla de emisión:** se emite solo cuando la transición observada del `estadoEnOrigen` es activo→inactivo; cualquier otro cambio emite `RolActualizado`. |
 | **Causalidad** | Directa (servicio). |
 | **Agregado** | `Tercero`. |
 | **Estado previo / resultante** | `Activo` o `Inactivo` / sin cambio (progreso). |
-| **Precondiciones** | El rol existe. |
+| **Precondiciones** | El rol existe; `secuencia` mayor a `ultimaSecuencia` (`[SI3]`); transición observada de `estadoEnOrigen`: activo→inactivo. |
 | **Información capturada** | Identidad del rol: { rol, dominio, empresa }; `referenciaOrigen`; `secuencia`; `fechaDelHecho`. |
 | **Efectos** | La ficha muestra el rol inactivo en su origen. |
 
@@ -550,7 +553,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Causalidad** | Directa (servicio, paso 4). |
 | **Agregado** | `Conciliacion`. |
 | **Estado previo / resultante** | No existe / `Abierta`. |
-| **Precondiciones** | Criterio de `[R09]` cumplido; sin homonimia previa por el mismo criterio sobre los mismos terceros (`[I9]`, `[SI5]`). |
+| **Precondiciones** | Criterio de `[R09]` cumplido; sin homonimia previa por el mismo criterio sobre los mismos terceros (`[I9]`, `[SI5]`); sin `Conciliacion` abierta por el mismo conjunto de candidatos y criterio (`[I15]`). |
 | **Información capturada** | `conciliacionId` (UUID); `candidatos` [ { terceroId, claveNatural { tipoDocumento, numero, pais }, razonSocial, estado (Activo / Inactivo), roles [ { rol, dominio, empresa } ] } ]; `criterioDeteccion` (enum: NumeroIgualRazonEquivalente / ClaveIdenticaPorCorreccion `[SI9]` / criterios F2 `[PD2]`). |
 | **Efectos** | Los candidatos se marcan "en conciliación" en la ficha (`[SI6]`). Ningún dominio se entera; nada se bloquea. |
 
@@ -562,9 +565,21 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Causalidad** | Directa (servicio, paso 4). |
 | **Agregado** | `Conciliacion`. |
 | **Estado previo / resultante** | No existe / `Abierta`. |
-| **Precondiciones** | Dato compartido con ≥2 valores vigentes distintos entre fuentes (`[I6]`). |
+| **Precondiciones** | Dato compartido con ≥2 valores distintos entre fuentes (`[I6]`); sin `Conciliacion` abierta o en corrección por el mismo (`terceroId`, `datoEnDisputa`) (`[I15]`) — si existe, la nueva versión enriquece el caso (`VersionAgregada`). |
 | **Información capturada** | `conciliacionId` (UUID); `terceroId`; `datoEnDisputa` (enum: RazonSocial / TipoPersona / IdentificacionLegal); `versiones` [ { valor, dominio, referenciaOrigen, empresa, fechaDelEvento } ]. |
 | **Efectos** | La ficha muestra el valor más reciente con marca de divergencia (Flujo 4, paso 2). |
+
+#### `VersionAgregada`
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | Una fuente adicional informó un valor para el dato ya en disputa de una divergencia existente — la señal repetida enriquece el caso en lugar de abrir otro (`[I15]`). |
+| **Causalidad** | Derivada (servicio, paso 4: la señal coincide con un caso existente). |
+| **Agregado** | `Conciliacion`. |
+| **Estado previo / resultante** | `Abierta` o `EnCorreccion` / sin cambio (progreso). |
+| **Precondiciones** | Caso de tipo `divergencia` por el mismo (`terceroId`, `datoEnDisputa`); la versión no estaba registrada. |
+| **Información capturada** | `version` { valor, dominio, referenciaOrigen, empresa, fechaDelEvento }. |
+| **Efectos** | El caso acumula la versión. Si el caso está `EnCorreccion` y el valor difiere del correcto ya decidido, la corrección se publica también al registro recién divergente (`DatoDeIdentidadCorregido`) — la decisión no se re-toma. |
 
 #### `NotaAgregada`
 
@@ -720,6 +735,7 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 | `[I12]` | Un tercero `Fusionado` es terminal: no consolida más roles ni cambia de señal. | Local | FSM (Sección 4.1). |
 | `[I13]` | Los eventos de rol con clave de un tercero absorbido se aplican al canónico. | Eventual | Enrutamiento por el mapa canónico (`[SI4]`, paso 2 del servicio). |
 | `[I14]` | El canónico de una fusión hereda la señal global más restrictiva de los candidatos: si alguno está `Inactivo`, el resultado queda `Inactivo` (con motivo heredado, trazado a la fusión). El veto nunca desaparece por fusionar. | Local | Verificación al fusionar: `TercerosFusionados` deriva `TerceroInactivado` en el canónico cuando aplica. |
+| `[I15]` | Una sola `Conciliacion` abierta (o en corrección) por señal: mismo conjunto de candidatos + criterio para duplicados; mismo (`terceroId`, `datoEnDisputa`) para divergencias. La señal repetida **enriquece** el caso existente (`VersionAgregada`), no abre otro. | Eventual | Paso 4 del servicio consulta los casos abiertos antes de abrir; precondición de los eventos de apertura. |
 
 ---
 
