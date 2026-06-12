@@ -386,6 +386,8 @@ Nace `Activo` (`[R16]`). La señal global alterna entre `Activo` e `Inactivo` (`
 
 Nace `Abierta` con la detección. Los duplicados cierran con la decisión; las divergencias resueltas pasan a `EnCorreccion` hasta que los dominios convergen (Flujo 4, paso 5), o cierran directo si convergieron sin decisión humana.
 
+> La permanencia prolongada en `EnCorreccion` (un dominio que nunca aplica la corrección) es una situación operativa **visible** que requiere política de seguimiento — umbral, alerta y escalamiento se definen en `[PD5]`.
+
 ```
    PosibleDuplicadoDetectado / DivergenciaDetectada
                          │
@@ -777,7 +779,7 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 
 | ID | Premisa |
 |----|---------|
-| `[P1]` | Los dominios capturan con las validaciones empaquetadas del producto — la calidad de formato y DV se garantiza en el origen (`[R03]`). La bodega verifica con las mismas reglas, pero las anomalías son casos de conciliación, no rechazos (`[R04]`). |
+| `[P1]` | Los dominios capturan con las validaciones empaquetadas del producto — la calidad de formato y DV se garantiza en el origen (`[R03]`). La bodega verifica con las mismas reglas, pero las anomalías son casos de conciliación, no rechazos (`[R04]`). Si un dominio captura con una versión del paquete y la bodega verifica con otra, el desacuerdo sobre la validez de un dato no rechaza nada: se vuelve un caso de conciliación, como cualquier anomalía (`[R04]`). Mantener las versiones al día entre dominios y bodega es tarea del custodio del paquete y del despliegue — no de este sub-dominio. |
 | `[P2]` | Los eventos de los dominios llegan al menos una vez y pueden llegar desordenados. El contrato `[D5]` + `[SI3]` lo absorben. |
 | `[P3]` | Tras la carga histórica, el volumen de conciliaciones abiertas será alto — es la deuda de calidad de datos de SincoERP saliendo a la luz (alcance, Sección 7). La resolución por lotes (`[SI8]`) es parte del plan, no una contingencia. |
 | `[P4]` | La empresa referenciada en cada rol existe en Estructura Organizacional. Es referencia por identificador, sin validación en caliente. |
@@ -792,6 +794,7 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 | `[PD2]` | Criterios ampliados de detección de duplicados (F2): contactos o direcciones coincidentes entre consolidados. | Producto + consultores | Diseño de F2 — no bloquea F1. |
 | `[PD3]` | Ratificar el catálogo de motivos de inactivación global (Sección 6.4) con el comité de producto. | Producto | Antes del desarrollo F1 de la señal global. |
 | `[PD4]` | Issue cruzado de refinamiento en Contabilidad: actualizar R07 y las menciones "Terceros como fuente de verdad que valida" al modelo de copia local + reportes canonizados (alcance v2.0, Sección 3). | Este sub-dominio (origina el cambio) | Crear el issue al fusionar el PR del #33. |
+| `[PD5]` | Política de seguimiento para divergencias `EnCorreccion` que no convergen: umbral de permanencia, alerta y escalamiento. | Producto + equipo técnico | Antes de la salida del Nivel B de F1 (en el Nivel A aún no hay dominios aplicando correcciones). |
 
 ---
 
