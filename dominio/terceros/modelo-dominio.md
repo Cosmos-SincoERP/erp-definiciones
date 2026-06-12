@@ -93,7 +93,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 
 **Dos agregados raíz:**
 
-- **`Tercero`** — la entidad consolidada: identidad compartida, sus roles (entidad interna `Rol`, uno por dominio y empresa) y la señal global. No se crea por comando de un usuario: nace cuando el `ServicioDeConsolidacion` procesa el primer evento de rol con una clave natural nueva.
+- **`Tercero`** — la entidad consolidada: identidad compartida, sus roles (entidad interna `Rol`, uno por registro de origen) y la señal global. No se crea por comando de un usuario: nace cuando el `ServicioDeConsolidacion` procesa el primer evento de rol con una clave natural nueva.
 - **`Conciliacion`** — una instancia del proceso de conciliación: un caso de duplicado o divergencia, con su evidencia, decisión humana y trazabilidad (`[R10]`).
 
 **Un domain service:** `ServicioDeConsolidacion` — procesa cada evento de rol recibido: resuelve la clave natural, crea o actualiza el `Tercero`, y evalúa las señales de duplicado y divergencia (consultando la memoria de conciliación) para abrir una `Conciliacion` cuando corresponde.
@@ -188,7 +188,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 
 | Atributo | Tipo | Notas |
 |----------|------|-------|
-| Identidad de la entidad | (`rol`, `dominio`, `empresa`) | Un tercero no puede tener dos veces el mismo rol del mismo dominio en la misma empresa. |
+| Identidad de la entidad | (`dominio`, `referenciaOrigen`) | Un registro del dominio de origen = un rol en la bodega. Tras una fusión pueden coexistir roles homólogos (mismo rol, dominio y empresa) diferenciados por su `referenciaOrigen` (ver `[D7]`). |
 | `rol` | Del catálogo de roles (Sección 6) | proveedor, cliente, empleado, entidad financiera, otro. |
 | `dominio` | Identificador del dominio fuente | OXP, CXC, RRHH… |
 | `empresa` | Referencia | La empresa donde el rol opera. |
@@ -208,7 +208,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 
 **Eventos que emite:** `TerceroCreado`, `RolIncorporado`, `RolActualizado`, `RolInactivado`, `IdentidadActualizada` (consolidación); `TerceroInactivado`, `TerceroReactivado` (señal global); `TerceroAbsorbido` (fusión: el absorbido pasa al estado terminal `Fusionado` y sus roles se incorporan al canónico — ver `[D7]` y Sección 5).
 
-**Qué protege (anticipo de invariantes, Sección 7):** unicidad por clave natural (`[R02]`, eventual vía índice); nace Activo con al menos un rol; un solo rol por (`rol`, `dominio`, `empresa`); cambio de señal global solo por administrador con motivo; ningún dato de identidad se edita directamente en la bodega — solo consolidación o resolución (`[R13]`).
+**Qué protege (anticipo de invariantes, Sección 7):** unicidad por clave natural (`[R02]`, eventual vía índice); nace Activo con al menos un rol; un solo rol por (`dominio`, `referenciaOrigen`); cambio de señal global solo por administrador con motivo; ningún dato de identidad se edita directamente en la bodega — solo consolidación o resolución (`[R13]`).
 
 ### 3.3. Agregado: Conciliacion
 
@@ -438,7 +438,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Agregado** | `Tercero`. |
 | **Estado previo** | `Activo` o `Inactivo` (progreso — la consolidación no se detiene por la señal). |
 | **Estado resultante** | Sin cambio. |
-| **Precondiciones** | No existe rol con la misma combinación (`rol`, `dominio`, `empresa`) (`[I3]`). |
+| **Precondiciones** | No existe rol con la misma combinación (`dominio`, `referenciaOrigen`) (`[I3]`). |
 | **Información capturada** | El estado completo del rol según el contrato de entrada: { rol (código del catálogo 6.1), dominio, empresa, referenciaOrigen, estadoEnOrigen (Activo / Inactivo), secuencia }; `direcciones` [ { DireccionFisica, tipoUso } ]; `contactos` [ { nombre?, rolContacto (código del catálogo 6.2), correos [CorreoElectronico], telefonos [Telefono], esPrincipal } ]; `fechaDelHecho`. |
 | **Efectos** | El servicio evalúa señales de duplicado y divergencia (paso 4 del `ServicioDeConsolidacion`). |
 
@@ -684,7 +684,7 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 |----|-----------|-------|-----------|
 | `[I1]` | No pueden existir dos terceros vigentes (no fusionados) con la misma clave natural (`[R02]`). | Eventual | Índice único `[SI1]`; las colisiones por corrección se tratan vía `[SI9]`. |
 | `[I2]` | Todo tercero nace `Activo` y con al menos un rol (`[R16]`). | Local | `TerceroCreado` + `RolIncorporado` en el mismo append. |
-| `[I3]` | Un tercero no tiene dos roles con la misma combinación (`rol`, `dominio`, `empresa`). | Local | Precondición de `RolIncorporado`. |
+| `[I3]` | Un tercero no tiene dos roles con la misma combinación (`dominio`, `referenciaOrigen`) — un registro del origen, un rol en la bodega. | Local | Precondición de `RolIncorporado`. |
 | `[I4]` | La señal global solo cambia por comando del administrador, con motivo (`[R17]`). | Local | Precondición de `TerceroInactivado` / `TerceroReactivado` + permiso (Sección 12). |
 | `[I5]` | La identidad compartida no se edita por comando: solo cambia por consolidación o por resolución de conciliación (`[R13]`). | Local | El agregado no expone comandos de edición de datos. |
 | `[I6]` | Un duplicado exige ≥2 candidatos; una divergencia exige un tercero y ≥2 versiones. | Local | Precondición de los eventos de apertura. |
@@ -723,7 +723,7 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 | `[D4]` | **La bodega publica decisiones, no datos.** Direcciones y contactos entran en los eventos de rol y se consultan en la ficha; nunca se re-publican. | Si la bodega re-emitiera datos, cada cambio de teléfono rebotaría por el ERP y la bodega se volvería un repetidor — acoplamiento informativo. |
 | `[D5]` | **El contrato de entrada lleva el estado completo del rol (no delta), con `secuencia` por `referenciaOrigen`.** | La consolidación tolera pérdida y desorden de mensajes: el evento más reciente siempre deja el rol correcto. El criterio de "delta" del proyecto aplica a eventos de dominio dentro de un agregado, no a contratos de integración entre BCs. |
 | `[D6]` | **La detección es del servicio; la decisión es humana; la apertura no tiene evento propio.** `PosibleDuplicadoDetectado` y `DivergenciaDetectada` son a la vez detección y apertura. | Un evento "CasoAbierto" separado no agrega información — la detección es el hecho de negocio (`[R10]`). |
-| `[D7]` | **Fusión por absorción:** el canónico incorpora los roles del absorbido; el absorbido pasa a `Fusionado` (terminal) y sus claves enrutan al canónico. | Los streams de ambos terceros se preservan completos (nada se reescribe, `[R12]`); el enrutamiento garantiza que los dominios no necesiten enterarse de la fusión para seguir publicando. |
+| `[D7]` | **Fusión por absorción:** el canónico incorpora los roles del absorbido; el absorbido pasa a `Fusionado` (terminal) y sus claves enrutan al canónico. Tras la fusión, los roles homólogos (mismo rol, dominio y empresa) **coexisten** en el canónico, diferenciados por su `referenciaOrigen` — reflejo de que en el origen siguen siendo dos registros. | Los streams de ambos terceros se preservan completos (nada se reescribe, `[R12]`); el enrutamiento garantiza que los dominios no necesiten enterarse de la fusión para seguir publicando. |
 | `[D8]` | **Resolución ≠ cierre en divergencias:** la divergencia resuelta queda `EnCorreccion` hasta que los dominios convergen (`ConvergenciaConfirmada`). | Fidelidad al Flujo 4 del alcance: el caso supervisa que la corrección publicada efectivamente se aplicó — visibilidad operativa de lo pendiente. |
 | `[D9]` | **El perfil tributario no es parte del agregado `Tercero`** — alimenta la proyección de la ficha directamente. | Impuestos es el dueño; la bodega solo lo muestra. Meterlo al agregado lo convertiría en dato compartido sujeto a divergencia, y no lo es. |
 | `[D10]` | **Injerencia por mensajes (`[R27]`) como contrato:** la bodega publica `DatoDeIdentidadCorregido` y la señal global; cada dominio los aplica automáticamente en sus registros, de forma autónoma. | Decisión del usuario (alcance, Flujo 4): corrección automática sí, pero desacoplada y distribuida — nunca escritura remota ni dependencia en línea. |
