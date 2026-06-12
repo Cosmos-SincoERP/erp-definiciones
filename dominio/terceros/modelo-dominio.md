@@ -420,6 +420,8 @@ Nace `Abierta` con la detección. Los duplicados cierran con la decisión; las d
 
 Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Empleado) en cada creación, actualización o inactivación de su registro del tercero. Es la "información estándar del rol" del alcance (Secciones 3 y 5).
 
+**Quién lo materializa:** cada dominio fuente emite el evento estándar de rol **directamente, como su propio evento de integración** hacia la bodega — además de los eventos de dominio internos que tenga. No existe un traductor intermedio por fuente: si lo hubiera, cada fuente nueva exigiría cambios en la bodega, exactamente lo que el alcance descarta ("las nuevas fuentes se integran publicando la misma información estándar — la bodega no requiere cambios", Sección 8).
+
 | Bloque | Campos |
 |--------|--------|
 | Identificación | `identificacionLegal` (tipo, número, país, DV), `razonSocial`, `tipoPersona` |
@@ -583,7 +585,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado previo** | `Abierta` (tipo `duplicado`). |
 | **Estado resultante** | `Cerrada` ■ (`motivoCierre = fusion`). |
 | **Precondiciones** | El canónico es uno de los candidatos (`[I7]`); decisor + motivo (`[I8]`). |
-| **Información capturada** | `terceroCanonicoId`; `absorbidos` [terceroId]; `correspondencias` [ { claveNatural → terceroCanonicoId } ]; `correccionDeDato`? { dato, valorCorrecto, registrosACorregir [ { dominio, referenciaOrigen } ] } (solo si el duplicado nació de un error de captura); `usuarioId`; `motivo`. |
+| **Información capturada** | `terceroCanonicoId`; `absorbidos` [terceroId]; `correspondencias` [ { claveNatural → { claveNaturalCanonica, terceroCanonicoId } } ] — la clave canónica es lo que usan los consumidores que identifican terceros por identificación (Contabilidad); el UUID, quienes consultan la bodega; `correccionDeDato`? { dato, valorCorrecto, registrosACorregir [ { dominio, referenciaOrigen } ] } (solo si el duplicado nació de un error de captura); `usuarioId`; `motivo`. |
 | **Efectos** | `TerceroAbsorbido` en cada absorbido y `RolIncorporado` en el canónico (efectos inter-agregado); mapa canónico actualizado (`[SI4]`); **herencia de señal (`[I14]`):** si algún candidato está `Inactivo` y el canónico está `Activo`, se deriva `TerceroInactivado` en el canónico (efecto inter-agregado, motivo heredado y trazado a la `conciliacionId`) y se publica como siempre; **se publica como aviso de integración** (Contabilidad lo aplica en sus reportes por tercero); si hay corrección de dato, se publica `DatoDeIdentidadCorregido`. La cadena completa está documentada como **proceso de fusión** en la Sección 3.6 (orden, idempotencia por paso, estado del proceso, ventana visible). |
 
 #### `HomonimiaMarcada`
@@ -640,7 +642,7 @@ La bodega publica **sus decisiones, nunca los datos de los roles** (`[D4]`):
 | Aviso | Origen | Qué lleva | Quién lo aplica |
 |-------|--------|-----------|-----------------|
 | `TerceroInactivado` / `TerceroReactivado` | El mismo evento de dominio viaja | Clave natural, motivo | Todos los dominios con roles del tercero — bloquean/permiten nuevas operaciones según su regla (`[R18]`). |
-| `TercerosFusionados` | El mismo evento de dominio viaja | Correspondencia identificación → tercero canónico | Contabilidad y demás interesados en reportes por tercero (`[R12]`). |
+| `TercerosFusionados` | El mismo evento de dominio viaja | Correspondencia identificación → { identificación canónica, terceroCanonicoId } | Contabilidad y demás interesados en reportes por tercero (`[R12]`) — canonizan por la identificación, que es como sus registros conocen al tercero. |
 | `DatoDeIdentidadCorregido` | Derivado de `DivergenciaResuelta` (y de fusiones con corrección de dato) | Clave natural **en su valor previo a la corrección** (contexto), dato en disputa, valor correcto, `registrosACorregir` [ { dominio, referenciaOrigen } ] | Cada dominio señalado corrige **el registro exacto** indicado por su `referenciaOrigen`, automáticamente (`[R13]`, `[R27]`) — sin búsquedas por clave ni ambigüedad cuando lo corregido es la propia identificación. |
 
 > Las direcciones y los contactos **no aparecen en esta tabla por diseño**: entran en los eventos de rol y se consultan en la ficha (`[D4]`).
