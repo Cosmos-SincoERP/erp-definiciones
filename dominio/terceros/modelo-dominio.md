@@ -1,6 +1,6 @@
 # Modelo de Dominio — Terceros
 
-> ℹ️ **v2.0.1 — Modelo completo con auditoría aplicada (junio 2026).** Reescritura por el replanteamiento arquitectónico (issues #31, #33): Terceros pasa de autoridad de registro a **bodega consolidadora**. Auditoría de 11 skills ejecutada y aplicada (`auditoria/terceros-v2-actual.md`). La v1.0 se conserva como referencia en [`modelo-dominio_bk.md`](modelo-dominio_bk.md) hasta el cierre del issue #33.
+> ℹ️ **v2.0.2 — Modelo cerrado para desarrollo (junio 2026).** Reescritura por el replanteamiento arquitectónico (issues #31, #33): Terceros pasa de autoridad de registro a **bodega consolidadora**. Dos auditorías completas de 11 skills ejecutadas y aplicadas (`auditoria/terceros-v2-actual.md` y `auditoria/terceros-final-v2.0.1.md`). La v1.0 (autoridad de registro) se conserva en el historial del repositorio.
 
 ## Tabla de contenido
 
@@ -27,7 +27,7 @@ Este documento describe el comportamiento del sub-dominio de Terceros como **bod
 |-----------|-----|-------------|
 | `definicion-alcance.md` (v2.0) | QUÉ hace Terceros | Fuente de verdad para glosario (16 términos), actores, 6 flujos principales, 30 reglas de negocio, alcance dentro/fuera y fases de implementación. No se duplica aquí. |
 | **Este documento** | CÓMO se comporta Terceros | Agregados, eventos, transiciones de estado, precondiciones, invariantes, contrato del evento de rol, decisiones de arquitectura y permisos atómicos. |
-| `definicion-alcance_bk.md` / `modelo-dominio_bk.md` | Referencia histórica | La v1.0 (autoridad de registro), superada por el replanteamiento. Se conservan hasta el cierre del issue #33. |
+| Historial del repositorio | Referencia histórica | La v1.0 (autoridad de registro), superada por el replanteamiento — conservada en el historial de git (los documentos superados se eliminan para evitar confusión, mismo criterio del replanteamiento). |
 | EventCatalog | Catalogación técnica | Fase 3 del proyecto. Consumirá este documento como especificación de entrada. |
 
 Las reglas de negocio se referencian como `[R##]` y su texto completo vive en `definicion-alcance.md`, Sección 6.
@@ -199,7 +199,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 | `estadoEnOrigen` | `activo` \| `inactivo` | Lo que el dominio informó (`[R20]`); la bodega no lo decide. |
 | `ultimaSecuencia` | Número | La última `secuencia` del origen aplicada a este rol — la consultan las precondiciones de `RolActualizado`/`RolInactivado` para aplicar una sola vez y en orden (`[SI3]`). |
 | `direcciones` | Colección VO `DireccionFisica` + tipo de uso | Como llegaron en el evento de rol. |
-| `contactos` | Colección `Contacto` | Estructura del paquete (issue #35): nombre, rol del contacto, correo, teléfono, marca de principal (`[R25]` — principal por rol). |
+| `contactos` | Colección { contacto: `Contacto`, esPrincipal } | Estructura del paquete (issue #35): nombre, rol del contacto, correos, teléfonos. La marca de principal es atributo de la relación, no del VO (`[R25]` — principal por rol). |
 
 **Lo que NO es atributo (y dónde vive):**
 
@@ -239,7 +239,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 
 | Atributo | Notas |
 |----------|-------|
-| `candidatos` (VO `Candidato`, colección 2..N) | Referencia a cada `terceroId` + **instantánea de la evidencia al detectar**: clave natural, razón social, roles y dominios de cada candidato en ese momento. |
+| `candidatos` (VO `Candidato`, colección 2..N) | Referencia a cada `terceroId` + **instantánea de la evidencia al detectar**: clave natural, razón social, estado global, roles y dominios de cada candidato en ese momento. |
 | `criterioDeteccion` | Qué señal lo abrió (`[R09]`: número igual + razón social canónica equivalente; en F2, criterios ampliados). Es la llave de la **memoria de conciliación**: una homonimia marcada con este criterio no se reabre (`[R11]`). |
 | Decisión posible | **Fusionar** (designa el canónico — debe ser uno de los candidatos) o **marcar homonimia legítima**. |
 
@@ -494,7 +494,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Agregado** | `Tercero`. |
 | **Estado previo / resultante** | `Activo` o `Inactivo` / sin cambio (progreso). |
 | **Precondiciones** | El rol existe; `secuencia` mayor a `ultimaSecuencia` (`[SI3]`); transición observada de `estadoEnOrigen`: activo→inactivo. |
-| **Información capturada** | Identidad del rol: { rol, dominio, empresa }; `referenciaOrigen`; `secuencia`; `fechaDelHecho`. |
+| **Información capturada** | Identidad del rol: { dominio, referenciaOrigen }; contexto: rol, empresa; `secuencia`; `fechaDelHecho`. |
 | **Efectos** | La ficha muestra el rol inactivo en su origen. |
 
 #### `IdentidadActualizada`
@@ -632,7 +632,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado resultante** | `EnCorreccion` — la decisión está tomada; falta que los dominios converjan. |
 | **Precondiciones** | Valor correcto determinado — una de las versiones u otro valor con evidencia (`[D12]`); decisor + motivo (`[I8]`). |
 | **Información capturada** | `datoEnDisputa`; `valorCorrecto`; `evidencia` (texto + referencias documentales, obligatoria si el valor es externo a las versiones `[D12]`); `registrosACorregir` [ { dominio, referenciaOrigen } ] — los roles cuyo valor difiere del correcto, identificados con exactitud; `usuarioId`; `motivo`. |
-| **Efectos** | **Se publica `DatoDeIdentidadCorregido`** (integración) a los dominios cuyo valor difiere — lo aplican automáticamente (`[R27]`); `IdentidadActualizada` en el `Tercero` (efecto inter-agregado: la vista consolidada refleja el valor decidido sin esperar el regreso). |
+| **Efectos** | **Se publica `DatoDeIdentidadCorregido`** (integración) a los registros señalados (`registrosACorregir`) — los dominios lo aplican automáticamente (`[R27]`); `IdentidadActualizada` en el `Tercero` (efecto inter-agregado: la vista consolidada refleja el valor decidido sin esperar el regreso). |
 
 #### `ConvergenciaConfirmada`
 
@@ -664,7 +664,7 @@ La bodega publica **sus decisiones, nunca los datos de los roles** (`[D4]`):
 |-------|--------|-----------|-----------------|
 | `TerceroInactivado` / `TerceroReactivado` | El mismo evento de dominio viaja | Clave natural, motivo | Todos los dominios con roles del tercero — bloquean/permiten nuevas operaciones según su regla (`[R18]`). |
 | `TercerosFusionados` | El mismo evento de dominio viaja | Correspondencia identificación → { identificación canónica, terceroCanonicoId } | Contabilidad y demás interesados en reportes por tercero (`[R12]`) — canonizan por la identificación, que es como sus registros conocen al tercero. |
-| `DatoDeIdentidadCorregido` | Derivado de `DivergenciaResuelta` (y de fusiones con corrección de dato) | Clave natural **en su valor previo a la corrección** (contexto), dato en disputa, valor correcto, `registrosACorregir` [ { dominio, referenciaOrigen } ] | Cada dominio señalado corrige **el registro exacto** indicado por su `referenciaOrigen`, automáticamente (`[R13]`, `[R27]`) — sin búsquedas por clave ni ambigüedad cuando lo corregido es la propia identificación. |
+| `DatoDeIdentidadCorregido` | Derivado de `DivergenciaResuelta`, de fusiones con corrección de dato, y de `VersionAgregada` sobre casos `EnCorreccion` | Clave natural **en su valor previo a la corrección** (contexto), dato en disputa, valor correcto, `registrosACorregir` [ { dominio, referenciaOrigen } ] | Cada dominio señalado corrige **el registro exacto** indicado por su `referenciaOrigen`, automáticamente (`[R13]`, `[R27]`) — sin búsquedas por clave ni ambigüedad cuando lo corregido es la propia identificación. |
 
 > Las direcciones y los contactos **no aparecen en esta tabla por diseño**: entran en los eventos de rol y se consultan en la ficha (`[D4]`).
 
@@ -739,7 +739,7 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 | `[I12]` | Un tercero `Fusionado` es terminal: no consolida más roles ni cambia de señal. | Local | FSM (Sección 4.1). |
 | `[I13]` | Los eventos de rol con clave de un tercero absorbido se aplican al canónico. | Eventual | Enrutamiento por el mapa canónico (`[SI4]`, paso 2 del servicio). |
 | `[I14]` | El canónico de una fusión hereda la señal global más restrictiva de los candidatos: si alguno está `Inactivo`, el resultado queda `Inactivo` (con motivo heredado, trazado a la fusión). El veto nunca desaparece por fusionar. | Local | Verificación al fusionar: `TercerosFusionados` deriva `TerceroInactivado` en el canónico cuando aplica. |
-| `[I15]` | Una sola `Conciliacion` abierta (o en corrección) por señal: mismo conjunto de candidatos + criterio para duplicados; mismo (`terceroId`, `datoEnDisputa`) para divergencias. La señal repetida **enriquece** el caso existente (`VersionAgregada`), no abre otro. | Eventual | Paso 4 del servicio consulta los casos abiertos antes de abrir; precondición de los eventos de apertura. |
+| `[I15]` | Una sola `Conciliacion` abierta (o en corrección) por señal: mismo conjunto de candidatos + criterio para duplicados; mismo (`terceroId`, `datoEnDisputa`) para divergencias. La señal repetida no abre otro caso: si es divergencia, **enriquece** el existente (`VersionAgregada`); en duplicados no produce evento — el caso abierto ya la representa. | Eventual | Paso 4 del servicio consulta los casos abiertos antes de abrir; precondición de los eventos de apertura. |
 
 ---
 
@@ -824,6 +824,7 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
+| 2.0.2 | Junio 2026 | **Segunda auditoría completa aplicada (6 hallazgos residuales: 0 Alta, 2 Media, 4 Baja — `auditoria/terceros-final-v2.0.1.md`).** Payload de `RolInactivado` con la identidad vigente (dominio, referenciaOrigen); tercera derivación de `DatoDeIdentidadCorregido` registrada en 5.5 (`VersionAgregada` sobre `EnCorreccion`); filas de composición de `contactos` y `candidatos` alineadas con sus payloads; redacción de `[I15]` precisa el alcance del enriquecimiento; Efectos de `DivergenciaResuelta` a granularidad de registro. **Modelo cerrado para desarrollo.** |
 | 2.0.1 | Junio 2026 | **Auditoría completa aplicada (28 hallazgos: 5 Alta, 13 Media, 10 Baja — `auditoria/terceros-v2-actual.md`).** Las 5 Altas: identidad de la entidad `Rol` pasa a (`dominio`, `referenciaOrigen`) — los roles homólogos coexisten tras la fusión; las correcciones se dirigen a registros exactos (`registrosACorregir`, clave en valor previo); nueva `[I14]` — el canónico hereda la señal global más restrictiva; la creación concurrente reintenta y consolida sobre el existente; la **fusión documentada como proceso** (stream `fusion-{conciliacionId}`, idempotencia por paso, ventana visible). Medias: granularidad de registro en `VersionDeDato`; identificación canónica en las correspondencias de fusión; contrato de entrada emitido directamente por cada fuente; `motivoEstado` tipado; `ultimaSecuencia` en `Rol`; "vigente" definido; nueva `[I15]` + evento `VersionAgregada` (anti-duplicación de casos); regla de emisión `RolInactivado`/`RolActualizado`; el comportamiento "consolidar la identidad" pasa al agregado; `[PD5]` (seguimiento de `EnCorreccion`); `[P1]` ampliada (versiones del paquete). Conteos: **17 eventos de dominio** (8+9), **15 invariantes** (10 Local + 5 Eventual), 5 pendientes. |
 | 2.0 | Junio 2026 | **Reescritura completa por el replanteamiento arquitectónico (#31, #33):** bodega consolidadora. 2 agregados raíz (`Tercero` con entidad interna `Rol` y estado terminal `Fusionado`; `Conciliacion` con seguimiento `EnCorreccion`), 1 domain service (`ServicioDeConsolidacion`, 5 pasos sin compensaciones), 7 VOs (5 del paquete transversal + `Candidato`/`VersionDeDato`), 16 eventos de dominio + 1 de integración derivado (`DatoDeIdentidadCorregido`) + contrato de entrada del evento de rol (estado completo + secuencia, `[D5]`), 2 FSM, 4 catálogos, 13 invariantes (9 Local + 4 Eventual), 12 decisiones, 4 premisas, 4 pendientes, 9 SIs, 11 permisos. Desaparecen frente a la v1.0: comandos de registro/edición, estados `EnRegistro`/`Abortado`, referencias a direcciones, dependencias de ejecución con Datos de Referencia y Direcciones. |
 | 1.0 | Abril 2026 | Versión inicial (autoridad de registro). Conservada en `modelo-dominio_bk.md`. |
