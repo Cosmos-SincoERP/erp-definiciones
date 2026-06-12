@@ -123,7 +123,7 @@ Ambos tipos preservan la inmutabilidad del cruce original — no se modifica el 
 
 ### OXP como Bounded Context
 
-OXP (Obligaciones por Pagar) es un **bounded context** — no un agregado. Contiene múltiples agregados coordinados que en conjunto gestionan el ciclo de vida de las obligaciones originadas en medios de pago corporativos.
+OXP (Obligaciones por Pagar) es un **bounded context** — no un agregado. Contiene múltiples agregados coordinados que en conjunto gestionan el ciclo de vida de las obligaciones originadas en medios de pago corporativos, junto con el **registro propio del Proveedor** — el rol del tercero de OXP en el modelo de bodega (replanteamiento #31, issue #38).
 
 ### Clasificación de capacidades
 
@@ -132,6 +132,7 @@ El bounded context de OXP agrupa capacidades con distinto nivel de madurez. Esta
 | Nivel | Capacidades | Agregados / Servicios | Fase |
 |---|---|---|---|
 | **Núcleo transaccional** | Obligaciones individuales, obligaciones consolidadas, anticipos, devoluciones, conciliación, regularización, aplicación de devoluciones | OxpComercio, OxpExtracto, Anticipo, Devolucion, ServicioDeConciliacion, ServicioDeRegularizacion, ServicioDeAplicacionDevolucion | `[F1]` |
+| **Registro del tercero** | Registro de proveedores con validación empaquetada, emisión del evento estándar de rol hacia la bodega de Terceros, aplicación automática de sus decisiones (señal global, correcciones) | Proveedor | `[F1]` |
 | **Configuración** | Catálogo de gasto directo, clasificación inteligente de origen | CatalogoGastoDirecto | `[F1]` |
 | **Ampliación** | Obligaciones de caja menor (fondo fijo, rendición, reembolso) | OxpCajaMenor *(por especificar)* | `[F2]` |
 
@@ -417,7 +418,7 @@ Además, OXP puebla **`terceroPrincipal`** a nivel del hecho económico (no por 
 
 | Value Object | Contenido |
 |---|---|
-| `InformacionTercero` | NIT, razón social |
+| `InformacionTercero` | NIT, razón social — **copiado del `Proveedor` al radicar** (referencia `proveedorId`, `[D31]`) |
 | `MedioDePago` | Tipo (crédito/débito prepago), número, entidad bancaria |
 | `ValorMonetario` | Monto, moneda, TRM (si aplica), monto en moneda funcional |
 | `SoporteDocumental` | Tipo (PDF, imagen, XML), referencia, datos extraídos |
@@ -561,7 +562,7 @@ Los valores totales y las líneas de traducción no se almacenan — se derivan 
 
 | Value Object | Contenido |
 |---|---|
-| `InformacionTercero` | NIT, razón social |
+| `InformacionTercero` | NIT, razón social — identifica al **emisor/banco** del producto financiero; no es un `Proveedor` de OXP (entidad financiera, `[D31]`) |
 | `MedioDePago` | Tipo (crédito/débito prepago), número, entidad bancaria |
 | `ValorMonetario` | Monto, moneda, TRM (si aplica), monto en moneda funcional |
 | `InstruccionDistribucion` | Distribución por unidad organizacional. Indica cómo distribuir un valor entre unidades organizacionales. Se aplica al valor total del extracto y a cada componente individual (CargoFinanciero, AjustePorDiferenciaCambio o AjustePorTolerancia). Cada referencia tiene su propia distribución independiente. `List<DestinoDeNegocio>` (invariante I2: suma = 100%). |
@@ -716,7 +717,7 @@ En ambos casos, la **regularización** siempre ocurre vía OxpComercio que aport
 
 | Componente | Tipo | Contenido |
 |---|---|---|
-| `InformacionTercero` | VO | NIT, razón social |
+| `InformacionTercero` | VO | NIT, razón social — **copiado del `Proveedor` al radicar** (referencia `proveedorId`, `[D31]`) |
 | `ValorMonetario` | VO | Valor del anticipo: monto adelantado. Monto, moneda, TRM si aplica, monto en moneda funcional. Valor global sin desglose fiscal `[P1]`. |
 | `MedioDePago` | VO | Tipo (crédito/débito prepago), número, entidad bancaria |
 | `SoporteDocumental` | VO (opcional) | Soporte preliminar del anticipo (ej: cuenta de cobro). Opcional — el anticipo puede registrarse sin soporte. El soporte formal definitivo (factura) llega vía OxpComercio durante la regularización. |
@@ -853,7 +854,7 @@ La devolución es un documento independiente que referencia exactamente **un** a
 
 | Value Object | Contenido | Aplica a tipo |
 |---|---|---|
-| `InformacionTercero` | NIT, razón social. Debe coincidir con el tercero del agregado OXP origen. | Todos |
+| `InformacionTercero` | NIT, razón social. Coincide con el del agregado OXP origen — misma referencia `proveedorId` (`[D31]`). | Todos |
 | `ValorMonetario` | Monto, moneda, TRM (si aplica), monto en moneda funcional. | Todos |
 | `SoporteDocumental` | Tipo (PDF, imagen, XML), referencia, datos extraídos. | Todos |
 | `DesgloseFiscal` | Agrupa los cálculos fiscales derivados de un `ConceptoDevuelto`. Inmutable — se reemplaza completo al recalcular. Contiene: `List<Tributo>` de impuestos y `List<Tributo>` de retenciones. | Comercio |
@@ -882,7 +883,7 @@ La devolución es un documento independiente que referencia exactamente **un** a
 │  ○ SoporteDocumental                                        │
 │                                                              │
 │  Invariante: mínimo 1 entidad interna                        │
-│  Invariante: mismo tercero que OXP origen                    │
+│  Invariante: mismo Proveedor que OXP origen                    │
 │                                                              │
 │  ┌────────────────────────────────────────────────────────┐  │
 │  │ ConceptoDevuelto #1 (Entidad)                          │  │
@@ -1023,7 +1024,7 @@ El registro propio de OXP del tercero con quien se contraen las obligaciones —
 
 ### Value Objects compartidos
 
-`InformacionTercero` y `ValorMonetario` son Value Objects reutilizados por los cuatro agregados. `MedioDePago` aplica a OxpComercio, OxpExtracto y Anticipo (Devolucion no lo requiere — hereda implícitamente el medio de pago del agregado OXP origen). Cada agregado los incluye en su composición pero la definición es la misma — evita duplicación de estructuras de datos sin acoplar los agregados.
+`InformacionTercero` y `ValorMonetario` son Value Objects reutilizados por los cuatro agregados transaccionales. Desde `[D31]`, en OxpComercio, Anticipo y Devolucion el `InformacionTercero` **se copia del agregado `Proveedor` al radicar** (referencia `proveedorId`) — una sola fuente del dato dentro de OXP; en OxpExtracto identifica al emisor/banco, que no es un Proveedor. `MedioDePago` aplica a OxpComercio, OxpExtracto y Anticipo (Devolucion no lo requiere — hereda implícitamente el medio de pago del agregado OXP origen). Cada agregado los incluye en su composición pero la definición es la misma — evita duplicación de estructuras de datos sin acoplar los agregados.
 
 ### [SI1] Entidades internas con discriminador de tipo → sealed interfaces
 
@@ -1052,22 +1053,22 @@ La conciliación es la operación que vincula OxpComercio y OxpExtracto. No pert
 
 **Flujo de partidas de retorno (devoluciones):**
 
-Si la partida es un crédito (retorno de dinero), el servicio busca Devoluciones existentes (tipo Comercio) del mismo tercero o permite crear una nueva Devolucion (tipo Extracto):
+Si la partida es un crédito (retorno de dinero), el servicio busca Devoluciones existentes (tipo Comercio) del mismo Proveedor (referencia `proveedorId`) o permite crear una nueva Devolucion (tipo Extracto):
 
 1. Carga la instancia de `OxpExtracto` (stream `oxp-extracto-{id}`)
 2. Identifica partida de retorno (crédito)
-3. Busca Devolucion existente (tipo Comercio) del mismo tercero, o permite radicar nueva Devolucion (tipo Extracto)
+3. Busca Devolucion existente (tipo Comercio) del mismo Proveedor (referencia `proveedorId`), o permite radicar nueva Devolucion (tipo Extracto)
 4. Emite `PartidaCubiertaPorDevolucion` → stream de OxpExtracto (crea `CoberturaDevolucion`, partida transiciona a estado `devolucion`)
 
 Sin tabla de compensación: operación de un solo paso sobre un solo agregado (OxpExtracto) — reintentable `[D20]`, sin riesgo de inconsistencia inter-agregado.
 
 **Flujo de cobertura de anticipo:**
 
-Si una partida no tiene OxpComercio asociada pero existe un Anticipo vigente del mismo tercero, el servicio permite cubrir la partida con el anticipo:
+Si una partida no tiene OxpComercio asociada pero existe un Anticipo vigente del mismo Proveedor (referencia `proveedorId`), el servicio permite cubrir la partida con el anticipo:
 
 1. Carga la instancia de `OxpExtracto` (stream `oxp-extracto-{id}`)
 2. Identifica partida pendiente sin OxpComercio
-3. Carga la instancia de `Anticipo` (stream `anticipo-{id}`) — del mismo tercero, con `saldoPorPagar()` > 0
+3. Carga la instancia de `Anticipo` (stream `anticipo-{id}`) — del mismo Proveedor (referencia `proveedorId`), con `saldoPorPagar()` > 0
 4. Emite `PartidaCubiertaPorAnticipo` → stream de OxpExtracto (crea `CoberturaAnticipo`, partida transiciona a estado `anticipo`)
 5. Emite `AnticipoVinculadoAPartida` → stream de Anticipo (crea `CrucePagoAplicado` tipo extracto, reduce `saldoPorPagar()`)
 
@@ -1097,7 +1098,7 @@ Dos streams, consistencia eventual, coordinados por el domain service.
 
 La regularización es la operación que vincula un Anticipo con una OxpComercio, aportando el soporte documental formal (factura) que justifica el anticipo. Es un **domain service** que coordina efectos en ambos streams:
 
-**Trigger:** El usuario selecciona una OxpComercio en estado Confirmada o posterior y un Anticipo del mismo tercero con `saldoPorRegularizar()` > 0. El sistema permite seleccionar el monto a regularizar (default: `min(saldoPorRegularizar(), saldoPorPagar(OxpComercio))`).
+**Trigger:** El usuario selecciona una OxpComercio en estado Confirmada o posterior y un Anticipo del mismo Proveedor (referencia `proveedorId`) con `saldoPorRegularizar()` > 0. El sistema permite seleccionar el monto a regularizar (default: `min(saldoPorRegularizar(), saldoPorPagar(OxpComercio))`).
 
 **Flujo principal:**
 
@@ -1282,6 +1283,8 @@ Devolucion ─────────┤                │                    
 - Un OxpExtracto puede recibir N vinculaciones.
 - Una OxpComercio puede recibir pagos tipo extracto (conciliación), anticipo (regularización), pago directo (confirmado por el sistema contable), o devolucion — los cuatro tipos de `PagoAplicado` pueden coexistir (pagos mixtos). La vinculación con extracto sigue siendo opcional.
 - La vinculación es por referencia (ID), no por composición. Cada agregado mantiene su propio stream de eventos independiente.
+
+**Proveedor:** OxpComercio, Anticipo y Devolucion lo referencian (N:1) vía `proveedorId` — es la fuente del `InformacionTercero` que embeben al radicar (`[D31]`). La comparación "mismo Proveedor" (regularización, aplicación de devoluciones, conciliación contra anticipos) es por esta referencia, no por igualdad de textos. OxpExtracto **no** lo referencia: su tercero es el emisor/banco (entidad financiera — fuera del rol que OXP informa a la bodega).
 
 ### Patrón: entidades espejo con consistencia eventual
 
@@ -1544,8 +1547,8 @@ Nace `Activo` (vía `AsegurarProveedor`). La inactivación tiene dos orígenes �
 | **Agregado** | OxpComercio |
 | **Estado previo** | (nuevo) — no existía previamente. |
 | **Estado resultante** | Pendiente. Si `[R02]` está configurada como automática: Confirmada. |
-| **Precondiciones** | Soporte documental adjunto (PDF, imagen o XML). Si es XML, datos extraídos de SincoRE. Validación de unicidad superada `[R26]`. |
-| **Información capturada** | Tercero (NIT, razón social), fecha de transacción, valor en moneda original, moneda, TRM del día si aplica `[R05b]`, valor en moneda funcional, número de soporte/factura, medio de pago (tarjeta), conceptos (gasto/costo + impuestos + retenciones) con clasificacionTributaria y conceptoPago por cada concepto (resueltos desde el catálogo del sub-dominio origen o del catálogo de gasto directo de OXP), subDominioOrigen `[SI5]`, distribución de costos si aplica `[R05c]`, soportes documentales adjuntos. |
+| **Precondiciones** | Soporte documental adjunto (PDF, imagen o XML). Si es XML, datos extraídos de SincoRE. Validación de unicidad superada `[R26]`. Proveedor asegurado (`AsegurarProveedor`, I20) y Activo (I22). |
+| **Información capturada** | `proveedorId` (referencia al Proveedor `[D31]`); tercero (NIT, razón social — copiado del Proveedor), fecha de transacción, valor en moneda original, moneda, TRM del día si aplica `[R05b]`, valor en moneda funcional, número de soporte/factura, medio de pago (tarjeta), conceptos (gasto/costo + impuestos + retenciones) con clasificacionTributaria y conceptoPago por cada concepto (resueltos desde el catálogo del sub-dominio origen o del catálogo de gasto directo de OXP), subDominioOrigen `[SI5]`, distribución de costos si aplica `[R05c]`, soportes documentales adjuntos. |
 | **Efectos** | Solicitud de cálculo al sub-dominio de Impuestos con el contexto transaccional completo (conceptos con clasificacionTributaria y conceptoPago, entidades fiscales, ubicaciones, fecha, moneda, direccionFiscal = gasto). El DesgloseFiscal propuesto se asigna a cada ConceptoDeGasto. Si el soporte trae tributos del proveedor, se validan contra el cálculo de Impuestos `[R37]` — las discrepancias se presentan al usuario para decisión. Si XML: extracción automática de datos desde SincoRE. Si requiere formalización: notificación a SincoADPRO `[R20]`. Si supera monto máximo: alerta informativa `[R05]`. Si compra del exterior o sujeto no obligado a facturar: alerta de plazo DIAN para Documento Soporte en Adquisiciones (6 días hábiles) `[R01]` — el documento lo emite SincoFE; OXP controla que haya sido emitido. Si `[R02]` automática: emite `OxpComercioConfirmada`. |
 
 #### ExtractoRadicado
@@ -1598,7 +1601,7 @@ Nace `Activo` (vía `AsegurarProveedor`). La inactivación tiene dos orígenes �
 | **Estado previo** | (nuevo) — no existía previamente. |
 | **Estado resultante** | Vigente. Excepción: anticipos nacidos de devolución (`ServicioDeAplicacionDevolucion`, Ramas B/C) — en el mismo append se emiten `AnticipoRegistrado` + `AnticipoConfirmado` + `AnticipoCausado` + `AnticipoPagado` (confirmación y causación automáticas heredadas; nacen con `CrucePagoAplicado` tipo devolucion que cubre 100% del `valorTotal`, por lo que `saldoPorPagar()` = 0). Estado resultante neto: Causada + Pagado. |
 | **Precondiciones** | **Registro manual:** Usuario con perfil habilitado para generar anticipos `[R22]`. Si no hay soporte: justificación obligatoria `[R03]`. **Nacido de devolución:** Emitido por `ServicioDeAplicacionDevolucion` (Ramas B/C) — precondiciones validadas por el domain service. |
-| **Información capturada** | Tercero (NIT, razón social), valor del anticipo, valorTotal (inicialmente igual al valor anticipo), medio de pago, fecha de transacción. Si hay soporte: soporte documental (ej: cuenta de cobro). Si no hay soporte: justificación de ausencia. Distribución de costos: instrucción única sobre el valor global (sin desglose fiscal `[P1]`) — preferencia de empresa o destino único pendiente (ver I10). **Nacido de devolución (Ramas B/C):** adicionalmente incluye `CrucePagoAplicado` tipo devolucion (ref. a Devolucion que originó el anticipo, valor = valorTotal), referencia a la OxpComercio origen de la devolución. |
+| **Información capturada** | `proveedorId` (referencia al Proveedor `[D31]`); tercero (NIT, razón social — copiado del Proveedor), valor del anticipo, valorTotal (inicialmente igual al valor anticipo), medio de pago, fecha de transacción. Si hay soporte: soporte documental (ej: cuenta de cobro). Si no hay soporte: justificación de ausencia. Distribución de costos: instrucción única sobre el valor global (sin desglose fiscal `[P1]`) — preferencia de empresa o destino único pendiente (ver I10). **Nacido de devolución (Ramas B/C):** adicionalmente incluye `CrucePagoAplicado` tipo devolucion (ref. a Devolucion que originó el anticipo, valor = valorTotal), referencia a la OxpComercio origen de la devolución. |
 | **Efectos** | **Registro manual:** Inicia conteo de plazo para regularización `[R04b]` (default 30 días). Anticipo queda en estado Vigente pendiente de confirmación. Si `[R12]` está configurada como automática: emite `AnticipoConfirmado` (y eventualmente `AnticipoCausado`) en el mismo append. **Nacido de devolución:** Anticipo pasa por Confirmada y Causada en el mismo append (confirmación y causación automáticas heredadas del flujo de devolución) y nace en estado Pagado (`saldoPorPagar()` = 0). `saldoPorRegularizar()` = valorNeto(devolucion) — pendiente de regularización contra nueva OxpComercio. Inicia conteo de plazo para regularización `[R04b]`. |
 
 #### AnticipoConfirmado
@@ -1636,7 +1639,7 @@ Nace `Activo` (vía `AsegurarProveedor`). La inactivación tiene dos orígenes �
 | **Agregado** | Anticipo |
 | **Estado previo** | Causada o Pagado. |
 | **Estado resultante** | Causada o Pagado (reduce `saldoPorRegularizar()`). Si `saldoPorRegularizar()` = 0: transiciona a Regularizado (o Cerrado si ya estaba Pagado). |
-| **Precondiciones** | Anticipo en estado no terminal (ni Cerrado ni Reversado), causado contablemente (estado Causada o posterior). OxpComercio del mismo tercero, en estado Confirmada o posterior. `saldoPorRegularizar()` suficiente para el monto a regularizar. Coordinado por `ServicioDeRegularizacion`. |
+| **Precondiciones** | Anticipo en estado no terminal (ni Cerrado ni Reversado), causado contablemente (estado Causada o posterior). OxpComercio del mismo Proveedor (referencia `proveedorId`), en estado Confirmada o posterior. `saldoPorRegularizar()` suficiente para el monto a regularizar. Coordinado por `ServicioDeRegularizacion`. |
 | **Información capturada** | Referencia a OxpComercio vinculada, monto regularizado, fecha. |
 | **Efectos** | Crea entidad `CruceRegularizacionAplicada` en el agregado Anticipo. Reduce `saldoPorRegularizar()`. Genera información estructurada para amortización contable `[R15]`. Si `saldoPorRegularizar()` = 0: emite `RegularizacionDeAnticipoCompletada`. |
 
@@ -1818,7 +1821,7 @@ Nace `Activo` (vía `AsegurarProveedor`). La inactivación tiene dos orígenes �
 | **Agregado** | OxpExtracto |
 | **Estado previo** | Parcialmente Conciliada. |
 | **Estado resultante** | Parcialmente Conciliada. Si el 100% de partidas quedan resueltas, el agregado emite `ExtractoConciliado` automáticamente. |
-| **Precondiciones** | Anticipo vigente para el mismo tercero. Partida en estado pendiente `[R08]`. |
+| **Precondiciones** | Anticipo vigente para el mismo Proveedor (referencia `proveedorId`). Partida en estado pendiente `[R08]`. |
 | **Información capturada** | Referencia al Anticipo, partida del extracto cubierta. |
 | **Efectos** | Partida transiciona a estado `anticipo`. Se crea entidad `CoberturaAnticipo` en el agregado. Cuenta como resuelta para invariante I3 (completitud de conciliación). El vínculo anticipo-partida es permanente. |
 
@@ -2130,8 +2133,8 @@ Nace `Activo` (vía `AsegurarProveedor`). La inactivación tiene dos orígenes �
 | **Agregado** | Devolucion |
 | **Estado previo** | (nuevo) — no existía previamente. |
 | **Estado resultante** | Pendiente. |
-| **Precondiciones** | **Comercio:** OxpComercio existe. Mismo tercero (NIT). `valorNeto(devolucion)` ≤ `valorNeto(OxpComercio)`. Acumulado I17. OxpComercio en Confirmada o posterior. Soporte documental adjunto (nota crédito `[R28]`). **Extracto:** OxpExtracto existe. `valorNeto(devolucion)` ≤ saldoPorPagar(OxpExtracto). OxpExtracto en estado Confirmada o posterior. **Anticipo:** Anticipo existe. Anticipo en estado Vigente o Confirmada (estados pre-causación). `saldoPorPagar()` = valorTotal (sin cruces de pago). `saldoPorRegularizar()` = valorAnticipo (sin cruces de regularización). `valorNeto(devolucion)` = valorTotal del anticipo (solo reversa total). Mismo tercero. |
-| **Información capturada** | Referencia a OXP origen (tipo + ID, obligatoria, inmutable), tercero (NIT, razón social), entidades internas según tipo de OXP: `ConceptoDevuelto`(s) para Comercio, `CargoFinancieroDevuelto`(s) para Extracto, `ReversaTotal` para Anticipo. Soportes documentales adjuntos. **Comercio:** adicionalmente moneda, TRM, distribución de costos. |
+| **Precondiciones** | **Comercio:** OxpComercio existe. Mismo Proveedor (referencia `proveedorId` del origen). `valorNeto(devolucion)` ≤ `valorNeto(OxpComercio)`. Acumulado I17. OxpComercio en Confirmada o posterior. Soporte documental adjunto (nota crédito `[R28]`). **Extracto:** OxpExtracto existe. `valorNeto(devolucion)` ≤ saldoPorPagar(OxpExtracto). OxpExtracto en estado Confirmada o posterior. **Anticipo:** Anticipo existe. Anticipo en estado Vigente o Confirmada (estados pre-causación). `saldoPorPagar()` = valorTotal (sin cruces de pago). `saldoPorRegularizar()` = valorAnticipo (sin cruces de regularización). `valorNeto(devolucion)` = valorTotal del anticipo (solo reversa total). Mismo Proveedor. |
+| **Información capturada** | Referencia a OXP origen (tipo + ID, obligatoria, inmutable), `proveedorId` (heredado del agregado OXP origen `[D31]`), tercero (NIT, razón social — coincide con el del origen), entidades internas según tipo de OXP: `ConceptoDevuelto`(s) para Comercio, `CargoFinancieroDevuelto`(s) para Extracto, `ReversaTotal` para Anticipo. Soportes documentales adjuntos. **Comercio:** adicionalmente moneda, TRM, distribución de costos. |
 | **Efectos** | Devolución disponible para confirmación. |
 
 #### DevolucionConfirmada
@@ -2462,6 +2465,9 @@ Registro de las decisiones tomadas durante la definición del modelo de dominio.
 | D27 | **OXP etiqueta sus eventos de causación con un tipo de transacción contable (`tipoTransaccion`) como metadato de integración con el sub-dominio Contabilidad.** Cinco eventos causales de OXP (`OxpComercioCausada`, `ExtractoCausado`, `AnticipoCausado`, `DevolucionCausada` en sus tres variantes) emiten líneas de traducción acompañadas de una etiqueta que permite al sistema contable seleccionar la plantilla de asiento aplicable. La etiqueta es semántica del hecho económico — no es cuenta, naturaleza ni centro de costo, por lo que no contradice `[D8]`. El mapeo canónico (evento → tipoTransaccion → plantilla) se documenta en la sección "Integración con sub-dominio Contabilidad" del Bounded Context. La amortización y la diferencia en cambio viajan como tipos de componente dentro de las líneas, no como `tipoTransaccion` separados. La devolución tipo Anticipo requiere una plantilla nueva (`reversa_anticipo`) en el inventario del sub-dominio Contabilidad — punto de coordinación cruzada. | El sub-dominio Contabilidad requiere que cada línea de traducción incluya `tipoTransaccion` para seleccionar plantilla (contrato del anexo de plantillas de Contabilidad). Sin documentar el mapeo en OXP, la integración queda implícita y abre zona gris en implementación. La separación `causacion_gasto` vs `reversa_anticipo` vs `nota_credito_gasto` preserva la claridad semántica para el contador en la consola de contabilización y permite reglas de derivación independientes en el motor de Contabilidad. | DDD: contrato explícito entre bounded contexts. La etiqueta es vocabulario compartido (shared kernel mínimo) sin acoplar el modelo de OXP al modelo contable. Funcionalmente análoga al "tipo de componente" que OXP ya emite por línea, pero a nivel del hecho económico completo. |
 | D28 | **OXP no cambia el estado de sus documentos causados cuando el sistema contable rechaza una entrega.** Los rechazos del sistema contable se resuelven dentro del ciclo del sub-dominio Contabilidad: los rechazos post-borrador (destino físico) los reabre y corrige el contador en la consola de contabilización; los rechazos pre-borrador (defectos de catálogo o de contrato) los atiende el equipo de producto o el consumidor. En ambos casos el documento OXP permanece en estado Causada — no hay nuevos eventos `*RechazadaPorContabilidad`, ni transiciones FSM hacia atrás, ni invariantes de "trazabilidad de rechazos" duplicando lo que ya vive en el sub-dominio Contabilidad. OXP es responsable de conservar el hecho económico hasta confirmar procesamiento exitoso vía `EntregaAceptada` mediante outbox pattern (ver `[SI6]`). | El contrato del sub-dominio Contabilidad establece explícitamente que el consumidor no es responsable de reaccionar ante `EntregaRechazada` — el flujo de corrección vive dentro del sub-dominio Contabilidad. Modelar el rechazo en OXP duplicaría responsabilidad. La durabilidad del hecho económico ante rechazos pre-borrador (NACK del bus) sí es responsabilidad del consumidor, materializada por outbox pattern como infraestructura, no como comportamiento de dominio. | DDD: cada bounded context resuelve sus problemas dentro de su propio ciclo. OXP delega la consistencia eventual al outbox + idempotencia del motor de Contabilidad, sin requerir modelado defensivo. |
 | D29 | **El cruce de la partida del extracto contra cada compra viaja en las líneas de traducción como `cruce_obligacion`.** Al causar el extracto, cada `Vinculacion` (partida ↔ OxpComercio) emite una línea `cruce_obligacion` que salda la cuenta por pagar del proveedor de esa compra. Lectura contable: el extracto **reclasifica** la deuda del proveedor hacia el banco/emisor (medio de pago crédito/prepago) — Db CxP proveedor (el cruce) · Cr CxP banco/emisor (contrapartida que genera el motor de Contabilidad); luego el pago del extracto al banco salda esa CxP (flujo ya existente). La línea lleva el tercero del proveedor, el valor de la obligación saldada (a TRM de radicación; la diferencia de cambio del momento viaja aparte como `diferencia_en_cambio`) y la distribución de origen de la compra; la **unidad organizacional del cruce la rinde Contabilidad según `[I33 de Contabilidad]`** (distribuida/general/sin unidad), espejando cómo se registró la CxP de la causación original para garantizar el neteo. | Antes del issue #18, `lineasParaTraduccion()` del extracto solo emitía `cargo_financiero`, `diferencia_en_cambio` y `ajuste_tolerancia`: la cuenta por pagar acreditada al causar cada OxpComercio nunca se debitaba al pagar vía extracto (`PagoOxpComercioViaExtractoAplicado` solo reduce `saldoPorPagar()`, sin asiento). El cruce restaura esa pata de la partida doble. La lectura de reclasificación es coherente con el ciclo de dos pasos que el extracto ya tiene (Causada → Pagada) y con la naturaleza de una tarjeta/cupo (la deuda pasa al emisor hasta pagar el extracto). | DDD: contrato explícito entre bounded contexts; OXP emite el hecho (tercero, valor, distribución de origen) y Contabilidad aplica su política `[I33]`. Coordinación cruzada: nuevo rol `CRUCE_OBLIGACION` en la plantilla `causacion_gasto` de Contabilidad. |
+| D30 | **Agregado `Proveedor` — el rol del tercero de OXP** (replanteamiento #31, issue #38). OXP captura y gobierna su registro del proveedor con las validaciones empaquetadas del producto, lo informa a la bodega de Terceros con el evento estándar de rol (estado completo + `secuencia`, entrega por outbox `[SI6]`) y aplica automáticamente las decisiones que la bodega publica (señal global → `ProveedorInactivado/Reactivado` con origen `senal_global`; correcciones → `CorreccionDeIdentidadAplicada`). `AsegurarProveedor` idempotente es la única vía de creación (I20) — reutiliza sin sobrescribir; la radicación nunca se bloquea. Sin `empresa` como atributo (convención del BC: contexto resuelto en la lógica de los eventos; el campo del contrato sale de ese contexto). Estado `Activo \| Inactivo` — mapeo natural al `estadoEnOrigen` del contrato, sin traducción. | La bodega nunca es prerrequisito (alcance de Terceros v2.0): la transversalidad se resuelve con distribución — validación local empaquetada + información por eventos — en lugar de consulta. El veto global no se esquiva localmente (I21). | DDD: el agregado de rol vive en el dominio consumidor (decisión D1 de Terceros v1.0, ratificada por el modelo de bodega); EDA: injerencia por mensajes, nunca escritura remota. |
+| D31 | **Las transacciones embeben `InformacionTercero` copiado del `Proveedor` y llevan la referencia `proveedorId`.** El contrato con Contabilidad queda intacto (el hecho económico viaja completo e inmutable, incluido `terceroPrincipal` `[D27]`/v3.7); lo que cambia es la **fuente**: el dato ya no se digita suelto en cada radicación — se copia del registro. "Mismo tercero" (regularización, devoluciones, anticipos) pasa de comparación de textos a **referencia exacta**. Las correcciones de la bodega aterrizan en el registro y las radicaciones futuras copian el dato corregido; las transacciones históricas no se reescriben. El emisor/banco del extracto **no** es un Proveedor (entidad financiera — su rol pertenece a Tesorería a futuro): su `InformacionTercero` se captura en el extracto como hasta ahora. | Sin registro, cada radicación re-captura el NIT y el error renace; sin referencia, "mismo tercero" depende de igualdad de textos digitados. | Una sola fuente del dato dentro del BC + trazabilidad transacción → registro → ficha consolidada de la bodega. |
+| D32 | **El candidato `InformacionTercero` del catálogo de Nuggets se resuelve como composición local — no será Nugget.** Es (identificación legal + razón social): la identificación ya es pieza del paquete con todas las reglas; la razón social es texto sin validación propia. Empaquetar la pareja no aportaría reglas ni datos — solo un envoltorio (fallaría el filtro 5/6 de la gobernanza frente a `IdentificacionLegal`). Cada consumidor la compone localmente: OXP la copia de su `Proveedor`; el contrato con Contabilidad ya la trata así desde antes del replanteamiento (fue el precedente del patrón). | Registrado en el catálogo de Nuggets (memoria de propuestas, para no re-evaluar). | Cierra el pendiente que el catálogo difería "al intervenir los modelos de OXP y Terceros". |
 
 ---
 
@@ -2522,3 +2528,4 @@ Aspectos del modelo que requieren definición futura. Los pendientes específico
 | 3.5 | Junio 2026 | **Cruce de la partida del extracto en las líneas de traducción — componente `cruce_obligacion` (issue #18).** Cierra un hueco de la partida doble: el `lineasParaTraduccion()` del `OxpExtracto` solo emitía `cargo_financiero`, `diferencia_en_cambio` y `ajuste_tolerancia`, así que la cuenta por pagar acreditada al causar cada OxpComercio nunca se debitaba al pagar vía extracto. **Cambios aplicados:** **(1)** Nuevo `tipoComponente` `cruce_obligacion` en el catálogo canónico (origen `Vinculacion`; emitido en `causacion_gasto`; agregado `OxpExtracto`). **(2)** `Vinculacion` ampliada con `valorCruzado` (valor de la obligación saldada, a TRM de radicación) y `distribucionOrigen` (distribución por unidad organizacional del gasto de la compra, leída del agregado OxpComercio). **(3)** `lineasParaTraduccion()` del extracto emite una línea `cruce_obligacion` por `Vinculacion` (tercero del proveedor, valor a radicación, distribución de origen; sin `descripcionConcepto`); la unidad organizacional la rinde Contabilidad según `[I33 de Contabilidad]`, espejando la CxP de la causación original. **(4)** Efectos de `ExtractoCausado` actualizados (lectura de reclasificación: Db CxP proveedor vía cruce · Cr CxP banco/emisor vía contrapartida del motor). **(5)** Diagrama de composición del extracto actualizado. **(6)** Nueva decisión **D29**. **Ajuste cruzado entre dominios:** nuevo rol `CRUCE_OBLIGACION` (débito, grupo del PUC `["2205","2335"]`) en la plantilla `causacion_gasto` de Contabilidad, preservando la coincidencia 1:1. **Conteos:** sin cambios en eventos (53), invariantes (18), pendientes (4), estados (7); decisiones 28 → **29** (D29 nueva). No requiere cambios en `definicion-alcance.md` — es detalle del contrato técnico (modelo). |
 | 3.6 | Junio 2026 | **Amortización del anticipo post-causación (Caso B) — issue #25.** Cierra el hueco contable cuando el cruce anticipo↔OXP ocurre después de causar la OXP (permitido por R30/R4 y §1307). **Cambios:** **(1)** `[D26]` reescrita: la amortización viaja **embebida** en la causación si el cruce es pre/durante (Caso A), y como **causación independiente** (`tipoTransaccion = amortizacion_anticipo`, Db CxP proveedor · Cr Anticipos) si es post-causación (Caso B, patrón SAP F-54). **(2)** Mapeo canónico: nueva fila `PagoOxpComercioViaAnticipoAplicado` (OXP ya Causada) → `amortizacion_anticipo`. **(3)** Nota de componentes: `amortizacion_anticipo` ahora es tipo de componente (Caso A) **y** `tipoTransaccion` propio (Caso B); fila del catálogo actualizada. **(4)** Efectos de `PagoOxpComercioViaAnticipoAplicado`: emite la causación de amortización separada cuando la OXP ya está Causada. **(5)** Efectos de `OxpComercioCausada` aclarados (Caso A vs B). **Ajuste cruzado:** nueva plantilla `amortizacion_anticipo` en Contabilidad. **Conteos:** sin cambios — eventos (53), invariantes (18), decisiones (29, D26 reescrita), pendientes (4), estados (7). Acompaña reescritura de R15/§311 en `definicion-alcance.md` y la regla de control de doble pago del issue #26. |
 | 3.7 | Junio 2026 | **`terceroPrincipal` a nivel de hecho económico (issue #28).** OXP puebla `terceroPrincipal` (el `InformacionTercero` de la raíz del agregado emisor: proveedor en `OxpComercioCausada`/`AnticipoCausado`/`DevolucionCausada`, banco/emisor en `ExtractoCausado`), que el motor de Contabilidad usa como tercero de la contrapartida. Resuelve el caso del extracto, cuyas líneas `cruce_obligacion` traen varios proveedores pero cuya contrapartida (CxP del banco/emisor) no viaja en ninguna línea. **Cambios:** nota "Campos que OXP puebla en `LineaTraduccion`" ampliada con `terceroPrincipal`. Sin cambios de conteo. Acompaña `modelo-dominio.md` de Contabilidad v1.8 (`InformacionTransaccion` con `terceroPrincipal`, paso 4 del `ServicioDeTraduccion`). |
+| 3.8 | Junio 2026 | **Agregado `Proveedor` — el rol del tercero de OXP en el modelo de bodega (replanteamiento #31, issue #38).** Quinto agregado del BC: registro propio del proveedor con validación empaquetada (identificación legal, direcciones, contactos — primera adopción del `Contacto` del paquete como { contacto, esPrincipal }), estado `Activo \| Inactivo` con `motivoInactivacion` cuyo origen (`local \| senal_global`) gobierna la reversa, `AsegurarProveedor` idempotente como única vía de creación, FSM 4.5 y 6 fichas de evento en 5.8 (5 de dominio + el **evento estándar de rol** hacia la bodega — estado completo + `secuencia`, derivado por transición, entrega por outbox `[SI6]`). Cableado: las radicaciones de Comercio, Anticipo y Devolución llevan `proveedorId` y copian el `InformacionTercero` del registro (el contrato con Contabilidad queda intacto); "mismo tercero" pasa a referencia exacta en regularización, devoluciones y conciliación contra anticipos; el emisor/banco del extracto no es Proveedor. Nuevas invariantes I19-I22, `[SI7]` (constraint único de clave natural), decisiones D30-D32 (D32 resuelve el candidato `InformacionTercero` del catálogo de Nuggets como composición local). Acompaña al alcance v1.10. |

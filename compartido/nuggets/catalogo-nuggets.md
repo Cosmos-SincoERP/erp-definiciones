@@ -40,7 +40,7 @@ Conceptos identificados que aún no tienen veredicto. No se adoptan ni se especi
 
 | Candidato | Concepto | Estado de la evaluación |
 |-----------|----------|-------------------------|
-| `InformacionTercero` | Identificación + razón social. Hoy compartido de facto entre OXP y Contabilidad vía el contrato de traducción contable (`terceroPrincipal`, tercero por línea). | Pasa los filtros 1-5. La duda abierta es si conviene formalizarlo como Nugget propio o dejarlo como composición local del Nugget `IdentificacionLegal` en cada consumidor. Se resolverá al intervenir los modelos de OXP y Terceros. |
+| *(ninguno)* | — | — |
 
 ---
 
@@ -57,11 +57,11 @@ Conceptos que pasaron los filtros y llegaron a borrador, pero quedaron fuera del
 
 ## Propuestas rechazadas
 
-Memoria del catálogo para no re-evaluar lo mismo dos veces. *(Ninguna hasta la fecha.)*
+Memoria del catálogo para no re-evaluar lo mismo dos veces.
 
 | Propuesta | Fecha | Razón del rechazo |
 |-----------|-------|-------------------|
-| — | — | — |
+| `InformacionTercero` | Jun-2026 | **Resuelto como composición local al intervenir OXP** (issue #38, `[D32]` de su modelo): es (identificación legal + razón social) — la identificación ya es pieza del paquete con todas las reglas; la razón social es texto sin validación propia. Empaquetar la pareja no aportaría reglas ni datos (filtros 5/6 frente a `IdentificacionLegal`). Cada consumidor la compone localmente: OXP la copia de su agregado `Proveedor`; el contrato OXP→Contabilidad ya la trataba así (precedente del patrón). |
 
 ---
 
@@ -96,6 +96,7 @@ Adopción **prevista** según los modelos de dominio vigentes; cada celda se con
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
+| 1.7 | Junio 2026 | **Candidato `InformacionTercero` resuelto: composición local, no Nugget** (intervención de OXP, issue #38, `[D32]` de su modelo). Pasa a la memoria de propuestas rechazadas con su razón — la identificación legal ya empaqueta todas las reglas; la razón social no aporta validación propia. La lista de candidatos queda vacía. |
 | 1.6 | Junio 2026 | **Entra `Contacto`** (0.1) — veredicto de aceptación del issue #35 (surgido de la reescritura de Terceros v2.0, #33: los contactos los captura cada dominio con su rol del tercero y la bodega los consolida). Estructura pura como dato (nombre opcional + rol de contacto + medios por composición); el ciclo de vida, la marca de principal y la unicidad quedan en el consumidor — mismo criterio que salvó a `DireccionFisica` en el filtro 2. Vocabulario de 7 roles de contacto **producido** (`datos/roles-contacto.json` — decisión de la revisión del PR #40: se crea con los códigos vigentes; los ajustes futuros entran como versión menor). Primera adopción prevista: OXP (#38). Catálogo queda con **8 Nuggets aceptados** + 1 candidato (`InformacionTercero`, se resuelve en #38) + 2 diferidos. |
 | 1.5 | Junio 2026 | **Entra `DivisionTerritorial`** (0.1): separado de `DireccionFisica` como fuente única de la jerarquía territorial — tiene dos consumidores de naturaleza distinta (direcciones y la jurisdicción fiscal de Impuestos, que no debe depender del Nugget de direcciones). `DireccionFisica` ahora compone sobre él; el pendiente de corregimientos PA se transfirió. Surge de la validación de eliminación total de Datos de Referencia (su alcance pasa a v2.0: producción de catálogos + tasas de cambio). |
 | 1.4 | Junio 2026 | **Ajuste de alcance del catálogo** (decisión del usuario): `ValorMonetario` y `Vigencia` pasan a **diferidos** (sirven a OXP/Contabilidad/Impuestos, fuera del frente actual Terceros/Direcciones/Datos de Referencia; sus decisiones de borrador quedan conservadas en la sección de diferidos). Entran **`Pais`** y **`Moneda`** (0.1, sin pendientes): pasan los 6 filtros y formalizan la fuente única de datos de país/moneda dentro del paquete — `IdentificacionLegal`, `DireccionFisica` y `Telefono` componen sobre `Pais`. |
