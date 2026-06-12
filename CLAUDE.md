@@ -11,7 +11,7 @@ Definición de los sub-dominios de un ERP mediante documentos de diseño convers
 | `dominio/obligaciones-por-pagar/` | Obligaciones por Pagar | En refinamiento (Fase 2) |
 | `dominio/impuestos/` | Impuestos | Modelo v1.3 completo |
 | `dominio/contabilidad/` | Contabilidad (Nivel 1: Motor de Traducción + Nivel 2: Sistema contable) | Alcance v1.0, Modelo v1.0 — Listo para desarrollo (F1) |
-| `dominio/terceros/` | Terceros | Alcance v1.0, Modelo v1.0 — Listo para desarrollo |
+| `dominio/terceros/` | Terceros (bodega consolidadora — replanteamiento jun-2026) | Alcance v2.0, Modelo v2.0.2 — 2 auditorías aplicadas, listo para desarrollo (F1) |
 | `dominio/estructura-organizacional/` | Estructura Organizacional | Definición inicial |
 | `compartido/datos-referencia/` | Datos de Referencia (catálogos base del ERP) | Alcance v1.0, Especificación v1.0 — Listo para desarrollo |
 | `compartido/asistente-onboarding/` | Asistente de Onboarding (caso PUC en v1.0; transversal a otros casos futuros) | Alcance v1.0, Modelo v1.0, Caso PUC v1.0 — Listo para desarrollo (F1) |

@@ -1,7 +1,15 @@
-## Audit Full — Reporte de Auditoría Completa — Terceros
+# Audit Full — Auditoría del Modelo de Dominio — Terceros v2.0
 
-**Fecha:** 2026-04-20
-**Modelo auditado:** `dominio/terceros/modelo-dominio.md` v1.0 (candidata)
+> Archivo único de auditoría del sub-dominio (convención: `auditoria/<subdominio>-actual.md`). Consolida las **dos rondas** sobre el modelo v2.0 (bodega consolidadora, issue #33). La auditoría de la v1.0 superada vive en el historial del repositorio.
+
+---
+
+# RONDA 1 — sobre el modelo v2.0
+
+
+**Fecha:** 2026-06-12
+**Modelo auditado:** `dominio/terceros/modelo-dominio.md` v2.0 (783 líneas — auditado completo)
+**Alcance de referencia:** `dominio/terceros/definicion-alcance.md` v2.0
 
 ---
 
@@ -11,23 +19,20 @@
 
 | Término canónico | Variantes encontradas | Secciones donde aparece | Tipo de problema |
 |-----------------|----------------------|------------------------|-----------------|
-| `ContactoRegistrado` (evento) | "agregar contacto" (`TerceroContactoAgregado`), "agregar medio" (`TerceroContactoMedioAgregado`) | § 3.4 `[SI10]` L430 vs § 5.5 catálogo | Sinónimo no controlado (eventos fantasma) |
-| `MedioDeComunicacion` | usado en diagrama (L123), pero los VOs declarados son `CorreoElectronico` y `Telefono` | Diagrama 3.1 vs composición 3.3 | Sinónimo / término no formalizado |
-| `HistorialIdentificacion` | aparece como "VO colección N" en diagrama | Diagrama 3.1 L116 vs D3 (derivado del stream, no persistido) | Variante contradictoria / término eliminado presente |
-| `contextoOrigen` — valores | `DesdeConsumidor` (en enum) vs "desde un consumidor" (en prosa) | § 5.1 L574 vs § 3.2 L259 | Variante menor estable |
-| `TipoUsoDireccion` | enum declarado (§8 L784) pero nunca se nombra explícitamente como tipo en § 3.3.2 | § 6 excluidos vs § 3.3.2 | Término declarado como enum pero sin nombre canónico en composición |
+| *(sin término)* | "vigente" | I1 (L~685), SI1 (L~279), TerceroCreado (L~428) | Ambigüedad — sin definición |
+| aviso | "aviso", "mensaje", "evento de integración" | 2.5, 5.5, D10 | Sinónimos no controlados |
+| fuente | "dominios fuente", "las fuentes discrepan", "única fuente" | 3.6, 5.4, 6.3 | Ambigüedad de granularidad |
 
 #### Hallazgos
 
 | # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
 |---|-----------|-------------------------------|----------|-------------------|
-| 1 | Alta | L430: "emitir `TerceroContactoAgregado`" … "`TerceroContactoMedioAgregado`" | En `[SI10]` se mencionan dos eventos (`TerceroContactoAgregado`, `TerceroContactoMedioAgregado`) que no existen en el catálogo § 5. El catálogo define `ContactoRegistrado` y `ContactoActualizado`. Inconsistencia terminológica que bloquea implementación. | Reemplazar en L430 `TerceroContactoAgregado` por `ContactoRegistrado` y `TerceroContactoMedioAgregado` por `ContactoActualizado`. |
-| 2 | Media | L116 (diagrama): "HistorialIdentificacion (VO, colección N)" | El diagrama de la Sección 3.1 muestra `HistorialIdentificacion` como VO colección, pero `[D3]` decide explícitamente que el historial NO se persiste como dato del agregado. Contradicción visual. | Eliminar la línea `HistorialIdentificacion (VO, colección N)` del diagrama ASCII. |
-| 3 | Media | L123: "MedioDeComunicacion (VO, 1..N)" | El diagrama introduce el término `MedioDeComunicacion` como VO, pero en la composición real (§ 3.3) los VOs son `CorreoElectronico` y `Telefono`. No existe ningún VO llamado `MedioDeComunicacion`. | Reemplazar en el diagrama `MedioDeComunicacion (VO, 1..N)` por `CorreoElectronico (VO, 0..N) · Telefono (VO, 0..N)`. |
-| 4 | Baja | L784: "`TipoUsoDireccion`, estados Activo/Inactivo, `origen` del registro" | Se declara "`TipoUsoDireccion`" como enum inline excluido del catálogo, pero en composición (L293) ese enum se nombra solo "`tipoUso`". Inconsistencia menor de naming. | Usar el mismo término `tipoUso` en § 6 o documentar `TipoUsoDireccion` como nombre del enum en § 3.3.2. |
+| 1 | Media | L~685 "terceros **vigentes** (no fusionados)"; L~428 "Clave natural sin tercero **vigente**" | "Vigente" se usa como condición de unicidad y de creación pero no está definido: ¿un tercero `Inactivo` es vigente? (debería serlo — conserva la clave). | Agregar fila en 2.5: "vigente = no fusionado (Activo o Inactivo)". |
+| 2 | Baja | L~84 "nunca se re-publican como **avisos**" vs L~729 "Injerencia por **mensajes**" | "Aviso", "mensaje" y "evento de integración" nombran lo mismo sin declaración de sinonimia. | Nota en 2.5 fijando "aviso" como término y los otros como equivalentes. |
+| 3 | Baja | L~315 "si el evento trae identidad compartida distinta y es la **única fuente**" | "Fuente" oscila entre dominio y registro informante; en divergencias la fuente real es el rol (un dominio puede tener dos registros). | Precisar en 2.5: "fuente = un rol informado (dominio + referenciaOrigen)". |
 
 #### Resumen
-- Alta: 1 | Media: 2 | Baja: 1 | Total: 4
+- Alta: 0 | Media: 1 | Baja: 2 — Total: 3 hallazgos
 
 ---
 
@@ -35,37 +40,32 @@
 
 #### Inventario por Agregado
 
-```
-### Composición: Tercero
+**Tercero** — Entidades internas: `Rol` (1..N). VOs: `IdentificacionLegal`, `DireccionFisica`, `Telefono`, `CorreoElectronico`, `Contacto` (paquete). Atributos raíz: `terceroId`, `identificacionLegal`, `razonSocial`, `tipoPersona`, `estado`, `motivoEstado`. Comportamientos calculados: ninguno declarado.
 
-Entidades internas: Contacto
-Value Objects: Identificacion, ReferenciaDireccion, CorreoElectronico, Telefono
-VO compartidos: (ninguno entre agregados — solo existe Tercero)
-Atributos raíz: terceroId, digitoVerificacion, tipoPersona, razonSocial, roles (set), estado
-Atributos de Contacto: contactoId, nombre (opcional), rolContacto, correos, telefonos, esPrincipal, estado
-Comportamientos calculados: contactoPrincipalActivo(), estaActivo(), tieneRol(), direccionesPorTipoUso(), direccionPreferidaPorTipoUso(), contactosActivos(), contactosPorRol(), identificacionVigente()
-```
+**Conciliacion** — Entidades internas: ninguna. VOs propios: `Candidato`, `VersionDeDato`. Atributos: `conciliacionId`, `tipo`, `estado`, `motivoCierre`, `decision`, `notas`.
 
 #### Inconsistencias
 
 | Agregado | Componente | Declarado en composición | Referenciado en eventos | Tipo de inconsistencia |
 |----------|-----------|-------------------------|------------------------|----------------------|
-| Tercero | `HistorialIdentificacion` (VO colección) | Sí, en diagrama L116 | No referenciado por ningún evento | Declarado pero huérfano (además contradice `[D3]`) |
-| Tercero | `MedioDeComunicacion` (VO 1..N) | Sí, en diagrama L123 | No; los eventos usan `CorreoElectronico` y `Telefono` | Declarado en diagrama pero ausente de § 3.3 |
-| Tercero | `TerceroContactoAgregado`, `TerceroContactoMedioAgregado` (eventos referenciados en `[SI10]` L430) | No (no existen en catálogo § 5) | Referenciados en `[SI10]` | Evento referenciado en sugerencia pero ausente en catálogo |
+| Tercero | Identidad de `Rol` | (`rol`, `dominio`, `empresa`) | La fusión incorpora roles homólogos del absorbido | Identidad insuficiente |
+| Tercero | `motivoEstado` | "Texto" | `motivo { codigo (catálogo 6.4), descripcion }` | Tipo desalineado |
+| Tercero (`Rol`) | última `secuencia` aplicada | No declarada | Precondición de `RolActualizado` la exige | Dato referenciado sin hogar |
+| Tercero (`Rol`) | `esPrincipal` | "atributo de la relación en el Rol, no del VO" (L~267) | Anidado dentro del elemento contacto en payloads | Representación ambigua |
+| Conciliacion | `decision` | "Estructura de resolución" sin atributos | Eventos capturan decisor, fecha, motivo, tipo | Tipo sin detallar |
 
 #### Hallazgos
 
 | # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
 |---|-----------|-------------------------------|----------|-------------------|
-| 1 | Alta | L430: "emitir `TerceroContactoAgregado`" | `[SI10]` referencia dos eventos (`TerceroContactoAgregado`, `TerceroContactoMedioAgregado`) que no existen en el catálogo § 5. Los nombres correctos son `ContactoRegistrado` y `ContactoActualizado`. | Reemplazar los nombres en L430 por los eventos reales del catálogo. |
-| 2 | Media | L116: "HistorialIdentificacion (VO, colección N)" | Componente declarado en el diagrama de Sección 3.1 pero no figura como VO en § 3.3 ni es capturado por ningún evento; contradice `[D3]`. | Eliminar la línea del diagrama. |
-| 3 | Media | L123: "MedioDeComunicacion (VO, 1..N)" | VO mencionado en el diagrama pero ausente en § 3.3; los medios de comunicación se modelan con los VOs `CorreoElectronico` y `Telefono`. | Sustituir en diagrama por los VOs concretos. |
-| 4 | Baja | L174: "roles (set)...`Proveedor`, `Cliente`, `Empleado`, `EntidadFinanciera`, `Otro`" | El enum `roles` está repetido en la composición (L174) y en el catálogo § 6.1 (L791). No es incorrecto pero el modelo no declara cuál es fuente canónica. | Dejar referencia única al catálogo § 6.1 en la composición (o viceversa). |
-| 5 | Baja | L176: "`Contactos` \| Componente `Contacto` (colección N)" | En la tabla raíz se usa `Contactos` (plural) como nombre; más abajo se habla de la sub-tabla "Componente interno `Contacto`". Naming plural/singular podría generar confusión. | Usar el singular `Contacto` (colección N) para alinearse con el diagrama y la FSM 4.2. |
+| 1 | **Alta** | L~191 "Identidad de la entidad \| (`rol`, `dominio`, `empresa`)" vs L~517 "Sus roles se incorporan al canónico" | El duplicado típico (la razón de ser de la fusión) tiene **el mismo rol del mismo dominio en la misma empresa** en ambos terceros: dos registros distintos de OXP (referenciaOrigen distinta). Al absorber, ambos deben persistir en el canónico pero colisionan en la identidad triple — `[I3]` lo prohíbe. La fusión más común es irrepresentable. | Identidad de `Rol` = (`dominio`, `referenciaOrigen`); `rol` y `empresa` pasan a atributos. Ajustar `[I3]` en consecuencia. |
+| 2 | Media | L~185 "`motivoEstado` \| Texto" vs L~491 "`motivo` { codigo (catálogo 6.4), descripcion }" | La composición declara texto plano; los eventos capturan estructura con código del catálogo 6.4. | Tipar `motivoEstado` como { codigo, descripcion }. |
+| 3 | Media | L~453 "`secuencia` mayor a la última aplicada (`[SI3]`)" | La precondición compara contra "la última aplicada" pero ningún componente del agregado la almacena. | Declarar `ultimaSecuencia` en la entidad `Rol` (o indicar explícitamente que vive en el estado reconstruido del stream). |
+| 4 | Baja | L~267 "La marca de principal es atributo de la relación en el `Rol`" vs L~442 "contactos [ { …, esPrincipal } ]" | El criterio dice que `esPrincipal` no es del VO, pero el payload lo anida dentro del contacto. | Representar la colección como [ { contacto: Contacto, esPrincipal } ] o nota aclaratoria. |
+| 5 | Baja | L~229 "`decision` \| Estructura de resolución" | Tipo sin atributos declarados, aunque los eventos los capturan. | Detallar: { tipoDecision, decididaPor, fecha, motivo }. |
 
 #### Resumen
-- Alta: 1 | Media: 2 | Baja: 2 | Total: 5
+- Alta: 1 | Media: 2 | Baja: 2 — Total: 5 hallazgos
 
 ---
 
@@ -73,42 +73,18 @@ Comportamientos calculados: contactoPrincipalActivo(), estaActivo(), tieneRol(),
 
 #### FSM por Agregado
 
-```
-### FSM: Tercero
-Estados: Activo, Inactivo
-Terminales: ninguno
-Transiciones:
-  TerceroRegistrado: ∅ → Activo
-  TerceroInactivado: Activo → Inactivo
-  TerceroReactivado:  Inactivo → Activo
-Eventos de progreso (en Activo):
-  TerceroIdentificacionActualizada, TerceroRazonSocialActualizada, TerceroTipoPersonaActualizado,
-  TerceroRolAsignado, TerceroRolRemovido,
-  TerceroDireccionReferenciada, TerceroDireccionDesreferenciada, TerceroDireccionPreferidaDesignada
-```
+**FSM: Tercero** — Estados: Activo, Inactivo. Terminales: Fusionado ■. Transiciones: TerceroCreado (∅→Activo), TerceroInactivado (Activo→Inactivo), TerceroReactivado (Inactivo→Activo), TerceroAbsorbido (Activo|Inactivo→Fusionado). Progreso: RolIncorporado, RolActualizado, RolInactivado, IdentidadActualizada (en Activo e Inactivo). Sin estados huérfanos ni sumideros no intencionados; los 8 eventos del catálogo están cubiertos.
 
-```
-### FSM: Contacto
-Estados: Activo, Inactivo
-Terminales: ninguno
-Transiciones:
-  ContactoRegistrado: ∅ → Activo
-  ContactoInactivado: Activo → Inactivo
-  ContactoReactivado: Inactivo → Activo
-Eventos de progreso (en Activo):
-  ContactoActualizado, ContactoPrincipalDesignado
-```
+**FSM: Conciliacion** — Estados: Abierta, EnCorreccion. Terminales: Cerrada ■. Transiciones: PosibleDuplicadoDetectado/DivergenciaDetectada (∅→Abierta), TercerosFusionados/HomonimiaMarcada (Abierta→Cerrada), DivergenciaSuperada (Abierta→Cerrada), DivergenciaResuelta (Abierta→EnCorreccion), ConvergenciaConfirmada (EnCorreccion→Cerrada). Progreso: NotaAgregada (Abierta, EnCorreccion). Sin huérfanos; los 8 eventos cubiertos.
 
 #### Hallazgos
 
 | # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
 |---|-----------|-------------------------------|----------|-------------------|
-| 1 | Media | L499-L508 (diagrama FSM Tercero) | La FSM del Tercero no representa visualmente los eventos del componente Contacto; solo los menciona en nota. El lector puede creer que el Tercero no emite eventos de Contacto. | Añadir línea ASCII bajo `Activo` del tipo `· (Componente Contacto — ver 4.2)`. |
-| 2 | Media | L549: "Precondición para `ContactoInactivado`: si el contacto es el principal, debe haberse designado previamente otro contacto activo como principal" | La FSM del Contacto muestra `ContactoInactivado: Activo → Inactivo` sin reflejar visualmente la precondición cruzada con `esPrincipal`. | Anotar en la flecha del diagrama la condición [R15] o poner guard visible. |
-| 3 | Baja | L250: "`ContactoPrincipalDesignado` cambia `esPrincipal` en el nuevo y en el anterior simultáneamente" | Evento clasificado como "progreso" pero cambia propiedades en dos instancias. No aclarado en el diagrama. | Añadir nota en diagrama 4.2: "afecta a dos contactos: designa nuevo y desmarca anterior". |
+| 1 | **Alta** | L~513 "Estado previo: `Activo` o `Inactivo`" (TerceroAbsorbido); L~566 payload de fusión sin tratamiento de señal | Fusionar candidatos con **señales globales distintas** no tiene regla: si el absorbido estaba `Inactivo` por fraude y el canónico `Activo`, el resultado opera sin restricción — el veto desaparece silenciosamente. | Regla en `TercerosFusionados`: el canónico hereda la señal más restrictiva de los candidatos (o precondición de igualar señales antes de fusionar), documentada en la ficha del evento y en la FSM 4.1. |
 
 #### Resumen
-- Alta: 0 | Media: 2 | Baja: 1 | Total: 3
+- Alta: 1 | Media: 0 | Baja: 0 — Total: 1 hallazgo
 
 ---
 
@@ -116,244 +92,408 @@ Eventos de progreso (en Activo):
 
 #### Clasificación de Invariantes
 
-| ID | Tipo | Enforcement documentado | Gap |
-|----|------|------------------------|-----|
-| I1 | Eventual | `[SI1]` índice eventualmente consistente | Falta documentar compensación ante colisión concurrente detectada post-append |
-| I2 | Local | Precondición eventos + `[SI2]` | OK |
-| I3 | Local | Guards `TerceroRegistrado`, `TerceroRolRemovido` | OK |
-| I4 | Local | Guards en varios eventos | OK |
-| I5 | Local | Precondición `ContactoRegistrado`, `ContactoActualizado` | OK |
-| I6 | Local | Precondición `TerceroRegistrado`, `TerceroDireccionDesreferenciada` | Gap: no existe guard explícito para `TerceroReactivado` |
-| I7 | Local | `TerceroDireccionPreferidaDesignada` | OK |
-| I8 | Local | Precondición `TerceroDireccionReferenciada` | OK |
-| I9 | Local | Declarado en VOs | Gap: eventos no explicitan validación al reemplazar colección |
-| I10 | Local (estructural ES) | Stream append-only | OK |
-| I11 | Eventual | `[SI10]` + `[SI11]` | Gap: no documenta compensación post-detección concurrente |
+| ID | Invariante (resumen) | Tipo | Agregado(s) | Enforcement documentado | Gap |
+|----|---------------------|------|-------------|------------------------|-----|
+| I1 | Unicidad de clave natural entre vigentes | Eventual | Tercero | Índice `[SI1]` + `[SI9]` | Colisión de creación concurrente sin estrategia (ver Idempotencia #1) |
+| I2 | Nace Activo con ≥1 rol | Local | Tercero | Mismo append | — |
+| I3 | Un rol por (rol, dominio, empresa) | Local | Tercero | Precondición | Identidad insuficiente (ver Composición #1) |
+| I4 | Señal solo por administrador con motivo | Local | Tercero | Precondición + permiso | — |
+| I5 | Identidad sin comandos de edición | Local | Tercero | Ausencia de comandos | — |
+| I6 | ≥2 candidatos / ≥2 versiones | Local | Conciliacion | Precondición de apertura | — |
+| I7 | Canónico ∈ candidatos | Local | Conciliacion | Precondición | — |
+| I8 | Decisión con decisor+fecha+motivo | Local | Conciliacion | Precondición de comandos | — |
+| I9 | Homonimia no se reabre | Eventual | Conciliacion + memoria | Consulta `[SI5]` | — |
+| I10 | EnCorreccion/convergencia solo divergencias | Local | Conciliacion | FSM | — |
+| I11 | Ningún evento de rol se descarta | Eventual | Servicio | Pasos 1-4 + `[D11]` | — |
+| I12 | Fusionado es terminal | Local | Tercero | FSM | — |
+| I13 | Claves absorbidas enrutan al canónico | Eventual | Servicio + mapa | `[SI4]` | — |
+| implícita-1 | Una sola Conciliacion abierta por señal | — | Conciliacion | **No formalizada** | Ver hallazgo 1 |
 
 #### Hallazgos
 
 | # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
 |---|-----------|-------------------------------|----------|-------------------|
-| 1 | Alta | L834: "`I1` … Eventual" y L351: "`[SI1]` … proyección" | I1 está clasificada como eventual, pero no se documenta estrategia de compensación si dos comandos concurrentes pasan el guard y el índice detecta colisión después. Gap alto porque `[R01]` es regla dura. | Añadir nota en `[SI1]` o D## que describa qué sucede ante colisión detectada a posteriori. |
-| 2 | Alta | L844: "`I11` … excepción `RegistrarTerceroForzado`" | Similar a I1: no hay mecanismo de compensación documentado si dos registros concurrentes pasan los guards y quedan creados. | Añadir en `[SI10]` o `[D10]` la política de reconciliación post-detección. |
-| 3 | Media | L839: "`I6` Dirección fiscal obligatoria" + L196: `TerceroReactivado` | El evento `TerceroReactivado` no documenta como precondición que el tercero tenga dirección fiscal. | Añadir precondición en `TerceroReactivado`: "el tercero conserva al menos una `ReferenciaDireccion` con `tipoUso=Fiscal`". |
-| 4 | Media | L842: "`I9` … como mucho un preferido" | I9 es local pero ni `ContactoActualizado` ni `ContactoRegistrado` explicitan la verificación al recibir colecciones con 2+ preferidos. | Añadir precondición explícita "≤1 correo con `preferido=true` y ≤1 teléfono con `preferido=true`" en ambos eventos. |
-| 5 | Media | L837: "`I4` Contacto principal único y obligatorio" | `ContactoInactivado` + `ContactoPrincipalDesignado` pueden observarse como dos appends separados con estado intermedio sin principal. | Aclarar que ambos eventos se appendean en el mismo commit atómico al inactivar al principal. |
-| 6 | Baja | L851: "`I11` … Unicidad reforzada" | La fila de I11 no clasifica explícitamente su enforcement (guard vs eventual) como sí lo hace I1. | Añadir en la fila de I11 la columna de enforcement "guard del comando + índice eventualmente consistente". |
+| 1 | Media | L~529 precondiciones de `PosibleDuplicadoDetectado` (solo criterio + memoria); L~541 `DivergenciaDetectada` | No existe invariante que impida **dos Conciliaciones abiertas por la misma señal**: cada evento de rol que repita la condición (R09/R14) re-dispara la detección — tras la carga histórica, el mismo par de candidatos generaría un caso por cada evento consolidado. | Nueva invariante: "una sola Conciliacion abierta por (par de candidatos + criterio) y por (terceroId + datoEnDisputa)"; precondición en los dos eventos de apertura consultando casos abiertos. |
 
 #### Resumen
-- Alta: 2 | Media: 3 | Baja: 1 | Total: 6
+- Alta: 0 | Media: 1 | Baja: 0 — Total: 1 hallazgo
 
 ---
 
 ### 5. Responsabilidades de Agregados
 
-#### Mapa de Responsabilidades
+#### Mapa de responsabilidades
 
-```
-### Responsabilidades: Tercero
+**Tercero** — Razón de cambio dominante: consolidación de la identidad compartida y señal global. Comandos: 2. Eventos: 8. Invariantes: I1-I5, I12. Domain services: ServicioDeConsolidacion. **Diagnóstico: Saludable, con una fuga puntual** (hallazgo 1).
 
-Razón de cambio dominante: identidad + roles + referencias + contactos de un tercero
-Comandos: 15+ (incluyendo AsegurarTerceroDesdeConsumidor, RegistrarTerceroForzado)
-Eventos propios: 16
-Invariantes protegidas: I1..I11
-Domain services que lo coordinan: Ninguno dentro del BC (L156)
-Diagnóstico: Saludable — agregado único, comportamiento rico y cohesivo.
-```
+**Conciliacion** — Razón de cambio dominante: el ciclo de decisión humana sobre señales de calidad. Comandos: 4. Eventos: 8. Invariantes: I6-I10. **Diagnóstico: Saludable.**
+
+**ServicioDeConsolidacion** — Coordina sin absorber, salvo el criterio del hallazgo 1.
 
 #### Hallazgos
 
 | # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
 |---|-----------|-------------------------------|----------|-------------------|
-| 1 | Media | L415-L456 (`[SI10]` completo) | `[SI10]` describe lógica de decisión compleja (lookup, canónica, rechazo, enriquecer, crear) que no está encapsulada en el agregado — vive en la SI. Riesgo de que se implemente como servicio fuera del agregado. | Aclarar que el cuerpo de decisión reside en el application service que carga el agregado; no es un domain service del BC. |
-| 2 | Media | L455: "El consumidor automático, ante un posible duplicado, siempre rechaza y escala." | La política "nunca bypass `[I11]` para consumidores" no está formalizada como decisión/premisa. | Documentar como D## o P##: "`AsegurarTerceroDesdeConsumidor` nunca bypassa `[I11]` — eso es privilegio exclusivo de `RegistrarTerceroForzado`". |
-| 3 | Baja | L217: "`contactoPrincipalActivo()`… invariante del agregado" | El comportamiento calculado referencia un invariante sin citar `[I4]`. | Añadir referencia `[I4]`. |
-| 4 | Baja | L219-L226 (métodos calculados) | `direccionPreferidaPorTipoUso` retorna "`null` si no existe" pero para `tipoUso=Fiscal` nunca sería null por `[I6]`. | Añadir nota "salvo `tipoUso=Fiscal`, siempre existe mientras el tercero esté activo (`[I6]`)". |
+| 1 | Media | L~315 "si el evento trae identidad compartida distinta **y es la única fuente**, actualizarla" | La decisión "actualizar identidad vs abrir divergencia" depende solo del estado interno del `Tercero` (cuántas fuentes tiene) — es lógica del agregado que vive en el paso 3 del servicio. | Declararla como comportamiento del agregado (el servicio entrega el dato; el agregado decide `IdentidadActualizada` o señal de divergencia) — basta una frase en 3.2 y ajustar el paso 3. |
+| 2 | Baja | L~315 "es la única fuente" | "Única fuente" sin definición operativa (¿un solo dominio? ¿un solo rol?). | Precisar: "todos los roles del tercero provienen del mismo dominio y registro" o el criterio que se decida. |
 
 #### Resumen
-- Alta: 0 | Media: 2 | Baja: 2 | Total: 4
+- Alta: 0 | Media: 1 | Baja: 1 — Total: 2 hallazgos
 
 ---
 
 ### 6. Semántica de Eventos
 
-#### Inventario Semántico
+#### Inventario semántico
+
+**Tercero** — De transición: TerceroCreado, TerceroInactivado, TerceroReactivado, TerceroAbsorbido. De progreso: RolIncorporado, RolActualizado, RolInactivado, IdentidadActualizada. Naming consistente: Sí (pasado, PascalCase, sin calificadores redundantes). Payloads completos: Sí.
+
+**Conciliacion** — De transición: PosibleDuplicadoDetectado, DivergenciaDetectada, TercerosFusionados, HomonimiaMarcada, DivergenciaResuelta, ConvergenciaConfirmada, DivergenciaSuperada. De progreso: NotaAgregada. Naming consistente: Sí. Payloads completos: Sí (con la salvedad de Contrato vs Flujo #2).
+
+#### Hallazgos
+
+| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
+|---|-----------|-------------------------------|----------|-------------------|
+| 1 | Media | L~449 `RolActualizado` "(datos… o su estado completo más reciente)" vs L~461 `RolInactivado` | Solapamiento: el contrato `[D5]` trae estado completo, así que una inactivación llega como estado con `estadoEnOrigen=inactivo` — expresable por ambos eventos. No hay regla de cuál emite el servicio. | Regla de emisión en 3.6/5.3: `RolInactivado` cuando la transición observada de `estadoEnOrigen` sea activo→inactivo; cualquier otro cambio → `RolActualizado`. |
+| 2 | Baja | L~437-439 causalidad triple de `RolIncorporado` con "Estado previo: `Activo` o `Inactivo`" | En el nacimiento (mismo append con `TerceroCreado`) el estado previo es "no existe" — la ficha no cubre ese caso. | Estado previo: "— (nacimiento) \| Activo \| Inactivo". |
+
+#### Resumen
+- Alta: 0 | Media: 1 | Baja: 1 — Total: 2 hallazgos
+
+---
+
+### 7. Contrato vs Flujo Interno
+
+#### Matriz Contrato ↔ Flujo (resumen de los 4 contratos con diagnóstico)
+
+**`DatoDeIdentidadCorregido` (L~624)** — evento-integración. Flujo interno: la `Conciliacion` conoce las versiones por fuente y los registros exactos; el contrato expone (clave natural, dato, valor). **Diagnóstico: Dimensión perdida + ambigüedad de destino.**
+
+**`versiones` de la divergencia (L~542)** — payload/contrato del caso. Flujo: el servicio compara valores por rol (dominio + referenciaOrigen + empresa); el contrato expone solo `dominio`. **Diagnóstico: Dimensión perdida.**
+
+**`TercerosFusionados` como aviso (L~623)** — evento-integración. Flujo: fusión por `terceroId`; contrato expone `claveNatural → terceroCanonicoId` (UUID interno). **Diagnóstico: Tipo inconsistente con el consumidor.**
+
+**Contrato de entrada (L~399)** — Forma completa y bien dimensionada. **Diagnóstico: Coherente, con un gap de materialización** (hallazgo 4).
+
+#### Hallazgos
+
+| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
+|---|-----------|-------------------------------|----------|-------------------|
+| 1 | **Alta** | L~624 "Clave natural, dato en disputa, valor correcto \| Los dominios cuyo valor difiere — corrigen su registro automáticamente" | El aviso no identifica con precisión el registro destino. Peor: si el dato corregido **es la identificación**, no se especifica si la clave del aviso es la errada (la que el dominio tiene) o la corregida — una aplicación automática con la clave equivocada corrige el registro equivocado. | El payload incluye las `referenciaOrigen` destino (la bodega las conoce por los roles) y se declara que la clave viaja en su valor **previo** a la corrección. |
+| 2 | Media | L~542 "`versiones` [ { valor, dominio, fechaDelEvento } ]" | El flujo conoce qué rol exacto informó cada valor; el contrato colapsa a dominio: con dos registros del mismo dominio (post-fusión es seguro), el administrador no puede distinguir cuál informó qué, y `dominiosACorregir` opera a granularidad gruesa. | Agregar `referenciaOrigen` (y `empresa`) a `VersionDeDato` y a `dominiosACorregir` → `registrosACorregir`. |
+| 3 | Media | L~566 "`correspondencias` [ { claveNatural → terceroCanonicoId } ]" | `terceroCanonicoId` es el UUID interno de la bodega; Contabilidad identifica terceros por identificación legal embebida en sus asientos — no posee ni necesita el UUID. | Incluir la identificación legal canónica en cada correspondencia (clave → clave canónica + terceroCanonicoId). |
+| 4 | Media | L~401 "Lo publican los dominios fuente (OXP: su Proveedor…)" | No se define quién materializa el contrato: ¿OXP emite directamente el evento estándar, o emite `ProveedorCreado` y algo lo adapta? Afecta a los tres equipos consumidores del contrato. | Declarar en 5.2: cada dominio fuente emite el contrato como su propio evento de integración (sin adaptador intermedio), o la alternativa que se decida. |
+
+#### Resumen
+- Alta: 1 | Media: 3 | Baja: 0 — Total: 4 hallazgos
+
+---
+
+### 8. Idempotencia y Concurrencia
+
+#### Matriz de idempotencia
+
+| Operación / Comando | Agregado | IdempotencyKey | Guard anti-duplicado | Optimistic concurrency | Riesgo |
+|---------------------|----------|----------------|---------------------|----------------------|--------|
+| Consolidación de evento de rol | Tercero | (referenciaOrigen, secuencia) `[SI3]` | Sí — descarta secuencias viejas | `[D11]` plataforma | Bajo |
+| Creación (`TerceroCreado`) | Tercero | — | Índice `[SI1]` (eventual) | `[D11]` | **Alto** (ver hallazgo 1) |
+| `FusionarTerceros` / `MarcarHomonimia` / `ResolverDivergencia` | Conciliacion | Estado `Abierta` requerido | Sí — FSM rechaza re-ejecución | `[D11]` | Bajo |
+| `InactivarTercero` / `ReactivarTercero` | Tercero | Estado previo requerido | Sí — FSM | `[D11]` | Bajo |
+| `AgregarNota` | Conciliacion | — | No | `[D11]` | Bajo (ruido) |
+
+#### Hallazgos
+
+| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
+|---|-----------|-------------------------------|----------|-------------------|
+| 1 | **Alta** | L~685 "[I1] … Eventual \| Índice único `[SI1]`"; L~428 "Clave natural sin tercero vigente" | **Creación concurrente**: dos fuentes publican la misma clave nueva a la vez (escenario garantizado en la carga histórica — OXP y CXC migrando al mismo tercero). Ambos pasan la precondición, el índice rechaza al segundo… y no está documentado qué hace el servicio con el perdedor. Riesgo de evento de rol perdido (violaría `[I11]`). | En `[SI1]`/paso 3: ante colisión del índice, reintentar resolviendo de nuevo la clave y consolidar sobre el tercero ya creado. |
+| 2 | Baja | L~553 `NotaAgregada` "{ texto; usuarioId; fecha }" | Reintento del comando duplica la nota (sin clave de idempotencia). Impacto solo de ruido. | Cubierto por `[D11]` — basta mencionarlo en la ficha. |
+
+#### Resumen
+- Alta: 1 | Media: 0 | Baja: 1 — Total: 2 hallazgos
+
+---
+
+### 9. Sagas y Procesos Multi-Agregado
+
+#### Mapa de procesos
+
+**Proceso: ServicioDeConsolidacion** — Trigger: evento de rol. Agregados: Tercero, Conciliacion. Pasos: 5 documentados. Compensación: declarada innecesaria con justificación (acumulativo e idempotente). CorrelationId: no declarado. IdempotencyKey por paso: `[SI3]`. Persistencia del estado: sin estado propio (cada paso es derivación de streams). **Diagnóstico: completo salvo correlación.**
+
+**Proceso: Fusión** (TercerosFusionados → TerceroAbsorbido×N → RolIncorporado×M en canónico → mapa `[SI4]`) — Trigger: comando FusionarTerceros. Agregados: Conciliacion + 2..N Terceros. Pasos: **no documentados como proceso** (solo como "Efectos"). Compensación: no aplica declarado… implícitamente. CorrelationId: `conciliacionId` viaja en TerceroAbsorbido pero no se declara como correlación. **Diagnóstico: incompleto.**
+
+**Proceso: Corrección de divergencia** (DivergenciaResuelta → aviso → dominios aplican → regreso por F1 → ConvergenciaConfirmada) — Ventana documentada (estado `EnCorreccion` ✓). Sin política si no converge.
+
+#### Hallazgos
+
+| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
+|---|-----------|-------------------------------|----------|-------------------|
+| 1 | **Alta** | L~567 "Efectos \| `TerceroAbsorbido` en cada absorbido y `RolIncorporado` en el canónico (efectos inter-agregado); mapa canónico actualizado" | La fusión toca N agregados en cadena y no documenta: orden de los pasos, idempotencia por paso ante reintento, ni qué ve la ficha si falla a mitad (absorbido ya `Fusionado`, roles aún no incorporados → roles invisibles). Es el proceso más delicado del BC. | Documentar la cadena en 3.6 o 5.4: orden (absorbidos → canónico → mapa), correlación e idempotencia por `conciliacionId`, reintento hasta completar (sin compensación), y la ventana visible. |
+| 2 | Media | L~589 "`EnCorreccion` — la decisión está tomada; falta que los dominios converjan" | Sin política si un dominio nunca aplica la corrección (ej: fuente que aún no implementa la aplicación automática): el caso queda `EnCorreccion` indefinidamente, sin seguimiento ni escalamiento documentado. | Nota en 4.2 + nuevo `[PD]` con owner (producto/equipo técnico) para la política de seguimiento. |
+| 3 | Media | L~309-317 (pasos del servicio, sin correlación declarada) | No se declara cómo trazar la cadena evento de rol → consolidación → señales (correlationId). | Declarar (referenciaOrigen, secuencia) como correlación de la cadena en 3.6 — alineado con `[D11]`. |
+
+#### Resumen
+- Alta: 1 | Media: 2 | Baja: 0 — Total: 3 hallazgos
+
+---
+
+### 10. Decisiones Abiertas
+
+#### Inventario de pendientes
+
+| # | Ubicación (L~N) | Texto literal | Tipo | Decisión temporal | Riesgo | Criterio de cierre |
+|---|-----------------|--------------|------|-------------------|--------|-------------------|
+| 1 | L~750 `[PD1]` | "Veredicto del custodio… issue #35" | Pendiente formal | Estructura propuesta en el issue | Medio | Resolución #35 antes de F1 |
+| 2 | L~751 `[PD2]` | "Criterios ampliados… (F2)" | Diferido formal | Criterio R09 en F1 | Bajo | Diseño F2 |
+| 3 | L~752 `[PD3]` | "Ratificar el catálogo de motivos…" | Pendiente formal | Propuesta inicial 6.4 | Bajo | Comité antes de F1 |
+| 4 | L~753 `[PD4]` | "Issue cruzado… Contabilidad" | Pendiente formal | — | Medio | Al fusionar el PR #33 |
+| 5 | L~739 `[P1]` | "con las validaciones empaquetadas del producto" | **Implícita** | — | Medio | Ver hallazgo 1 |
+| 6 | L~3 | "v2.0 — En construcción" | Banner temporal | — | Bajo | Cierre de auditoría |
+
+#### Hallazgos
+
+| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
+|---|-----------|-------------------------------|----------|-------------------|
+| 1 | Media | L~739 "La bodega verifica con las mismas reglas" | Decisión implícita sin formalizar: ¿qué pasa cuando dominio y bodega tienen **versiones distintas del paquete** de validaciones? (un dominio rezagado captura con reglas viejas). `[R04]` lo absorbe como anomalía→conciliación, pero nadie lo declara. | Ampliar `[P1]` ("las diferencias de versión del paquete se manifiestan como anomalías → conciliación, nunca rechazo") o nuevo `[PD]` con owner custodio. |
+| 2 | Baja | L~3 "v2.0 — En construcción (junio 2026)" | El banner quedará obsoleto al cerrar la auditoría y fusionar el PR. | Actualizar el banner al cierre del #33. |
+
+#### Resumen
+- Alta: 0 | Media: 1 | Baja: 1 — Total: 2 hallazgos
+
+---
+
+### 11. Sanity Check (Coherencia Cruzada)
+
+#### Resumen de coherencia
 
 ```
-### Eventos: Tercero
-
-De transición (3): TerceroRegistrado, TerceroInactivado, TerceroReactivado
-De progreso (8): TerceroIdentificacionActualizada, TerceroRazonSocialActualizada, TerceroTipoPersonaActualizado, TerceroRolAsignado, TerceroRolRemovido, TerceroDireccionReferenciada, TerceroDireccionDesreferenciada, TerceroDireccionPreferidaDesignada
-De transición Contacto (3): ContactoRegistrado, ContactoInactivado, ContactoReactivado
-De progreso Contacto (2): ContactoActualizado, ContactoPrincipalDesignado
-
-Naming consistente: Sí
+Referencias verificadas: D1-D12, I1-I13, P1-P4, PD1-PD4, SI1-SI9 — todas definidas; 0 usadas-sin-definir
+Conteos verificados: 11 correctos (eventos 16=8+8, invariantes 13=9L+4E, VOs 7, SIs 9,
+                     decisiones 12, premisas 4, pendientes 4, permisos 11, FSM 2, catálogos 4, pasos 5)
+                     0 inconsistentes
+Decisiones vigentes: 12 alineadas, 0 desalineadas
+Premisas operacionalizadas: 4 reflejadas (P1→R04/paso1, P2→D5/SI3, P3→SI8, P4→3.7), 0 sin reflejo
+Conceptos eliminados: sin rastros ("figura", "EnRegistro", "Abortado" solo en contraste declarado con v1.0)
 ```
 
 #### Hallazgos
 
 | # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
 |---|-----------|-------------------------------|----------|-------------------|
-| 1 | Alta | L430: "`TerceroContactoAgregado`" / "`TerceroContactoMedioAgregado`" | `[SI10]` menciona dos eventos que no existen en el catálogo: rompe auto-contención y hace ambigua la implementación. | Usar los nombres correctos: `ContactoRegistrado` y `ContactoActualizado`. |
-| 2 | Media | L574 (`TerceroRegistrado.contactoPrincipalInicial`) vs L725 (`ContactoRegistrado`) | Ambigüedad sobre si `TerceroRegistrado` crea el primer contacto sin emitir `ContactoRegistrado` adicional. | Añadir nota: "este evento crea el contacto principal inicial sin emitir un `ContactoRegistrado` adicional; el `contactoId` viene en el payload." |
-| 3 | Media | L710: "`TerceroDireccionPreferidaDesignada` … `direccionIdAnterior` (opcional; caso raro)" | "Caso raro" sin explicar cómo ocurre. | Documentar el escenario exacto: "cuando el único con `esPreferida=true` de ese `tipoUso` fue desreferenciado". |
-| 4 | Media | L574: `origen` en `TerceroRegistrado` vs eventos de actualización | Solo `TerceroRegistrado` carga `origen`/`contextoOrigen`. Eventos de actualización pueden venir de consumidor pero no capturan ese contexto. | Decidir explícitamente: "eventos de actualización no capturan `origen`; la trazabilidad queda en `motivo` + `usuarioId`" o añadir `origen`. |
-| 5 | Baja | L720: `ContactoRegistrado` + esPrincipal=false | No obvio qué pasa al intentar registrar un contacto cuando I4 no está satisfecha aún (reparación). | Añadir nota: "`ContactoRegistrado` nunca viola I4 porque `esPrincipal` nace siempre en false; I4 se satisface por secuencia `ContactoRegistrado` + `ContactoPrincipalDesignado`". |
-| 6 | Baja | L775: `contactoIdAnterior` | No se contempla `contactoIdAnterior = null` como ocurrió en `TerceroDireccionPreferidaDesignada`. | Alinear al patrón hermano: aceptar `contactoIdAnterior` opcional y documentar el escenario. |
+| 1 | Media | L~184 "`estado` \| `Activo` \| `Inactivo`" vs L~357 "FUSIONADO ■" | La composición de la raíz no incluye el estado terminal `Fusionado` que la FSM 4.1 sí tiene. | Tipar `estado` como `Activo \| Inactivo \| Fusionado`. |
+| 2 | Baja | L~96 "entidad interna `Rol`, **uno por dominio y empresa**" vs L~191 identidad (`rol`, `dominio`, `empresa`) | La prosa de 3.1 omite la dimensión `rol` de la identidad triple. | "uno por rol, dominio y empresa" (o la identidad que resulte del hallazgo Composición #1). |
+| 3 | Baja | L~689, L~695-697 (I5, I11, I12, I13) | Cuatro invariantes definidas sin referencia cruzada desde las fichas de eventos o FSM donde se hacen cumplir. | Citarlas en las fichas correspondientes (TerceroAbsorbido→I12/I13; paso 1→I11; 3.2→I5). |
 
 #### Resumen
-- Alta: 1 | Media: 3 | Baja: 2 | Total: 6
+- Alta: 0 | Media: 1 | Baja: 2 — Total: 3 hallazgos
 
 ---
 
-### 7. Idempotencia y Concurrencia
-
-#### Matriz de Idempotencia
-
-| Comando | IdempotencyKey | Guard anti-duplicado | expectedVersion | Riesgo |
-|---------|---------------|---------------------|-----------------|--------|
-| `RegistrarTercero` | No | `[I1]`, `[I11]` vía `[SI1]` | No doc | Medio |
-| `RegistrarTerceroForzado` | No | Solo `[I1]` | No doc | Medio |
-| `AsegurarTerceroDesdeConsumidor` | No explícito | Dedupe por rol/contacto/tipoUso | No doc | Bajo-Medio |
-| `ActualizarIdentificacion` | No | Parcial (unicidad) | No doc | Medio |
-| `DesignarContactoPrincipal` | No | Guards I4 | No doc | Medio |
-
-#### Hallazgos
-
-| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
-|---|-----------|-------------------------------|----------|-------------------|
-| 1 | Alta | L442: "idempotente — reintentos producen 0 eventos nuevos" | `[SI10]` declara idempotencia sin mecanismo concreto. Dos llamadas concurrentes pueden ambas pasar guards y emitir eventos duplicados. | Añadir en `[SI10]`: "cada invocación lleva `idempotencyKey` única del consumidor" + optimistic concurrency. |
-| 2 | Alta | L351: "índice … eventualmente consistente" | No se documenta resolución de ventana de carrera entre dos `RegistrarTercero` simultáneos con misma identificación. | Documentar: (a) unique-constraint DB transaccional antes del append, o (b) evento `TerceroDuplicadoDetectado` + reconciliación. |
-| 3 | Media | Toda § 5 | Ningún evento documenta `expectedVersion` del stream como precondición (patrón estándar ES optimistic concurrency). | Añadir en § 2 o § 3.2: "todos los comandos verifican `expectedVersion` del stream". |
-| 4 | Media | L777: `DesignarContactoPrincipal` | Dos `DesignarContactoPrincipal` simultáneos podrían ambos pasar el guard leyendo el mismo estado. | Igual que #3: documentar expectedVersion. |
-| 5 | Media | L415 (`[SI10]`) | Mezcla creación con enriquecimiento; si retry parcial falla entre eventos, no es idempotente. | Aclarar: "todos los eventos van en un solo commit atómico; si falla, nada se persiste". |
-| 6 | Baja | L442 | No documenta cómo un consumidor con timeout reintenta safe. | Añadir nota: "reintentos safe por construcción — si el primer llegó al stream, el segundo hace no-op". |
-
-#### Resumen
-- Alta: 2 | Media: 3 | Baja: 1 | Total: 6
-
----
-
-### 8. Sagas y Procesos Multi-Agregado
-
-#### Mapa de Procesos
-
-```
-### Proceso: (ninguno dentro del BC)
-
-El BC declara explícitamente que NO tiene domain services ni sagas internas:
-- L156: "Terceros no tiene domain services."
-- L459: "No hay relaciones entre agregados internos del BC."
-
-La orquestación multi-dominio (BFF / API Composition) vive EXTERNAMENTE, documentada en `anexo-decision-orquestacion-registro.md`.
-```
-
-#### Hallazgos
-
-| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
-|---|-----------|-------------------------------|----------|-------------------|
-| 1 | Media | L415 `[SI10]` | Aunque no hay saga, `AsegurarTerceroDesdeConsumidor` ejecuta secuencia compleja que emite N eventos. Si precondiciones fallan parcialmente, no se documenta rollback/compensación. | Añadir en `[SI10]`: "todos los eventos en un único append atómico; si falla, nada se emite. No hay compensación porque no hay pasos multi-agregado." |
-| 2 | Media | L9 tabla contenidos y anexo externo | El modelo reconoce proceso externo pero no declara la responsabilidad de compensación como no-suya explícitamente. | Añadir en § 8: "Compensación ante fallos en orquestación multi-dominio: responsabilidad del BFF/API Composition según anexo." |
-| 3 | Baja | Sección 5.3 `TerceroRolAsignado` L657 | Se notifica a consumidor para que "abra su registro" — proceso multi-agregado eventual sin `correlationId` ni política de retry documentados. | Añadir en § 8 o `[PD1]`: "contrato con consumidores define `correlationId`, retry, DLQ en Fase 3 EventCatalog". |
-
-#### Resumen
-- Alta: 0 | Media: 2 | Baja: 1 | Total: 3
-
----
-
-### 9. Decisiones Abiertas
-
-#### Inventario de Pendientes
-
-| # | Ubicación | Texto | Tipo | Riesgo |
-|---|-----------|-------|------|--------|
-| 1 | L908 `[PD1]` | Contratos de eventos de integración | Fase 3 EventCatalog | Medio |
-| 2 | L909 `[PD2]` | Estrategia técnica del índice de unicidad | Implementación | **Alto** |
-| 3 | L910 `[PD3]` | Canales externos adicionales | Futuro Producto | Bajo |
-| 4 | L395 `[SI7]` | Verificación MX de correos | Implícita opcional | Bajo |
-| 5 | L399 `[SI8]` | Advertencia UX contactos sin nombre | Implícita UX | Bajo |
-| 6 | L341 | Validación por país delegada al catálogo | Implícita | Bajo |
-| 7 | L710 | `direccionIdAnterior=null` "caso raro" | Implícita semántica | Medio |
-| 8 | L777 | `contactoIdAnterior=null` "caso raro" | Implícita semántica | Medio |
-| 9 | L965 | Changelog desactualizado | TODO | Bajo |
-
-#### Hallazgos
-
-| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
-|---|-----------|-------------------------------|----------|-------------------|
-| 1 | Alta | L909: "`PD2` queda fuera del modelo por ser decisión de implementación" | El mecanismo del índice determina si `[I1]` e `[I11]` se cumplen. Diferirlo a implementación sin definir comportamiento ante colisión concurrente deja una regla de negocio dura abierta. | Reclasificar PD2 como "pendiente del modelo" o añadir sub-pendiente "resolución de colisiones concurrentes post-detección" con criterio de cierre. |
-| 2 | Media | L965 (Control de versiones) | Changelog afirma que solo 1-2 están redactadas, pero todo 3-12 está escrito. | Actualizar entrada v1.0. |
-| 3 | Media | L710, L777 ("caso raro") | Ambiguedad sobre cuándo se acepta `null` en `direccionIdAnterior` / `contactoIdAnterior`. | Documentar escenario exacto. |
-| 4 | Baja | L395 `[SI7]` "opcionalmente el sistema puede verificar" | "Opcionalmente" sin criterio de activación. | Aclarar: "feature opcional habilitable por configuración de tenant". |
-| 5 | Baja | L341 | Validación condicionada a evento futuro del catálogo sin ownership. | Mover a `[PD#]` formal o fijar plazo de cierre. |
-
-#### Resumen
-- Alta: 1 | Media: 2 | Baja: 2 | Total: 5
-
----
-
-### 10. Sanity Check (Coherencia Cruzada)
-
-#### Coherencia
-
-```
-Referencias del alcance USADAS: R01, R03, R04, R05, R06, R07, R08, R09, R10, R11, R12, R13, R15, R16, R17, R18, R19, R21, R23, R24, R25, R02 (en P3)
-Referencias del alcance NO usadas: R14, R20, R22
-
-Invariantes: I1..I11 todas definidas y usadas → OK
-Decisiones: D1..D10 todas definidas y usadas → OK
-Premisas: P1..P6 todas definidas → OK
-Pendientes: PD1..PD3 todos declarados → OK
-SIs: SI1..SI11 todas declaradas y referenciadas → OK
-
-Conteos:
-  16 eventos ✓, 19 permisos ✓, 11 invariantes ✓, 10 decisiones ✓, 6 premisas ✓, 3 pendientes ✓, 11 SIs ✓
-
-Conceptos fantasma:
-  - HistorialIdentificacion en diagrama pero D3 lo elimina
-  - TerceroContactoAgregado / TerceroContactoMedioAgregado en [SI10] no existen como eventos
-```
-
-#### Hallazgos
-
-| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
-|---|-----------|-------------------------------|----------|-------------------|
-| 1 | Alta | L430 | Dos eventos referenciados en `[SI10]` no existen. Contradicción cruzada. | Renombrar a `ContactoRegistrado` y `ContactoActualizado`. |
-| 2 | Alta | L116 vs L876 `[D3]` | Contradicción: diagrama muestra `HistorialIdentificacion` como VO pero D3 lo elimina. | Eliminar la línea del diagrama. |
-| 3 | Media | L123 vs § 3.3 | `MedioDeComunicacion` en diagrama no existe en composición. | Reemplazar por `CorreoElectronico`, `Telefono`. |
-| 4 | Media | L965 | Control de versiones dice "Secciones 3-12 en construcción" pero están completas. | Actualizar al cerrar v1.0. |
-| 5 | Media | R23 en § 8 | R23 solo se cita en exclusión; podría referenciarse en comportamiento `estaActivo()`. | Añadir `[R23]` junto a `estaActivo()` L220. |
-| 6 | Media | R20, R22 sin usar | R20 (alcance) y R22 (completitud) están en alcance pero no se referencian. | Añadir `[R20]` en § 3.1 (L84) y `[R22]` junto a `[D5]` (L878). |
-| 7 | Media | R14 sin usar | R14 (medios exclusivos del contacto) no está referenciada. | Añadir `[R14]` en L176 o como nota en § 3.2. |
-| 8 | Baja | L165/L171/D6 | DV no-clave-unicidad mencionado en 3 lugares. | Dejar una sola fuente canónica y referencias. |
-
-#### Resumen
-- Alta: 2 | Media: 5 | Baja: 1 | Total: 8
-
----
-
-### Resumen Ejecutivo
+## Resumen Ejecutivo
 
 | Skill | Alta | Media | Baja | Total |
 |-------|------|-------|------|-------|
-| Glosario | 1 | 2 | 1 | 4 |
+| Glosario | 0 | 1 | 2 | 3 |
 | Composición | 1 | 2 | 2 | 5 |
-| FSM | 0 | 2 | 1 | 3 |
-| Invariantes | 2 | 3 | 1 | 6 |
-| Responsabilidades | 0 | 2 | 2 | 4 |
-| Semántica Eventos | 1 | 3 | 2 | 6 |
-| Idempotencia | 2 | 3 | 1 | 6 |
-| Sagas | 0 | 2 | 1 | 3 |
-| Decisiones Abiertas | 1 | 2 | 2 | 5 |
-| Sanity Check | 2 | 5 | 1 | 8 |
-| **TOTAL** | **10** | **26** | **14** | **50** |
+| FSM | 1 | 0 | 0 | 1 |
+| Invariantes | 0 | 1 | 0 | 1 |
+| Responsabilidades | 0 | 1 | 1 | 2 |
+| Semántica Eventos | 0 | 1 | 1 | 2 |
+| Contrato vs Flujo | 1 | 3 | 0 | 4 |
+| Idempotencia | 1 | 0 | 1 | 2 |
+| Sagas | 1 | 2 | 0 | 3 |
+| Decisiones Abiertas | 0 | 1 | 1 | 2 |
+| Sanity Check | 0 | 1 | 2 | 3 |
+| **TOTAL** | **5** | **13** | **10** | **28** |
 
-### Top 5 Hallazgos Críticos
+## Top 5 Hallazgos Críticos
 
 | # | Skill origen | Severidad | Problema | Corrección mínima |
 |---|-------------|-----------|----------|-------------------|
-| 1 | Glosario / Composición / Semántica Eventos / Sanity Check | Alta | `[SI10]` (L430) referencia dos eventos (`TerceroContactoAgregado`, `TerceroContactoMedioAgregado`) que no existen en el catálogo de eventos § 5. Replicado en 4 auditorías distintas. | Reemplazar ambos nombres en L430 por `ContactoRegistrado` y `ContactoActualizado`. |
-| 2 | Idempotencia | Alta | El índice de unicidad de `[I1]` es eventualmente consistente (`[SI1]`) y no se documenta resolución de colisiones concurrentes. Riesgo: dos terceros con misma identificación violando `[R01]`. | Añadir a `[SI1]` estrategia concreta: unique-constraint transaccional previo al append, o evento `TerceroDuplicadoDetectado` + política. |
-| 3 | Idempotencia | Alta | `AsegurarTerceroDesdeConsumidor` se declara idempotente sin mecanismo explícito. Dos llamadas concurrentes pueden emitir eventos duplicados. | Añadir en `[SI10]`: `idempotencyKey` única del consumidor + optimistic concurrency por versión del stream. |
-| 4 | Sanity Check / Composición | Alta | El diagrama § 3.1 (L116) muestra `HistorialIdentificacion (VO, colección N)` contradiciendo `[D3]`. | Eliminar la línea del diagrama ASCII. |
-| 5 | Invariantes / Decisiones Abiertas | Alta | `[I11]` no documenta qué ocurre si la inconsistencia se detecta post-creación por dos registros concurrentes. `[PD2]` difiere este vacío a "implementación". | Documentar en `[SI10]`/`[D10]` la política de reconciliación post-detección o reclasificar `[PD2]`. |
+| 1 | Composición | Alta | La identidad de la entidad `Rol` (`rol`, `dominio`, `empresa`) hace **irrepresentable la fusión típica**: dos registros del mismo dominio/rol/empresa (el duplicado real) colisionan al absorber. | Identidad = (`dominio`, `referenciaOrigen`); `rol` y `empresa` como atributos; ajustar `[I3]`. |
+| 2 | Contrato vs Flujo | Alta | `DatoDeIdentidadCorregido` no identifica el registro destino y es ambiguo cuando el dato corregido es la propia clave — la **corrección automática puede aplicarse al registro equivocado**. | Incluir `referenciaOrigen` destino y declarar que la clave viaja en su valor previo. |
+| 3 | FSM | Alta | Fusionar candidatos con **señales globales distintas** no tiene regla: el veto por fraude del absorbido desaparece silenciosamente. | El canónico hereda la señal más restrictiva (o precondición de igualar señales). |
+| 4 | Idempotencia | Alta | **Creación concurrente** de la misma clave (garantizada en carga histórica) sin estrategia documentada para el perdedor del índice — riesgo de evento de rol perdido (violaría `[I11]`). | Ante colisión de `[SI1]`: reintentar y consolidar sobre el tercero existente. |
+| 5 | Sagas | Alta | La **fusión no está documentada como proceso**: sin orden de pasos, idempotencia por paso ni ventana visible definida — fallo parcial deja roles invisibles. | Documentar la cadena (orden, correlación por `conciliacionId`, reintento, ventana). |
+
+---
+
+# RONDA 2 — sobre el modelo v2.0.1 (verificación post-aplicación)
+
+
+**Fecha:** 2026-06-12
+**Modelo auditado:** `dominio/terceros/modelo-dominio.md` v2.0.1 (830 líneas — auditado completo)
+**Ronda anterior:** Ronda 1 de este mismo archivo (28 hallazgos — todos aplicados)
+**Naturaleza de esta ronda:** verificación post-aplicación — confirma las correcciones y detecta residuos e inconsistencias introducidas por ellas.
+
+---
+
+### 1. Glosario y Lenguaje Ubicuo
+
+Verificado: "vigente", "aviso" y "fuente" definidos en 2.5 (G1, G2, G3 de la primera ronda — resueltos); "registro"/"registro informante" cubierto por la fila "Fuente"; nomenclatura de eventos consistente; sin sinónimos nuevos.
+
+**Hallazgos:** ninguno.
+
+#### Resumen
+- Alta: 0 | Media: 0 | Baja: 0 — Total: 0
+
+---
+
+### 2. Composición de Agregados
+
+Verificado: identidad de `Rol` = (`dominio`, `referenciaOrigen`) aplicada coherentemente en 3.1, 3.2, `[I3]` y precondición de `RolIncorporado`; `ultimaSecuencia` y `motivoEstado` tipados; `decision` detallada; `estado` con `Fusionado`.
+
+#### Hallazgos
+
+| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
+|---|-----------|-------------------------------|----------|-------------------|
+| 1 | Baja | L~202 "`contactos` \| Colección `Contacto` \| Estructura del paquete (issue #35): nombre, rol del contacto, correo, teléfono, marca de principal" | La fila de composición del `Rol` no refleja la representación { contacto, esPrincipal } que sí quedó en los payloads y el contrato (corrección C3 de la primera ronda — aplicada de forma incompleta). | Tipar la fila como "Colección { contacto: `Contacto`, esPrincipal }". |
+| 2 | Baja | L~242 "instantánea de la evidencia al detectar: clave natural, razón social, roles y dominios" | La fila `candidatos` de la composición no incluye el **estado global** que sí ganaron el VO `Candidato` (L~279) y el payload de `PosibleDuplicadoDetectado` (L~561) con la corrección `[I14]`. | Agregar "estado global" a la instantánea de la fila. |
+
+#### Resumen
+- Alta: 0 | Media: 0 | Baja: 2 — Total: 2
+
+---
+
+### 3. Máquinas de Estado (FSM)
+
+Verificado: `VersionAgregada` como progreso en `Abierta` y `EnCorreccion` (coincide con su ficha); `Fusionado` en composición y FSM; herencia de señal compatible con las transiciones (el canónico `Activo` → `Inactivo` por el derivado de fusión; si ya estaba `Inactivo`, no hay derivación — la señal más restrictiva ya rige).
+
+**Hallazgos:** ninguno.
+
+#### Resumen
+- Alta: 0 | Media: 0 | Baja: 0 — Total: 0
+
+---
+
+### 4. Invariantes
+
+Verificado: I1-I15 clasificadas; I14 Local con mecanismo; I15 Eventual con doble enforcement (paso 4 + precondición).
+
+#### Hallazgos
+
+| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
+|---|-----------|-------------------------------|----------|-------------------|
+| 1 | Baja | L~742 "La señal repetida **enriquece** el caso existente (`VersionAgregada`), no abre otro." | La redacción de `[I15]` aplica el enriquecimiento a ambos tipos, pero `VersionAgregada` es solo de divergencias (L~584): en un duplicado, la señal repetida simplemente no produce evento — el caso abierto ya la representa. | Precisar en `[I15]`: "…enriquece el caso si es divergencia (`VersionAgregada`); en duplicados la señal repetida no produce evento". |
+
+#### Resumen
+- Alta: 0 | Media: 0 | Baja: 1 — Total: 1
+
+---
+
+### 5. Responsabilidades de Agregados
+
+Verificado: el comportamiento "consolidar la identidad compartida" quedó en el agregado (R1 — resuelto); el servicio entrega y el agregado decide; "única fuente" definida a granularidad de registro (R2 — resuelto). Ambos agregados saludables.
+
+**Hallazgos:** ninguno.
+
+#### Resumen
+- Alta: 0 | Media: 0 | Baja: 0 — Total: 0
+
+---
+
+### 6. Semántica de Eventos
+
+Verificado: regla de emisión `RolInactivado`/`RolActualizado` (E1 — resuelto); estado previo de `RolIncorporado` cubre el nacimiento (E2 — resuelto); `VersionAgregada` bien delimitado (hecho propio: tercera fuente opina sobre un dato en disputa).
+
+#### Hallazgos
+
+| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
+|---|-----------|-------------------------------|----------|-------------------|
+| 1 | Media | L~497 "Información capturada \| Identidad del rol: { rol, dominio, empresa }; `referenciaOrigen`; …" (`RolInactivado`) | El payload etiqueta { rol, dominio, empresa } como "Identidad del rol", pero la identidad de la entidad cambió a (`dominio`, `referenciaOrigen`) en la primera ronda — contradicción residual que confunde al implementador sobre cómo ubicar el rol a inactivar. | "Identidad del rol: { dominio, referenciaOrigen }; contexto: rol, empresa; `secuencia`; `fechaDelHecho`." |
+| 2 | Baja | L~635 "Se publica `DatoDeIdentidadCorregido` (integración) a **los dominios** cuyo valor difiere" (`DivergenciaResuelta`, Efectos) | Residuo de la granularidad anterior: el payload ya dice `registrosACorregir`, pero los Efectos siguen hablando de dominios. | "…a los **registros señalados** (`registrosACorregir`)". |
+
+#### Resumen
+- Alta: 0 | Media: 1 | Baja: 1 — Total: 2
+
+---
+
+### 7. Contrato vs Flujo Interno
+
+Verificado: `DatoDeIdentidadCorregido` con registros exactos y clave en valor previo (CV1 — resuelto); `VersionDeDato` con granularidad de registro (CV2 — resuelto); correspondencias con identificación canónica (CV3 — resuelto); materialización del contrato declarada (CV4 — resuelto).
+
+#### Hallazgos
+
+| # | Severidad | Evidencia (L~N, cita textual) | Problema | Corrección mínima |
+|---|-----------|-------------------------------|----------|-------------------|
+| 1 | Media | L~667 "`DatoDeIdentidadCorregido` \| Derivado de `DivergenciaResuelta` (y de fusiones con corrección de dato)" vs L~586 "la corrección se publica también al registro recién divergente" | La tabla 5.5 no registra la **tercera derivación** del aviso, introducida con `VersionAgregada`: cuando una versión nueva llega a un caso `EnCorreccion`, la corrección ya decidida se publica al registro recién divergente. El contrato queda incompleto frente al flujo. | En la columna Origen: "Derivado de `DivergenciaResuelta`, de fusiones con corrección de dato, y de `VersionAgregada` sobre casos `EnCorreccion`". |
+
+#### Resumen
+- Alta: 0 | Media: 1 | Baja: 0 — Total: 1
+
+---
+
+### 8. Idempotencia y Concurrencia
+
+Verificado: creación concurrente con estrategia (ID1 — resuelto); `VersionAgregada` con guard anti-duplicado ("la versión no estaba registrada"); `NotaAgregada` remite a `[D11]` (ID3 — resuelto); comandos de resolución protegidos por estado.
+
+**Hallazgos:** ninguno.
+
+#### Resumen
+- Alta: 0 | Media: 0 | Baja: 0 — Total: 0
+
+---
+
+### 9. Sagas y Procesos Multi-Agregado
+
+Verificado: proceso de fusión documentado con orden, compensación justificada, correlación, idempotencia por paso y persistencia (SA1 — resuelto); correlación de la consolidación declarada (SA3 — resuelto); `[PD5]` para `EnCorreccion` sin convergencia (SA2 — resuelto). El paso 2 de la fusión no puede violar `[I3]`: un registro pertenece a un solo tercero a la vez, y el reintento queda cubierto por la idempotencia por paso.
+
+**Hallazgos:** ninguno.
+
+#### Resumen
+- Alta: 0 | Media: 0 | Baja: 0 — Total: 0
+
+---
+
+### 10. Decisiones Abiertas
+
+Verificado: `[PD1]`-`[PD5]` con owner y criterio de cierre; banner actualizado a v2.0.1 (OD2 — resuelto); `[P1]` cubre el desfase de versiones del paquete (OD1 — resuelto). Sin pendientes implícitos nuevos.
+
+**Hallazgos:** ninguno.
+
+#### Resumen
+- Alta: 0 | Media: 0 | Baja: 0 — Total: 0
+
+---
+
+### 11. Sanity Check (Coherencia Cruzada)
+
+```
+Referencias verificadas: D1-D12, I1-I15, P1-P4, PD1-PD5, SI1-SI9 — todas definidas y resueltas
+Conteos verificados: 17 eventos (8+9) = resumen 5.1 = fichas reales; 15 invariantes (10 Local + 5 Eventual)
+                     = tabla Sección 7; 5 pendientes; 11 permisos; 12 decisiones — todos correctos
+Decisiones vigentes: 12 alineadas (D7 con coexistencia y herencia; D8 con EnCorreccion)
+Premisas operacionalizadas: 4 reflejadas
+Conceptos eliminados: sin rastros de la identidad triple salvo el residuo reportado en Semántica #1
+```
+
+**Hallazgos:** ninguno adicional (la contradicción del payload de `RolInactivado` quedó reportada en Semántica de Eventos #1; las dos filas de composición desactualizadas, en Composición #1 y #2).
+
+#### Resumen
+- Alta: 0 | Media: 0 | Baja: 0 — Total: 0
+
+---
+
+## Resumen Ejecutivo
+
+| Skill | Alta | Media | Baja | Total |
+|-------|------|-------|------|-------|
+| Glosario | 0 | 0 | 0 | 0 |
+| Composición | 0 | 0 | 2 | 2 |
+| FSM | 0 | 0 | 0 | 0 |
+| Invariantes | 0 | 0 | 1 | 1 |
+| Responsabilidades | 0 | 0 | 0 | 0 |
+| Semántica Eventos | 0 | 1 | 1 | 2 |
+| Contrato vs Flujo | 0 | 1 | 0 | 1 |
+| Idempotencia | 0 | 0 | 0 | 0 |
+| Sagas | 0 | 0 | 0 | 0 |
+| Decisiones Abiertas | 0 | 0 | 0 | 0 |
+| Sanity Check | 0 | 0 | 0 | 0 |
+| **TOTAL** | **0** | **2** | **4** | **6** |
+
+**Comparación entre rondas:** 28 hallazgos (5 Alta) → **6 hallazgos (0 Alta)**. Los 28 de la primera ronda quedaron resueltos; los 6 de esta ronda son residuos de la propia aplicación (filas de composición que no acompañaron a los payloads corregidos, una etiqueta de identidad desactualizada, una derivación nueva sin registrar en la tabla de integración y dos precisiones de redacción).
+
+## Top hallazgos (los 2 Media)
+
+| # | Skill origen | Severidad | Problema | Corrección mínima |
+|---|-------------|-----------|----------|-------------------|
+| 1 | Semántica Eventos | Media | El payload de `RolInactivado` etiqueta { rol, dominio, empresa } como "Identidad del rol" — contradice la identidad (`dominio`, `referenciaOrigen`) aplicada en la primera ronda. | Reetiquetar: identidad = { dominio, referenciaOrigen }; rol y empresa como contexto. |
+| 2 | Contrato vs Flujo | Media | La tabla 5.5 omite la tercera derivación de `DatoDeIdentidadCorregido` (`VersionAgregada` sobre casos `EnCorreccion`). | Completar la columna Origen. |
