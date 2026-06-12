@@ -81,6 +81,7 @@ Cada evento se documenta con esta estructura:
 | **Tercero** | En este BC, el agregado `Tercero` **es** el "tercero consolidado" del alcance — la entidad única que agrupa los roles informados por los dominios. El calificativo "consolidado" pertenece a la descripción conceptual del alcance; el modelo usa el nombre simple. |
 | **Rol del tercero / rol del contacto** | Dos conceptos siempre calificados (alcance, Sección 2): el rol del tercero (proveedor, cliente, empleado — entidad interna `Rol` del agregado) y el rol del contacto (representante legal, tesorero — atributo del contacto). |
 | **Conciliación** | Designa el proceso (término 10 del glosario) **y** el agregado `Conciliacion` (una instancia del proceso: un caso concreto con su evidencia, decisión y trazabilidad). El contexto gramatical desambigua: "la conciliación del NIT 900123456" = instancia. |
+| **Vigente** | Un tercero **no fusionado** (`Activo` o `Inactivo`). Los inactivos conservan su clave natural — no puede crearse otro tercero con la clave de un inactivo (recrearía el duplicado); solo la fusión libera la clave hacia el canónico (`[I1]`, `[SI1]`). |
 | **La bodega publica decisiones, no datos** | Los datos de los roles (direcciones, contactos) **entran** en los eventos de rol y se **consultan** en la ficha; nunca se re-publican como avisos. Lo único que la bodega publica son sus decisiones: señal global, fusiones, correcciones (ver `[D4]` en Sección 9). |
 
 ---
@@ -181,7 +182,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 | `identificacionLegal` | VO `IdentificacionLegal` *(paquete transversal)* | Tipo + número + país + DV. Define la clave natural (sin DV, `[R05]`). |
 | `razonSocial` | Texto | Dato compartido — sujeto a divergencia (`[R14]`). |
 | `tipoPersona` | `persona` \| `organizacion` | Dato compartido (`[R07]`). |
-| `estado` | `Activo` \| `Inactivo` | Señal global. Nace Activo (`[R16]`). |
+| `estado` | `Activo` \| `Inactivo` \| `Fusionado` | Señal global. Nace Activo (`[R16]`); `Fusionado` es terminal — el tercero fue absorbido en una fusión (`[D7]`, FSM 4.1). |
 | `motivoEstado` | { codigo (catálogo 6.4), descripcion } | Obligatorio al inactivar/reactivar (`[R17]`). |
 
 **Entidad interna — `Rol` (colección 1..N):**
