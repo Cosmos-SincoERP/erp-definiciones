@@ -94,7 +94,7 @@ Los datos viajan dentro del paquete (carpeta `datos/`) y los produce **Datos de 
 
 | Archivo | Contenido | Estado |
 |---------|-----------|--------|
-| `datos/roles-contacto.json` | **Vocabulario de roles de contacto** — 7 códigos (tabla abajo), con nombre de presentación y marca `activo`. Es **un solo vocabulario para todo el ERP**: el que los dominios usan al capturar y el que la bodega de Terceros recibe en el evento estándar de rol. Extensible por versión del producto, no por configuración del cliente. | ⏳ Por producir (tras cerrar P1, Sección 10) |
+| [`datos/roles-contacto.json`](datos/roles-contacto.json) | **Vocabulario de roles de contacto** — 7 códigos (tabla abajo), con nombre de presentación y marca `activo`. Es **un solo vocabulario para todo el ERP**: el que los dominios usan al capturar y el que la bodega de Terceros recibe en el evento estándar de rol. Extensible por versión del producto, no por configuración del cliente. | ✅ Producido (jun-2026, 7 entradas) |
 
 | Código | Rol del contacto |
 |--------|------------------|
@@ -152,9 +152,7 @@ Previstos según la [matriz del catálogo](../catalogo-nuggets.md#matriz-de-cons
 
 ## Sección 10: Revisión pendiente
 
-| # | Pendiente | Owner | Criterio de cierre |
-|---|----------|-------|--------------------|
-| P1 | Ratificar el vocabulario de roles de contacto con el comité de producto (heredado de Terceros v1.0 — probablemente pasa sin cambios). | Producto | Vocabulario ratificado → producir `datos/roles-contacto.json`. |
+*Ninguno.* El vocabulario de roles de contacto se produjo con los 7 códigos vigentes (decisión de la revisión del PR #40); cualquier ajuste futuro entra como versión menor del paquete, por el proceso normal de la gobernanza.
 
 ---
 
@@ -162,4 +160,4 @@ Previstos según la [matriz del catálogo](../catalogo-nuggets.md#matriz-de-cons
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
-| 0.1 | Junio 2026 | Borrador inicial — veredicto de aceptación del issue #35 (surge de Terceros v2.0, #33). Especificación autocontenida: estructura pura del contacto (nombre opcional + rol de contacto + medios por composición de `CorreoElectronico` y `Telefono`), igualdad por valor sin identificar personas, 5 reglas, 4 operaciones, vocabulario de 7 roles de contacto embebido (por producir), universalidad declarada (sin perfiles por país), 1 pendiente. El ciclo de vida, la marca de principal y la unicidad en colecciones quedan en el consumidor. |
+| 0.1 | Junio 2026 | Borrador inicial — veredicto de aceptación del issue #35 (surge de Terceros v2.0, #33). Especificación autocontenida: estructura pura del contacto (nombre opcional + rol de contacto + medios por composición de `CorreoElectronico` y `Telefono`), igualdad por valor sin identificar personas, 5 reglas, 4 operaciones, **vocabulario de 7 roles de contacto producido** (`datos/roles-contacto.json`, decisión de la revisión del PR #40), universalidad declarada (sin perfiles por país), sin pendientes. El ciclo de vida, la marca de principal y la unicidad en colecciones quedan en el consumidor. |
