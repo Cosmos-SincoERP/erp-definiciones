@@ -793,7 +793,6 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 
 | ID | Pendiente | Owner | Criterio / momento de cierre |
 |----|-----------|-------|------------------------------|
-| ~~`[PD1]`~~ | ✅ **Resuelto (jun-2026):** el custodio aceptó el `Contacto` del paquete (issue #35) — la estructura coincide con la del contrato de entrada (Sección 5.2), sin ajustes, y su vocabulario de roles de contacto quedó producido. | — | — |
 | `[PD2]` | Criterios ampliados de detección de duplicados (F2): contactos o direcciones coincidentes entre consolidados. | Producto + consultores | Diseño de F2 — no bloquea F1. |
 | `[PD3]` | Ratificar el catálogo de motivos de inactivación global (Sección 6.4) con el comité de producto. | Producto | Antes del desarrollo F1 de la señal global. |
 | `[PD4]` | Issue cruzado de refinamiento en Contabilidad: actualizar R07 y las menciones "Terceros como fuente de verdad que valida" al modelo de copia local + reportes canonizados (alcance v2.0, Sección 3). | Este sub-dominio (origina el cambio) | **Issue #37 creado** — se cierra cuando Contabilidad lo aplique. |
