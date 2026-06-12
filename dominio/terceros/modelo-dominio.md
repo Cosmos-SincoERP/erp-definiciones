@@ -82,6 +82,8 @@ Cada evento se documenta con esta estructura:
 | **Rol del tercero / rol del contacto** | Dos conceptos siempre calificados (alcance, Sección 2): el rol del tercero (proveedor, cliente, empleado — entidad interna `Rol` del agregado) y el rol del contacto (representante legal, tesorero — atributo del contacto). |
 | **Conciliación** | Designa el proceso (término 10 del glosario) **y** el agregado `Conciliacion` (una instancia del proceso: un caso concreto con su evidencia, decisión y trazabilidad). El contexto gramatical desambigua: "la conciliación del NIT 900123456" = instancia. |
 | **Vigente** | Un tercero **no fusionado** (`Activo` o `Inactivo`). Los inactivos conservan su clave natural — no puede crearse otro tercero con la clave de un inactivo (recrearía el duplicado); solo la fusión libera la clave hacia el canónico (`[I1]`, `[SI1]`). |
+| **Aviso** | El término para lo que la bodega publica y los dominios aplican por su cuenta. "Mensaje" y "evento de integración" son equivalentes cuando aparecen. |
+| **Fuente** | Un registro informante: (`dominio`, `referenciaOrigen`). La granularidad de fuente es siempre **de registro**, no de dominio — un dominio puede tener varios registros del mismo tercero (roles homólogos post-fusión). |
 | **La bodega publica decisiones, no datos** | Los datos de los roles (direcciones, contactos) **entran** en los eventos de rol y se **consultan** en la ficha; nunca se re-publican como avisos. Lo único que la bodega publica son sus decisiones: señal global, fusiones, correcciones (ver `[D4]` en Sección 9). |
 
 ---
@@ -168,7 +170,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 
 ### 3.2. Agregado: Tercero
 
-**Descripción:** La entidad consolidada del tercero. Agrupa bajo una clave natural los roles que los dominios operativos informan, mantiene la identidad compartida (identificación legal, razón social, tipo de persona) y administra la señal global. **No se crea ni se edita por comando de usuario:** nace cuando el `ServicioDeConsolidacion` procesa el primer evento de rol con una clave natural nueva (`[R16]` — nace Activo), y sus datos solo cambian por consolidación de eventos de rol o por resolución de conciliación. Los únicos comandos que acepta son los del administrador sobre la señal global (`InactivarTercero`, `ReactivarTercero`, con motivo obligatorio `[R17]`).
+**Descripción:** La entidad consolidada del tercero. Agrupa bajo una clave natural los roles que los dominios operativos informan, mantiene la identidad compartida (identificación legal, razón social, tipo de persona) y administra la señal global. **No se crea ni se edita por comando de usuario:** nace cuando el `ServicioDeConsolidacion` procesa el primer evento de rol con una clave natural nueva (`[R16]` — nace Activo), y sus datos solo cambian por consolidación de eventos de rol o por resolución de conciliación (`[I5]`). Los únicos comandos que acepta son los del administrador sobre la señal global (`InactivarTercero`, `ReactivarTercero`, con motivo obligatorio `[R17]`).
 
 **Identidad del agregado:** el `Tercero` tiene **identificador propio** (`terceroId`), con **índice único por clave natural** (tipo de documento + número + país). La clave natural **no puede ser** la identidad del agregado porque es corregible: el caso CC→NIT (una conciliación corrige el tipo de documento) cambiaría la clave, y una fusión hace que dos claves apunten al mismo tercero. Con identificador propio, el historial sobrevive a ambas. *(Ver `[D2]` en Sección 9 y el índice `[SI1]`.)*
 
@@ -230,7 +232,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 | `tipo` | `duplicado` \| `divergencia` | Fijo desde la detección. |
 | `estado` | `Abierta` \| `EnCorreccion` \| `Cerrada` | FSM en Sección 4. `EnCorreccion` solo aplica a divergencias. |
 | `motivoCierre` | `fusion` \| `homonimia` \| `convergencia` \| `superada` | Con qué cerró: decisión de fusión, homonimia legítima, convergencia tras resolución, o superada sin decisión humana. |
-| `decision` | Estructura de resolución | Tipo de decisión, decidida por quién, cuándo, **motivo obligatorio**. |
+| `decision` | { tipoDecision (`fusion` \| `homonimia` \| `datoCorrecto`), decididaPor, fecha, motivo } | **Motivo obligatorio** (`[I8]`). |
 | `notas` | Texto (0..N) | Anotaciones del administrador durante la revisión. |
 
 **Si es duplicado:**
@@ -314,7 +316,7 @@ Si una corrección de clave natural (aplicada por un dominio y consolidada de re
 
 | # | Paso | Agregado / proyección | Eventos |
 |---|------|----------------------|---------|
-| 1 | **Verificar** el evento con las reglas empaquetadas. Una anomalía no rechaza: se registra como evidencia para conciliación (`[R04]`). | — | — |
+| 1 | **Verificar** el evento con las reglas empaquetadas. Una anomalía no rechaza: se registra como evidencia para conciliación (`[R04]`, `[I11]`). | — | — |
 | 2 | **Resolver la clave natural** y buscar el tercero por el índice (`[SI1]`), pasando por el mapa canónico (`[SI4]`) si la clave pertenece a un absorbido. | `Tercero` | — |
 | 3 | **Consolidar:** si no existe → crear (`TerceroCreado` + `RolIncorporado`, mismo append). Si existe → incorporar o actualizar el rol (`RolIncorporado` / `RolActualizado` / `RolInactivado` según la regla de emisión de 5.3); si el evento trae identidad compartida distinta, **el agregado decide** (comportamiento de 3.2): la acepta (`IdentidadActualizada`) cuando es la única fuente; si hay otras, queda como señal de divergencia para el paso 4. **Creación concurrente:** si el índice (`[SI1]`) rechaza la creación porque otro evento ganó la carrera con la misma clave, el servicio vuelve al paso 2, encuentra al tercero recién creado y consolida sobre él — el evento nunca se descarta (`[I11]`). | `Tercero` | Consolidación |
 | 4 | **Evaluar señales:** duplicado (`[R09]`, consultando la memoria `[SI5]`) y divergencia (`[R14]`, comparando los datos compartidos entre fuentes). Si hay señal y no existe caso por ella → abrir `Conciliacion` (`PosibleDuplicadoDetectado` / `DivergenciaDetectada`); si ya existe → enriquecerlo (`VersionAgregada`, `[I15]`). Caso especial de colisión de claves: `[SI9]`. | `Conciliacion` | Apertura |
@@ -434,7 +436,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | Identificación | `identificacionLegal` (tipo, número, país, DV), `razonSocial`, `tipoPersona` |
 | El rol | `rol` (del catálogo, Sección 6), `dominio`, `empresa`, `referenciaOrigen`, `estadoEnOrigen`, `secuencia` |
 | Direcciones | Colección de (`DireccionFisica`, tipo de uso) |
-| Contactos | Colección de `Contacto` (nombre opcional, rol del contacto, correos, teléfonos) + marca de principal |
+| Contactos | Colección de { contacto: `Contacto` (nombre opcional, rol del contacto, correos, teléfonos), esPrincipal } |
 | Contexto | Fecha del hecho en el origen |
 
 **Semántica del contrato (`[D5]`):**
@@ -465,10 +467,10 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Descripción** | Un rol informado por un dominio quedó incorporado al tercero. |
 | **Causalidad** | Derivado por transición (con `TerceroCreado`), directa (servicio, sobre tercero existente) o efecto inter-agregado (fusión: los roles del absorbido se incorporan al canónico). |
 | **Agregado** | `Tercero`. |
-| **Estado previo** | `Activo` o `Inactivo` (progreso — la consolidación no se detiene por la señal). |
-| **Estado resultante** | Sin cambio. |
+| **Estado previo** | — (nacimiento, mismo append con `TerceroCreado`) \| `Activo` \| `Inactivo` (progreso — la consolidación no se detiene por la señal). |
+| **Estado resultante** | Sin cambio (en el nacimiento: `Activo`, fijado por `TerceroCreado`). |
 | **Precondiciones** | No existe rol con la misma combinación (`dominio`, `referenciaOrigen`) (`[I3]`). |
-| **Información capturada** | El estado completo del rol según el contrato de entrada: { rol (código del catálogo 6.1), dominio, empresa, referenciaOrigen, estadoEnOrigen (Activo / Inactivo), secuencia }; `direcciones` [ { DireccionFisica, tipoUso } ]; `contactos` [ { nombre?, rolContacto (código del catálogo 6.2), correos [CorreoElectronico], telefonos [Telefono], esPrincipal } ]; `fechaDelHecho`. |
+| **Información capturada** | El estado completo del rol según el contrato de entrada: { rol (código del catálogo 6.1), dominio, empresa, referenciaOrigen, estadoEnOrigen (Activo / Inactivo), secuencia }; `direcciones` [ { DireccionFisica, tipoUso } ]; `contactos` [ { contacto { nombre?, rolContacto (código del catálogo 6.2), correos [CorreoElectronico], telefonos [Telefono] }, esPrincipal } ] — la marca de principal acompaña al contacto como atributo de la relación, no del VO; `fechaDelHecho`. |
 | **Efectos** | El servicio evalúa señales de duplicado y divergencia (paso 4 del `ServicioDeConsolidacion`). |
 
 #### `RolActualizado`
@@ -543,7 +545,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado resultante** | `Fusionado` ■ (terminal). |
 | **Precondiciones** | Fusión decidida en una `Conciliacion` (`[I7]`). |
 | **Información capturada** | `terceroCanonicoId` (UUID); `conciliacionId` (UUID). |
-| **Efectos** | Sus roles se incorporan al canónico (`RolIncorporado`, efecto inter-agregado); su clave natural queda asociada al canónico en el mapa (`[SI4]`); eventos de rol futuros con esa clave se enrutan al canónico. |
+| **Efectos** | Sus roles se incorporan al canónico (`RolIncorporado`, efecto inter-agregado); su clave natural queda asociada al canónico en el mapa (`[SI4]`); eventos de rol futuros con esa clave se enrutan al canónico (`[I12]`, `[I13]`). |
 
 ### 5.4. Eventos del agregado Conciliacion
 
@@ -592,7 +594,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Agregado** | `Conciliacion`. |
 | **Estado previo / resultante** | `Abierta` o `EnCorreccion` / sin cambio (progreso). |
 | **Información capturada** | `texto`; `usuarioId`; `fecha`. |
-| **Efectos** | Trazabilidad de la revisión. |
+| **Efectos** | Trazabilidad de la revisión. La deduplicación ante reintento del comando es de plataforma (`[D11]`). |
 
 #### `TercerosFusionados`
 
