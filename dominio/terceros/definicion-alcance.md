@@ -125,7 +125,7 @@ La bodega tiene dos relaciones de naturaleza distinta con los dominios: **fuente
 | **Datos de Referencia** | La validación de tipos de documento y países ya no se consulta en ejecución — viaja empaquetada con el producto en cada dominio. |
 | **Direcciones** | El servicio desapareció en el replanteamiento; las direcciones se capturan en cada dominio con la validación empaquetada de direcciones. |
 
-> **Nota — Contabilidad cambió de naturaleza, no salió:** en la v1.0 era un consumidor que "validaba el tercero activo" contra Terceros como fuente de verdad. En la v2.0 su certificación es **eventual y por suscripción**: la calidad de la captura la garantizan las validaciones empaquetadas en el origen, la vigencia la da la señal global (copia local), y la canonicidad llega por los resultados de conciliación aplicados en sus vistas y reportes por tercero — donde el dato fiscal realmente se reporta. Requiere un ajuste cruzado en los documentos de Contabilidad (issue al cerrar este alcance).
+> **Nota — Contabilidad cambió de naturaleza, no salió:** en la v1.0 era un consumidor que "validaba el tercero activo" contra Terceros como fuente de verdad. En la v2.0 su certificación es **eventual y por suscripción**: la calidad de la captura la garantizan las validaciones empaquetadas en el origen, la vigencia la da la señal global (copia local), y la canonicidad llega por los resultados de conciliación aplicados en sus vistas y reportes por tercero — donde el dato fiscal realmente se reporta. El ajuste cruzado en los documentos de Contabilidad quedó aplicado (R07 y R51 de su alcance, issue #37).
 
 ### Formatos de entrada soportados
 
