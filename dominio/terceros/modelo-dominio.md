@@ -291,7 +291,7 @@ Acumulado de los eventos `TercerosFusionados`: correspondencia identificación �
 Pares de terceros + criterio con homonimia marcada (`HomonimiaMarcada`). El `ServicioDeConsolidacion` la consulta antes de abrir un duplicado (`[I9]`).
 
 #### `[SI6]` Proyección de la ficha consolidada
-La vista de lectura del Flujo 6: identidad, estado global, roles con sus datos, contactos, perfil tributario (de los eventos de Impuestos — ver `[D9]`), marca "en conciliación" (cruce con `Conciliacion` abiertas o en corrección).
+La vista de lectura del Flujo 6: identidad, estado global, roles con sus datos, contactos, perfil tributario (de los eventos de Impuestos — ver `[D9]`), marca "en conciliación" (cruce con `Conciliacion` abiertas o en corrección). Los terceros `Fusionado` se presentan como "fusionado en → canónico" — quien los consulte es dirigido al canónico, también durante la ventana del proceso de fusión (Sección 3.6).
 
 #### `[SI7]` Consulta de asistencia de captura
 Búsqueda por número (exacta y similar) sobre la proyección consolidada, diseñada para responder dentro del tiempo de espera corto del Flujo 2. El presupuesto de espera y la degradación los gobierna el formulario del dominio, no la bodega.
@@ -319,6 +319,26 @@ Si una corrección de clave natural (aplicada por un dominio y consolidada de re
 **Eventos de perfil tributario (Impuestos):** no tocan los agregados — alimentan directamente la proyección de la ficha (`[SI6]`, ver `[D9]`).
 
 **Compensaciones:** no tiene. Todos los pasos son acumulativos e idempotentes (`[SI3]`); un fallo se resuelve con reintento de plataforma (`[D11]`), nunca con reversa — la consolidación no produce efectos en otros dominios.
+
+**Correlación:** la cadena evento de rol → consolidación → señales se traza por (`referenciaOrigen`, `secuencia`) del evento de entrada.
+
+#### Proceso de fusión (disparado por `TercerosFusionados`)
+
+La fusión es la única cadena que escribe en varios agregados. Se documenta como proceso, con el mismo formato de los domain services multi-stream de OXP y Contabilidad:
+
+| # | Paso | Agregado / proyección | Evento |
+|---|------|----------------------|--------|
+| 1 | Cada absorbido transiciona al estado terminal | `Tercero` (absorbidos) | `TerceroAbsorbido` |
+| 2 | El canónico incorpora los roles de los absorbidos | `Tercero` (canónico) | `RolIncorporado` × M |
+| 3 | Herencia de señal cuando aplica (`[I14]`) | `Tercero` (canónico) | `TerceroInactivado` (derivado) |
+| 4 | Mapa canónico actualizado; avisos de integración publicados | Proyección `[SI4]` | — |
+
+- **Orden:** primero se cierran los absorbidos (paso 1) y luego se puebla el canónico (paso 2) — nunca existen dos terceros vigentes con los mismos roles.
+- **Compensación:** sin eventos de reversa, justificado: la fusión decidida no se revierte — **se completa**. Todos los pasos son acumulativos; ante fallo permanente tras los reintentos (`[D11]`), el proceso queda registrado como incompleto para resolución operativa.
+- **CorrelationId:** la `conciliacionId` — viaja en todos los eventos de la cadena.
+- **IdempotencyKey por paso:** el estado destino — un absorbido ya `Fusionado` se omite; un rol ya incorporado por (`dominio`, `referenciaOrigen`) se omite. El reintento reanuda donde quedó.
+- **Persistencia del estado:** stream propio `fusion-{conciliacionId}` con los pasos completados — la `Conciliacion` cierra con la decisión y no rastrea la ejecución.
+- **Ventana visible:** entre los pasos 1 y 2 la ficha del canónico puede no mostrar aún los roles absorbidos; la proyección de la ficha (`[SI6]`) presenta los terceros `Fusionado` como "fusionado en → canónico", de modo que ningún rol queda ilegible y quien consulte al absorbido es dirigido al canónico.
 
 ### 3.7. Relaciones y referencias externas
 
@@ -564,7 +584,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado resultante** | `Cerrada` ■ (`motivoCierre = fusion`). |
 | **Precondiciones** | El canónico es uno de los candidatos (`[I7]`); decisor + motivo (`[I8]`). |
 | **Información capturada** | `terceroCanonicoId`; `absorbidos` [terceroId]; `correspondencias` [ { claveNatural → terceroCanonicoId } ]; `correccionDeDato`? { dato, valorCorrecto, registrosACorregir [ { dominio, referenciaOrigen } ] } (solo si el duplicado nació de un error de captura); `usuarioId`; `motivo`. |
-| **Efectos** | `TerceroAbsorbido` en cada absorbido y `RolIncorporado` en el canónico (efectos inter-agregado); mapa canónico actualizado (`[SI4]`); **herencia de señal (`[I14]`):** si algún candidato está `Inactivo` y el canónico está `Activo`, se deriva `TerceroInactivado` en el canónico (efecto inter-agregado, motivo heredado y trazado a la `conciliacionId`) y se publica como siempre; **se publica como aviso de integración** (Contabilidad lo aplica en sus reportes por tercero); si hay corrección de dato, se publica `DatoDeIdentidadCorregido`. |
+| **Efectos** | `TerceroAbsorbido` en cada absorbido y `RolIncorporado` en el canónico (efectos inter-agregado); mapa canónico actualizado (`[SI4]`); **herencia de señal (`[I14]`):** si algún candidato está `Inactivo` y el canónico está `Activo`, se deriva `TerceroInactivado` en el canónico (efecto inter-agregado, motivo heredado y trazado a la `conciliacionId`) y se publica como siempre; **se publica como aviso de integración** (Contabilidad lo aplica en sus reportes por tercero); si hay corrección de dato, se publica `DatoDeIdentidadCorregido`. La cadena completa está documentada como **proceso de fusión** en la Sección 3.6 (orden, idempotencia por paso, estado del proceso, ventana visible). |
 
 #### `HomonimiaMarcada`
 
