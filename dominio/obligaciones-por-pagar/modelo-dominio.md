@@ -990,6 +990,37 @@ La devolución es un documento independiente que referencia exactamente **un** a
 └──────────────────────────────────────────────────────────────┘
 ```
 
+### Agregado: Proveedor [F1]
+
+El registro propio de OXP del tercero con quien se contraen las obligaciones — su **rol del tercero** en el modelo de bodega (replanteamiento #31, issue #38). OXP lo captura con las validaciones empaquetadas del producto, lo gobierna y **informa cada cambio a la bodega de Terceros** con el evento estándar de rol. La bodega nunca es prerrequisito: el Proveedor nace y opera con validación local.
+
+**Identidad:** `proveedorId` propio — es la `referenciaOrigen` que viaja a la bodega: la correlación exacta para que las resoluciones de conciliación lleguen a este registro y para navegar transacción → registro → ficha consolidada. La empresa no es atributo del agregado (convención del BC: el contexto de empresa está resuelto en la lógica de los eventos) — el campo `empresa` del evento estándar sale de ese contexto, igual que en las causaciones.
+
+**Estructura:**
+
+| Componente | Tipo | Contenido |
+|---|---|---|
+| `identificacionLegal` | Pieza del paquete | Tipo de documento + número + país (+ DV cuando aplica). **Clave natural** del registro; validación local al capturar (formato, DV, tipo válido para el país). |
+| `razonSocial` | Texto | Dato de identidad compartido — sujeto a conciliación en la bodega. |
+| `tipoPersona` | `persona` \| `organizacion` | Dato de identidad compartido. |
+| `direcciones` | Colección { `DireccionFisica`, tipoUso } | Piezas del paquete; el tipo de uso es atributo de la relación. |
+| `contactos` | Colección { contacto: `Contacto`, esPrincipal } | Pieza del paquete (primera adopción del `Contacto`); la marca de principal es de la relación. |
+| `estado` | `Activo` \| `Inactivo` | Mapeo natural al `estadoEnOrigen` del contrato con la bodega — sin traducción. |
+| `motivoInactivacion` | { origen: `local` \| `senal_global`, codigo, descripcion } | El origen distingue la decisión comercial de OXP del veto global de la bodega — y gobierna quién puede reactivar (I21). |
+| `secuencia` | Número | Contador de emisión del contrato: incrementa con cada evento estándar de rol informado a la bodega. |
+
+**Comandos:**
+
+| Comando | Descripción |
+|---|---|
+| `AsegurarProveedor` | **Única vía de creación** (I20). Idempotente: si no existe Proveedor con la clave natural, lo crea (`ProveedorRegistrado`); si existe, **lo reutiliza sin modificarlo** — las diferencias entre lo digitado y el registro se presentan al usuario (asistencia de captura), nunca sobrescriben en silencio: la actualización es siempre explícita. Invocado desde la radicación (la radicación nunca se bloquea por proveedor inexistente) o desde la gestión directa. |
+| `ActualizarProveedor` | Actualización explícita de datos (razón social, tipo de persona, identificación, direcciones, contactos). Si cambia un dato de identidad compartido, el cambio viaja a la bodega y puede abrir divergencia allá — comportamiento correcto y deseado. |
+| `InactivarProveedor` / `ReactivarProveedor` | Decisión comercial **local** de OXP, con motivo. La reactivación local solo procede si la inactivación vigente es de origen local (I21). |
+
+> Las decisiones de la bodega (señal global, resoluciones de conciliación) **no son comandos**: OXP las aplica automáticamente al consumir los avisos — emiten `ProveedorInactivado`/`ProveedorReactivado` con origen `senal_global` y `CorreccionDeIdentidadAplicada`.
+
+**Relación con las transacciones:** los 4 agregados transaccionales siguen embebiendo `InformacionTercero` en sus eventos (el hecho económico queda completo e inmutable; contrato con Contabilidad intacto) — pero el dato **se copia del Proveedor al radicar**, y la radicación lleva además la referencia `proveedorId` (ver Sección 5.1 y `[D31]`).
+
 ### Value Objects compartidos
 
 `InformacionTercero` y `ValorMonetario` son Value Objects reutilizados por los cuatro agregados. `MedioDePago` aplica a OxpComercio, OxpExtracto y Anticipo (Devolucion no lo requiere — hereda implícitamente el medio de pago del agregado OXP origen). Cada agregado los incluye en su composición pero la definición es la misma — evita duplicación de estructuras de datos sin acoplar los agregados.
@@ -1209,7 +1240,7 @@ La invariante I1 (unicidad NIT + número de soporte en ventana de 24 meses) cruz
 
 El campo `subDominioOrigen` de `OxpComercio` no viaja en el comando del consumidor — se resuelve en la capa de aplicación de OXP a partir de la identidad del consumidor del comando (autenticación del sub-dominio). Esto garantiza que ningún consumidor puede hacerse pasar por otro y que el dato es confiable para auditoría y trazabilidad. La validación opcional de `referenciaOrigen` (código del concepto en el catálogo del sub-dominio origen, presente en cada `ConceptoDeGasto`) depende de la disponibilidad de un query al catálogo del consumidor. Si no está disponible, se acepta la referencia como dato informativo sin validación cruzada.
 
-### [SI6] Outbox pattern del consumidor para integración contable
+### [SI6] Outbox pattern del consumidor para integración contable y eventos hacia la bodega
 
 OXP es responsable de conservar los hechos económicos causados (eventos `*Causada`) hasta confirmar su procesamiento exitoso por el sub-dominio Contabilidad vía `EntregaAceptada`. Esto materializa la responsabilidad del consumidor declarada en `[SI7]` del modelo de Contabilidad y la decisión `[D28]` de OXP. Se sugiere implementarlo como **outbox pattern** sobre la infraestructura de persistencia y mensajería (Marten + Wolverine en el stack actual, según `[D20]`):
 
@@ -1219,6 +1250,10 @@ OXP es responsable de conservar los hechos económicos causados (eventos `*Causa
 4. **Métricas operativas:** se sugiere exponer métricas de la cola outbox (cantidad de causaciones pendientes, antigüedad máxima de una entrada sin confirmar, tasa de reintento) como indicadores de salud de la integración con Contabilidad.
 
 La combinación outbox del consumidor + DLQ del bus + idempotencia del motor de Contabilidad garantiza que ningún hecho económico se pierda y que cada causación se procese exactamente una vez, sin requerir modelado defensivo en OXP (`[D28]`).
+
+### [SI7] Unicidad de Proveedor (I19) → proyección con constraint único
+
+Mismo patrón de `[SI4]`: proyección con constraint único sobre la clave natural (tipo de documento, número, país) del Proveedor. Es además el árbitro de la creación concurrente: el perdedor de la carrera reintenta `AsegurarProveedor` y reutiliza el registro ganador — alineado con el `[SI1]` de la bodega de Terceros.
 
 ### Relaciones entre agregados
 
@@ -1476,6 +1511,26 @@ Cada `PartidaExtracto` tiene su propia máquina de estados, independiente de la 
 - La máquina de estados es la misma independiente del tipo de OXP. Lo que cambia son los efectos de la confirmación.
 
 ---
+
+### 4.5. Proveedor
+
+Nace `Activo` (vía `AsegurarProveedor`). La inactivación tiene dos orígenes — la decisión comercial local y la señal global de la bodega — y cada origen gobierna su reversa (I21). Los datos se siguen actualizando en cualquier estado (las correcciones de la bodega aplican también sobre un Proveedor inactivo).
+
+```
+                 ProveedorRegistrado
+                        │
+                        ▼
+                 ┌─────────────┐   ProveedorInactivado     ┌─────────────┐
+                 │   ACTIVO    │ ────────────────────────► │  INACTIVO   │
+                 │             │ ◄──────────────────────── │             │
+                 │ · ProveedorActualizado ProveedorReactivado · ProveedorActualizado
+                 │ · CorreccionDeIdentidadAplicada          │ · CorreccionDeIdentidadAplicada
+                 └─────────────┘                            └─────────────┘
+
+  Reglas de reversa (I21):
+   · origen local        → reactiva el comando local o la señal de la bodega
+   · origen senal_global → reactiva SOLO la señal de reactivación de la bodega
+```
 
 ## 5. Catálogo de eventos
 
@@ -2132,6 +2187,82 @@ Eventos de configuración del catálogo de gasto directo `[D21]`. Patrón unifor
 
 ---
 
+### 5.8. Proveedor
+
+#### ProveedorRegistrado
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | Se registró un proveedor nuevo en OXP — el registro propio del tercero con quien se contraen obligaciones. |
+| **Causalidad** | Directa (`AsegurarProveedor`, cuando no existe la clave natural). |
+| **Agregado** | Proveedor |
+| **Estado previo** | (nuevo) — no existía. |
+| **Estado resultante** | Activo. |
+| **Precondiciones** | Identificación legal válida (validación empaquetada: tipo para el país, formato, DV según política); clave natural sin Proveedor existente (I19). La asistencia de captura de la bodega pudo advertir duplicados — el usuario decidió (no bloqueante). |
+| **Información capturada** | `proveedorId`; `identificacionLegal` { tipoDocumento, numero, pais, digitoVerificacion? }; `razonSocial`; `tipoPersona`; `direcciones` [ { DireccionFisica, tipoUso } ]; `contactos` [ { contacto, esPrincipal } ]. |
+| **Efectos** | Emite el evento estándar de rol hacia la bodega (derivado por transición, `secuencia` = 1) — OXP informa, la bodega consolida. |
+
+#### ProveedorActualizado
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | Se actualizaron datos del proveedor por decisión explícita de un usuario de OXP. |
+| **Causalidad** | Directa (`ActualizarProveedor`). |
+| **Agregado** | Proveedor |
+| **Estado previo / resultante** | Activo o Inactivo / sin cambio (progreso). |
+| **Precondiciones** | El Proveedor existe. Si cambia la identificación legal: validación empaquetada de la nueva. |
+| **Información capturada** | Campos modificados (delta): de `razonSocial`, `tipoPersona`, `identificacionLegal`, `direcciones`, `contactos` — solo los que cambiaron, con identificadores. |
+| **Efectos** | Emite el evento estándar de rol (estado completo, `secuencia` incrementada). Si cambió un dato de identidad compartido y otra fuente de la bodega lo tiene distinto, la bodega abrirá divergencia — comportamiento esperado. |
+
+#### ProveedorInactivado
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | El proveedor dejó de estar disponible para nuevas operaciones: por decisión comercial local de OXP o por aplicación automática de la señal global de la bodega. |
+| **Causalidad** | Directa (`InactivarProveedor`, origen `local`) o efecto de integración (aviso `TerceroInactivado` de la bodega, origen `senal_global` — aplicado automáticamente, sin intervención). |
+| **Agregado** | Proveedor |
+| **Estado previo** | Activo. |
+| **Estado resultante** | Inactivo. |
+| **Precondiciones** | Origen `local`: motivo obligatorio y permiso del usuario. Origen `senal_global`: la clave natural del aviso corresponde a este registro. |
+| **Información capturada** | `motivoInactivacion` { origen, codigo, descripcion }; `usuarioId` (solo origen local). |
+| **Efectos** | Las radicaciones nuevas con este proveedor quedan impedidas (I22); el historial no se toca. Emite el evento estándar de rol (`estadoEnOrigen` = inactivo). |
+
+#### ProveedorReactivado
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | El proveedor vuelve a estar disponible para nuevas operaciones. |
+| **Causalidad** | Directa (`ReactivarProveedor`, solo si la inactivación vigente es de origen `local`) o efecto de integración (aviso `TerceroReactivado` de la bodega). |
+| **Agregado** | Proveedor |
+| **Estado previo / resultante** | Inactivo / Activo. |
+| **Precondiciones** | **I21:** si la inactivación vigente tiene origen `senal_global`, solo la señal de reactivación de la bodega procede — el veto global no se levanta localmente. |
+| **Información capturada** | `motivo` { origen, codigo, descripcion }; `usuarioId` (solo origen local). |
+| **Efectos** | Emite el evento estándar de rol (`estadoEnOrigen` = activo). |
+
+#### CorreccionDeIdentidadAplicada
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | OXP aplicó automáticamente una resolución de conciliación de la bodega: el dato de identidad de este registro estaba errado y quedó corregido — injerencia por mensajes, nunca escritura remota. |
+| **Causalidad** | Efecto de integración (aviso `DatoDeIdentidadCorregido` cuyo `registrosACorregir` incluye este `proveedorId`). |
+| **Agregado** | Proveedor |
+| **Estado previo / resultante** | Activo o Inactivo / sin cambio (progreso). |
+| **Precondiciones** | El aviso señala este registro por (`dominio` = OXP, `referenciaOrigen` = `proveedorId`); el valor actual difiere del corregido. |
+| **Información capturada** | `dato` (RazonSocial / TipoPersona / IdentificacionLegal); `valorAnterior`; `valorNuevo`; `conciliacionId` (trazabilidad a la decisión de la bodega). |
+| **Efectos** | Emite el evento estándar de rol con el dato corregido — la corrección **regresa a la bodega por el flujo normal** y permite el cierre por convergencia de la divergencia. Las transacciones históricas no se modifican (sus `InformacionTercero` embebidos son el hecho económico de su momento); las radicaciones futuras copian el dato corregido. |
+
+#### Evento estándar de rol (integración → bodega de Terceros)
+
+| Aspecto | Detalle |
+|---------|---------|
+| **Descripción** | OXP informa a la bodega el estado completo de su Proveedor — el contrato de entrada del modelo de Terceros (Sección 5.2 de ese documento). Es el evento que convierte a OXP en fuente de la bodega. |
+| **Causalidad** | Derivado por transición de cada evento de dominio del Proveedor (mismo append; la entrega usa el patrón de outbox `[SI6]`). |
+| **Agregado** | Proveedor |
+| **Estado previo / resultante** | El del evento que lo deriva / sin cambio. |
+| **Precondiciones** | — (acompaña siempre al evento de dominio). |
+| **Información capturada** | El contrato completo: `identificacionLegal`, `razonSocial`, `tipoPersona`; `rol` = `proveedor`, `dominio` = OXP, `empresa` (del contexto), `referenciaOrigen` = `proveedorId`, `estadoEnOrigen` (activo/inactivo — mapeo directo del estado), `secuencia`; `direcciones`; `contactos` [ { contacto, esPrincipal } ]; `fechaDelHecho`. **Estado completo, no delta** — la bodega tolera pérdida y desorden (contrato `[D5]` de Terceros). |
+| **Efectos** | La bodega consolida (crea o actualiza el rol del tercero), evalúa señales de duplicado/divergencia y actualiza la ficha. Si la bodega no está disponible, el evento espera en la cola — la operación de OXP no se entera. |
+
 ## 6. Tipos de concepto
 
 El agregado `OxpComercio` tiene una única entidad interna (`ConceptoDeGasto`) que contiene su desglose fiscal como Value Objects (`DesgloseFiscal` → `Tributo`). El agregado `Devolucion` tiene tres entidades polimórficas con contrato común (`descripcion`, `valor`): `ConceptoDevuelto` (Comercio), `CargoFinancieroDevuelto` (Extracto) y `ReversaTotal` (Anticipo). La distribución de costos se gestiona mediante instrucciones separadas a nivel del agregado (ver Sección 3, reglas de consistencia). OXP captura la información de negocio; la traducción a lenguaje contable es responsabilidad del servicio de **Traducción Contable** en la frontera OXP → sistema contable.
@@ -2274,6 +2405,10 @@ Las invariantes son restricciones estructurales que deben ser verdaderas en todo
 | I16 | **Origen del pago determina estado mínimo.** Pagos de origen interno — coordinados por domain services (`ServicioDeRegularizacion`, `ServicioDeAplicacionDevolucion`) — se aplican desde estado **Confirmada**: `PagoOxpComercioViaAnticipoAplicado`, `PagoOxpComercioViaDevolucionAplicado` (OxpComercio) y `PagoExtractoViaDevolucionAplicado` (OxpExtracto). Confirmada es el estado más temprano donde `valorNeto()` es estable — la FSM no permite correcciones posteriores. Pagos de origen externo — confirmados por el sistema contable — se aplican desde estado **Causada** (OxpComercio: `PagoAplicado` tipo pago_directo, pago_extracto; OxpExtracto: `CrucePagoExtractoAplicado` tipo pago_sincoa; Anticipo: `AnticipoVinculadoAPartida` tipo extracto, `PagoAnticipoAplicado` tipo pago_directo). Los pagos externos requieren causación porque dependen de la integración contable. **Excepción Anticipo nacido de devolución (Ramas B/C):** el `CrucePagoAplicado` tipo devolucion se aplica en el mismo append que `AnticipoRegistrado` + `AnticipoConfirmado` + `AnticipoCausado` — la confirmación y causación son automáticas (heredadas del flujo de devolución), por lo que el cruce queda registrado al alcanzar el estado Causada en ese mismo append. Ver `[PD3]` para evolución futura de esta invariante. | OxpComercio, OxpExtracto, Anticipo | — |
 | I17 | **Consistencia de devolución (eventual):** Restricciones por tipo de OXP. **Comercio:** `valorNeto(Devolucion)` ≤ `valorNeto(OxpComercio)`. La suma de todas las devoluciones sobre una misma OxpComercio no puede superar el `valorNeto()` original. Cuando `saldoPorPagar(OXP) > 0` y `valorNeto(devolucion) ≤ saldoPorPagar`: crédito directo (Rama A). Cuando `saldoPorPagar(OXP) > 0` y `valorNeto(devolucion) > saldoPorPagar`: bifurcación — crédito por `saldoPorPagar` + Anticipo por excedente (Rama C). **Extracto:** `valorNeto(devolucion)` ≤ `saldoPorPagar(OxpExtracto)` cuando saldo > 0. **Anticipo:** solo reversa total (`valorNeto(devolucion)` = valorTotal del anticipo). Anticipo en estado Vigente o Confirmada (estados pre-causación) sin cruces de pago ni regularización. Mismo tercero obligatorio en todos los tipos. Enforcement: validación en `ServicioDeAplicacionDevolucion` (precondición con lectura de acumulado de devoluciones por OxpComercio) + proyección eventual `[SI4]` de suma de devoluciones por OxpComercio para detección tardía. | Devolucion, OxpComercio, OxpExtracto, Anticipo | — |
 | I18 | **Unicidad de código en CatalogoGastoDirecto:** No pueden existir dos `ConceptoGastoDirecto` con el mismo código dentro del mismo catálogo (empresa). | CatalogoGastoDirecto | — |
+| I19 | **Unicidad de Proveedor por clave natural** (eventual): no pueden existir dos Proveedores con la misma identificación legal (tipo + número + país, sin DV). Enforcement: proyección con constraint único `[SI7]`; ante colisión concurrente, `AsegurarProveedor` reintenta y reutiliza el existente. | Proveedor | — |
+| I20 | **`AsegurarProveedor` es la única vía de creación del Proveedor.** No existe registro directo: toda creación pasa por la vía idempotente (crear o reutilizar) — la radicación nunca se bloquea por proveedor inexistente. | Proveedor | — |
+| I21 | **El origen de la inactivación gobierna la reversa:** toda inactivación lleva motivo y origen (`local` \| `senal_global`); la de origen `senal_global` solo la levanta la señal de reactivación de la bodega — el veto global no se esquiva localmente. | Proveedor | — |
+| I22 | **Ninguna radicación nueva con Proveedor Inactivo** (eventual): OxpComercio, Anticipo y Devolucion verifican al radicar que el Proveedor referenciado esté Activo. El historial y los documentos en curso no se afectan — la inactivación impide operaciones **nuevas**. | Proveedor + OxpComercio, Anticipo, Devolucion | — |
 
 ---
 
