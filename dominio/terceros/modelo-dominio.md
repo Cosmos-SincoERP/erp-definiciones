@@ -199,7 +199,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 | `estadoEnOrigen` | `activo` \| `inactivo` | Lo que el dominio informó (`[R20]`); la bodega no lo decide. |
 | `ultimaSecuencia` | Número | La última `secuencia` del origen aplicada a este rol — la consultan las precondiciones de `RolActualizado`/`RolInactivado` para aplicar una sola vez y en orden (`[SI3]`). |
 | `direcciones` | Colección VO `DireccionFisica` + tipo de uso | Como llegaron en el evento de rol. |
-| `contactos` | Colección { contacto: `Contacto`, esPrincipal } | Estructura del paquete (issue #35): nombre, rol del contacto, correos, teléfonos. La marca de principal es atributo de la relación, no del VO (`[R25]` — principal por rol). |
+| `contactos` | Colección { contacto: `Contacto`, esPrincipal } | Nugget `Contacto` del paquete (aceptado en el issue #35; especificación en `compartido/nuggets/contacto/`): nombre, rol del contacto, correos, teléfonos. La marca de principal es atributo de la relación, no del VO (`[R25]` — principal por rol). |
 
 **Lo que NO es atributo (y dónde vive):**
 
@@ -270,7 +270,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 | `DireccionFisica` | Colección en la entidad `Rol` | El tipo de uso (fiscal, comercial, entrega…) es atributo de la relación en el `Rol`, no del VO — criterio transversal del catálogo de Nuggets. |
 | `Telefono` | Dentro de `Contacto` | Formato internacional validado. |
 | `CorreoElectronico` | Dentro de `Contacto` | Formato validado, normalizado a minúsculas. |
-| `Contacto` | Colección en la entidad `Rol` | Estructura propuesta como pieza del paquete (issue #35): nombre opcional, rol del contacto (vocabulario compartido), correos y teléfonos (`[R23]`: al menos un medio). La marca de principal es atributo de la relación en el `Rol` (`[R25]`). |
+| `Contacto` | Colección en la entidad `Rol` | Pieza del paquete aceptada en el issue #35 (especificación 0.1 en `compartido/nuggets/contacto/`): nombre opcional, rol del contacto (vocabulario compartido), correos y teléfonos (`[R23]`: al menos un medio). La marca de principal es atributo de la relación en el `Rol` (`[R25]`). |
 
 **Propios del BC:**
 
@@ -686,7 +686,7 @@ Universal, no varía por país (`[R08]` del alcance v1.0, ratificado). Se extien
 
 ### 6.2. Vocabulario de roles de contacto
 
-Compartido con los dominios a través de la estructura empaquetada del contacto (issue #35) — todos capturan con el mismo vocabulario (`[R22]`).
+Compartido con los dominios a través del Nugget `Contacto` del paquete (aceptado en el issue #35; su especificación embebe este mismo vocabulario) — todos capturan con el mismo vocabulario (`[R22]`).
 
 | Código | Rol del contacto |
 |--------|------------------|
@@ -792,7 +792,7 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 
 | ID | Pendiente | Owner | Criterio / momento de cierre |
 |----|-----------|-------|------------------------------|
-| `[PD1]` | Veredicto del custodio sobre la estructura empaquetada del contacto (issue #35). Si la estructura cambia, ajustar el contrato de entrada (Sección 5.2). | Custodio (Datos de Referencia) | Resolución del issue #35, antes del desarrollo F1 del contrato. |
+| ~~`[PD1]`~~ | ✅ **Resuelto (jun-2026):** el custodio aceptó el Nugget `Contacto` (issue #35; especificación 0.1 en `compartido/nuggets/contacto/`) — la estructura coincide con la del contrato de entrada (Sección 5.2), sin ajustes. La ratificación del vocabulario de roles de contacto quedó como P1 de la propia especificación del Nugget. | — | — |
 | `[PD2]` | Criterios ampliados de detección de duplicados (F2): contactos o direcciones coincidentes entre consolidados. | Producto + consultores | Diseño de F2 — no bloquea F1. |
 | `[PD3]` | Ratificar el catálogo de motivos de inactivación global (Sección 6.4) con el comité de producto. | Producto | Antes del desarrollo F1 de la señal global. |
 | `[PD4]` | Issue cruzado de refinamiento en Contabilidad: actualizar R07 y las menciones "Terceros como fuente de verdad que valida" al modelo de copia local + reportes canonizados (alcance v2.0, Sección 3). | Este sub-dominio (origina el cambio) | **Issue #37 creado** — se cierra cuando Contabilidad lo aplique. |

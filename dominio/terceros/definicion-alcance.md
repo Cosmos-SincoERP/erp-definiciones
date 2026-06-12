@@ -80,7 +80,7 @@ Se evaluaron varios términos antes de adoptar **Terceros** como nombre oficial:
 | 12 | **Estado del tercero** | Señal global del tercero consolidado: **Activo** o **Inactivo**. La administra la bodega (único lugar donde el tercero existe completo) ante el cese global de la relación (fraude, listas restrictivas, cierre definitivo); se publica por evento y **cada dominio la aplica localmente** — la bodega no autoriza ni bloquea operación por operación. |
 | 13 | **Razón social** | Nombre legal registrado del tercero. Personas naturales: nombres y apellidos; jurídicas: nombre de la empresa. |
 | 14 | **Tipo de persona** | Clasificación base: persona (individuo) u organización (entidad constituida). Dato de identidad; la clasificación tributaria detallada es responsabilidad del perfil tributario en Impuestos. |
-| 15 | **Contacto** | Persona asociada al tercero en una relación, con **rol de contacto** (representante legal, tesorero, comercial, técnico, facturación, notificaciones). La captura cada dominio junto con su rol del tercero — con estructura empaquetada propuesta como validación del producto (issue #35) — y la bodega la consolida. El ciclo de vida y la designación de principal viven donde se captura y se consolidan en la bodega. |
+| 15 | **Contacto** | Persona asociada al tercero en una relación, con **rol de contacto** (representante legal, tesorero, comercial, técnico, facturación, notificaciones). La captura cada dominio junto con su rol del tercero — con la estructura empaquetada del producto (aceptada en el issue #35) — y la bodega la consolida. El ciclo de vida y la designación de principal viven donde se captura y se consolidan en la bodega. |
 | 16 | **DV (Dígito de Verificación)** | Carácter que verifica la integridad del número de documento. Las reglas y algoritmos por país viven en la validación empaquetada de la identificación, con políticas de rechazo o advertencia según el tipo de documento. |
 
 > **Sobre la palabra "rol":** el documento la usa en dos sentidos que siempre se califican: el **rol del tercero** (término 3: proveedor, cliente, empleado) y el **rol del contacto** (término 15: representante legal, tesorero, comercial). Nunca aparece "rol" sin contexto que indique cuál de los dos es.
@@ -451,7 +451,7 @@ Las reglas se organizan en cinco frentes funcionales:
 
 | ID | Regla | Configurable |
 |----|-------|:------------:|
-| **R21** | **Contactos capturados en el origen:** Cada dominio captura los contactos junto con su rol del tercero, con la estructura empaquetada del producto (propuesta en el issue #35). La bodega los consolida en la vista del tercero. | No |
+| **R21** | **Contactos capturados en el origen:** Cada dominio captura los contactos junto con su rol del tercero, con la estructura empaquetada del producto (aceptada en el issue #35). La bodega los consolida en la vista del tercero. | No |
 | **R22** | **Rol del contacto como dato de la relación:** El rol del contacto (representante legal, tesorero, comercial, técnico, facturación, notificaciones, otro) califica la relación del contacto con el rol del tercero, y se captura en el dominio usando el vocabulario compartido del producto. | No |
 | **R23** | **Datos mínimos del contacto:** Todo contacto debe tener rol de contacto y al menos un medio de comunicación (correo o teléfono). El nombre es opcional al capturar y se recomienda completarlo. *(Hereda la v1.0; la exige la estructura empaquetada en el origen.)* | No |
 | **R24** | **Ciclo de vida del contacto en el origen:** Crear, actualizar o inactivar un contacto es del dominio que lo capturó; la bodega refleja el cambio en la vista consolidada, indicando el rol y dominio de origen de cada contacto. | No |
@@ -509,7 +509,7 @@ La bodega consolidadora mantiene la vista unificada de los terceros a partir de 
 | Dependencia | Descripción | Impacto |
 |-------------|-------------|---------|
 | **OXP — rol Proveedor** | Primera fuente de la bodega (registro definido en el replanteamiento). | Sin roles publicados no hay qué consolidar: el arranque funcional de la bodega depende de esta integración. |
-| **Validaciones empaquetadas** | Paquete del producto con las reglas de identificación, dirección, teléfono y correo (custodio: Datos de Referencia). | La bodega verifica con las mismas reglas con que los dominios capturan. Incluye la estructura de contacto propuesta (issue #35). |
+| **Validaciones empaquetadas** | Paquete del producto con las reglas de identificación, dirección, teléfono y correo (custodio: Datos de Referencia). | La bodega verifica con las mismas reglas con que los dominios capturan. Incluye la estructura del contacto (aceptada en el issue #35). |
 | **Contratos de los eventos del rol** | La información estándar que toda fuente publica. | Se formalizan con el modelo de dominio y el EventCatalog (Fase 3 del proyecto). |
 
 > Frente a la v1.0 salen de esta sección: el servicio de Direcciones (desapareció), la capa de composición para la vista (la ficha se lee de la bodega) y la "resolución de duplicados" como capacidad diferida a F2 (la conciliación es ahora el corazón del sub-dominio en F1).
