@@ -244,7 +244,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 | `terceroId` | El tercero (uno solo) cuyas fuentes discrepan. |
 | `datoEnDisputa` | Cuál dato de identidad compartido: razón social, tipo de persona o componente de la identificación (`[R14]`). |
 | `versiones` (VO `VersionDeDato`, colección 2..N) | Cada valor informado + el dominio que lo informó + cuándo. |
-| Decisión posible | **Determinar el dato correcto** — el valor elegido puede ser una de las versiones **o un valor distinto respaldado por evidencia** (ej: el certificado RUES trae la razón social vigente y ningún dominio la tenía bien, ver `[D12]`). La resolución publica la corrección a todos los dominios cuyo valor difiera del correcto. |
+| Decisión posible | **Determinar el dato correcto** — el valor elegido puede ser una de las versiones **o un valor distinto respaldado por evidencia** (ej: el certificado RUES trae la razón social vigente y ningún dominio la tenía bien, ver `[D12]`). La resolución publica la corrección a los registros exactos cuyo valor difiera del correcto (`dominio` + `referenciaOrigen`). |
 
 **Comandos (solo administrador de terceros, `[R10]`):** `FusionarTerceros`, `MarcarHomonimia`, `ResolverDivergencia`, `AgregarNota`. No existe comando de apertura (la abre el servicio) ni de cierre por convergencia (lo detecta el servicio al consolidar las correcciones).
 
@@ -563,7 +563,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado previo** | `Abierta` (tipo `duplicado`). |
 | **Estado resultante** | `Cerrada` ■ (`motivoCierre = fusion`). |
 | **Precondiciones** | El canónico es uno de los candidatos (`[I7]`); decisor + motivo (`[I8]`). |
-| **Información capturada** | `terceroCanonicoId`; `absorbidos` [terceroId]; `correspondencias` [ { claveNatural → terceroCanonicoId } ]; `correccionDeDato`? { dato, valorCorrecto, dominiosACorregir [dominio] } (solo si el duplicado nació de un error de captura); `usuarioId`; `motivo`. |
+| **Información capturada** | `terceroCanonicoId`; `absorbidos` [terceroId]; `correspondencias` [ { claveNatural → terceroCanonicoId } ]; `correccionDeDato`? { dato, valorCorrecto, registrosACorregir [ { dominio, referenciaOrigen } ] } (solo si el duplicado nació de un error de captura); `usuarioId`; `motivo`. |
 | **Efectos** | `TerceroAbsorbido` en cada absorbido y `RolIncorporado` en el canónico (efectos inter-agregado); mapa canónico actualizado (`[SI4]`); **se publica como aviso de integración** (Contabilidad lo aplica en sus reportes por tercero); si hay corrección de dato, se publica `DatoDeIdentidadCorregido`. |
 
 #### `HomonimiaMarcada`
@@ -588,7 +588,7 @@ Lo publican los dominios fuente (OXP: su Proveedor; CXC: su Cliente; RRHH: su Em
 | **Estado previo** | `Abierta` (tipo `divergencia`). |
 | **Estado resultante** | `EnCorreccion` — la decisión está tomada; falta que los dominios converjan. |
 | **Precondiciones** | Valor correcto determinado — una de las versiones u otro valor con evidencia (`[D12]`); decisor + motivo (`[I8]`). |
-| **Información capturada** | `datoEnDisputa`; `valorCorrecto`; `evidencia` (texto + referencias documentales, obligatoria si el valor es externo a las versiones `[D12]`); `dominiosACorregir` [dominio]; `usuarioId`; `motivo`. |
+| **Información capturada** | `datoEnDisputa`; `valorCorrecto`; `evidencia` (texto + referencias documentales, obligatoria si el valor es externo a las versiones `[D12]`); `registrosACorregir` [ { dominio, referenciaOrigen } ] — los roles cuyo valor difiere del correcto, identificados con exactitud; `usuarioId`; `motivo`. |
 | **Efectos** | **Se publica `DatoDeIdentidadCorregido`** (integración) a los dominios cuyo valor difiere — lo aplican automáticamente (`[R27]`); `IdentidadActualizada` en el `Tercero` (efecto inter-agregado: la vista consolidada refleja el valor decidido sin esperar el regreso). |
 
 #### `ConvergenciaConfirmada`
@@ -621,7 +621,7 @@ La bodega publica **sus decisiones, nunca los datos de los roles** (`[D4]`):
 |-------|--------|-----------|-----------------|
 | `TerceroInactivado` / `TerceroReactivado` | El mismo evento de dominio viaja | Clave natural, motivo | Todos los dominios con roles del tercero — bloquean/permiten nuevas operaciones según su regla (`[R18]`). |
 | `TercerosFusionados` | El mismo evento de dominio viaja | Correspondencia identificación → tercero canónico | Contabilidad y demás interesados en reportes por tercero (`[R12]`). |
-| `DatoDeIdentidadCorregido` | Derivado de `DivergenciaResuelta` (y de fusiones con corrección de dato) | Clave natural, dato en disputa, valor correcto | Los dominios cuyo valor difiere — corrigen su registro automáticamente (`[R13]`, `[R27]`). |
+| `DatoDeIdentidadCorregido` | Derivado de `DivergenciaResuelta` (y de fusiones con corrección de dato) | Clave natural **en su valor previo a la corrección** (contexto), dato en disputa, valor correcto, `registrosACorregir` [ { dominio, referenciaOrigen } ] | Cada dominio señalado corrige **el registro exacto** indicado por su `referenciaOrigen`, automáticamente (`[R13]`, `[R27]`) — sin búsquedas por clave ni ambigüedad cuando lo corregido es la propia identificación. |
 
 > Las direcciones y los contactos **no aparecen en esta tabla por diseño**: entran en los eventos de rol y se consultan en la ficha (`[D4]`).
 
