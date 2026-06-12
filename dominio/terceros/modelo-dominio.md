@@ -795,7 +795,6 @@ Propuesta inicial, extensible por versión del producto (ver `[PD3]`):
 |----|-----------|-------|------------------------------|
 | `[PD2]` | Criterios ampliados de detección de duplicados (F2): contactos o direcciones coincidentes entre consolidados. | Producto + consultores | Diseño de F2 — no bloquea F1. |
 | `[PD3]` | Ratificar el catálogo de motivos de inactivación global (Sección 6.4) con el comité de producto. | Producto | Antes del desarrollo F1 de la señal global. |
-| `[PD4]` | Issue cruzado de refinamiento en Contabilidad: actualizar R07 y las menciones "Terceros como fuente de verdad que valida" al modelo de copia local + reportes canonizados (alcance v2.0, Sección 3). | Este sub-dominio (origina el cambio) | **Issue #37 creado** — se cierra cuando Contabilidad lo aplique. |
 | `[PD5]` | Política de seguimiento para divergencias `EnCorreccion` que no convergen: umbral de permanencia, alerta y escalamiento. | Producto + equipo técnico | Antes de la salida del Nivel B de F1 (en el Nivel A aún no hay dominios aplicando correcciones). |
 
 ---
