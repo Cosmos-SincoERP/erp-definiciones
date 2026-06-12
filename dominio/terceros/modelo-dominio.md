@@ -182,7 +182,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 | `razonSocial` | Texto | Dato compartido — sujeto a divergencia (`[R14]`). |
 | `tipoPersona` | `persona` \| `organizacion` | Dato compartido (`[R07]`). |
 | `estado` | `Activo` \| `Inactivo` | Señal global. Nace Activo (`[R16]`). |
-| `motivoEstado` | Texto | Obligatorio al inactivar/reactivar (`[R17]`). |
+| `motivoEstado` | { codigo (catálogo 6.4), descripcion } | Obligatorio al inactivar/reactivar (`[R17]`). |
 
 **Entidad interna — `Rol` (colección 1..N):**
 
@@ -194,6 +194,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 | `empresa` | Referencia | La empresa donde el rol opera. |
 | `referenciaOrigen` | Identificador externo | El identificador del registro en el dominio dueño (ej: el `proveedorId` de OXP) — la correlación entre la bodega y el origen: permite que las resoluciones de conciliación lleguen al registro exacto y que la ficha enlace "navegar al dominio". |
 | `estadoEnOrigen` | `activo` \| `inactivo` | Lo que el dominio informó (`[R20]`); la bodega no lo decide. |
+| `ultimaSecuencia` | Número | La última `secuencia` del origen aplicada a este rol — la consultan las precondiciones de `RolActualizado`/`RolInactivado` para aplicar una sola vez y en orden (`[SI3]`). |
 | `direcciones` | Colección VO `DireccionFisica` + tipo de uso | Como llegaron en el evento de rol. |
 | `contactos` | Colección `Contacto` | Estructura del paquete (issue #35): nombre, rol del contacto, correo, teléfono, marca de principal (`[R25]` — principal por rol). |
 
@@ -282,7 +283,7 @@ Materializa `[I1]`/`[R02]`: índice único sobre (tipo de documento, número, pa
 Normalización para la comparación de `[R09]`: mayúsculas, tildes, puntuación y espacios. Se calcula al consolidar y se usa solo para detección — nunca se muestra ni reemplaza el valor informado. Análoga al `[SI9]` de la v1.0.
 
 #### `[SI3]` Idempotencia y orden de los eventos de rol
-El contrato de entrada trae (`referenciaOrigen`, `secuencia`) — ver Sección 5.2. La bodega aplica cada evento una sola vez y descarta secuencias anteriores a la última aplicada por esa referencia. El mecanismo técnico (deduplicación, reintentos) es de plataforma (`[D11]`).
+El contrato de entrada trae (`referenciaOrigen`, `secuencia`) — ver Sección 5.2. La bodega aplica cada evento una sola vez y descarta secuencias anteriores a la última aplicada por esa referencia — la última aplicada vive en el atributo `ultimaSecuencia` de la entidad `Rol` (Sección 3.2). El mecanismo técnico (deduplicación, reintentos) es de plataforma (`[D11]`).
 
 #### `[SI4]` Proyección del mapa canónico
 Acumulado de los eventos `TercerosFusionados`: correspondencia identificación → tercero canónico. Consultable por los interesados en reportes por tercero (Contabilidad) y usada por el `ServicioDeConsolidacion` para enrutar eventos de rol que lleguen con claves de terceros absorbidos.
