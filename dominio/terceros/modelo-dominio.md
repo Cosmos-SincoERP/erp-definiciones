@@ -276,7 +276,7 @@ El sub-dominio de Terceros es la **bodega consolidadora** de las personas y empr
 ### 3.5. Sugerencias de implementación
 
 #### `[SI1]` Índice único por clave natural
-Materializa `[I1]`/`[R02]`: índice único sobre (tipo de documento, número, país) de los terceros **no fusionados**. Las claves de terceros absorbidos se asocian al canónico (ver `[SI4]`). Análogo al `[SI1]` de la v1.0.
+Materializa `[I1]`/`[R02]`: índice único sobre (tipo de documento, número, país) de los terceros **no fusionados**. Las claves de terceros absorbidos se asocian al canónico (ver `[SI4]`). El índice es además el **árbitro de la creación concurrente**: si dos eventos de rol con la misma clave nueva compiten (escenario garantizado en la carga histórica), el primero crea y el segundo es rechazado por el índice — el servicio reintenta la resolución y consolida sobre el tercero existente; el evento de rol nunca se descarta (`[I11]`, paso 3 del servicio). Análogo al `[SI1]` de la v1.0.
 
 #### `[SI2]` Forma canónica de la razón social
 Normalización para la comparación de `[R09]`: mayúsculas, tildes, puntuación y espacios. Se calcula al consolidar y se usa solo para detección — nunca se muestra ni reemplaza el valor informado. Análoga al `[SI9]` de la v1.0.
@@ -312,7 +312,7 @@ Si una corrección de clave natural (aplicada por un dominio y consolidada de re
 |---|------|----------------------|---------|
 | 1 | **Verificar** el evento con las reglas empaquetadas. Una anomalía no rechaza: se registra como evidencia para conciliación (`[R04]`). | — | — |
 | 2 | **Resolver la clave natural** y buscar el tercero por el índice (`[SI1]`), pasando por el mapa canónico (`[SI4]`) si la clave pertenece a un absorbido. | `Tercero` | — |
-| 3 | **Consolidar:** si no existe → crear (`TerceroCreado` + `RolIncorporado`, mismo append). Si existe → incorporar o actualizar el rol (`RolIncorporado` / `RolActualizado` / `RolInactivado`); si el evento trae identidad compartida distinta y es la única fuente, actualizarla (`IdentidadActualizada`). | `Tercero` | Consolidación |
+| 3 | **Consolidar:** si no existe → crear (`TerceroCreado` + `RolIncorporado`, mismo append). Si existe → incorporar o actualizar el rol (`RolIncorporado` / `RolActualizado` / `RolInactivado`); si el evento trae identidad compartida distinta y es la única fuente, actualizarla (`IdentidadActualizada`). **Creación concurrente:** si el índice (`[SI1]`) rechaza la creación porque otro evento ganó la carrera con la misma clave, el servicio vuelve al paso 2, encuentra al tercero recién creado y consolida sobre él — el evento nunca se descarta (`[I11]`). | `Tercero` | Consolidación |
 | 4 | **Evaluar señales:** duplicado (`[R09]`, consultando la memoria `[SI5]`) y divergencia (`[R14]`, comparando los datos compartidos entre fuentes). Si hay señal → abrir `Conciliacion` (`PosibleDuplicadoDetectado` / `DivergenciaDetectada`). Caso especial de colisión de claves: `[SI9]`. | `Conciliacion` | Apertura |
 | 5 | **Detectar convergencia:** si el tercero tiene divergencias `Abiertas` o `EnCorreccion` y los datos de las fuentes ya coinciden → cerrarlas (`DivergenciaSuperada` / `ConvergenciaConfirmada`). | `Conciliacion` | Cierre |
 
