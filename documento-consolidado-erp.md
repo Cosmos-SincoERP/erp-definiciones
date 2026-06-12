@@ -220,7 +220,9 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Estado:** Alcance v1.0, modelo v1.0. Auditoría de 10 skills + rondas de refinamiento aplicadas. Listo para desarrollo F1.
 
-> Detalle: [`dominio/terceros/modelo-dominio.md`](dominio/terceros/modelo-dominio.md), [`dominio/terceros/anexo-decision-orquestacion-registro.md`](dominio/terceros/anexo-decision-orquestacion-registro.md)
+> ⚠️ **Superado (junio 2026):** Terceros pasó a v2.0 — **bodega consolidadora** (replanteamiento #31, issue #33): la captura vive en los dominios con sus roles; la bodega consolida por clave natural, concilia duplicados y divergencias, y administra la señal global. Esta sección describe la v1.0 y se actualizará con el consolidado.
+>
+> Detalle: [`dominio/terceros/definicion-alcance.md`](dominio/terceros/definicion-alcance.md), [`dominio/terceros/modelo-dominio.md`](dominio/terceros/modelo-dominio.md)
 
 ---
 
@@ -728,8 +730,7 @@ Un cliente puede empezar con un producto y escalar sin fricción. Cada módulo s
 | [`dominio/contabilidad/anexo-marco-contable-y-arquitectura-puc.md`](dominio/contabilidad/anexo-marco-contable-y-arquitectura-puc.md) | Investigación de seis ERPs modernos. Justificación de la arquitectura PUC único + libros paralelos (Principal/Fiscal) y `MarcoContable` como agregado de configuración |
 | [`dominio/impuestos/anexo-catalogo-regimenes-especiales.md`](dominio/impuestos/anexo-catalogo-regimenes-especiales.md) | Regímenes empresariales: zonas francas (DIAN, CNZFE), monopolios departamentales CO, ZEEs panameñas, Puerto Libre. Fuentes normativas. |
 | [`dominio/terceros/definicion-alcance.md`](dominio/terceros/definicion-alcance.md) | Alcance Terceros: glosario, reglas, flujos, fases |
-| [`dominio/terceros/modelo-dominio.md`](dominio/terceros/modelo-dominio.md) | Modelo Terceros: agregado, eventos, invariantes, FSM, D13 registro en dos fases |
-| [`dominio/terceros/anexo-decision-orquestacion-registro.md`](dominio/terceros/anexo-decision-orquestacion-registro.md) | Decisión BFF/API Composition para orquestación del registro |
+| [`dominio/terceros/modelo-dominio.md`](dominio/terceros/modelo-dominio.md) | Modelo Terceros v2.0: bodega consolidadora — agregados Tercero y Conciliacion, ServicioDeConsolidacion |
 | [`dominio/estructura-organizacional/definicion-alcance.md`](dominio/estructura-organizacional/definicion-alcance.md) | Alcance Estructura Organizacional (v1.2): glosario, actores, flujos, reglas |
 | [`dominio/estructura-organizacional/anexo-definicion-contexto-inicial.md`](dominio/estructura-organizacional/anexo-definicion-contexto-inicial.md) | Definición inicial de contexto (preexistente al alcance formal) |
 | [`dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md`](dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md) | Cuatro decisiones arquitectónicas: codificación plana + jerarquía versionada, FSM 4 estados, fusión/división/traslado como eventos, multi-dimensionalidad |

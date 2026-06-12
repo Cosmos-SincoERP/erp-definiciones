@@ -58,7 +58,7 @@ Una capa BFF compone la experiencia del usuario operativo. La solicitud de creac
 | Responsabilidad | Respetada — Estructura Organizacional valida y gestiona el ciclo de vida. OXP solo referencia. |
 | Gobierno | Preservado — el administrador retiene control sobre qué entra a la estructura como `Activa`. |
 
-**Seleccionada.** Es el mismo patrón usado por el sub-dominio de Terceros (ver `../terceros/anexo-decision-orquestacion-registro.md`) y por los ERPs de referencia que separan solicitud de confirmación (Workday mediante su modelo de `Proposed` → `Active`).
+**Seleccionada.** Es el mismo patrón que usaba el sub-dominio de Terceros v1.0 (anexo de orquestación del registro, hoy en el historial del repositorio — el replanteamiento de jun-2026 eliminó el registro centralizado de terceros, pero la elección de este anexo se sostiene por sus propios méritos) y el de los ERPs de referencia que separan solicitud de confirmación (Workday mediante su modelo de `Proposed` → `Active`).
 
 ---
 

@@ -1,6 +1,6 @@
 # Definición de Alcance — Terceros
 
-> ℹ️ **v2.0 — Alcance completo (junio 2026).** Reescritura por el replanteamiento arquitectónico (issue #31): Terceros pasa de autoridad de registro a **bodega consolidadora**. El modelo de dominio v2.0 está en construcción; la v1.0 se conserva como referencia en [`definicion-alcance_bk.md`](definicion-alcance_bk.md) hasta el cierre del issue #33.
+> ℹ️ **v2.0 — Alcance completo (junio 2026).** Reescritura por el replanteamiento arquitectónico (issue #31): Terceros pasa de autoridad de registro a **bodega consolidadora**. El modelo de dominio v2.0 está cerrado y auditado (`modelo-dominio.md`); la v1.0 (autoridad de registro) se conserva en el historial del repositorio.
 
 ## Tabla de contenido
 
@@ -601,4 +601,4 @@ El Nivel A puede alcanzarse sin esperar al Nivel B; el Nivel B madura progresiva
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
 | 2.0 | Junio 2026 | **Reescritura completa por el replanteamiento arquitectónico (#31, #33):** Terceros pasa de autoridad de registro a **bodega consolidadora** — consolidación de roles por clave natural, conciliación de duplicados y divergencias con resolución humana e injerencia por mensajes (correcciones aplicadas automáticamente por los dominios), señal global Activo/Inactivo, asistencia de captura no bloqueante con degradación controlada, vista consolidada de lectura local. 9 secciones, 16 términos, 6 flujos con diagrama, 30 reglas en 5 frentes, fases F1 (núcleo + habilitadores) y F2. Terminología: "rol" unificado (absorbe "figura"); "validación empaquetada" como nombre funcional del empaque transversal. Contabilidad pasa a certificación eventual por suscripción (señal global + mapa canónico en sus reportes por tercero). |
-| 1.0 | Abril 2026 | Versión inicial (autoridad de registro). Conservada en `definicion-alcance_bk.md`. |
+| 1.0 | Abril 2026 | Versión inicial (autoridad de registro). Conservada en el historial del repositorio. |

@@ -71,7 +71,7 @@ en adelante cada cambio se maneja como issue para que quede trazable y justifica
 | [Obligaciones por Pagar](dominio/obligaciones-por-pagar/) | ✅ v1 | ✅ v2.9 | 🟡 En refinamiento (Fase 2) |
 | [Impuestos](dominio/impuestos/) | ✅ v1.1 | ✅ v1.3 | 🟢 Completo — listo para desarrollo |
 | [Contabilidad](dominio/contabilidad/) | ✅ v1.0 | ✅ v1.0 | 🟢 Completo — listo para desarrollo (F1) |
-| [Terceros](dominio/terceros/) | ✅ v1.0 | ✅ v1.0 | 🟢 Completo — listo para desarrollo |
+| [Terceros](dominio/terceros/) | ✅ v2.0 | ✅ v2.0.2 | 🟢 Bodega consolidadora (replanteamiento jun-2026) — 2 auditorías aplicadas, listo para desarrollo (F1) |
 | [Estructura Organizacional](dominio/estructura-organizacional/) | ⬜ | ⬜ | 🔴 Solo anexo de contexto |
 | *Tesorería* | — | — | ⚪ No iniciado |
 | *Emisión Electrónica* | — | — | ⚪ No iniciado |
@@ -157,7 +157,7 @@ Los anexos viven junto al sub-dominio al que pertenecen y se nombran con prefijo
 
 | Prefijo | Tipo | Propósito | Ejemplo |
 |---------|------|-----------|---------|
-| `anexo-decision-*` | **Decisión de diseño** | Documenta el *porqué* de una elección arquitectónica: problema, alternativas evaluadas con trade-offs, decisión tomada y justificación. Preserva el contexto de decisiones que de otra forma se perderían. | [i18n / l10n transversal](compartido/anexo-decision-i18n-l10n.md) · [Orquestación del registro de terceros](dominio/terceros/anexo-decision-orquestacion-registro.md) |
+| `anexo-decision-*` | **Decisión de diseño** | Documenta el *porqué* de una elección arquitectónica: problema, alternativas evaluadas con trade-offs, decisión tomada y justificación. Preserva el contexto de decisiones que de otra forma se perderían. | [i18n / l10n transversal](compartido/anexo-decision-i18n-l10n.md) · [Decisiones arquitectónicas — Estructura Organizacional](dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md) |
 | `anexo-analisis-*` | **Análisis de industria / técnico** | Investigación de cómo resuelven el mismo problema ERPs líderes (SAP, Oracle, Dynamics, NetSuite, Odoo) o análisis técnico profundo de alternativas. Respalda las decisiones con evidencia externa. | [Numeración contable](dominio/contabilidad/anexo-analisis-numeracion-contable.md) · [Obligatoriedad de tercero / unidad organizacional](dominio/contabilidad/anexo-obligatoriedad-tercero-unidad-organizacional.md) · [ES en agregados de configuración](dominio/impuestos/anexo-analisis-es-configuracion.md) |
 | `anexo-ejemplo-*` | **Ejemplo ilustrativo** | Aterriza un concepto abstracto del modelo con un caso concreto, con datos y flujo paso a paso. Reduce ambigüedades al momento de implementar. | [Plantilla de asiento](dominio/contabilidad/anexo-ejemplo-plantilla-de-asiento.md) · [Stream de Registro Tributario](dominio/impuestos/anexo-ejemplo-registro-tributario.md) |
 | `anexo-configuracion-estandar-<país>` | **Configuración estándar por país** | Contenido precargado (seeds) por jurisdicción: catálogos, tarifas, tributos, formatos fiscales. Se carga como streams de eventos al iniciar operación. | [Colombia](dominio/impuestos/anexo-configuracion-estandar-co.md) · [Rep. Dominicana](dominio/impuestos/anexo-configuracion-estandar-do.md) · [Panamá](dominio/impuestos/anexo-configuracion-estandar-pa.md) |
