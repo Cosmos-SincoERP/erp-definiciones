@@ -402,7 +402,15 @@ Además, OXP puebla **`terceroPrincipal`** a nivel del hecho económico (no por 
 
 Las distribuciones de OXP (`InstruccionDistribucion` → `DestinoDeNegocio`) imputan a **unidades organizacionales**, cuyo **dueño único es el sub-dominio de Estructura Organizacional (EO)**. OXP es **consumidor**: no crea, modifica ni gobierna el ciclo de vida de las unidades — solo las usa para distribuir e imputar. Por eso la unidad **no es un agregado de OXP** (a diferencia del `Proveedor` `[D30]`, que OXP sí co-gobierna): es un dato gobernado externamente que OXP mantiene como **copia local**. Ver `[D34]`, la decisión `[D15]` del modelo de EO y la guía `guias-de-modelado/datos-entre-dominios.md`.
 
-**Copia local por eventos (`[SI8]`):** OXP se suscribe a los eventos de ciclo de vida de unidades que EO publica y mantiene una proyección local (read model) de las unidades del tenant con su estado vigente. OXP **opera y valida siempre contra esa copia, nunca consulta a EO en caliente** — si EO está caído, OXP sigue operando. La copia es derivada y reconstruible; se repara de fondo contra el punto de resincronización que EO ofrece (Capa 2 de la guía, `[SI12]` de EO), fuera del camino crítico. La proyección es segura de repetir (un evento reprocesado no cambia el resultado) y respeta el orden por unidad.
+**Copia local por eventos (`[SI8]`):** OXP mantiene una vista de lectura (read model) de las unidades del tenant con su estado vigente. **Precisión sobre su naturaleza:** no es una proyección del *event store* de OXP (como `[SI4]`/`[SI7]`, que se reconstruyen reproduciendo streams propios), sino un read model alimentado por un **consumidor de los eventos de integración que EO publica** (Event-Carried State Transfer) — los eventos viven en EO, OXP solo guarda la réplica. OXP **opera y valida siempre contra esa copia, nunca consulta a EO en caliente**: si EO está caído, OXP sigue operando.
+
+Cómo se mantiene (incremental y reactivo, no un proceso programado):
+
+- **Carga inicial (bootstrap):** al desplegar OXP o incorporar un tenant nuevo, la copia se llena pidiendo a EO el estado vigente (una foto) o reproduciendo su histórico de eventos.
+- **Operación normal:** cada evento de ciclo de vida que EO publica y el bus entrega actualiza la tabla local al instante (push, evento por evento) — sin *polling* ni *cron*.
+- **Reparación de respaldo (Capa 2 de la guía):** de fondo y fuera del camino crítico, OXP reconcilia su copia contra el punto de resincronización de EO (`[SI12]` de EO) ante un evento perdido o un desfase tras estar caído.
+
+Garantías (provistas por la plataforma, `[D20]` — Marten/Wolverine *inbox*): **entrega al-menos-una-vez** + consumidor **seguro de repetir** (reprocesar un evento no duplica ni corrompe la copia); **orden por unidad** (un evento más viejo que el último aplicado a esa unidad se descarta, por versión/secuencia); **consistencia eventual** — la copia está al día con el retraso de propagación del bus, y es justo ese retraso el que motiva el *diferir* (`[D34]`): si el evento de creación aún no llegó, la unidad no está en la copia y el componente cae en destino pendiente hasta que aterrice.
 
 **Eventos entrantes (EO → OXP), alimentan la copia local:**
 
