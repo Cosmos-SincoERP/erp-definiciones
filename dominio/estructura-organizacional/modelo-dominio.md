@@ -615,35 +615,60 @@ Las FSM de la Sección 4 describen el ciclo de vida **interno** de la unidad. Es
 **Escenario:** a OXP le llega un documento imputado a una unidad que todavía no existe en su copia local.
 
 ```
-  [OXP]  Imputa contra su COPIA LOCAL  ->  la unidad NO existe
-           |
-           |   (desde aquí salen dos caminos independientes)
-           |
-           +--> CORRECCIÓN  (deja el sistema correcto)
-           |      [OXP] DIFIERE solo la parte que requiere la unidad;
-           |            registra todo el resto y NO se detiene.
-           |            Queda esperando el evento de creación.
-           |
-           +--> VISIBILIDAD  (solo avisa; no es condición de nada)
-                  [OXP] Emite SEÑAL de demanda (informativa,
-                  |     fire-and-forget, dedup por [SI07])
-                  v
-                  [EO]  Proyecta en la BANDEJA DE SUGERENCIAS [SI11]
-                  |
-                  v
-                  [Admin EO] Decide crear -- acto deliberado
-                  |          (F1: CrearUnidad -> ActivarUnidad)
-                  v
-                  [EO]  Emite UnidadActivada (a todos los consumidores)
-                  |
-   +--------------+
-   v
-  [OXP]  Recibe UnidadActivada -> actualiza su copia local ->
-         el DIFERIDO se resuelve SOLO (consistencia eventual,
-         sin consultar a EO en caliente, sin intervención humana en OXP)
-           |
-           v
-  Causación completa contra la unidad real (coincide exacto con Contabilidad)
+    ┌────────────────────────────────────────────────────┐
+    │ [OXP] imputa contra su copia local                 │
+    │       · la unidad aún no existe                    │
+    └────────────────────────────────────────────────────┘
+                               │
+                               ▼
+  ── camino de la CORRECCIÓN — deja el sistema correcto ──
+                               │
+                               ▼
+    ┌────────────────────────────────────────────────────┐
+    │ [OXP] DIFIERE la parte que requiere la unidad;     │
+    │       registra el resto y no se detiene; espera.   │
+    └────────────────────────────────────────────────────┘
+                               │
+  ── camino de la VISIBILIDAD — solo avisa, no condiciona ──
+                               │
+                               ▼
+    ┌────────────────────────────────────────────────────┐
+    │ [OXP] emite la señal de demanda                    │
+    │       (no bloqueante · segura de repetir · [SI07]) │
+    └────────────────────────────────────────────────────┘
+                               │
+                               ▼
+    ┌────────────────────────────────────────────────────┐
+    │ [EO] proyecta la señal en la bandeja de            │
+    │      sugerencias ([SI11])                          │
+    └────────────────────────────────────────────────────┘
+                               │
+                               ▼
+    ┌────────────────────────────────────────────────────┐
+    │ [ADMIN EO] ve la sugerencia y decide crear         │
+    │            la unidad — acto deliberado (F1)        │
+    └────────────────────────────────────────────────────┘
+                               │
+                               ▼
+    ┌────────────────────────────────────────────────────┐
+    │ [EO] emite UnidadActivada a los consumidores       │
+    └────────────────────────────────────────────────────┘
+                               │
+                               ▼
+  ── ambos caminos confluyen ──
+                               │
+                               ▼
+    ┌────────────────────────────────────────────────────┐
+    │ [OXP] recibe UnidadActivada en su copia local;     │
+    │       el diferido se resuelve solo (consistencia   │
+    │       eventual, sin consulta en caliente)          │
+    └────────────────────────────────────────────────────┘
+                               │
+                               ▼
+    ┌────────────────────────────────────────────────────┐
+    │ causación completa contra la unidad real           │
+    │ (coincide exacto con Contabilidad)                 │
+    └────────────────────────────────────────────────────┘
 ```
 
 **Lo que el diagrama hace explícito** (los dos caminos arrancan juntos y son independientes):
