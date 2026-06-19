@@ -615,43 +615,58 @@ Las FSM de la Sección 4 describen el ciclo de vida **interno** de la unidad. Es
 **Escenario:** a OXP le llega un documento imputado a una unidad que todavía no existe en su copia local.
 
 ```
-   [OXP] imputa contra su copia local
-         · la unidad aún no existe
-                  │
-                  │    dos caminos independientes
-         ┌────────┴────────┐
-         ▼                 ▼
-   CORRECCIÓN       VISIBILIDAD
-   (deja el         (solo avisa;
-    sistema          no condiciona)
-    correcto)              │
-         │                 ▼
-   [OXP] difirió    [OXP] emite la señal de demanda
-   la parte que     (no bloqueante · segura de repetir · [SI07])
-   requiere la             │
-   unidad y                ▼
-   espera; no       [EO] proyecta la señal en la bandeja
-   se detiene       de sugerencias ([SI11])
-         │                 │
-         │                 ▼
-         │          [ADMIN EO] ve la sugerencia y decide crear
-         │          la unidad — acto deliberado (F1)
-         │                 │
-         │                 ▼
-         │          [EO] emite UnidadActivada a los consumidores
-         │                 │
-         └────────┬────────┘
-                  ▼
-   [OXP] recibe UnidadActivada en su copia local;
-         el diferido se resuelve solo (consistencia
-         eventual, sin consulta en caliente)
-                  │
-                  ▼
-   causación completa contra la unidad real
-   (coincide exacto con Contabilidad)
+   ┌──────────────────────────────────────────────┐
+   │ [OXP] imputa contra su copia local;          │
+   │ la unidad aún no existe                      │
+   └──────────────────────────────────────────────┘
+                          │
+                          ▼
+   ┌──────────────────────────────────────────────┐
+   │ CORRECCIÓN — el sistema queda correcto:      │
+   │ [OXP] DIFIERE la parte que requiere la       │
+   │ unidad; no se detiene y espera el evento     │
+   └──────────────────────────────────────────────┘
+                          │
+                          ▼
+   ┌──────────────────────────────────────────────┐
+   │ VISIBILIDAD — solo avisa, no condiciona:     │
+   │ [OXP] emite la señal de demanda              │
+   │ (no bloqueante · segura de repetir · [SI07]) │
+   └──────────────────────────────────────────────┘
+                          │
+                          ▼
+   ┌──────────────────────────────────────────────┐
+   │ [EO] proyecta la señal en la bandeja de      │
+   │ sugerencias ([SI11])                         │
+   └──────────────────────────────────────────────┘
+                          │
+                          ▼
+   ┌──────────────────────────────────────────────┐
+   │ [ADMIN EO] ve la sugerencia y decide         │
+   │ crear la unidad — acto deliberado (F1)       │
+   └──────────────────────────────────────────────┘
+                          │
+                          ▼
+   ┌──────────────────────────────────────────────┐
+   │ [EO] emite UnidadActivada a los              │
+   │ consumidores                                 │
+   └──────────────────────────────────────────────┘
+                          │
+                          ▼
+   ┌──────────────────────────────────────────────┐
+   │ [OXP] recibe UnidadActivada: su copia        │
+   │ local se actualiza y el diferido se          │
+   │ resuelve solo (consistencia eventual)        │
+   └──────────────────────────────────────────────┘
+                          │
+                          ▼
+   ┌──────────────────────────────────────────────┐
+   │ causación completa contra la unidad          │
+   │ real (coincide exacto con Contabilidad)      │
+   └──────────────────────────────────────────────┘
 ```
 
-**Lo que el diagrama hace explícito** (los dos caminos arrancan juntos y son independientes):
+**Lo que el diagrama hace explícito** (la CORRECCIÓN y la VISIBILIDAD son dos caminos independientes que arrancan a la vez tras el primer paso; el diagrama los presenta en secuencia por claridad de lectura):
 
 - **Camino de la *corrección* vs camino de la *visibilidad*.** El primero (diferir y esperar el evento `UnidadActivada`) es el que deja el sistema correcto; el segundo (la señal a la bandeja) solo acelera que el administrador se entere.
 - **La señal no es condición de nada.** Si se perdiera, el diferido sigue en pie y la unidad puede crearse igual por la planeación del administrador; cuando exista, la resolución ocurre de todos modos. Por eso la señal puede ser fire-and-forget.
