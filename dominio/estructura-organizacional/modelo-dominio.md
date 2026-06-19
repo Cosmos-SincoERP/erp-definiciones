@@ -615,55 +615,66 @@ Las FSM de la Sección 4 describen el ciclo de vida **interno** de la unidad. Es
 **Escenario:** a OXP le llega un documento imputado a una unidad que todavía no existe en su copia local.
 
 ```
-   ┌──────────────────────────────────────────────┐
-   │ [OXP] imputa contra su copia local;          │
-   │ la unidad aún no existe                      │
-   └──────────────────────────────────────────────┘
-                          │
-                          ▼
-   ┌──────────────────────────────────────────────┐
-   │ CORRECCIÓN — el sistema queda correcto:      │
-   │ [OXP] DIFIERE la parte que requiere la       │
-   │ unidad; no se detiene y espera el evento     │
-   └──────────────────────────────────────────────┘
-                          │
-                          ▼
-   ┌──────────────────────────────────────────────┐
-   │ VISIBILIDAD — solo avisa, no condiciona:     │
-   │ [OXP] emite la señal de demanda              │
-   │ (no bloqueante · segura de repetir · [SI07]) │
-   └──────────────────────────────────────────────┘
-                          │
-                          ▼
-   ┌──────────────────────────────────────────────┐
-   │ [EO] proyecta la señal en la bandeja de      │
-   │ sugerencias ([SI11])                         │
-   └──────────────────────────────────────────────┘
-                          │
-                          ▼
-   ┌──────────────────────────────────────────────┐
-   │ [ADMIN EO] ve la sugerencia y decide         │
-   │ crear la unidad — acto deliberado (F1)       │
-   └──────────────────────────────────────────────┘
-                          │
-                          ▼
-   ┌──────────────────────────────────────────────┐
-   │ [EO] emite UnidadActivada a los              │
-   │ consumidores                                 │
-   └──────────────────────────────────────────────┘
-                          │
-                          ▼
-   ┌──────────────────────────────────────────────┐
-   │ [OXP] recibe UnidadActivada: su copia        │
-   │ local se actualiza y el diferido se          │
-   │ resuelve solo (consistencia eventual)        │
-   └──────────────────────────────────────────────┘
-                          │
-                          ▼
-   ┌──────────────────────────────────────────────┐
-   │ causación completa contra la unidad          │
-   │ real (coincide exacto con Contabilidad)      │
-   └──────────────────────────────────────────────┘
+      ┌──────────────────┐
+      │ [OXP] imputa     │
+      │ contra su copia; │
+      │ la unidad no     │
+      │ existe aún       │
+      └──────────────────┘
+                │
+                ▼
+      ┌──────────────────┐
+      │ CORRECCIÓN:      │
+      │ [OXP] DIFIERE    │
+      │ y espera (no     │
+      │ se detiene)      │
+      └──────────────────┘
+                │
+                ▼
+      ┌──────────────────┐
+      │ VISIBILIDAD:     │
+      │ [OXP] emite la   │
+      │ señal de         │
+      │ demanda ([SI07]) │
+      └──────────────────┘
+                │
+                ▼
+      ┌──────────────────┐
+      │ [EO] proyecta    │
+      │ en la bandeja    │
+      │ de sugerencias   │
+      │ ([SI11])         │
+      └──────────────────┘
+                │
+                ▼
+      ┌──────────────────┐
+      │ [ADMIN EO] ve    │
+      │ y decide crear   │
+      │ la unidad (F1)   │
+      └──────────────────┘
+                │
+                ▼
+      ┌──────────────────┐
+      │ [EO] emite       │
+      │ UnidadActivada   │
+      │ a consumidores   │
+      └──────────────────┘
+                │
+                ▼
+      ┌──────────────────┐
+      │ [OXP] recibe el  │
+      │ evento; el       │
+      │ diferido se      │
+      │ resuelve solo    │
+      └──────────────────┘
+                │
+                ▼
+      ┌──────────────────┐
+      │ causación        │
+      │ completa contra  │
+      │ la unidad real   │
+      │ (= Contabilidad) │
+      └──────────────────┘
 ```
 
 **Lo que el diagrama hace explícito** (la CORRECCIÓN y la VISIBILIDAD son dos caminos independientes que arrancan a la vez tras el primer paso; el diagrama los presenta en secuencia por claridad de lectura):
