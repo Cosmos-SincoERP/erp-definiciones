@@ -76,7 +76,7 @@ La decisión de nombre está resuelta en [`anexo-definicion-contexto-inicial.md`
 | 8 | **Grupo raíz** | Grupo organizacional único por tenant, creado automáticamente al inicializar la estructura. Es el ancestro de toda la jerarquía. No puede inactivarse mientras existan otros nodos colgando de él. |
 | 9 | **Nivel** | Profundidad de un nodo (grupo o unidad) dentro de la jerarquía. Se calcula a partir de la estructura, no se almacena en el código. |
 | 10 | **Estado de la unidad** | Condición del ciclo de vida de una unidad organizacional. Cinco estados: **Borrador** (en preparación, no transaccional), **Activa** (recibe imputaciones), **Suspendida** (transitoriamente no recibe imputaciones, pero consultable), **Inactiva** (dada de baja después de haber operado; el historial se conserva; reabrible si la unidad retoma operación) y **Descartada** (terminal estricto, nunca llegó a operar; se filtra de reportes históricos). |
-| 11 | **Borrador** | Estado inicial de una unidad organizacional que aún no es transaccional. Permite su referencia en flujos de planeación pero bloquea la imputación de transacciones hasta que se active. |
+| 11 | **Borrador** | Estado de **preparación del administrador**: una unidad que aún no es transaccional, mientras el administrador termina de definirla antes de activarla (Flujo 1). **No se origina desde sub-dominios consumidores** (ver R29). Permite su referencia en flujos de planeación pero bloquea la imputación hasta que se active. |
 | 12 | **Activa** | Estado operativo de una unidad organizacional. Recibe imputaciones en nuevas transacciones. |
 | 13 | **Suspendida** | Estado transitorio en el que una unidad organizacional no recibe nuevas imputaciones pero sigue siendo consultable y reportable. Aplica a situaciones como cierre temporal, disputa en curso o congelamiento gerencial. |
 | 14 | **Inactiva** | Estado en el que una unidad organizacional deja de recibir imputaciones después de haber operado. Los registros históricos que la referencian se conservan intactos y siguen apareciendo en reportes históricos. **Puede reabrirse** si la unidad retoma operación (ej: sucursal que reabre, proyecto que se reanuda); la reapertura emite un evento de auditoría dedicado (`UnidadReabierta`) distinto del de reactivación desde `Suspendida`. |
@@ -98,24 +98,24 @@ La decisión de nombre está resuelta en [`anexo-definicion-contexto-inicial.md`
 
 | Actor | Descripción | Responsabilidades |
 |-------|-------------|-------------------|
-| **Administrador de estructura organizacional** | Usuario encargado de gobernar la estructura de grupos y unidades organizacionales. Perfil típico: controller, gerente de planeación o administrador del ERP. | Gestionar el ciclo de vida de grupos y unidades (crear, activar, suspender, inactivar). Gestionar la jerarquía. Ejecutar fusiones, divisiones y traslados con su fecha efectiva y razón. Revisar y activar las solicitudes de creación originadas desde sub-dominios consumidores. |
-| **Usuario consumidor** | Usuario de cualquier sub-dominio del ERP que interactúa con unidades organizacionales en su flujo. No se subdivide en roles específicos — el sistema es inteligente y guía al usuario según el contexto de la tarea. | Consultar unidades. Referenciarlas en sus transacciones. Originar solicitudes de creación cuando el flujo lo requiere (la solicitud se enruta al sub-dominio de Estructura Organizacional para su validación y eventual activación). |
+| **Administrador de estructura organizacional** | Usuario encargado de gobernar la estructura de grupos y unidades organizacionales. Perfil típico: controller, gerente de planeación o administrador del ERP. | Gestionar el ciclo de vida de grupos y unidades (crear, activar, suspender, inactivar). Gestionar la jerarquía. Ejecutar fusiones, divisiones y traslados con su fecha efectiva y razón. Atender las sugerencias de creación de unidades que surgen de la operación de los consumidores y crear las unidades que correspondan. |
+| **Usuario consumidor** | Usuario de cualquier sub-dominio del ERP que interactúa con unidades organizacionales en su flujo. No se subdivide en roles específicos — el sistema es inteligente y guía al usuario según el contexto de la tarea. | Consultar unidades. Referenciarlas en sus transacciones. Señalar la necesidad de una unidad inexistente desde su flujo (sugerencia no bloqueante; la creación la decide Estructura Organizacional). |
 
 ### Actores externos (sistemas integrados)
 
 | Sistema | Descripción | Relación con el dominio |
 |---------|-------------|------------------------|
-| **OXP** | Gestión de obligaciones por pagar. | Consume unidades organizacionales para imputar obligaciones. Escucha los eventos del ciclo de vida (creación, activación, suspensión, inactivación) y de reestructuración para mantener su referencia local consistente. Puede originar solicitudes de creación desde su flujo (ver `anexo-orquestacion-creacion.md`). |
-| **Contabilidad** | Motor de traducción contable. | Consume unidades como dimensión de imputación en las líneas de traducción. Reacciona a eventos de reestructuración para reclasificación contable. Puede originar solicitudes de creación desde sus flujos. |
-| **Sub-dominios consumidores futuros** | Cualquier sub-dominio que se incorpore al ERP y requiera imputar transacciones a unidades organizacionales. | Consume unidades y reacciona a sus eventos siguiendo el mismo patrón EDA. Puede originar solicitudes de creación desde sus flujos. |
+| **OXP** | Gestión de obligaciones por pagar. | Consume unidades organizacionales para imputar obligaciones. Escucha los eventos del ciclo de vida (creación, activación, suspensión, inactivación) y de reestructuración para mantener su **copia local** consistente, contra la que opera. Hace visible la necesidad de una unidad inexistente como sugerencia no bloqueante. |
+| **Contabilidad** | Motor de traducción contable. | Consume unidades como dimensión de imputación en las líneas de traducción, contra su **copia local**. Reacciona a eventos de reestructuración para reclasificación contable. Hace visible la necesidad de una unidad inexistente como sugerencia no bloqueante. |
+| **Sub-dominios consumidores futuros** | Cualquier sub-dominio que se incorpore al ERP y requiera imputar transacciones a unidades organizacionales. | Consume unidades y reacciona a sus eventos siguiendo el mismo patrón EDA (copia local). Hace visible la necesidad de una unidad inexistente como sugerencia no bloqueante. |
 
 ### Formatos de entrada soportados
 
 No aplica. Estructura Organizacional no recibe documentos externos — las unidades y grupos se crean desde la UI propia del sub-dominio o mediante solicitudes originadas desde sub-dominios consumidores.
 
-### Nota sobre el patrón de creación desde consumidores
+### Nota sobre la operación de los consumidores
 
-El sub-dominio sigue el mismo patrón que Terceros: cualquier sub-dominio consumidor puede originar la solicitud de creación de una unidad organizacional desde su propio flujo, pero **la creación y el ciclo de vida los gestiona Estructura Organizacional** (propietario del dato). La orquestación se resuelve mediante una capa **BFF (Backend for Frontend)** y las unidades solicitadas entran en estado `Borrador` hasta que el administrador (o una regla del sistema inteligente en fases posteriores) las activa. Ver [`anexo-orquestacion-creacion.md`](anexo-orquestacion-creacion.md) para el detalle del flujo, las alternativas evaluadas y el manejo de errores.
+Estructura Organizacional es el **dueño único** de las unidades; los consumidores **operan contra su copia local** (mantenida por los eventos de ciclo de vida) y **nunca consultan a Estructura Organizacional en el camino crítico** de sus operaciones. Cuando un consumidor necesita una unidad que aún no existe, **su operación no se detiene**: registra lo que puede, difiere solo la parte que requiere la unidad y hace visible la necesidad como **sugerencia no bloqueante**. La creación de unidades es siempre **acto deliberado de Estructura Organizacional** (administrador o integración) — ningún flujo consumidor crea unidades ni las origina en un estado bloqueante. El fundamento de patrones (réplica local, estrategias para datos faltantes, anti-patrones) está en [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md).
 
 ---
 
@@ -179,58 +179,39 @@ Escenario en el que el administrador de estructura organizacional crea un grupo 
 
 ---
 
-#### Flujo 2 — Solicitud de creación desde un sub-dominio consumidor
+#### Flujo 2 — Necesidad de una unidad desde un sub-dominio consumidor
 
-Escenario en el que el usuario operativo de un sub-dominio consumidor (OXP, Contabilidad, etc.) necesita referenciar una unidad que no existe. La solicitud se enruta al sub-dominio de Estructura Organizacional (propietario del dato); la unidad entra en `Borrador` y el administrador (o una regla del sistema inteligente, en fases posteriores) decide si la activa o la rechaza. El detalle de la orquestación y el manejo de errores está en [`anexo-orquestacion-creacion.md`](anexo-orquestacion-creacion.md).
+Escenario en el que un sub-dominio consumidor (OXP, Contabilidad, etc.) necesita imputar contra una unidad organizacional. El consumidor **opera contra su copia local** de unidades —mantenida por los eventos de Estructura Organizacional— y **nunca consulta a Estructura Organizacional en el momento de operar** (ver [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md)). El caso que este flujo resuelve es cuando la unidad que el consumidor necesita **aún no existe**.
 
 ```
- Usuario operativo en OXP (o Contabilidad, ...)
+ Sub-dominio consumidor (OXP, Contabilidad, ...) necesita imputar a una unidad
        │
-       │  Detecta durante su flujo la necesidad
-       │  de una unidad inexistente
        ▼
- ┌────────────────────────────────────────────┐
- │ Sistema inteligente                        │
- │  1. Busca unidades similares existentes    │
- │     (evita proliferación)                  │
- │  2. Si ninguna aplica, pre-llena           │
- │     formulario con tipo, padre probable,   │
- │     nombre canónico inferido del contexto  │
- └──────────────────────┬─────────────────────┘
-                        │
-                        │  Usuario confirma solicitud
-                        ▼
- ┌────────────────────────────────────────────┐
- │ Estructura Organizacional                  │
- │  Recibe SolicitarCreacionDeUnidad          │
- │  Valida código, tipo, padre, jerarquía     │
- │  Crea la unidad en estado Borrador         │
- │  Emite: UnidadCreada (estado Borrador)     │
- └──────────────────────┬─────────────────────┘
-           ┌────────────┴────────────┐
-           ▼                         ▼
- OXP referencia la unidad    Administrador revisa
- en su flujo. La operación   en su bandeja.
- del consumidor queda        Completa datos y decide:
- marcada "pendiente por          ┌─────────────┐
- unidad organizacional"          │ Activar     │ → UnidadActivada
- hasta que llegue                │    o        │
- UnidadActivada.                 │ Descartar   │ → UnidadDescartada
-                                 │             │   (terminal, identificación libre)
-                                 └──────┬──────┘
-                                        │
-                                        ▼
-                             OXP reacciona al evento:
-                             si Activada, destraba la
-                             operación pendiente; si
-                             Descartada, la cancela y
-                             notifica al usuario.
+ ¿la unidad está en su COPIA LOCAL? ──── SÍ ───► imputa contra la copia local
+       │                                          (no consulta a Estructura Org.)
+       NO (la unidad no existe todavía)
+       │
+       ├──► el consumidor NO se detiene: registra lo que puede y difiere
+       │    solo la parte que requiere la unidad (el cómo vive en el consumidor)
+       │
+       └──► hace VISIBLE la necesidad a Estructura Organizacional
+            (señal no bloqueante, vía el sistema inteligente)
+                     │
+                     ▼
+            El administrador decide (curaduría):
+             · crea la unidad si corresponde (Flujo 1 → nace Activa)
+             · o no la crea, si la necesidad no era válida
+                     │
+                     ▼ (al crear) evento UnidadCreada
+            La copia local del consumidor se actualiza →
+            la parte diferida se resuelve sola.
 ```
 
-- **Actor principal:** Usuario consumidor (origina la solicitud); Administrador de estructura organizacional (revisa y activa).
-- **Pre-condiciones:** el sistema inteligente confirmó que no existen unidades similares reutilizables; el tipo y padre sugeridos son coherentes con la jerarquía.
-- **Eventos emitidos:** `UnidadCreada` (estado `Borrador`); posteriormente `UnidadActivada` o `UnidadDescartada` según la decisión del administrador.
-- **Estado resultante:** unidad en `Borrador` inmediatamente después de la solicitud; en `Activa` o `Descartada` tras la revisión.
+- **Actor principal:** el sub-dominio consumidor opera de forma autónoma; el administrador de estructura organizacional crea la unidad cuando corresponde.
+- **Pre-condiciones:** el consumidor mantiene su copia local de unidades al día (eventos de Estructura Organizacional).
+- **Comportamiento clave:** la operación del consumidor **no se detiene** por una unidad faltante (difiere solo la parte que la requiere — el detalle vive en el consumidor); la creación de la unidad es **acto deliberado de Estructura Organizacional**; la unidad nace `Activa` por la vía normal (Flujo 1). Ningún flujo consumidor crea unidades ni las origina en un estado bloqueante.
+- **Eventos emitidos:** `UnidadCreada` (+ `UnidadActivada`) cuando el administrador crea la unidad vía Flujo 1.
+- **Estado resultante:** la parte diferida del consumidor se resuelve sola cuando el evento `UnidadCreada` llega a su copia local.
 
 ---
 
@@ -425,7 +406,7 @@ Escenario en el que una unidad **que operó** deja de hacerlo (cierre de sucursa
 
 #### Flujo 8 — Descarte de una unidad en `Borrador`
 
-Escenario terminal en el que una unidad **que nunca operó** se descarta antes de activarse. Aplica cuando el administrador rechaza una solicitud originada por un consumidor (Flujo 2) o abandona un borrador propio porque la decisión de negocio que motivó la creación no se concretó (proyecto cancelado, sucursal no autorizada). La unidad no aparece en reportes históricos y la identificación queda libre para futuras solicitudes.
+Escenario terminal en el que una unidad **que nunca operó** se descarta antes de activarse. Aplica cuando el administrador abandona un borrador propio porque la decisión de negocio que motivó la creación no se concretó (proyecto cancelado, sucursal no autorizada). La unidad no aparece en reportes históricos y la identificación queda libre.
 
 ```
  Administrador selecciona una unidad
@@ -877,16 +858,16 @@ Estructura Organizacional es el **propietario** de la estructura jerárquica de 
 
 En procesos de reestructuración, Estructura Organizacional emite los eventos que describen la fusión, división o traslado, pero no modifica directamente las transacciones ni las vistas internas de los consumidores. Cada sub-dominio consumidor es responsable de interpretar los eventos recibidos y aplicar, según sus propias reglas, la reasignación, bloqueo, reclasificación, advertencia o reconstrucción de sus vistas locales.
 
-La orquestación de la experiencia de usuario cuando un consumidor origina la creación de una unidad vive fuera del sub-dominio, en una capa BFF (ver [`anexo-orquestacion-creacion.md`](anexo-orquestacion-creacion.md)).
+Los consumidores **operan contra su copia local** de unidades y **nunca consultan a Estructura Organizacional en el camino crítico** de sus operaciones (ver [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md)). Estructura Organizacional no responde consultas en el flujo transaccional de los consumidores: publica eventos y ofrece un punto de resincronización de respaldo. La necesidad de una unidad inexistente se le hace visible como sugerencia no bloqueante (R29, R30).
 
 ### Integraciones de entrada
 
 | Origen | Dato | Propósito |
 |--------|------|-----------|
-| **Sub-dominios consumidores** (OXP, Contabilidad, y futuros) | Solicitud de creación de unidad organizacional desde sus propios flujos (vía BFF) | Permitir que un usuario operativo origine la creación sin salir de su módulo. La unidad queda en `Borrador`; el administrador la activa o descarta (ver Flujos 2, 3 y 8). |
-| **Sub-dominios consumidores** | Consulta por código de unidad o por jerarquía | Resolver una unidad organizacional y obtener sus datos (estado, tipo, padre, posición jerárquica) para validar antes de imputar una transacción o construir un reporte. |
+| **Sub-dominios consumidores** (OXP, Contabilidad, y futuros) | Señal de demanda de una unidad inexistente (no bloqueante) | Hacer visible al administrador que un consumidor necesitó una unidad que no existe, como sugerencia de creación (R30). No es un comando de creación ni bloquea al consumidor. |
+| **Sub-dominios consumidores** | Eventos de imputación a unidades | Alimentar la **proyección de última imputación por unidad** que Estructura Organizacional usa para validar la fecha efectiva de reestructuraciones (R25/I08) — sin consultar a los consumidores en caliente (ver Sección 7 y `[SI10]`). |
 
-**Consultas mínimas esperadas:**
+**Consultas mínimas esperadas** (para administración, reportería y resincronización — **no** para el flujo transaccional de los consumidores, que usan su copia local):
 
 - Resolver unidad organizacional por código.
 - Resolver grupo organizacional por código.
@@ -910,6 +891,7 @@ La orquestación de la experiencia de usuario cuando un consumidor origina la cr
 | **Sub-dominios consumidores** (OXP, Contabilidad, y futuros) | Eventos del ciclo de vida de unidades: `UnidadCreada`, `UnidadActivada`, `UnidadSuspendida`, `UnidadReactivada`, `UnidadReabierta`, `UnidadInactivada`, `UnidadDescartada`, `UnidadModificada` | Que cada consumidor mantenga su vista local consistente y reaccione según corresponda: bloquear nuevas imputaciones cuando una unidad se suspende o inactiva, destrabar operaciones pendientes cuando una unidad se activa, cancelar operaciones cuando una unidad se descarta, etc. |
 | **Sub-dominios consumidores** | Eventos del ciclo de vida de grupos: `GrupoCreado`, `GrupoInactivado`, `GrupoReactivado`, `GrupoModificado` | Que los consumidores con interés en la estructura jerárquica (reportería consolidada, vistas agregadas) actualicen su vista local. |
 | **Sub-dominios consumidores** | Eventos de reestructuración: `UnidadFusionada`, `UnidadDividida`, `UnidadTrasladada` | Que los consumidores reasignen sus referencias locales según corresponda, apliquen re-expresión comparativa en reportes (IFRS 8) y notifiquen a sus propios usuarios del cambio estructural. |
+| **Sub-dominios consumidores** | Punto de resincronización (foto del estado actual / reproceso de eventos desde un punto) | Que un consumidor **repare su copia local** si se desfasó (reconciliación de respaldo, de fondo — ver [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md)). No se usa en el flujo transaccional. |
 
 > **Nota sobre el conteo de eventos:** el modelo de dominio define 18 eventos en total. De estos, 15 corresponden a eventos de ciclo de vida, reestructuración y jerarquía relevantes para los sub-dominios consumidores. Los 3 eventos restantes corresponden a la configuración interna del catálogo de tipos de unidad (`TipoUnidadAgregado`, `TipoUnidadModificado`, `TipoUnidadInactivado`) y su publicación externa dependerá de la definición contractual de EventCatalog en la fase correspondiente.
 
@@ -925,13 +907,13 @@ La orquestación de la experiencia de usuario cuando un consumidor origina la cr
                     │  · Motivos de baja: literales    │
                     └──────────────┬───────────────────┘
                                    │
-              ┌────────────────────┼────────────────────┐
-              │                    │                    │
-       Solicitudes de        Consultas de         Eventos del
-       creación (vía BFF)    unidades             ciclo de vida
-       ◄─────────            ◄─────────           ─────────►
-              │                    │                    │
-              ▼                    ▼                    ▼
+       ┌─────────────────┬──────────┴───────┬──────────────────┐
+       │                 │                  │                  │
+  Eventos del      Eventos de         Señal de demanda    Punto de
+  ciclo de vida    imputación         (no bloqueante)     resincronización
+  ─────────►       ◄─────────         ◄─────────          ◄───────── (de fondo)
+       │                 │                  │                  │
+       ▼                 ▼                  ▼                  ▼
        ┌─────────────────────────────────────────────────────┐
        │                                                     │
        │   Sub-dominios consumidores                         │
@@ -940,25 +922,26 @@ La orquestación de la experiencia de usuario cuando un consumidor origina la cr
        │   F2+: otros sub-dominios que se incorporen         │
        │                                                     │
        │   Cada uno:                                         │
-       │    · mantiene su vista local de unidades            │
+       │    · OPERA contra su copia local de unidades        │
        │    · reacciona a eventos según su contexto          │
-       │    · puede originar solicitudes de creación         │
-       │    · consulta unidades antes de imputar             │
-       │                                                     │
+       │    · hace visible la demanda de una unidad faltante │
+       │    · emite eventos de imputación (última imputación)│
+       │    · NO consulta a Estructura Org. en el camino     │
+       │      crítico de operar                              │
        └─────────────────────────────────────────────────────┘
 ```
 
 ### Notas de la primera fase
 
-- En F1 los consumidores son **OXP** y **Contabilidad** únicamente. Las solicitudes de creación se originan típicamente desde OXP (al radicar una obligación contra una unidad que no existe) y desde Contabilidad (al generar borradores contables con referencia a una unidad faltante).
-- La activación de unidades solicitadas desde consumidores es siempre **humana** en F1 (administrador de estructura organizacional). En fases posteriores el sistema inteligente puede asumir activaciones automáticas cuando el contexto sea inequívoco (ver `anexo-orquestacion-creacion.md`, PD1).
+- En F1 los consumidores son **OXP** y **Contabilidad** únicamente. La necesidad de una unidad inexistente se origina típicamente desde OXP (al radicar una obligación) o desde Contabilidad (al generar borradores), y se hace visible a Estructura Organizacional como sugerencia no bloqueante (R30) — sin detener la operación del consumidor.
+- La creación de unidades es siempre **acto deliberado del administrador** en F1 (o por integración con sistemas de origen, ej: presupuesto). En fases posteriores el sistema inteligente puede crear unidades automáticamente cuando el contexto sea inequívoco.
 - En F1 solo se expone la dimensión **Unidad Organizacional** como dimensión de imputación. El contrato de líneas de traducción con Contabilidad acepta solo esa dimensión.
 - Las **direcciones** de las unidades (por ejemplo de sucursales o inmuebles) **no son responsabilidad** de Estructura Organizacional en F1. Si un sub-dominio consumidor requiere asociar una dirección a una unidad, lo gestiona internamente con el servicio de Direcciones que corresponda.
 
 ### Visión a futuro
 
 - **F2+ — Multi-dimensionalidad.** Cuando se incorporen otras dimensiones (Proyecto, Sucursal, Línea de Negocio, etc.), el contrato de líneas de traducción se extiende con campos opcionales para cada dimensión adicional. Estructura Organizacional sigue siendo el owner de la dimensión "Unidad Organizacional"; las demás dimensiones tendrán sus propios sub-dominios owners. Ver `anexo-decisiones-arquitectonicas.md`, Decisión 4.
-- **F2+ — Activación automática de solicitudes.** Cuando el contexto de una solicitud es inequívoco (ej: proyecto aprobado en sistema de presupuesto con todos los datos), el sistema inteligente puede activar la unidad sin intervención humana.
+- **F2+ — Creación automática de unidades.** Cuando el contexto es inequívoco (ej: proyecto aprobado en el sistema de presupuesto con todos los datos), el sistema inteligente puede crear la unidad sin intervención humana, a partir de la señal de demanda o de la integración con el sistema de origen.
 - **F2+ — Incorporación de nuevos consumidores.** Cualquier sub-dominio que se incorpore al ERP y necesite imputar transacciones a unidades organizacionales se conecta al mismo patrón EDA. No requiere cambios en Estructura Organizacional.
 
 ---
@@ -993,7 +976,7 @@ Las reglas se numeran `[R##]` y se organizan por tema operativo.
 | # | Regla | Descripción | Configurable |
 |---|-------|-------------|:------------:|
 | R12 | **Transiciones permitidas** | Las transiciones válidas de la FSM de unidad son: `Borrador → Activa`, `Borrador → Descartada`, `Activa → Suspendida`, `Suspendida → Activa`, `Activa → Inactiva`, `Suspendida → Inactiva`, `Inactiva → Activa` (reapertura). Cualquier otra transición es rechazada por el dominio. | No |
-| R13 | **Imputaciones solo contra `Activa`** | Las nuevas transacciones de los consumidores solo se aceptan contra unidades en estado `Activa`. Una unidad en `Borrador`, `Suspendida`, `Inactiva` o `Descartada` no admite nuevas imputaciones. | No |
+| R13 | **Imputaciones solo contra `Activa`** | Las nuevas transacciones de los consumidores solo se aceptan contra unidades en estado `Activa`. Una unidad en `Borrador`, `Suspendida`, `Inactiva` o `Descartada` no admite nuevas imputaciones. **El consumidor valida esta condición contra su copia local de unidades** (mantenida por los eventos de Estructura Organizacional), no consultando a Estructura Organizacional en el momento de imputar. | No |
 | R14 | **`Descartada` terminal estricto** | Una unidad en `Descartada` no puede transicionar a ningún otro estado. Para volver a operar, se crea una unidad nueva con datos limpios. | No |
 | R15 | **`Inactiva` reabrible** | Una unidad en `Inactiva` puede reabrirse mediante F6 emitiendo `UnidadReabierta`. La unidad conserva su identidad, código e historial; las nuevas imputaciones se enlazan con la operación previa. | No |
 | R16 | **Reapertura requiere padre activo** | Reabrir una unidad inactiva requiere que su grupo padre esté en estado `Activo`. Si el padre fue inactivado por cascada, primero se reactiva el grupo padre. | No |
@@ -1024,8 +1007,8 @@ Las reglas se numeran `[R##]` y se organizan por tema operativo.
 
 | # | Regla | Descripción | Configurable |
 |---|-------|-------------|:------------:|
-| R29 | **Solicitudes entran en `Borrador`** | Las unidades creadas vía solicitud de un sub-dominio consumidor (F2) entran obligatoriamente en estado `Borrador`. Nunca se activan automáticamente en F1 — la activación requiere gesto explícito del administrador. | No |
-| R30 | **Descarte propaga cancelación en cascada** | Descartar una unidad en `Borrador` (F8) propaga la cancelación de operaciones pendientes en sub-dominios consumidores que la referenciaban. El sistema inteligente advierte al administrador del impacto antes de proceder. | No |
+| R29 | **Operación del consumidor sin bloqueo** | El consumidor opera contra su copia local de unidades. Cuando requiere una unidad que no existe, su operación **no se detiene ni espera la creación**: registra lo que puede y difiere solo la parte que requiere la unidad, que se resuelve cuando llega el evento `UnidadCreada`. La creación de una unidad es siempre **acto deliberado de Estructura Organizacional** (administrador o integración) — ningún flujo consumidor crea unidades ni las origina en un estado bloqueante. | No |
+| R30 | **Demanda de unidad no bloqueante** | Cuando un consumidor requiere una unidad inexistente, la necesidad se hace visible para Estructura Organizacional como **sugerencia** (vía el sistema inteligente), para que el administrador la cree si corresponde. Nunca es un comando que obligue a crear ni que bloquee o cancele operaciones del consumidor. | No |
 
 ---
 
@@ -1041,7 +1024,7 @@ Estructura Organizacional asume las siguientes responsabilidades funcionales:
 - **Codificación de unidades y grupos** — códigos alfanuméricos planos, únicos por tenant, inmutables.
 - **Catálogo interno de tipos de unidad** — clasificación de la unidad según su naturaleza (centro de costo, proyecto, sucursal, inmueble, departamento, etc.), extensible por cada empresa según su modelo de negocio.
 - **Procesos de reestructuración**: fusión, división y traslado, con fecha efectiva, motivo y proyección del motivo de baja (`motivoBaja`) en el modelo de lectura.
-- **Solicitudes de creación originadas desde sub-dominios consumidores** — recepción de la solicitud, validación de sus reglas propias y creación de la unidad en `Borrador` para revisión del administrador.
+- **Atención de la demanda de unidades desde consumidores** — recepción de la señal no bloqueante que indica que un consumidor necesitó una unidad inexistente; la creación es acto deliberado del administrador (la unidad nace `Activa`).
 - **Emisión de eventos** — todo cambio de ciclo de vida, jerarquía o reestructuración emite un evento de dominio que los consumidores reciben para mantener su vista local consistente.
 - **Consultas de unidades y jerarquía** — los consumidores pueden resolver una unidad por código o navegar la jerarquía para validar antes de imputar transacciones o construir reportes.
 - **Control de autorización funcional** — las operaciones principales del sub-dominio se protegen mediante permisos atómicos por acción y recurso, definidos en el modelo de dominio. Esto permite diferenciar permisos para crear, modificar, inactivar, reactivar, trasladar, fusionar, dividir, consultar y administrar tipos de unidad.
@@ -1065,8 +1048,8 @@ Estructura Organizacional **no** asume las siguientes responsabilidades — pert
 
 | Dependencia | Descripción | Impacto en Estructura Organizacional |
 |-------------|-------------|--------------------------------------|
-| **Sub-dominios consumidores** (OXP, Contabilidad en F1; otros que se incorporen en fases posteriores) | Sub-dominios que consumen unidades organizacionales para imputar transacciones y reaccionan a los eventos del ciclo de vida y de reestructuración. | Originan solicitudes de creación desde sus propios flujos; mantienen su vista local de unidades; son notificados de los cambios para mantener consistencia. La existencia operativa de Estructura Organizacional cobra valor solo cuando hay al menos un consumidor (OXP o Contabilidad en F1). |
-| **Sub-dominios consumidores transaccionales** (OXP, Contabilidad; otros que registren imputaciones por unidad) — segunda relación, además de la principal de emisión/recepción de eventos | Fuente consultable de la **última imputación por unidad organizacional**. | Estructura Organizacional consulta esta información antes de aceptar reestructuraciones (`F12` Fusión, `F13` División, `F14` Traslado) para validar que la `fechaEfectiva` no sea anterior al historial registrado (regla R25, invariante I08 del modelo). La forma exacta del mecanismo de consulta se materializa en el modelo de dominio (`[SI10]`). |
+| **Sub-dominios consumidores** (OXP, Contabilidad en F1; otros que se incorporen en fases posteriores) | Sub-dominios que consumen unidades organizacionales para imputar transacciones y reaccionan a los eventos del ciclo de vida y de reestructuración. | Operan contra su copia local de unidades; hacen visible la demanda de unidades inexistentes como sugerencia no bloqueante; son notificados de los cambios para mantener consistencia. La existencia operativa de Estructura Organizacional cobra valor solo cuando hay al menos un consumidor (OXP o Contabilidad en F1). |
+| **Sub-dominios consumidores transaccionales** (OXP, Contabilidad; otros que registren imputaciones por unidad) — segunda relación, además de la principal de emisión/recepción de eventos | Eventos de imputación por unidad organizacional. | Estructura Organizacional mantiene una **proyección local de última imputación por unidad** alimentada por estos eventos — **no consulta a los consumidores en caliente** (ver [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md)). Usa esa proyección para validar que la `fechaEfectiva` de una reestructuración (`F12`/`F13`/`F14`) no sea anterior al historial (regla R25, invariante I08). El mecanismo se materializa en el modelo (`[SI10]`); si la proyección está desfasada, aplica la reconciliación de respaldo. |
 
 ---
 
@@ -1086,7 +1069,7 @@ Estructura Organizacional se entrega como un sub-dominio funcional completo en u
 | 4 | Codificación de unidades y grupos | Códigos alfanuméricos planos, únicos por tenant, inmutables. Longitud parametrizable entre 4 y 12 caracteres. |
 | 5 | Catálogo interno de tipos de unidad | Lista de clasificaciones (centro de costo, proyecto, sucursal, inmueble, departamento, etc.) extensible por cada empresa según su modelo de negocio. |
 | 6 | Procesos de reestructuración | Fusión (F12), División (F13) y Traslado (F14) aplicables a unidades, con fecha efectiva, motivo y motivo de baja proyectado en el modelo de lectura. |
-| 7 | Solicitudes de creación desde consumidores | Recepción de la solicitud, validación de reglas propias y creación en `Borrador`. Activación por el administrador. |
+| 7 | Atención de la demanda de unidades desde consumidores | Recepción de la señal no bloqueante; la creación es acto deliberado del administrador (la unidad nace `Activa`). |
 | 8 | Emisión EDA completa | Eventos de dominio emitidos ante cambios de ciclo de vida, jerarquía o reestructuración. El modelo completo define 18 eventos; 15 son directamente relevantes para consumidores transaccionales en F1 y 3 corresponden a configuración interna del catálogo de tipos de unidad. |
 | 9 | Consultas de unidades y jerarquía | Resolución por código y navegación de la jerarquía para validación antes de imputar transacciones o construir reportes. |
 | 10 | Dimensión "Unidad Organizacional" como dimensión de imputación | Única dimensión expuesta en el contrato de líneas de traducción con Contabilidad. El modelo queda preparado para extender el contrato con dimensiones adicionales sin rediseño. |
@@ -1095,7 +1078,7 @@ Estructura Organizacional se entrega como un sub-dominio funcional completo en u
 
 | Consumidor | Rol |
 |------------|-----|
-| **OXP** | Imputa obligaciones a unidades organizacionales; origina solicitudes de creación desde su flujo cuando una factura llega asociada a una unidad inexistente. |
+| **OXP** | Imputa obligaciones a unidades organizacionales (contra su copia local); cuando una factura llega asociada a una unidad inexistente, no se detiene y hace visible la necesidad como sugerencia no bloqueante. |
 | **Contabilidad** | Consume la unidad organizacional como dimensión de imputación en las líneas de traducción; origina solicitudes desde sus propios flujos. Reacciona a eventos de reestructuración para reclasificación contable. |
 
 ### Fases futuras
@@ -1112,7 +1095,7 @@ Las capacidades adicionales que el sub-dominio pueda soportar en el futuro (acti
 | 2 | **Estructura sin techo combinatorio:** La codificación plana + jerarquía versionada permite modelar empresas con estructuras robustas (múltiples sucursales en varios países, proyectos con sub-proyectos anidados, matrices con varios ejes) sin las restricciones del código posicional tradicional. | Jerarquía limitada por código alfanumérico (Problema 2) |
 | 3 | **Nomenclatura unificada en todo el ERP:** "Estructura Organizacional" describe la responsabilidad completa del sub-dominio (estructura, jerarquía, tipos, reestructuración). Los demás sub-dominios consumidores adoptan "unidad organizacional" como término único, eliminando la confusión que generaba "centro de costo" en módulos no contables. | Nomenclatura limitante (Problema 3) |
 | 4 | **Tipos de unidad explícitos:** El catálogo interno de tipos (centro de costo, proyecto, sucursal, inmueble, departamento, etc.) permite a cada sub-dominio consumidor interpretar la unidad según su contexto. Cada empresa puede extender el catálogo con sus propios tipos. | Sin tipos de unidad (Problema 4) |
-| 5 | **Creación centralizada iniciada desde cualquier flujo:** El administrador de estructura organizacional y los usuarios operativos de otros módulos (OXP, Contabilidad) pueden iniciar el registro de una unidad sin duplicar procesos. La validación de unicidad y reglas de jerarquía se aplica siempre, independientemente del origen de la solicitud. | Creación dispersa (Problema 5) |
+| 5 | **Operación sin bloqueo con gobierno preservado:** los consumidores nunca se detienen por una unidad faltante (operan contra su copia local y difieren lo que falta); la creación de unidades sigue siendo acto deliberado de Estructura Organizacional, con su validación de unicidad y jerarquía — sin proliferación dispersa de unidades ad-hoc. | Creación dispersa (Problema 5) |
 | 6 | **Reestructuración como procesos formales:** Fusión, división y traslado se ejecutan como eventos de dominio con fecha efectiva, motivo y trazabilidad histórica. Reemplazan los renombres y reasignaciones manuales que rompían la comparabilidad año-contra-año. | Sin concepto de reestructuración (Problema 6) |
 | 7 | **Estados que reflejan la realidad operativa:** Los cinco estados de unidad (`Borrador`, `Activa`, `Suspendida`, `Inactiva`, `Descartada`) modelan explícitamente los momentos transitorios del negocio (preparación, operación, pausa, cierre, descarte) que hoy se enmascaran detrás de "activo/inactivo" y generan transacciones incorrectas. | *Modelado fiel a la realidad operativa* |
 | 8 | **Cumplimiento IFRS 8 sin reconstrucción manual:** La historia estructural versionada y los eventos formales de reestructuración permiten cumplir con la re-expresión comparativa de periodos anteriores (IFRS 8 §29-30) sin que el equipo financiero deba reconstruir manualmente la estructura previa en cada auditoría. | *Comparabilidad histórica* |
@@ -1138,4 +1121,5 @@ Las capacidades adicionales que el sub-dominio pueda soportar en el futuro (acti
 | 0.11 | 2026-05-27 | **Sección 8 — Estrategia de implementación por fases cerrada.** Una sola fase F1 plana con 10 capacidades del sub-dominio completo (ciclo de vida grupos+unidades, jerarquía versionada, codificación, catálogo de tipos, reestructuración, solicitudes desde consumidores, emisión EDA, consultas, dimensión Unidad Organizacional). Consumidores F1: OXP y Contabilidad. Sin sub-división núcleo/habilitadores porque la única dependencia funcional son los consumidores. Capacidades adicionales (activación automática, multi-dimensionalidad operativa, reestructuración de sub-grupos) quedan como nota corta "fases futuras" sin compromiso de tiempo — se evaluarán según necesidades del negocio. |
 | **1.0** | **2026-05-27** | **Sección 9 — Beneficios esperados cerrada. Alcance completo, listo para Fase 2 (modelo de dominio).** 10 beneficios en formato tabla `# / Beneficio / Problema que resuelve` alineado con Terceros (los primeros 6 enlazan 1:1 con los 6 problemas originales de Sección 1; los 4 últimos son beneficios transversales derivados de las decisiones arquitectónicas: estados explícitos, IFRS 8, reapertura, multi-dimensionalidad preparatoria). Sin indicadores de éxito / KPIs — alineado con todos los demás sub-dominios del proyecto (no aplican naturalmente a sub-dominios de definición/configuración). |
 | 1.1 | 2026-05-28 | Ajuste editorial menor por auditoría Bloque Baja (B7) del modelo de dominio: glosario término 22 "Unidad de imputación" — agregada nota explícita de que en los documentos de dominio de Estructura Organizacional se prefiere el término "unidad organizacional" y el sinónimo solo se registra para referencia cruzada con sub-dominios consumidores. |
+| 1.3 | 2026-06-19 | **Replanteamiento — eliminación de acoplamientos de ejecución y proceso con los consumidores (issue #45/#46).** La creación de unidades desde consumidores deja de ser un flujo bloqueante: el consumidor opera contra su **copia local** y nunca consulta a Estructura Organizacional en el camino crítico; cuando necesita una unidad inexistente, su operación **no se detiene** (difiere lo que la requiere) y la necesidad se hace visible como **sugerencia no bloqueante**. Flujo 2 reescrito; R29 (era 'solicitudes entran en Borrador') y R30 (era 'descarte cancela en cascada') reescritas como 'operación sin bloqueo' y 'demanda no bloqueante'; R13 aclarada (validación contra copia local); glosario de `Borrador` acotado a preparación del administrador; Sección 5 (principio, integraciones, diagrama) alineada — entra el punto de resincronización y los eventos de imputación, salen la solicitud bloqueante y la consulta en caliente del flujo transaccional; Sección 7 (H2) — la última imputación pasa de consulta federada a **proyección local por eventos**. Fundamento en `guias-de-modelado/datos-entre-dominios.md`. Acompaña al modelo de dominio (Hito 2). |
 | 1.2 | 2026-05-28 | **Aplicados 11 ajustes del comité de producto (A1-A11) + consecuencia de D4.** **A1:** Sección 1 — sustituido "estructura jerárquica de dos niveles" por "dos tipos de nodo" con aclaración de jerarquía multinivel mediante grupos anidados. **A2:** Sección 5 (nota de conteo) y Sección 8 capacidad 8 — distinguido entre 18 eventos totales y 15 relevantes para consumidores transaccionales en F1. **A3:** Flujo 15 — precondiciones diferenciadas por tipo de nodo (grupos `Inactivo` sí admiten modificación); R17 mantenida solo para unidades. **A4:** R26 ampliada para cubrir unidades `Descartada` y motivo `abandono_por_inactividad`. **A5:** R3 "grupo raíz protegido" + Flujo 10 alineado ("raíz con contenido"). **A6:** glosario término División — eliminada la idea de distribución del historial. **A7:** Sección 5 — agregada precisión sobre responsabilidad de consumidores en reestructuración (reasignación/reclasificación es suya, no de Estructura Organizacional). **A8:** Sección 5 — lista de 10 consultas mínimas esperadas (incluye consultar historial de reestructuración mediante el identificador del proceso correspondiente — lenguaje funcional). **A9:** Sección 7 dentro del alcance — agregada responsabilidad "Control de autorización funcional" (permisos atómicos). **A10:** Sección 4 — nota sobre el rol del sistema inteligente como asistencia de producto, no como reglas duras del dominio. **A11:** Sección 8 — nota de implementación con hitos internos (que **no constituyen sub-fases del producto ni alteran el alcance comprometido**). **Consecuencia de D4:** Sección 7 Dependencias externas — agregada segunda relación con sub-dominios consumidores transaccionales como fuente consultable de la última imputación por unidad, requerida para validar la `fechaEfectiva` en reestructuraciones (R25/I08). |
