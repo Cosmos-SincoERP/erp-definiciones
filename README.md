@@ -123,7 +123,8 @@ erp-definiciones/
 ├── guias-de-modelado/               ← Criterios transversales
 │   ├── arquitectura-eda.md
 │   ├── modelar-agregados.md
-│   └── separacion-responsabilidades.md
+│   ├── separacion-responsabilidades.md
+│   └── datos-entre-dominios.md
 │
 ├── auditoria/                       ← Reportes de las skills de auditoría
 ├── fuentes/                         ← Referencias externas (PDFs, papers)
