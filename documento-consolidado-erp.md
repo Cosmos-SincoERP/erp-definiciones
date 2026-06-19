@@ -254,7 +254,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Estado:** Alcance v1.2, modelo v1.4 (junio 2026). Auditoría completa (101 hallazgos) + rondas de refinamiento aplicadas. Listo para desarrollo F1.
 
-> Detalle: [`dominio/estructura-organizacional/definicion-alcance.md`](dominio/estructura-organizacional/definicion-alcance.md), [`dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md`](dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md), [`dominio/estructura-organizacional/anexo-orquestacion-creacion.md`](dominio/estructura-organizacional/anexo-orquestacion-creacion.md)
+> Detalle: [`dominio/estructura-organizacional/definicion-alcance.md`](dominio/estructura-organizacional/definicion-alcance.md), [`dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md`](dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md)
 
 ---
 
@@ -734,7 +734,6 @@ Un cliente puede empezar con un producto y escalar sin fricción. Cada módulo s
 | [`dominio/estructura-organizacional/definicion-alcance.md`](dominio/estructura-organizacional/definicion-alcance.md) | Alcance Estructura Organizacional (v1.2): glosario, actores, flujos, reglas |
 | [`dominio/estructura-organizacional/anexo-definicion-contexto-inicial.md`](dominio/estructura-organizacional/anexo-definicion-contexto-inicial.md) | Definición inicial de contexto (preexistente al alcance formal) |
 | [`dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md`](dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md) | Cuatro decisiones arquitectónicas: codificación plana + jerarquía versionada, FSM 4 estados, fusión/división/traslado como eventos, multi-dimensionalidad |
-| [`dominio/estructura-organizacional/anexo-orquestacion-creacion.md`](dominio/estructura-organizacional/anexo-orquestacion-creacion.md) | Patrón BFF + estado `Borrador` para creación de unidades desde sub-dominios consumidores |
 | [`compartido/datos-referencia/definicion-alcance.md`](compartido/datos-referencia/definicion-alcance.md) | Alcance Datos de Referencia (v2.0 — producción de catálogos + tasas de cambio) |
 | [`compartido/nuggets/gobernanza-nuggets.md`](compartido/nuggets/gobernanza-nuggets.md) | Gobernanza de Nuggets: filtros de admisión, proceso con custodio, versionado |
 | [`compartido/nuggets/catalogo-nuggets.md`](compartido/nuggets/catalogo-nuggets.md) | Catálogo de Nuggets (7 aceptados en borrador) |
