@@ -638,7 +638,7 @@ Escenario en el que dos o más unidades organizacionales se integran en una sola
  │   · destino en Activa y distinta del       │
  │     conjunto origen                        │
  │   · fecha efectiva no anterior a la        │
- │     última transacción registrada en       │
+ │     versión vigente de jerarquía de        │
  │     las unidades origen                    │
  └──────────────────────┬─────────────────────┘
                         │
@@ -661,7 +661,7 @@ Escenario en el que dos o más unidades organizacionales se integran en una sola
 ```
 
 - **Actor principal:** Administrador de estructura organizacional.
-- **Pre-condiciones:** todas las unidades origen están en `Activa` o `Suspendida`; el destino existe en `Activa` y no está en el conjunto origen; la fecha efectiva no es anterior a la última transacción registrada en alguna unidad origen.
+- **Pre-condiciones:** todas las unidades origen están en `Activa` o `Suspendida`; el destino existe en `Activa` y no está en el conjunto origen; la fecha efectiva no es anterior a la versión vigente de jerarquía (validable localmente). Su coherencia con la actividad transaccional la rinde el administrador, no es un bloqueo del sistema (R25 relajada, issue #56).
 - **Eventos emitidos:** `UnidadFusionada` (una vez, evento de proceso) + `UnidadInactivada` por cada unidad origen (con `motivoBaja: "fusion"` y referencia al destino).
 - **Estado resultante:** las unidades origen quedan en `Inactiva` con `motivoBaja: "fusion"`; la unidad destino mantiene su estado `Activa` y absorbe las nuevas imputaciones desde la fecha efectiva.
 
@@ -698,7 +698,7 @@ Escenario en el que una unidad organizacional se separa en varias unidades desti
  │   · al menos dos destinos, todos en        │
  │     Activa y distintos del origen          │
  │   · fecha efectiva no anterior a la        │
- │     última transacción registrada en       │
+ │     versión vigente de jerarquía de        │
  │     la unidad origen                       │
  └──────────────────────┬─────────────────────┘
                         │
@@ -721,7 +721,7 @@ Escenario en el que una unidad organizacional se separa en varias unidades desti
 ```
 
 - **Actor principal:** Administrador de estructura organizacional.
-- **Pre-condiciones:** la unidad origen está en `Activa` o `Suspendida`; existen al menos dos unidades destino, todas en `Activa`, distintas del origen; la fecha efectiva no es anterior a la última transacción registrada en el origen.
+- **Pre-condiciones:** la unidad origen está en `Activa` o `Suspendida`; existen al menos dos unidades destino, todas en `Activa`, distintas del origen; la fecha efectiva no es anterior a la versión vigente de jerarquía (validable localmente). Su coherencia con la actividad transaccional la rinde el administrador, no es un bloqueo del sistema (R25 relajada, issue #56).
 - **Eventos emitidos:** `UnidadDividida` (una vez, evento de proceso) + `UnidadInactivada` por la unidad origen (con `motivoBaja: "division"` y referencia a los destinos).
 - **Estado resultante:** la unidad origen queda en `Inactiva` con `motivoBaja: "division"`; las unidades destino mantienen su estado `Activa` y reciben las nuevas imputaciones desde la fecha efectiva. El historial previo a la fecha efectiva permanece referenciado al origen.
 
@@ -865,7 +865,6 @@ Los consumidores **operan contra su copia local** de unidades y **nunca consulta
 | Origen | Dato | Propósito |
 |--------|------|-----------|
 | **Sub-dominios consumidores** (OXP, Contabilidad, y futuros) | Señal de demanda de una unidad inexistente (no bloqueante) | Hacer visible al administrador que un consumidor necesitó una unidad que no existe, como sugerencia de creación (R30). No es un comando de creación ni bloquea al consumidor. |
-| **Sub-dominios consumidores** | Eventos de imputación a unidades | Alimentar la **proyección de última imputación por unidad** que Estructura Organizacional usa para validar la fecha efectiva de reestructuraciones (R25/I08) — sin consultar a los consumidores en caliente (ver Sección 7 y `[SI10]`). |
 
 **Consultas mínimas esperadas** (para administración, reportería y resincronización — **no** para el flujo transaccional de los consumidores, que usan su copia local):
 
@@ -900,35 +899,33 @@ Los consumidores **operan contra su copia local** de unidades y **nunca consulta
 ```
                     ┌──────────────────────────────────┐
                     │  Estructura Organizacional       │
-                    │  (propietario de la estructura   │
+                    │  (dueño de la estructura         │
                     │   jerárquica y su ciclo de vida) │
                     │                                  │
                     │  · Catálogo de tipos: interno    │
                     │  · Motivos de baja: literales    │
-                    └──────────────┬───────────────────┘
-                                   │
-       ┌─────────────────┬──────────┴───────┬──────────────────┐
-       │                 │                  │                  │
-  Eventos del      Eventos de         Señal de demanda    Punto de
-  ciclo de vida    imputación         (no bloqueante)     resincronización
-  ─────────►       ◄─────────         ◄─────────          ◄───────── (de fondo)
-       │                 │                  │                  │
-       ▼                 ▼                  ▼                  ▼
-       ┌─────────────────────────────────────────────────────┐
-       │                                                     │
-       │   Sub-dominios consumidores                         │
-       │                                                     │
-       │   F1: OXP, Contabilidad                             │
-       │   F2+: otros sub-dominios que se incorporen         │
-       │                                                     │
-       │   Cada uno:                                         │
-       │    · OPERA contra su copia local de unidades        │
-       │    · reacciona a eventos según su contexto          │
-       │    · hace visible la demanda de una unidad faltante │
-       │    · emite eventos de imputación (última imputación)│
-       │    · NO consulta a Estructura Org. en el camino     │
-       │      crítico de operar                              │
-       └─────────────────────────────────────────────────────┘
+                    └────────────────┬─────────────────┘
+                                     │
+            ┌────────────────────────┼────────────────────────┐
+            │                        │                         │
+      Eventos del              Señal de demanda          Punto de
+      ciclo de vida            (no bloqueante)            resincronización
+      ─────────►               ◄─────────                ◄───────── (de fondo)
+            │                        │                         │
+            ▼                        ▼                         ▼
+       ┌──────────────────────────────────────────────────────────┐
+       │   Sub-dominios consumidores                              │
+       │                                                          │
+       │   F1: OXP, Contabilidad                                  │
+       │   F2+: otros sub-dominios que se incorporen              │
+       │                                                          │
+       │   Cada uno:                                              │
+       │    · OPERA contra su copia local de unidades             │
+       │    · reacciona a eventos según su contexto               │
+       │    · hace visible la demanda de una unidad faltante      │
+       │    · NO consulta a Estructura Org. en el camino          │
+       │      crítico de operar                                   │
+       └──────────────────────────────────────────────────────────┘
 ```
 
 ### Notas de la primera fase
@@ -998,7 +995,7 @@ Las reglas se numeran `[R##]` y se organizan por tema operativo.
 | R22 | **Destino debe existir y estar `Activa`** | En F12 (Fusión) y F13 (División), las unidades destino deben existir y estar en estado `Activa` antes de iniciar el proceso. La creación de la unidad destino y la reestructuración son flujos separados. | No |
 | R23 | **Origen en `Activa` o `Suspendida`** | En F12 y F13, las unidades origen deben estar en `Activa` o `Suspendida`. Las unidades en `Borrador`, `Inactiva` o `Descartada` no se reestructuran. | No |
 | R24 | **Destino distinto del conjunto origen** | En F12, la unidad destino no puede estar dentro del conjunto de unidades origen. En F13, la unidad origen no puede estar dentro del conjunto de unidades destino. | No |
-| R25 | **Fecha efectiva no anterior al historial** | La fecha efectiva de una reestructuración (F12, F13, F14) no puede ser anterior a la fecha de la última transacción registrada en las unidades involucradas ni a la versión vigente de jerarquía. | No |
+| R25 | **Fecha efectiva coherente con la jerarquía vigente** | La fecha efectiva de una reestructuración (F12, F13, F14) no puede ser anterior a la versión vigente de jerarquía de las unidades involucradas — Estructura Organizacional lo valida localmente (es dueña de la jerarquía). Su coherencia con la última transacción registrada en las unidades **es responsabilidad del administrador** que ejecuta la reestructuración, **no un bloqueo del sistema**: las transacciones/asientos son inmutables y los reportes ofrecen vista actual/histórica (relajado en el issue #56 — Estructura Organizacional no importa ni valida la última imputación). | No |
 | R26 | **Motivo de baja proyectado** | Las unidades que pasan a `Inactiva` o `Descartada` llevan en el modelo de lectura un atributo `motivoBaja` que permite identificar la causa de la baja. Para unidades `Inactiva`, los valores son `operativa`, `fusion` o `division`, según el flujo que originó la inactivación. Para unidades `Descartada`, los valores son `operativa` cuando corresponde a rechazo manual del administrador, o `abandono_por_inactividad` cuando corresponde a descarte automático o descarte por cascada de inactivación de grupo. Los valores son literales fijos del dominio. | No |
 | R27 | **Historial referenciado al origen** | En F12 y F13, el historial transaccional previo a la fecha efectiva permanece referenciado a las unidades origen. Las unidades destino arrancan limpias y solo reciben las nuevas imputaciones desde la fecha efectiva. | No |
 | R28 | **Traslado preserva identidad** | El traslado de una unidad (F14) conserva su identidad, código, estado e historial transaccional. Solo cambia su posición en el árbol y la versión vigente de jerarquía. | No |
@@ -1049,7 +1046,6 @@ Estructura Organizacional **no** asume las siguientes responsabilidades — pert
 | Dependencia | Descripción | Impacto en Estructura Organizacional |
 |-------------|-------------|--------------------------------------|
 | **Sub-dominios consumidores** (OXP, Contabilidad en F1; otros que se incorporen en fases posteriores) | Sub-dominios que consumen unidades organizacionales para imputar transacciones y reaccionan a los eventos del ciclo de vida y de reestructuración. | Operan contra su copia local de unidades; hacen visible la demanda de unidades inexistentes como sugerencia no bloqueante; son notificados de los cambios para mantener consistencia. La existencia operativa de Estructura Organizacional cobra valor solo cuando hay al menos un consumidor (OXP o Contabilidad en F1). |
-| **Sub-dominios consumidores transaccionales** (OXP, Contabilidad; otros que registren imputaciones por unidad) — segunda relación, además de la principal de emisión/recepción de eventos | Eventos de imputación por unidad organizacional. | Estructura Organizacional mantiene una **proyección local de última imputación por unidad** alimentada por estos eventos — **no consulta a los consumidores en caliente** (ver [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md)). Usa esa proyección para validar que la `fechaEfectiva` de una reestructuración (`F12`/`F13`/`F14`) no sea anterior al historial (regla R25, invariante I08). El mecanismo se materializa en el modelo (`[SI10]`); si la proyección está desfasada, aplica la reconciliación de respaldo. |
 
 ---
 
@@ -1122,4 +1118,5 @@ Las capacidades adicionales que el sub-dominio pueda soportar en el futuro (acti
 | **1.0** | **2026-05-27** | **Sección 9 — Beneficios esperados cerrada. Alcance completo, listo para Fase 2 (modelo de dominio).** 10 beneficios en formato tabla `# / Beneficio / Problema que resuelve` alineado con Terceros (los primeros 6 enlazan 1:1 con los 6 problemas originales de Sección 1; los 4 últimos son beneficios transversales derivados de las decisiones arquitectónicas: estados explícitos, IFRS 8, reapertura, multi-dimensionalidad preparatoria). Sin indicadores de éxito / KPIs — alineado con todos los demás sub-dominios del proyecto (no aplican naturalmente a sub-dominios de definición/configuración). |
 | 1.1 | 2026-05-28 | Ajuste editorial menor por auditoría Bloque Baja (B7) del modelo de dominio: glosario término 22 "Unidad de imputación" — agregada nota explícita de que en los documentos de dominio de Estructura Organizacional se prefiere el término "unidad organizacional" y el sinónimo solo se registra para referencia cruzada con sub-dominios consumidores. |
 | 1.3 | 2026-06-19 | **Replanteamiento — eliminación de acoplamientos de ejecución y proceso con los consumidores (issue #45/#46).** La creación de unidades desde consumidores deja de ser un flujo bloqueante: el consumidor opera contra su **copia local** y nunca consulta a Estructura Organizacional en el camino crítico; cuando necesita una unidad inexistente, su operación **no se detiene** (difiere lo que la requiere) y la necesidad se hace visible como **sugerencia no bloqueante**. Flujo 2 reescrito; R29 (era 'solicitudes entran en Borrador') y R30 (era 'descarte cancela en cascada') reescritas como 'operación sin bloqueo' y 'demanda no bloqueante'; R13 aclarada (validación contra copia local); glosario de `Borrador` acotado a preparación del administrador; Sección 5 (principio, integraciones, diagrama) alineada — entra el punto de resincronización y los eventos de imputación, salen la solicitud bloqueante y la consulta en caliente del flujo transaccional; Sección 7 (H2) — la última imputación pasa de consulta federada a **proyección local por eventos**. Fundamento en `guias-de-modelado/datos-entre-dominios.md`. Acompaña al modelo de dominio (Hito 2). |
+| 1.4 | 2026-06-19 | **Consistencia del modelo de comunicación — relajación de R25 (issue #56).** `R25` pasa de *fecha efectiva no anterior al historial* (bloqueo validado contra la última transacción) a **coherente con la jerarquía vigente**: EO valida localmente que la fecha no sea anterior a la versión vigente de jerarquía; la coherencia con la actividad transaccional es **responsabilidad del administrador**, no un bloqueo del sistema (transacciones inmutables + vista actual/histórica). Se **retira la integración entrante de eventos de imputación** y la dependencia de la Sección 7 correspondiente (EO ya no mantiene proyección de última imputación, `[SI10]` retirada en el modelo); el **diagrama de integraciones pasa de 4 a 3 flujos**; precondiciones de F12/F13 relajadas. Acompaña al modelo v1.6 (`[SI10]` retirada, `[I08]` reformulada). |
 | 1.2 | 2026-05-28 | **Aplicados 11 ajustes del comité de producto (A1-A11) + consecuencia de D4.** **A1:** Sección 1 — sustituido "estructura jerárquica de dos niveles" por "dos tipos de nodo" con aclaración de jerarquía multinivel mediante grupos anidados. **A2:** Sección 5 (nota de conteo) y Sección 8 capacidad 8 — distinguido entre 18 eventos totales y 15 relevantes para consumidores transaccionales en F1. **A3:** Flujo 15 — precondiciones diferenciadas por tipo de nodo (grupos `Inactivo` sí admiten modificación); R17 mantenida solo para unidades. **A4:** R26 ampliada para cubrir unidades `Descartada` y motivo `abandono_por_inactividad`. **A5:** R3 "grupo raíz protegido" + Flujo 10 alineado ("raíz con contenido"). **A6:** glosario término División — eliminada la idea de distribución del historial. **A7:** Sección 5 — agregada precisión sobre responsabilidad de consumidores en reestructuración (reasignación/reclasificación es suya, no de Estructura Organizacional). **A8:** Sección 5 — lista de 10 consultas mínimas esperadas (incluye consultar historial de reestructuración mediante el identificador del proceso correspondiente — lenguaje funcional). **A9:** Sección 7 dentro del alcance — agregada responsabilidad "Control de autorización funcional" (permisos atómicos). **A10:** Sección 4 — nota sobre el rol del sistema inteligente como asistencia de producto, no como reglas duras del dominio. **A11:** Sección 8 — nota de implementación con hitos internos (que **no constituyen sub-fases del producto ni alteran el alcance comprometido**). **Consecuencia de D4:** Sección 7 Dependencias externas — agregada segunda relación con sub-dominios consumidores transaccionales como fuente consultable de la última imputación por unidad, requerida para validar la `fechaEfectiva` en reestructuraciones (R25/I08). |
