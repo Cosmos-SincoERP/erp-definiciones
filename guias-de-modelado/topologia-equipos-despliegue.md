@@ -82,7 +82,66 @@ La elección del intermediario es una decisión **aparte de la topología**: se 
 
 ---
 
-## 5. Gobierno de DevOps
+## 5. Alternativas concretas de estructura (cómputo y mensajería)
+
+"Separación física" suele mezclar **dos preguntas distintas** que conviene desenredar antes de decidir:
+
+- **Cómputo:** ¿dónde corre cada servicio? (máquina / cluster / contenedor)
+- **Mensajería:** ¿cómo viajan los eventos entre servicios? (el broker / bus)
+
+"Cada servicio en su máquina" es una decisión de **cómputo**; "su propio broker" es una de **mensajería**. Una **no** implica la otra: se puede tener cada servicio en su propia máquina y, aun así, **un solo bus compartido**.
+
+> Un **bus compartido no contradice** la separación física: es justamente lo que permite que servicios separados se hablen. No es una concesión ni un parche; es el patrón correcto. Lo problemático sería un **broker por servicio** (ver anti-patrones).
+
+### Eje 1 — Cómputo (dónde corre cada servicio)
+
+De más compartido/barato a más aislado/caro:
+
+| Opción | Cómo se ve | Costo | Aislamiento |
+|---|---|---|---|
+| **A. Cluster compartido, un contenedor por servicio** | Un orquestador (tipo Kubernetes / Azure Container Apps) corre los contenedores; comparten el cómputo del cluster | Bajo | Lógico (contenedor), comparten máquina |
+| **B. Cluster compartido, recursos reservados por servicio** | Mismo cluster, cada servicio con su cuota/nodo asignado | Medio | Mayor: un servicio pesado no ahoga a los otros |
+| **C. Una máquina (VM) dedicada por servicio** | Cada servicio en su propia máquina | Alto | Físico por servicio |
+| **D. Una suscripción/cuenta cloud por servicio** | Cada servicio en su propio compartimento de la nube | Muy alto | Máximo (facturación, accesos, todo separado) |
+
+### Eje 2 — Mensajería (cómo viajan los eventos)
+
+| Opción | Cómo se ve | Veredicto |
+|---|---|---|
+| **1. Un solo bus compartido** | Un broker (ej. un namespace de Azure Service Bus); cada servicio publica en **su** tópico y se suscribe a los que le interesan | ✅ Recomendado |
+| **2. Bus compartido con aislamiento lógico** | Mismo broker, con tópicos/colas separados y permisos por dominio | ✅ Válido, más control de accesos |
+| **3. Un broker por servicio + puentes** | Cada servicio con su propio broker, conectados entre sí | ❌ Anti-patrón: reintroduce el problema de integración |
+
+### Cómo se combinan — la estructura recomendada
+
+Los dos ejes se combinan libremente. La recomendación: separación lógica + de despliegue (un contenedor y datos propios por servicio, cualquiera de A–D) sobre **un solo bus compartido** (opción 1 o 2). El bus sigue siendo uno solo corra el contenedor en cluster compartido (A/B) o en máquina dedicada (C).
+
+```
+        ┌──────────── BUS DE EVENTOS COMPARTIDO (uno solo) ────────────┐
+        │   tópico OXP · tópico Contab · tópico Impuestos · ...         │
+        └───▲────────────▲──────────────▲──────────────▲───────────▲───┘
+            │            │              │              │           │
+        ┌───┴───┐   ┌────┴────┐   ┌─────┴────┐   ┌─────┴────┐  ┌───┴───┐
+        │  OXP  │   │ Contab. │   │ Impuestos│   │ Terceros │  │  EO   │
+        └───────┘   └─────────┘   └──────────┘   └──────────┘  └───────┘
+        contenedor   contenedor    contenedor     contenedor   contenedor
+        + datos      + datos       + datos        + datos      + datos
+        propios      propios       propios        propios      propios
+```
+
+### Preguntas para definir con el equipo de plataforma
+
+Para cerrar la duda con la información real del aprovisionamiento:
+
+1. **¿"Máquina por servicio" es una VM dedicada (opción C) o son contenedores en un cluster compartido (A/B)?** — define el costo real.
+2. **El bus montado, ¿es uno solo compartido para todos los servicios (opción 1) o cada servicio tiene el suyo?** — confirma que no se cayó en la opción 3.
+3. **Si es Azure Service Bus: ¿es un solo namespace con un tópico por servicio?** — esa es la forma sana.
+4. **¿El bus es administrado (lo opera el proveedor) o se pensaba autooperar algo tipo RabbitMQ?** — define quién carga con operarlo (ver sección 4).
+5. **¿Cada servicio tiene su propia base de datos/almacenamiento, separado del de los demás?** — es lo innegociable: nadie toca la base del otro.
+
+---
+
+## 6. Gobierno de DevOps
 
 El gobierno de DevOps recae en el **equipo de producto** ("tú lo construyes, tú lo operas"), con el apoyo de un **equipo de plataforma** que diseña el mecanismo de aprovisionamiento (autoservicio, plantillas, guardarraíles) y lo entrega a los microequipos, de forma que cada equipo entienda la responsabilidad sobre cada componente que necesite aprovisionar.
 
@@ -90,7 +149,7 @@ La intención de la separación a futuro es que **microequipos administren los s
 
 ---
 
-## 6. Empaque comercial: el paquete mínimo vendible
+## 7. Empaque comercial: el paquete mínimo vendible
 
 El empaque comercial **no** define fronteras de servicio: define qué debe poder correr y licenciarse junto. Se resuelve por **licenciamiento / activación por configuración**, no por topología. El mismo conjunto de servicios separados se empaqueta como un SKU u otro prendiendo o apagando piezas.
 
@@ -99,7 +158,7 @@ El empaque comercial **no** define fronteras de servicio: define qué debe poder
 
 ---
 
-## 7. Anti-patrones
+## 8. Anti-patrones
 
 | Anti-patrón | Por qué es malo |
 |---|---|
@@ -112,7 +171,7 @@ El empaque comercial **no** define fronteras de servicio: define qué debe poder
 
 ---
 
-## 8. Caso aplicado: estado actual del ERP
+## 9. Caso aplicado: estado actual del ERP
 
 Los cinco servicios están en **contenedores independientes** (OXP, Contabilidad, Impuestos, Terceros, EO) sobre **un único bus de eventos compartido**. La separación arquitectónica de los cinco va completa desde el día uno; la operación/equipo propios se gradúan servicio por servicio con los criterios de la sección 3.
 
@@ -137,7 +196,7 @@ Matiz sobre "qué está vivo": como OXP no se vende sin los demás, los cinco es
 
 ---
 
-## 9. Relación con otras guías
+## 10. Relación con otras guías
 
 - **[`datos-entre-dominios.md`](datos-entre-dominios.md)** — la cara lógica del mismo problema: cómo un consumidor usa datos de otro dominio sin acoplar disponibilidad (dueño único, réplica local, eventos). Esta guía asume ese diseño y trata cómo se empaquetan y operan los servicios.
 - **[`arquitectura-eda.md`](arquitectura-eda.md)** — los mecanismos de mensajería que el backbone de eventos usa.
@@ -149,3 +208,4 @@ Matiz sobre "qué está vivo": como OXP no se vende sin los demás, los cinco es
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
 | 1.0 | Junio 2026 | Versión inicial. Surge del análisis de infraestructura de los sub-dominios del ERP. Consolida: las tres decisiones ortogonales (frontera lógica vs. topología, topología vs. broker, empaque vs. fronteras de servicio), las cuatro capas de separación con su costo, los ocho criterios para graduar un servicio a operación independiente, el backbone de eventos único y la elección administrado vs. autooperado, el gobierno de DevOps (producto + plataforma), el paquete mínimo vendible, anti-patrones y el caso aplicado del estado actual del ERP (cinco servicios en contenedores sobre un bus compartido). |
+| 1.1 | Junio 2026 | Nueva sección 5 "Alternativas concretas de estructura (cómputo y mensajería)" para analizar con el equipo de plataforma: desenreda cómputo vs. mensajería, menú del eje de cómputo (A–D), menú del eje de mensajería (1–3), diagrama de la estructura recomendada (bus compartido único + contenedor y datos propios por servicio) y cinco preguntas para definir con plataforma a partir del aprovisionamiento real. Renumeradas las secciones siguientes. |
