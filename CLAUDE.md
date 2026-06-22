@@ -8,12 +8,13 @@ Definición de los sub-dominios de un ERP mediante documentos de diseño convers
 
 | Carpeta | Sub-dominio | Estado |
 |---------|-------------|--------|
-| `dominio/obligaciones-por-pagar/` | Obligaciones por Pagar | En refinamiento (Fase 2) |
-| `dominio/impuestos/` | Impuestos | Modelo v1.3 completo |
-| `dominio/contabilidad/` | Contabilidad (Nivel 1: Motor de Traducción + Nivel 2: Sistema contable) | Alcance v1.0, Modelo v1.0 — Listo para desarrollo (F1) |
-| `dominio/terceros/` | Terceros (bodega consolidadora — replanteamiento jun-2026) | Alcance v2.0, Modelo v2.0.2 — 2 auditorías aplicadas, listo para desarrollo (F1) |
-| `dominio/estructura-organizacional/` | Estructura Organizacional | Definición inicial |
-| `compartido/datos-referencia/` | Datos de Referencia (catálogos base del ERP) | Alcance v1.0, Especificación v1.0 — Listo para desarrollo |
+| `dominio/obligaciones-por-pagar/` | Obligaciones por Pagar (OXP) | Alcance v1.15, Modelo v4.3 — Fase 2 (refinamiento continuo) |
+| `dominio/impuestos/` | Impuestos | Alcance v1.5, Modelo v2.0.5 — Listo para desarrollo (F1); multi-país CO/DO/PA + catálogos precargados |
+| `dominio/contabilidad/` | Contabilidad (Nivel 1: Motor de Traducción + Nivel 2: Sistema contable) | Alcance v1.10, Modelo v1.9 — N1 listo para desarrollo (F1); N2 (F2) |
+| `dominio/terceros/` | Terceros (bodega consolidadora — replanteamiento #31) | Alcance v2.0, Modelo v2.0.2 — listo para desarrollo (F1) |
+| `dominio/estructura-organizacional/` | Estructura Organizacional | Alcance v1.4, Modelo v1.6 — replanteamiento #45 (copia local + diferir + señal), listo para desarrollo (F1) |
+| `compartido/datos-referencia/` | Datos de Referencia (catálogos base del ERP) | Alcance v2.0 — replanteamiento jun-2026 (catálogos como Nuggets + tasas de cambio) |
+| `compartido/nuggets/` | Nuggets (value objects transversales empaquetados: identificación legal, dirección, contacto, país, moneda, etc.) | Catálogo + gobernanza — 8 nuggets aceptados (replanteamiento #31) |
 | `compartido/asistente-onboarding/` | Asistente de Onboarding (caso PUC en v1.0; transversal a otros casos futuros) | Alcance v1.0, Modelo v1.0, Caso PUC v1.0 — Listo para desarrollo (F1) |
 | *(pendiente)* | Tesorería | No iniciado |
 | *(pendiente)* | Emisión Electrónica | No iniciado |
@@ -46,12 +47,12 @@ Skills especializadas para generar EventCatalog desde el modelo de dominio. No i
 | Directorio | Propósito |
 |------------|-----------|
 | `dominio/` | Bounded contexts de negocio. Cada sub-dominio con su alcance y modelo. |
-| `compartido/` | Servicios compartidos del application plane que no son dominio de negocio. |
+| `compartido/` | Servicios compartidos del application plane que no son dominio de negocio: `datos-referencia/`, `nuggets/` (value objects transversales empaquetados), `asistente-onboarding/`. |
 | `integraciones/entre-dominios/` | Contratos de integración entre sub-dominios propios. |
 | `integraciones/externas/` | Conectores y contratos con sistemas de terceros. |
 | `plataforma-saas/` | Control plane (futuro): tenant management, identity, billing, admin. |
 | `plantillas/` | Plantillas base para crear nuevos sub-dominios y servicios. |
-| `guias-de-modelado/` | Criterios generales de modelado (aplican a todos los sub-dominios). |
+| `guias-de-modelado/` | Criterios generales de modelado (aplican a todos los sub-dominios): `arquitectura-eda.md`, `modelar-agregados.md`, `separacion-responsabilidades.md`, `datos-entre-dominios.md` (dato con dueño único consumido por copia local entre dominios), `topologia-equipos-despliegue.md`. |
 | `fuentes/` | Material de referencia externo (PDFs, papers). |
 | `auditoria/` | Reportes generados por las skills de auditoría. |
 
