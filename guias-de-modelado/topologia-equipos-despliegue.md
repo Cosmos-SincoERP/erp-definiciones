@@ -129,15 +129,71 @@ Los dos ejes se combinan libremente. La recomendación: separación lógica + de
         propios      propios       propios        propios      propios
 ```
 
-### Preguntas para definir con el equipo de plataforma
+### Decisión verificada contra la infraestructura real (jun-2026)
 
-Para cerrar la duda con la información real del aprovisionamiento:
+Las cinco preguntas que esta sección dejaba abiertas ya tienen respuesta. Se validó el Terraform real de los repos `*.Infraestructura` (`ApplicationPlane`, `ObligacionesPorPagar`, `Cosmos.Impuestos`, `Cosmos.Contabilidad`, `Cosmos.Terceros`, `Cosmos.Asistente`) y los ADR del repo `architecture` —sobre todo `ADR-001` (BC aislados por VNet/RG/VM-Swarm) y `ADR-002` (Service Bus único cross-BC). **La clave es que la unidad de aislamiento físico es el bounded context, no el servicio.**
 
-1. **¿"Máquina por servicio" es una VM dedicada (opción C) o son contenedores en un cluster compartido (A/B)?** — define el costo real.
-2. **El bus montado, ¿es uno solo compartido para todos los servicios (opción 1) o cada servicio tiene el suyo?** — confirma que no se cayó en la opción 3.
-3. **Si es Azure Service Bus: ¿es un solo namespace con un tópico por servicio?** — esa es la forma sana.
-4. **¿El bus es administrado (lo opera el proveedor) o se pensaba autooperar algo tipo RabbitMQ?** — define quién carga con operarlo (ver sección 4).
-5. **¿Cada servicio tiene su propia base de datos/almacenamiento, separado del de los demás?** — es lo innegociable: nadie toca la base del otro.
+| # | Pregunta | Respuesta verificada |
+|---|---|---|
+| 1 | ¿VM dedicada (C) o cluster compartido (A/B)? | **Híbrido por nivel.** Cada BC = **1 VM dedicada con Docker Swarm** (opción C a nivel BC); dentro, los varios servicios del BC corren como contenedores que comparten esa VM-Swarm (opción A/B a nivel servicio). "VM por servicio" se descartó por costo (ADR-001). En prod la VM-Swarm pasa de single-node a 3 nodos (HA). |
+| 2 | ¿Un bus compartido o uno por servicio? | **Un solo bus compartido para lo inter-BC** (ADR-002). El "bus federado por BC" se descartó explícitamente. |
+| 3 | Si Azure SB: ¿un namespace con tópico por servicio? | **Un namespace, tópico por bounded context** (`<contexto>.events`), no por servicio. ⚠️ Esos tópicos están diseñados pero **aún no creados** en Azure/TF (solo existe el tópico de *provisioning de suscripciones*). |
+| 4 | ¿Administrado o autooperado? | **Inter-BC: administrado** (Azure Service Bus, SKU Standard). **Intra-BC: autooperado** (RabbitMQ + Redis en la VM-Swarm de cada BC). Auth hoy por SAS; el plan es migrar a Managed Identity (ADR-004). |
+| 5 | ¿BD separada por servicio? | **1 PostgreSQL Flexible por BC** (sin BD compartida — ADR-001) y **una base por servicio dentro del server** (ej. OXP: `entradasdb`, `radicaciondb`, `radicaciondb_vectorial`, `reconocimientodb`). Nadie toca la base de otro BC. |
+
+**Dos niveles de mensajería, deliberados** (y ninguno es el anti-patrón de la sección 8):
+
+- **Intra-BC** — entre los servicios de un mismo BC: RabbitMQ + Redis propios del BC, en su red overlay privada (`<bc>-internal`); no se exponen fuera del bounded context.
+- **Inter-BC** — entre bounded contexts: **el único** Service Bus compartido, topic por BC, con MassTransit. Llamadas síncronas cross-BC prohibidas (ADR-001/ADR-002).
+
+El RabbitMQ-por-BC **no** contradice el "un solo bus" de la sección 4: solo hace plomería interna del BC, no integración cross-BC.
+
+### Cómo quedó montado (estado real verificado)
+
+```
+                         Usuarios del ERP (HTTPS)
+                                   │
+                        ┌──────────▼──────────┐
+                        │   Azure Front Door  │   edge (application-plane)
+                        └──────────┬──────────┘
+                                   │  /api/*
+                        ┌──────────▼──────────┐
+                        │   VM Gateway YARP   │   Docker Swarm
+                        │  (application-plane)│
+                        └──────────┬──────────┘
+                                   │  enruta al BC que corresponde
+         ┌─────────────────┬───────┴────────┬─────────────────┐
+         ▼                 ▼                ▼                 ▼
+   ┌───────────┐     ┌───────────┐    ┌───────────┐    ┌───────────┐
+   │  BC OXP   │     │ Impuestos │    │Contabilid.│    │ Terceros  │
+   │ VM+Swarm  │     │ VM+Swarm  │    │ VM+Swarm  │    │ VM+Swarm  │
+   │           │     │           │    │           │    │           │
+   │ servicios │     │ servicios │    │ servicios │    │ servicios │
+   │ del BC    │     │ del BC    │    │ del BC    │    │ del BC    │
+   │ ········· │     │ ········· │    │ ········· │    │ ········· │
+   │ RabbitMQ  │     │ RabbitMQ  │    │ RabbitMQ  │    │ RabbitMQ  │
+   │ + Redis   │     │ + Redis   │    │ + Redis   │    │ + Redis   │
+   │ (interno) │     │ (interno) │    │ (interno) │    │ (interno) │
+   │ ········· │     │ ········· │    │ ········· │    │ ········· │
+   │ Postgres  │     │ Postgres  │    │ Postgres  │    │ Postgres  │
+   │ (N bases) │     │ (1 base)  │    │ (1 base)  │    │ (2 bases) │
+   └─────┬─────┘     └─────┬─────┘    └─────┬─────┘    └─────┬─────┘
+         │                 │                │                │
+         │   publican / se suscriben a eventos de dominio    │
+         ▼                 ▼                ▼                 ▼
+   ╔═══════════════════════════════════════════════════════════════╗
+   ║  AZURE SERVICE BUS — ÚNICO, compartido (application-plane)     ║
+   ║  administrado · Standard · topic por BC: <contexto>.events     ║
+   ║  ⚠ tópicos de dominio diseñados (ADR-002), aún no creados      ║
+   ╚═══════════════════════════════════════════════════════════════╝
+
+   Cada BC = 1 VNet + 1 RG + 1 VM-Swarm + 1 ACR + 1 Key Vault + 1 Postgres propios.
+   Intra-BC: RabbitMQ/Redis en la red overlay privada del BC (no sale del BC).
+   Inter-BC: solo por el Service Bus compartido (sin llamadas síncronas).
+   (Asistente tiene su propia VM-Swarm con el mismo molde; EO aún no tiene infra.)
+```
+
+> **Pendiente real de implementación:** el backbone inter-BC está diseñado (ADR-002) pero los tópicos `<contexto>.events` todavía no existen en Azure ni en el Terraform activo (verificado 2026-05-14, vista `03-messaging-flow` del repo `architecture`). Hoy la infraestructura de cada BC está viva, pero los eventos de dominio entre BC aún no fluyen. Es el siguiente paso para que la integración cross-BC sea real.
 
 ---
 
@@ -173,7 +229,7 @@ El empaque comercial **no** define fronteras de servicio: define qué debe poder
 
 ## 9. Caso aplicado: estado actual del ERP
 
-Los cinco servicios están en **contenedores independientes** (OXP, Contabilidad, Impuestos, Terceros, EO) sobre **un único bus de eventos compartido**. La separación arquitectónica de los cinco va completa desde el día uno; la operación/equipo propios se gradúan servicio por servicio con los criterios de la sección 3.
+**La unidad de separación es el bounded context, no el servicio** — cada BC empaca varios servicios (OXP, por ejemplo: Entradas, Radicación, Reconocimiento, Conciliación Inteligente, Notificaciones), todos en su propia VM con Docker Swarm. Hoy tienen infraestructura aprovisionada (repo `*.Infraestructura` + VM-Swarm propia) **OXP, Impuestos, Contabilidad, Terceros y Asistente**; **Estructura Organizacional (EO) todavía no tiene repo de infraestructura**. Cada BC es autónomo en recursos (VNet, RG, VM-Swarm, ACR, Key Vault y Postgres propios — ADR-001) y se comunica con los demás **solo** por el Service Bus compartido (ADR-002). La operación/equipo propios se gradúan BC por BC con los criterios de la sección 3. El montaje real verificado y las respuestas a las cinco preguntas de aprovisionamiento están en la sección 5.
 
 Hechos comerciales que alimentan el análisis:
 
@@ -184,15 +240,16 @@ Hechos comerciales que alimentan el análisis:
 
 Mapa por servicio:
 
-| Servicio | Lógica + contenedor + bus | ¿Producto propio? | Operación / equipo propio |
+| Bounded context | Infra propia (repo + VM-Swarm + bus) | ¿Producto propio? | Operación / equipo propio |
 |---|:---:|:---:|---|
 | **OXP** | ✅ | No se vende solo (núcleo) | **Sí** — producto vivo, su equipo |
 | **Contabilidad** | ✅ | **Sí** (consolidación) | **Temprano** — se gradúa con el núcleo |
 | **Impuestos** | ✅ | **Sí** (en paquetes) | **Temprano + equipo propio** — el reloj regulatorio lo empuja primero |
 | **Terceros** | ✅ | No (soporte de datos) | Tardío — pero listo para la 1.ª venta |
-| **EO** | ✅ | No (soporte de datos) | Tardío — pero listo para la 1.ª venta |
+| **Asistente** | ✅ | No (transversal) | Según carga — no estaba en el set original de la guía |
+| **EO** | ⏳ **pendiente** (sin repo `.Infraestructura` aún) | No (soporte de datos) | Tardío — pero en la ruta crítica de la 1.ª venta |
 
-Matiz sobre "qué está vivo": como OXP no se vende sin los demás, los cinco están en la **ruta crítica de la primera venta** — todos deben estar listos para facturar. Lo que difiere no es *si* deben funcionar, sino *cuándo cada uno gana equipo y operación propios*: OXP ya; Impuestos y Contabilidad temprano por ser productos (Impuestos con equipo propio por el reloj regulatorio); Terceros y EO al final por ser soporte de datos.
+Matiz sobre "qué está vivo": como OXP no se vende sin los demás, los BC del núcleo están en la **ruta crítica de la primera venta** — todos deben estar listos para facturar. Lo que difiere no es *si* deben funcionar, sino *cuándo cada uno gana equipo y operación propios*: OXP ya; Impuestos y Contabilidad temprano por ser productos (Impuestos con equipo propio por el reloj regulatorio); Terceros y EO al final por ser soporte de datos. **EO es hoy la brecha concreta:** todavía le falta su repo `*.Infraestructura` para estar en línea con los demás.
 
 ---
 
@@ -209,3 +266,4 @@ Matiz sobre "qué está vivo": como OXP no se vende sin los demás, los cinco es
 |---------|-------|-------------|
 | 1.0 | Junio 2026 | Versión inicial. Surge del análisis de infraestructura de los sub-dominios del ERP. Consolida: las tres decisiones ortogonales (frontera lógica vs. topología, topología vs. broker, empaque vs. fronteras de servicio), las cuatro capas de separación con su costo, los ocho criterios para graduar un servicio a operación independiente, el backbone de eventos único y la elección administrado vs. autooperado, el gobierno de DevOps (producto + plataforma), el paquete mínimo vendible, anti-patrones y el caso aplicado del estado actual del ERP (cinco servicios en contenedores sobre un bus compartido). |
 | 1.1 | Junio 2026 | Nueva sección 5 "Alternativas concretas de estructura (cómputo y mensajería)" para analizar con el equipo de plataforma: desenreda cómputo vs. mensajería, menú del eje de cómputo (A–D), menú del eje de mensajería (1–3), diagrama de la estructura recomendada (bus compartido único + contenedor y datos propios por servicio) y cinco preguntas para definir con plataforma a partir del aprovisionamiento real. Renumeradas las secciones siguientes. |
+| 1.2 | Junio 2026 | Cierre de las cinco preguntas con la **infraestructura real verificada** (repos `*.Infraestructura` + ADR-001/ADR-002 del repo `architecture`). En la sección 5: las preguntas pasan a respuestas, se documentan los dos niveles de mensajería (intra-BC RabbitMQ/Redis autooperado, inter-BC Service Bus único administrado), nueva subsección "Cómo quedó montado" con el diagrama ASCII del estado real, y la advertencia de que los tópicos `<contexto>.events` están diseñados pero aún no creados. Sección 9 actualizada: la unidad de aislamiento es el **bounded context (con N servicios)**, no el servicio; set real de BC con infra (OXP, Impuestos, Contabilidad, Terceros, Asistente) y EO marcado como pendiente de repo `.Infraestructura`. |
