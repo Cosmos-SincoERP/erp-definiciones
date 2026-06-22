@@ -1,6 +1,6 @@
 # Modelo de Dominio — Estructura Organizacional
 
-**Versión:** 1.5
+**Versión:** 1.6
 **Fecha:** 2026-06-19
 
 ---
