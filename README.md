@@ -33,7 +33,7 @@ No hay código aquí. Hay **contratos de dominio**: lo que el negocio hace, cóm
    │               │       │  (el CÓMO)    │       │                │
    └───────────────┘       └───────────────┘       └────────────────┘
    definicion-            modelo-dominio.md         (pendiente)
-   alcance.md             + /audit (10 skills)
+   alcance.md             + /audit (11 skills)
 ```
 
 Cada sub-dominio atraviesa estas fases. Los artefactos quedan versionados en el repo como fuente de verdad.
@@ -68,11 +68,11 @@ en adelante cada cambio se maneja como issue para que quede trazable y justifica
 
 | Sub-dominio | Alcance | Modelo | Estado |
 |-------------|---------|--------|--------|
-| [Obligaciones por Pagar](dominio/obligaciones-por-pagar/) | ✅ v1 | ✅ v2.9 | 🟡 En refinamiento (Fase 2) |
-| [Impuestos](dominio/impuestos/) | ✅ v1.1 | ✅ v1.3 | 🟢 Completo — listo para desarrollo |
-| [Contabilidad](dominio/contabilidad/) | ✅ v1.0 | ✅ v1.0 | 🟢 Completo — listo para desarrollo (F1) |
-| [Terceros](dominio/terceros/) | ✅ v2.0 | ✅ v2.0.2 | 🟢 Bodega consolidadora (replanteamiento jun-2026) — 2 auditorías aplicadas, listo para desarrollo (F1) |
-| [Estructura Organizacional](dominio/estructura-organizacional/) | ⬜ | ⬜ | 🔴 Solo anexo de contexto |
+| [Obligaciones por Pagar](dominio/obligaciones-por-pagar/) | ✅ v1.15 | ✅ v4.3 | 🟡 En refinamiento (Fase 2) |
+| [Impuestos](dominio/impuestos/) | ✅ v1.5 | ✅ v2.0.5 | 🟢 Completo — listo para desarrollo (F1) |
+| [Contabilidad](dominio/contabilidad/) | ✅ v1.10 | ✅ v1.9 | 🟢 N1 listo para desarrollo (F1); N2 (F2) |
+| [Terceros](dominio/terceros/) | ✅ v2.0 | ✅ v2.0.2 | 🟢 Bodega consolidadora (replanteamiento #31) — listo para desarrollo (F1) |
+| [Estructura Organizacional](dominio/estructura-organizacional/) | ✅ v1.4 | ✅ v1.6 | 🟢 Replanteamiento #45 (copia local + diferir + señal) — listo para desarrollo (F1) |
 | *Tesorería* | — | — | ⚪ No iniciado |
 | *Emisión Electrónica* | — | — | ⚪ No iniciado |
 | *Recepción Electrónica* | — | — | ⚪ No iniciado |
@@ -81,8 +81,9 @@ en adelante cada cambio se maneja como issue para que quede trazable y justifica
 
 | Servicio | Estado |
 |----------|--------|
-| [Nuggets](compartido/nuggets/) (VOs transversales empaquetados: identificación legal, dirección física, teléfono, correo, país, moneda, división territorial) | 🟡 Gobernanza v1.0 + catálogo v1.5 (7 especificaciones en borrador) |
+| [Nuggets](compartido/nuggets/) (VOs transversales empaquetados: identificación legal, dirección física, teléfono, correo, país, moneda, división territorial, contacto) | 🟡 Gobernanza + catálogo — 8 nuggets aceptados (replanteamiento #31) |
 | [Datos de Referencia](compartido/datos-referencia/) (producción de catálogos + tasas de cambio) | 🟡 Alcance v2.0 (replanteamiento jun-2026) |
+| [Asistente de Onboarding](compartido/asistente-onboarding/) (caso PUC en v1.0; transversal a otros casos futuros) | 🟢 Alcance v1.0 + Modelo v1.0 + Caso PUC v1.0 — listo para desarrollo (F1) |
 | ~~Direcciones~~ | ⚫ Eliminado (jun-2026) — reemplazado por el Nugget [`DireccionFisica`](compartido/nuggets/direccion-fisica/especificacion.md) |
 
 > Los servicios compartidos viven en el *application plane* pero no son dominio de negocio. Se consumen desde los sub-dominios.
@@ -106,7 +107,8 @@ erp-definiciones/
 │
 ├── compartido/                      ← Servicios de plataforma no-negocio
 │   ├── datos-referencia/
-│   └── direcciones/
+│   ├── nuggets/                     ← Value objects transversales empaquetados
+│   └── asistente-onboarding/
 │
 ├── integraciones/
 │   ├── entre-dominios/              ← Contratos entre sub-dominios propios
@@ -124,14 +126,15 @@ erp-definiciones/
 │   ├── arquitectura-eda.md
 │   ├── modelar-agregados.md
 │   ├── separacion-responsabilidades.md
-│   └── datos-entre-dominios.md
+│   ├── datos-entre-dominios.md
+│   └── topologia-equipos-despliegue.md
 │
 ├── auditoria/                       ← Reportes de las skills de auditoría
 ├── fuentes/                         ← Referencias externas (PDFs, papers)
 │
 ├── .claude/
 │   ├── commands/                    ← /audit, /relacion-cambios
-│   └── skills/                      ← 10 skills de auditoría + orquestador
+│   └── skills/                      ← 11 skills de auditoría + orquestador + issues-crear
 │
 ├── CLAUDE.md                        ← Instrucciones operativas para la IA
 └── README.md                        ← Este archivo
@@ -273,7 +276,7 @@ pendiente postergado se maneja como **issue**, no como edición suelta.
                             ▼
 ┌─ Paso 4 ─ AUDITORÍA ─────────────────────────────────────┐
 │  /audit dominio/<nuevo-sub-dominio>/modelo-dominio.md    │
-│  → Ejecuta 10 skills de auditoría                        │
+│  → Ejecuta 11 skills de auditoría                        │
 │  → Resuelve hallazgos por severidad                      │
 └──────────────────────────────────────────────────────────┘
 ```
@@ -332,12 +335,12 @@ La segunda versión es implementable en cualquier stack — REST + SQL + Kafka, 
 
 ## 🔍 Auditoría del modelo
 
-El comando `/audit <archivo>` ejecuta 10 skills especializadas que validan distintas dimensiones:
+El comando `/audit <archivo>` ejecuta 11 skills especializadas que validan distintas dimensiones:
 
 | Dimensión | Skills |
 |-----------|--------|
 | **Estructura** | glossary · composition · state-machines · invariants |
-| **Comportamiento** | responsibilities · event-semantics · idempotency |
+| **Comportamiento** | responsibilities · event-semantics · contract-vs-internals · idempotency |
 | **Procesos** | sagas |
 | **Calidad** | open-decisions · sanity-check |
 
@@ -379,7 +382,7 @@ Los criterios transversales de modelado viven en [`guias-de-modelado/`](guias-de
 
 ## 🗺️ Próximos pasos del proyecto
 
-Ver [`plan-trabajo-abril.md`](plan-trabajo-abril.md) para el plan activo:
+Ver [`plan-trabajo-junio.md`](plan-trabajo-junio.md) para el plan activo:
 
 - **Bloque A** — Sub-dominios base bloqueantes
 - **Bloque B** — Refinamientos de OXP e Impuestos
