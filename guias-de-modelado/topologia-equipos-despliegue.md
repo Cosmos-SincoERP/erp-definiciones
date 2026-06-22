@@ -151,46 +151,34 @@ El RabbitMQ-por-BC **no** contradice el "un solo bus" de la sección 4: solo hac
 ### Cómo quedó montado (estado real verificado)
 
 ```
-                         Usuarios del ERP (HTTPS)
-                                   │
-                        ┌──────────▼──────────┐
-                        │   Azure Front Door  │   edge (application-plane)
-                        └──────────┬──────────┘
-                                   │  /api/*
-                        ┌──────────▼──────────┐
-                        │   VM Gateway YARP   │   Docker Swarm
-                        │  (application-plane)│
-                        └──────────┬──────────┘
-                                   │  enruta al BC que corresponde
-         ┌─────────────────┬───────┴────────┬─────────────────┐
-         ▼                 ▼                ▼                 ▼
-   ┌───────────┐     ┌───────────┐    ┌───────────┐    ┌───────────┐
-   │  BC OXP   │     │ Impuestos │    │Contabilid.│    │ Terceros  │
-   │ VM+Swarm  │     │ VM+Swarm  │    │ VM+Swarm  │    │ VM+Swarm  │
-   │           │     │           │    │           │    │           │
-   │ servicios │     │ servicios │    │ servicios │    │ servicios │
-   │ del BC    │     │ del BC    │    │ del BC    │    │ del BC    │
-   │ ········· │     │ ········· │    │ ········· │    │ ········· │
-   │ RabbitMQ  │     │ RabbitMQ  │    │ RabbitMQ  │    │ RabbitMQ  │
-   │ + Redis   │     │ + Redis   │    │ + Redis   │    │ + Redis   │
-   │ (interno) │     │ (interno) │    │ (interno) │    │ (interno) │
-   │ ········· │     │ ········· │    │ ········· │    │ ········· │
-   │ Postgres  │     │ Postgres  │    │ Postgres  │    │ Postgres  │
-   │ (N bases) │     │ (1 base)  │    │ (1 base)  │    │ (2 bases) │
-   └─────┬─────┘     └─────┬─────┘    └─────┬─────┘    └─────┬─────┘
-         │                 │                │                │
-         │   publican / se suscriben a eventos de dominio    │
-         ▼                 ▼                ▼                 ▼
-   ╔═══════════════════════════════════════════════════════════════╗
-   ║  AZURE SERVICE BUS — ÚNICO, compartido (application-plane)     ║
-   ║  administrado · Standard · topic por BC: <contexto>.events     ║
-   ║  ⚠ tópicos de dominio diseñados (ADR-002), aún no creados      ║
-   ╚═══════════════════════════════════════════════════════════════╝
+                  Usuarios del ERP (HTTPS)
+                              │
+                   ┌──────────▼──────────┐
+                   │   Azure Front Door  │   edge (application-plane)
+                   └──────────┬──────────┘
+                              │  /api/*
+                   ┌──────────▼──────────┐
+                   │   VM Gateway YARP   │   Docker Swarm (application-plane)
+                   └──────────┬──────────┘
+                              │  enruta al BC que corresponde
+      ┌───────────┬───────────┴───────────┬───────────┐
+      ▼           ▼           ▼           ▼           ▼
+ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐ ┌─────────┐
+ │   OXP   │ │Impuestos│ │Contabil.│ │Terceros │ │Asistente│
+ └────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘ └────┬────┘
+      │           │           │           │           │
+      └───────────┴───────────┬───────────┴───────────┘
+                              ▼  eventos de dominio (MassTransit)
+   ┌───────────────────────────────────────────────────┐
+   │ Azure Service Bus — único, compartido (app-plane) │
+   └───────────────────────────────────────────────────┘
 
    Cada BC = 1 VNet + 1 RG + 1 VM-Swarm + 1 ACR + 1 Key Vault + 1 Postgres propios.
-   Intra-BC: RabbitMQ/Redis en la red overlay privada del BC (no sale del BC).
-   Inter-BC: solo por el Service Bus compartido (sin llamadas síncronas).
-   (Asistente tiene su propia VM-Swarm con el mismo molde; EO aún no tiene infra.)
+   Dentro de cada BC: sus servicios + RabbitMQ/Redis (mensajería intra-BC, red
+   privada del BC) + 1 Postgres con una base por servicio (OXP: 4 bases).
+   Inter-BC: solo por el Service Bus compartido —administrado, SKU Standard,
+   topic por BC— sin llamadas síncronas.
+   EO no aparece: todavía no tiene repo .Infraestructura.
 ```
 
 > **Pendiente real de implementación:** el backbone inter-BC está diseñado (ADR-002) pero los tópicos `<contexto>.events` todavía no existen en Azure ni en el Terraform activo (verificado 2026-05-14, vista `03-messaging-flow` del repo `architecture`). Hoy la infraestructura de cada BC está viva, pero los eventos de dominio entre BC aún no fluyen. Es el siguiente paso para que la integración cross-BC sea real.
