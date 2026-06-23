@@ -107,7 +107,7 @@ La decisión de nombre está resuelta en [`anexo-definicion-contexto-inicial.md`
 |---------|-------------|------------------------|
 | **OXP** | Gestión de obligaciones por pagar. | Consume unidades organizacionales para imputar obligaciones. Escucha los eventos del ciclo de vida (creación, activación, suspensión, inactivación) y de reestructuración para mantener su **copia local** consistente, contra la que valida y opera. |
 | **Contabilidad** | Motor de traducción contable. | Consume unidades como dimensión de imputación en las líneas de traducción, contra su **copia local**. Reacciona a eventos de reestructuración para reclasificación contable. |
-| **Sub-dominios consumidores futuros** | Cualquier sub-dominio que se incorpore al ERP y requiera imputar transacciones a unidades organizacionales. | Consume unidades y reacciona a sus eventos siguiendo el mismo patrón EDA (copia local). |
+| **Sub-dominios consumidores futuros** | Cualquier sub-dominio que se incorpore al ERP y requiera imputar transacciones a unidades organizacionales. | Consume unidades y reacciona a sus eventos siguiendo el mismo esquema de copia local mantenida por eventos. |
 
 ### Formatos de entrada soportados
 
@@ -845,7 +845,7 @@ Siguiendo el patrón establecido del proyecto en Event Sourcing, los eventos `*M
 
 ### Principio de responsabilidad
 
-Estructura Organizacional es el **propietario** de la estructura jerárquica de grupos y unidades. Su responsabilidad termina en la gestión del ciclo de vida y la emisión de eventos. Los sub-dominios consumidores son **propietarios de su vista local** de unidades organizacionales — el sub-dominio no orquesta a los consumidores ni les impone reglas; solo notifica cambios mediante eventos del modelo EDA.
+Estructura Organizacional es el **propietario** de la estructura jerárquica de grupos y unidades. Su responsabilidad termina en la gestión del ciclo de vida y la emisión de eventos. Los sub-dominios consumidores son **propietarios de su vista local** de unidades organizacionales — el sub-dominio no orquesta a los consumidores ni les impone reglas; solo notifica cambios mediante eventos.
 
 En procesos de reestructuración, Estructura Organizacional emite los eventos que describen la fusión, división o traslado, pero no modifica directamente las transacciones ni las vistas internas de los consumidores. Cada sub-dominio consumidor es responsable de interpretar los eventos recibidos y aplicar, según sus propias reglas, la reasignación, bloqueo, reclasificación, advertencia o reconstrucción de sus vistas locales.
 
@@ -928,7 +928,7 @@ Estructura Organizacional **no recibe integraciones de entrada por eventos**: es
 
 - **F2+ — Multi-dimensionalidad.** Cuando se incorporen otras dimensiones (Proyecto, Sucursal, Línea de Negocio, etc.), el contrato de líneas de traducción se extiende con campos opcionales para cada dimensión adicional. Estructura Organizacional sigue siendo el owner de la dimensión "Unidad Organizacional"; las demás dimensiones tendrán sus propios sub-dominios owners. Ver `anexo-decisiones-arquitectonicas.md`, Decisión 4.
 - **F2+ — Creación automática de unidades.** Cuando el contexto es inequívoco (ej: proyecto aprobado en el sistema de presupuesto con todos los datos), el sistema inteligente puede crear la unidad sin intervención humana, a partir de la integración con el sistema de origen.
-- **F2+ — Incorporación de nuevos consumidores.** Cualquier sub-dominio que se incorpore al ERP y necesite imputar transacciones a unidades organizacionales se conecta al mismo patrón EDA. No requiere cambios en Estructura Organizacional.
+- **F2+ — Incorporación de nuevos consumidores.** Cualquier sub-dominio que se incorpore al ERP y necesite imputar transacciones a unidades organizacionales se conecta al mismo esquema de eventos. No requiere cambios en Estructura Organizacional.
 
 ---
 
@@ -1052,7 +1052,7 @@ Estructura Organizacional se entrega como un sub-dominio funcional completo en u
 | 4 | Codificación de unidades y grupos | Códigos alfanuméricos planos, únicos por tenant, inmutables. Longitud parametrizable entre 4 y 12 caracteres. |
 | 5 | Catálogo interno de tipos de unidad | Lista de clasificaciones (centro de costo, proyecto, sucursal, inmueble, departamento, etc.) extensible por cada empresa según su modelo de negocio. |
 | 6 | Procesos de reestructuración | Fusión (F12), División (F13) y Traslado (F14) aplicables a unidades, con fecha efectiva, motivo y motivo de baja proyectado en el modelo de lectura. |
-| 7 | Emisión EDA completa | Eventos de dominio emitidos ante cambios de ciclo de vida, jerarquía o reestructuración. El modelo completo define 18 eventos; 15 son directamente relevantes para consumidores transaccionales en F1 y 3 corresponden a configuración interna del catálogo de tipos de unidad. |
+| 7 | Notificación de cambios a los consumidores | Cada cambio de ciclo de vida, jerarquía o reestructuración se notifica mediante un evento que los consumidores reciben para mantener su vista al día. El modelo completo define 18 eventos; 15 son relevantes para los consumidores en F1 y 3 corresponden a la configuración interna del catálogo de tipos de unidad. |
 | 8 | Consultas de unidades y jerarquía | Resolución por código y navegación de la jerarquía para validación antes de imputar transacciones o construir reportes. |
 | 9 | Dimensión "Unidad Organizacional" como dimensión de imputación | Única dimensión expuesta en el contrato de líneas de traducción con Contabilidad. El modelo queda preparado para extender el contrato con dimensiones adicionales sin rediseño. |
 
@@ -1082,7 +1082,7 @@ Las capacidades adicionales que el sub-dominio pueda soportar en el futuro (acti
 | 7 | **Estados que reflejan la realidad operativa:** Los cinco estados de unidad (`Borrador`, `Activa`, `Suspendida`, `Inactiva`, `Descartada`) modelan explícitamente los momentos transitorios del negocio (preparación, operación, pausa, cierre, descarte) que hoy se enmascaran detrás de "activo/inactivo" y generan transacciones incorrectas. | *Modelado fiel a la realidad operativa* |
 | 8 | **Cumplimiento IFRS 8 sin reconstrucción manual:** La historia estructural versionada y los eventos formales de reestructuración permiten cumplir con la re-expresión comparativa de periodos anteriores (IFRS 8 §29-30) sin que el equipo financiero deba reconstruir manualmente la estructura previa en cada auditoría. | *Comparabilidad histórica* |
 | 9 | **Reapertura sin perder continuidad:** Una unidad inactivada por error o reactivada por un cambio de decisión del negocio (sucursal que reabre, proyecto que se reanuda) puede reabrirse conservando su identidad, código e historial. El evento `UnidadReabierta` queda como traza auditable diferenciada de la reactivación de pausas transitorias. | *Flexibilidad operativa sin sacrificar auditoría* |
-| 10 | **Base preparada para crecer:** El modelo está diseñado para soportar nuevas dimensiones de imputación (Proyecto, Sucursal, Línea de Negocio) en fases posteriores sin rediseño estructural. Cualquier nuevo sub-dominio del ERP que requiera imputar a unidades organizacionales se incorpora al mismo patrón EDA sin tocar Estructura Organizacional. | *Extensibilidad estratégica* |
+| 10 | **Base preparada para crecer:** El modelo está diseñado para soportar nuevas dimensiones de imputación (Proyecto, Sucursal, Línea de Negocio) en fases posteriores sin rediseño estructural. Cualquier nuevo sub-dominio del ERP que requiera imputar a unidades organizacionales se incorpora al mismo esquema de eventos sin tocar Estructura Organizacional. | *Extensibilidad estratégica* |
 
 ---
 
