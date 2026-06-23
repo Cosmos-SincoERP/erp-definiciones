@@ -82,9 +82,9 @@ La elección del intermediario es una decisión **aparte de la topología**: se 
 
 ---
 
-## 5. Alternativas concretas de estructura (cómputo y mensajería)
+## 5. Cómputo y mensajería: dos decisiones distintas
 
-"Separación física" suele mezclar **dos preguntas distintas** que conviene desenredar antes de decidir:
+"Separación física" suele mezclar **dos preguntas distintas** que conviene desenredar:
 
 - **Cómputo:** ¿dónde corre cada servicio? (máquina / cluster / contenedor)
 - **Mensajería:** ¿cómo viajan los eventos entre servicios? (el broker / bus)
@@ -112,88 +112,21 @@ De más compartido/barato a más aislado/caro:
 | **2. Bus compartido con aislamiento lógico** | Mismo broker, con tópicos/colas separados y permisos por dominio | ✅ Válido, más control de accesos |
 | **3. Un broker por servicio + puentes** | Cada servicio con su propio broker, conectados entre sí | ❌ Anti-patrón: reintroduce el problema de integración |
 
-### Cómo se combinan — la estructura recomendada
+### Cómo se combinan
 
-Los dos ejes se combinan libremente. La recomendación: separación lógica + de despliegue (un contenedor y datos propios por servicio, cualquiera de A–D) sobre **un solo bus compartido** (opción 1 o 2). El bus sigue siendo uno solo corra el contenedor en cluster compartido (A/B) o en máquina dedicada (C).
+Los dos ejes se combinan libremente: separación lógica + de despliegue (un contenedor y datos propios por servicio, cualquiera de A–D) sobre **un solo bus compartido** (opción 1 o 2). El bus sigue siendo uno solo corra el contenedor en cluster compartido (A/B) o en máquina dedicada (C). El diagrama del estado actual está en la **sección 9**.
 
-```
-        ┌──────────── BUS DE EVENTOS COMPARTIDO (uno solo) ────────────┐
-        │   tópico OXP · tópico Contab · tópico Impuestos · ...         │
-        └───▲────────────▲──────────────▲──────────────▲───────────▲───┘
-            │            │              │              │           │
-        ┌───┴───┐   ┌────┴────┐   ┌─────┴────┐   ┌─────┴────┐  ┌───┴───┐
-        │  OXP  │   │ Contab. │   │ Impuestos│   │ Terceros │  │  EO   │
-        └───────┘   └─────────┘   └──────────┘   └──────────┘  └───────┘
-        contenedor   contenedor    contenedor     contenedor   contenedor
-        + datos      + datos       + datos        + datos      + datos
-        propios      propios       propios        propios      propios
-```
+### Cómo está montado (verificado contra el Terraform real)
 
-### Decisión verificada contra la infraestructura real (jun-2026)
+Validado contra el Terraform de los repos `*.Infraestructura` y los ADR del repo `architecture` (`ADR-001` BC aislados por VNet/RG/VM-Swarm; `ADR-002` Service Bus único cross-BC). **La unidad de aislamiento físico es el bounded context, no el servicio:**
 
-Las cinco preguntas que esta sección dejaba abiertas ya tienen respuesta. Se validó el Terraform real de los repos `*.Infraestructura` (`ApplicationPlane`, `ObligacionesPorPagar`, `Cosmos.Impuestos`, `Cosmos.Contabilidad`, `Cosmos.Terceros`, `Cosmos.Asistente`) y los ADR del repo `architecture` —sobre todo `ADR-001` (BC aislados por VNet/RG/VM-Swarm) y `ADR-002` (Service Bus único cross-BC). **La clave es que la unidad de aislamiento físico es el bounded context, no el servicio.**
+- **Cómputo (C a nivel BC + A/B a nivel servicio):** cada BC = **1 VM dedicada con Docker Swarm**; dentro, sus varios servicios corren como contenedores que comparten esa VM-Swarm. "VM por servicio" se descartó por costo (ADR-001). En prod la VM-Swarm pasa de single-node a 3 nodos (HA).
+- **Mensajería inter-BC (opción 1, administrado):** **un solo** Azure Service Bus (SKU Standard) en el application-plane, un tópico por bounded context (`<contexto>.events`), con MassTransit. El "bus federado por BC" se descartó; llamadas síncronas cross-BC prohibidas.
+- **Mensajería intra-BC (autooperado):** cada host corre su propio RabbitMQ + Redis en red overlay privada (`<host>-internal`), solo para sus servicios; no sale del host. **No es** el anti-patrón de la sección 8 — no hace integración cross-BC.
+- **Datos:** **1 PostgreSQL Flexible por host** (sin BD compartida — ADR-001), **una base por servicio/ocupante** dentro del server. Nadie toca la base de otro BC.
+- **Auth del bus:** hoy SAS; el plan es migrar a Managed Identity (ADR-004).
 
-| # | Pregunta | Respuesta verificada |
-|---|---|---|
-| 1 | ¿VM dedicada (C) o cluster compartido (A/B)? | **Híbrido por nivel.** Cada BC = **1 VM dedicada con Docker Swarm** (opción C a nivel BC); dentro, los varios servicios del BC corren como contenedores que comparten esa VM-Swarm (opción A/B a nivel servicio). "VM por servicio" se descartó por costo (ADR-001). En prod la VM-Swarm pasa de single-node a 3 nodos (HA). |
-| 2 | ¿Un bus compartido o uno por servicio? | **Un solo bus compartido para lo inter-BC** (ADR-002). El "bus federado por BC" se descartó explícitamente. |
-| 3 | Si Azure SB: ¿un namespace con tópico por servicio? | **Un namespace, tópico por bounded context** (`<contexto>.events`), no por servicio. ⚠️ Esos tópicos están diseñados pero **aún no creados** en Azure/TF (solo existe el tópico de *provisioning de suscripciones*). |
-| 4 | ¿Administrado o autooperado? | **Inter-BC: administrado** (Azure Service Bus, SKU Standard). **Intra-BC: autooperado** (RabbitMQ + Redis en la VM-Swarm de cada BC). Auth hoy por SAS; el plan es migrar a Managed Identity (ADR-004). |
-| 5 | ¿BD separada por servicio? | **1 PostgreSQL Flexible por BC** (sin BD compartida — ADR-001) y **una base por servicio dentro del server** (ej. OXP: `entradasdb`, `radicaciondb`, `radicaciondb_vectorial`, `reconocimientodb`). Nadie toca la base de otro BC. |
-
-**Dos niveles de mensajería, deliberados** (y ninguno es el anti-patrón de la sección 8):
-
-- **Intra-BC** — entre los servicios de un mismo BC: RabbitMQ + Redis propios del BC, en su red overlay privada (`<bc>-internal`); no se exponen fuera del bounded context.
-- **Inter-BC** — entre bounded contexts: **el único** Service Bus compartido, topic por BC, con MassTransit. Llamadas síncronas cross-BC prohibidas (ADR-001/ADR-002).
-
-El RabbitMQ-por-BC **no** contradice el "un solo bus" de la sección 4: solo hace plomería interna del BC, no integración cross-BC.
-
-### Cómo quedó montado (estado real verificado)
-
-```
-                    Usuarios del ERP (HTTPS)
-                                │
-                     ┌──────────▼──────────┐
-                     │   Azure Front Door  │ edge (application-plane)
-                     └──────────┬──────────┘
-                                │  /api/*
-                     ┌──────────▼──────────┐
-                     │   VM Gateway YARP   │ Docker Swarm
-                     │  (application-plane)│
-                     └──────────┬──────────┘
-                                │  enruta al BC que corresponde
-          ┌──────────────┬──────┴───────┬──────────────┐
-          ▼              ▼              ▼              ▼
-    ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────┐
-    │   BC OXP  │  │ Impuestos │  │Contabilid.│  │  Terceros │
-    │  VM+Swarm │  │  VM+Swarm │  │  VM+Swarm │  │  VM+Swarm │
-    │           │  │           │  │           │  │           │
-    │ servicios │  │ servicios │  │ servicios │  │ servicios │
-    │   del BC  │  │   del BC  │  │   del BC  │  │   del BC  │
-    │ ········· │  │ ········· │  │ ········· │  │ ········· │
-    │  RabbitMQ │  │  RabbitMQ │  │  RabbitMQ │  │  RabbitMQ │
-    │  + Redis  │  │  + Redis  │  │  + Redis  │  │  + Redis  │
-    │ (interno) │  │ (interno) │  │ (interno) │  │ (interno) │
-    │ ········· │  │ ········· │  │ ········· │  │ ········· │
-    │  Postgres │  │  Postgres │  │  Postgres │  │  Postgres │
-    │ (N bases) │  │  (1 base) │  │  (1 base) │  │ (2 bases) │
-    └─────┬─────┘  └─────┬─────┘  └─────┬─────┘  └─────┬─────┘
-          │              │              │              │
-          │   publican / se suscriben a eventos de dominio
-          ▼              ▼              ▼              ▼
-    ┌─────┬──────────────┬──────────────┬──────────────┬─────┐
-    │ Azure Service Bus — único, compartido (app-plane)      │
-    │ administrado · Standard · topic por BC                 │
-    │ <contexto>.events: diseñados (ADR-002), aún no creados │
-    └─────┴──────────────┴──────────────┴──────────────┴─────┘
-
-   Cada BC = 1 VNet + 1 RG + 1 VM-Swarm + 1 ACR + 1 Key Vault + 1 Postgres propios.
-   Intra-BC: RabbitMQ/Redis en la red overlay privada del BC (no sale del BC).
-   Inter-BC: solo por el Service Bus compartido (sin llamadas síncronas).
-   (Asistente tiene su propia VM-Swarm con el mismo molde; EO aún no tiene infra.)
-```
-
-> **Pendiente real de implementación:** el backbone inter-BC está diseñado (ADR-002) pero los tópicos `<contexto>.events` todavía no existen en Azure ni en el Terraform activo (verificado 2026-05-14, vista `03-messaging-flow` del repo `architecture`). Hoy la infraestructura de cada BC está viva, pero los eventos de dominio entre BC aún no fluyen. Es el siguiente paso para que la integración cross-BC sea real.
+Es decir, **dos niveles de mensajería deliberados**: inter-BC por el Service Bus único; intra-BC por el RabbitMQ/Redis de cada host. Ninguno es el anti-patrón de la sección 8.
 
 ---
 
@@ -227,9 +160,68 @@ El empaque comercial **no** define fronteras de servicio: define qué debe poder
 
 ---
 
-## 9. Caso aplicado: estado actual del ERP
+## 9. Estado actual del ERP (cómo está montado hoy)
 
-**La unidad de separación es el bounded context, no el servicio** — cada BC empaca varios servicios (OXP, por ejemplo: Entradas, Radicación, Reconocimiento, Conciliación Inteligente, Notificaciones), todos en su propia VM con Docker Swarm. Hoy tienen infraestructura aprovisionada (repo `*.Infraestructura` + VM-Swarm propia) **OXP, Impuestos, Contabilidad, Terceros y Asistente**; **Estructura Organizacional (EO) todavía no tiene repo de infraestructura**. Cada BC es autónomo en recursos (VNet, RG, VM-Swarm, ACR, Key Vault y Postgres propios — ADR-001) y se comunica con los demás **solo** por el Service Bus compartido (ADR-002). La operación/equipo propios se gradúan BC por BC con los criterios de la sección 3. El montaje real verificado y las respuestas a las cinco preguntas de aprovisionamiento están en la sección 5.
+**La unidad de separación es el bounded context, no el servicio** — cada BC empaca varios servicios (OXP, por ejemplo: Entradas, Radicación, Reconocimiento, Conciliación Inteligente, Notificaciones), todos en una VM con Docker Swarm. Cada unidad de cómputo es autónoma en recursos (VNet, RG, VM-Swarm, ACR, Key Vault y Postgres — ADR-001) y se comunica con las demás **solo** por el Service Bus compartido (ADR-002). La operación/equipo propios se gradúan BC por BC con los criterios de la sección 3.
+
+Hoy hay **cinco unidades de cómputo** desplegadas:
+
+- **OXP, Impuestos, Contabilidad y Asistente** — cada uno en su **propia** VM-Swarm + Postgres.
+- **Host compartido de soporte de datos** (repo `Cosmos.Terceros.Infraestructura`, prefijo `terc`) — **una sola** VM-Swarm + **un solo** Postgres que hospeda **tres ocupantes ya desplegados**: **Terceros** (`tercerosdb`), **Datos de Referencia** (servicio de catálogos, repo `Cosmos.DatosReferencia`, `datosreferenciadb`) y **Estructura Organizacional / EO** (`estructuraorganizacionaldb`).
+
+```
+                          Usuarios del ERP (HTTPS)
+                                      │
+                           ┌──────────▼──────────┐
+                           │   Azure Front Door  │ edge (application-plane)
+                           └──────────┬──────────┘
+                                      │  /api/*
+                           ┌──────────▼──────────┐
+                           │   VM Gateway YARP   │ Docker Swarm (application-plane)
+                           └──────────┬──────────┘
+                                      │  enruta al BC que corresponde
+          ┌─────────────┬─────────────┴─────────────┬─────────────┐
+          ▼             ▼             ▼             ▼             ▼
+    ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐ ┌───────────┐
+    │   BC OXP  │ │ Impuestos │ │Contabilid.│ │ Asistente │ │ Host terc │ ◄ HOST COMPARTIDO (repo Cosmos.Terceros.Infraestructura, prefijo terc)
+    │ VM propia │ │ VM propia │ │ VM propia │ │ VM propia │ │ 1 VM Swarm│   ocupantes: Terceros · Datos de Referencia · EO  (ya desplegados)
+    │           │ │           │ │           │ │           │ │           │   bases: tercerosdb · datosreferenciadb · estructuraorganizacionaldb
+    │ servicios │ │ servicios │ │ servicios │ │ servicios │ │ servicios │   contenedores · redes · topics SEPARADOS  → no acoplados
+    │   del BC  │ │   del BC  │ │   del BC  │ │  + OpenAI │ │  de los 3 │   (renombrar a Cosmos.SoporteDeDatos = decisión de naming pendiente)
+    │ ········· │ │ ········· │ │ ········· │ │ ········· │ │ ········· │
+    │  RabbitMQ │ │  RabbitMQ │ │  RabbitMQ │ │  RabbitMQ │ │  RabbitMQ │
+    │  + Redis  │ │  + Redis  │ │  + Redis  │ │  + Redis  │ │  + Redis  │
+    │ (interno) │ │ (interno) │ │ (interno) │ │ (interno) │ │ (interno) │
+    │ ········· │ │ ········· │ │ ········· │ │ ········· │ │ ········· │
+    │  Postgres │ │  Postgres │ │  Postgres │ │  Postgres │ │ 1 Postgres│
+    │ (4 bases) │ │  (1 base) │ │  (1 base) │ │  (1 base) │ │  3 bases  │
+    └─────┬─────┘ └─────┬─────┘ └─────┬─────┘ └─────┬─────┘ └─────┬─────┘
+          │             │             │             │             │
+          │   publican / se suscriben a eventos de dominio
+          ▼             ▼             ▼             ▼             ▼
+    ┌─────┬─────────────┬─────────────┬─────────────┬─────────────┬─────┐
+    │ Azure Service Bus — único, compartido (application-plane)         │
+    │ topics: oxp · impuestos · contabilidad · asistente ·              │
+    │ terceros · datosreferencia · estructuraorganizacional  (.events)  │
+    │ ⚠ tópicos diseñados (ADR-002), aún NO creados en Azure todavía    │
+    └─────┴─────────────┴─────────────┴─────────────┴─────────────┴─────┘
+```
+
+### El host compartido de soporte de datos
+
+Terceros, Datos de Referencia y EO son todos **soporte de datos** (baja carga, graduación tardía — criterio #7): no se justifica una VM dedicada por cada uno. Comparten el **host físico** (1 VM-Swarm + 1 Postgres) **sin quedar acoplados**, porque cada ocupante conserva:
+
+- **Su base de datos** en el mismo servidor — nadie toca las tablas del otro.
+- **Su contenedor y su red overlay** dentro del Swarm; cada repo de aplicación (`Cosmos.Terceros*`, `Cosmos.DatosReferencia`, `Cosmos.EstructuraOrganizacional*`) despliega sus servicios con el patrón `onboard-dotnet-repo`.
+- **Su tópico en el bus** (`terceros.events`, `datosreferencia.events`, `estructuraorganizacional.events`) — se hablan solo por eventos, nunca en proceso (ADR-002), aunque compartan host.
+
+Compartir hierro **≠** ser el mismo bounded context: EO y Datos de Referencia **no** son "parte de Terceros"; son BC/servicios propios que co-habitan el host.
+
+**Consideraciones evaluadas:**
+
+- **Trade-offs del host compartido:** se comparte *blast radius* (si la VM cae, caen los tres) y ventana de parcheo; y el host lo opera **un solo equipo**. Aceptable para ocupantes de soporte de datos de baja carga. Es una **excepción deliberada al ADR-001** ("1 VM por BC"), justificada por costo (criterio #7) y reversibilidad — el equipo decide si enmienda el ADR o abre un ADR nuevo para la excepción.
+- **Reversible:** mover cualquier ocupante a su propia VM más adelante (más carga, equipo propio, aislamiento de fallo) es un cambio de **despliegue**, no de diseño ni de código. Solo se relaja la *capa 4* (aislamiento de infra) de la sección 2.
+- **Naming pendiente (decisión de plataforma):** el repo se llama `Cosmos.Terceros.Infraestructura` pero hospeda tres ocupantes — el nombre se quedó corto. Renombrarlo a `Cosmos.SoporteDeDatos.Infraestructura` (familia de *host*, como `ApplicationPlane.Infraestructura`) sería más honesto, pero el prefijo CAF `terc` está incrustado en todos los recursos (RG, VM, Postgres, ACR, redes, runner) y los nombres en Azure son **inmutables**, así que re-prefijar implica **re-provisionar** (barato en DEV, no trivial en prod). Es una mejora **cosmética**, no funcional: el host compartido ya está montado. Lo que **sí** conviene corregir es la etiqueta interna que llama al front de EO "segundo front del BC Terceros" — para no acoplar conceptualmente a EO con Terceros.
 
 Hechos comerciales que alimentan el análisis:
 
@@ -238,77 +230,19 @@ Hechos comerciales que alimentan el análisis:
 - **Contabilidad se puede comercializar sola** a futuro (sistema de consolidación de información) → es producto por derecho propio.
 - **Impuestos** es el que más localización necesita al llevar el sistema a otros países → evoluciona en el reloj regulatorio de cada jurisdicción.
 
-Mapa por servicio:
+Mapa por bounded context:
 
-| Bounded context | Infra propia (repo + VM-Swarm + bus) | ¿Producto propio? | Operación / equipo propio |
+| Bounded context | Cómputo | ¿Producto propio? | Operación / equipo propio |
 |---|:---:|:---:|---|
-| **OXP** | ✅ | No se vende solo (núcleo) | **Sí** — producto vivo, su equipo |
-| **Contabilidad** | ✅ | **Sí** (consolidación) | **Temprano** — se gradúa con el núcleo |
-| **Impuestos** | ✅ | **Sí** (en paquetes) | **Temprano + equipo propio** — el reloj regulatorio lo empuja primero |
-| **Terceros** | ✅ | No (soporte de datos) | Tardío — pero listo para la 1.ª venta |
-| **Asistente** | ✅ | No (transversal) | Según carga — no estaba en el set original de la guía |
-| **EO** | ⏳ **pendiente** (sin repo `.Infraestructura` aún) | No (soporte de datos) | Tardío — pero en la ruta crítica de la 1.ª venta |
+| **OXP** | VM propia | No se vende solo (núcleo) | **Sí** — producto vivo, su equipo |
+| **Contabilidad** | VM propia | **Sí** (consolidación) | **Temprano** — se gradúa con el núcleo |
+| **Impuestos** | VM propia | **Sí** (en paquetes) | **Temprano + equipo propio** — el reloj regulatorio lo empuja primero |
+| **Asistente** | VM propia | No (transversal) | Según carga — no estaba en el set original de la guía |
+| **Terceros** | host compartido `terc` | No (soporte de datos) | Tardío — comparte host con DatosRef y EO |
+| **Datos de Referencia** | host compartido `terc` | No (servicio de catálogos) | Tardío — servicio compartido, no BC de dominio |
+| **EO** | host compartido `terc` | No (soporte de datos) | Tardío — ya desplegado sobre el host compartido |
 
-Matiz sobre "qué está vivo": como OXP no se vende sin los demás, los BC del núcleo están en la **ruta crítica de la primera venta** — todos deben estar listos para facturar. Lo que difiere no es *si* deben funcionar, sino *cuándo cada uno gana equipo y operación propios*: OXP ya; Impuestos y Contabilidad temprano por ser productos (Impuestos con equipo propio por el reloj regulatorio); Terceros y EO al final por ser soporte de datos. **EO es hoy la brecha concreta:** todavía le falta su repo `*.Infraestructura` para estar en línea con los demás.
-
-### Propuesta: incorporar Estructura Organizacional (EO) compartiendo host con Terceros
-
-**El caso.** EO es el único BC del set que todavía no tiene repo `*.Infraestructura`. Como EO y Terceros son ambos **soporte de datos** (baja carga, graduación tardía — criterio #7 de la sección 3), no se justifica pagarle a EO una VM dedicada desde el día uno. La propuesta: que **compartan el host físico** —una sola VM con Docker Swarm y un solo servidor PostgreSQL— **sin quedar acoplados**.
-
-**Definición.** Un único repo de infraestructura aprovisiona el *host* de los ocupantes de soporte de datos; cada uno sigue siendo dueño de su lógica, sus datos y su contrato. Como deja de ser "de un BC", el repo se nombra por su rol, no por Terceros:
-
-- **Repo:** `Cosmos.Terceros.Infraestructura` se renombra a **`Cosmos.SoporteDeDatos.Infraestructura`** (familia de *host*, como `ApplicationPlane.Infraestructura`; ya no de la familia `Cosmos.<BC>.Infraestructura`).
-- **Aprovisiona:** 1 VNet, 1 VM + Docker Swarm, 1 PostgreSQL Flexible, ACR/Key Vault y runner (`swarm-deploy-sop`), con código CAF propio (`sop` → `rg-sop-dev-eus2-001`).
-- **Tres ocupantes.** Ese host **ya corre dos**: Terceros (`tercerosdb`) y **Datos de Referencia** (servicio compartido de catálogos, repo `Cosmos.DatosReferencia`, base `datosreferenciadb`). La propuesta suma el tercero, **EO** (`estructuraorganizacionaldb`). El nombre `Terceros` ya se quedaba corto — de ahí el renombre por rol.
-
-El diagrama es el mismo de la sección 5, con la 4.ª columna convertida en el host compartido de soporte de datos:
-
-```
-                    Usuarios del ERP (HTTPS)
-                                │
-                     ┌──────────▼──────────┐
-                     │   Azure Front Door  │ edge (application-plane)
-                     └──────────┬──────────┘
-                                │  /api/*
-                     ┌──────────▼──────────┐
-                     │   VM Gateway YARP   │ Docker Swarm
-                     │  (application-plane)│
-                     └──────────┬──────────┘
-                                │  enruta al BC que corresponde
-          ┌──────────────┬──────┴───────┬──────────────┐
-          ▼              ▼              ▼              ▼
-    ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────┐
-    │   BC OXP  │  │ Impuestos │  │Contabilid.│  │ Host datos│ ◄ host COMPARTIDO  (repo Cosmos.SoporteDeDatos.Infraestructura)
-    │ VM propia │  │ VM propia │  │ VM propia │  │ 1 VM Swarm│   ocupantes: Terceros · Datos de Referencia · EO
-    │           │  │           │  │           │  │           │   bases: tercerosdb · datosreferenciadb · estructuraorganizacionaldb
-    │ servicios │  │ servicios │  │ servicios │  │ servicios │   contenedores · redes · topics SEPARADOS  → no acoplados (mover c/u luego = redeploy)
-    │   del BC  │  │   del BC  │  │   del BC  │  │  de los 3 │
-    │ ········· │  │ ········· │  │ ········· │  │ ········· │
-    │  RabbitMQ │  │  RabbitMQ │  │  RabbitMQ │  │  RabbitMQ │
-    │  + Redis  │  │  + Redis  │  │  + Redis  │  │  + Redis  │
-    │ (interno) │  │ (interno) │  │ (interno) │  │ (interno) │
-    │ ········· │  │ ········· │  │ ········· │  │ ········· │
-    │  Postgres │  │  Postgres │  │  Postgres │  │ 1 Postgres│
-    │ (4 bases) │  │  (1 base) │  │  (1 base) │  │  3 bases  │
-    └─────┬─────┘  └─────┬─────┘  └─────┬─────┘  └─────┬─────┘
-          │              │              │              │
-          │   publican / se suscriben a eventos de dominio
-          ▼              ▼              ▼              ▼
-    ┌─────┬──────────────┬──────────────┬──────────────┬─────┐
-    │ Azure Service Bus — único, compartido. Topics:         │
-    │ oxp · impuestos · contabilidad · terceros ·            │
-    │ datosreferencia · estructuraorganizacional  (.events)  │
-    └─────┴──────────────┴──────────────┴──────────────┴─────┘
-```
-
-**Qué los mantiene desacoplados** (lo mismo que rige a cualquier par de BC):
-
-- **Base de datos propia** por ocupante en el mismo servidor — nadie toca las tablas del otro.
-- **Contenedor y red overlay propios** por ocupante dentro del Swarm; los repos de aplicación (`Cosmos.Terceros*`, `Cosmos.DatosReferencia`, `Cosmos.EstructuraOrganizacional*`) despliegan sus servicios con el patrón `onboard-dotnet-repo`, cada uno con su stack.
-- **Topic propio en el bus** (`terceros.events`, `datosreferencia.events`, `estructuraorganizacional.events`) — se hablan solo por eventos, nunca en proceso (ADR-002), aunque vivan en el mismo host.
-- **Reversible:** mover cualquiera a su propia VM más adelante (más carga, equipo propio, aislamiento de fallo) es un cambio de **despliegue**, no de diseño ni de código. Solo se relaja la *capa 4* (aislamiento de infra) de la sección 2, que es la que la guía define como reversible.
-
-**Trade-offs honestos.** Compartir host = compartir *blast radius* (si la VM cae, caen los tres) y ventana de parcheo; y el repo del host lo opera **un solo equipo**. Aceptable para ocupantes de soporte de datos de baja carga. Es una **excepción deliberada al ADR-001** ("1 VM por BC"), justificada por costo (criterio #7) y reversibilidad — el equipo decide si enmienda el ADR o la registra como excepción.
+> **Pendiente real de implementación:** el backbone inter-BC está diseñado (ADR-002) pero los tópicos `<contexto>.events` todavía **no existen** en Azure ni en el Terraform activo (solo el tópico de *provisioning de suscripciones*; verificado contra la vista `03-messaging-flow` del repo `architecture`). La infraestructura de cada host está viva, pero los eventos de dominio entre BC aún no fluyen. Es el siguiente paso para que la integración cross-BC sea real.
 
 ---
 
@@ -327,3 +261,4 @@ El diagrama es el mismo de la sección 5, con la 4.ª columna convertida en el h
 | 1.1 | Junio 2026 | Nueva sección 5 "Alternativas concretas de estructura (cómputo y mensajería)" para analizar con el equipo de plataforma: desenreda cómputo vs. mensajería, menú del eje de cómputo (A–D), menú del eje de mensajería (1–3), diagrama de la estructura recomendada (bus compartido único + contenedor y datos propios por servicio) y cinco preguntas para definir con plataforma a partir del aprovisionamiento real. Renumeradas las secciones siguientes. |
 | 1.2 | Junio 2026 | Cierre de las cinco preguntas con la **infraestructura real verificada** (repos `*.Infraestructura` + ADR-001/ADR-002 del repo `architecture`). En la sección 5: las preguntas pasan a respuestas, se documentan los dos niveles de mensajería (intra-BC RabbitMQ/Redis autooperado, inter-BC Service Bus único administrado), nueva subsección "Cómo quedó montado" con el diagrama ASCII del estado real, y la advertencia de que los tópicos `<contexto>.events` están diseñados pero aún no creados. Sección 9 actualizada: la unidad de aislamiento es el **bounded context (con N servicios)**, no el servicio; set real de BC con infra (OXP, Impuestos, Contabilidad, Terceros, Asistente) y EO marcado como pendiente de repo `.Infraestructura`. |
 | 1.3 | Junio 2026 | Nueva subsección en la sección 9: **propuesta para incorporar EO compartiendo host con Terceros** (repo `Cosmos.Terceros.Infraestructura` → `Cosmos.SoporteDeDatos.Infraestructura`; 1 VM + 1 Postgres compartidos, bases/contenedores/redes/topics separados; desacople por eventos y reversibilidad; excepción deliberada al ADR-001). Incluye un diagrama completo (el de la sección 5 con la 4.ª columna como host compartido). **El diagrama de la sección 5 no se modificó.** |
+| 2.0 | Junio 2026 | **Refinamiento integral al estado actual.** Se confirmó con plataforma que EO ya está desplegado sobre el host compartido de Terceros (swarm `terceros`, `estructuraorganizacionaldb`, RabbitMQ/KV de `terc`) — el host compartido ya es realidad, no propuesta. Se eliminó la estructura de "preguntas para plataforma" y la "propuesta"; la guía ahora presenta **cómo está montado hoy**. Sección 5 sin diagramas (solo explicación + "cómo está montado" en afirmaciones). Sección 9 = estado actual con **un único diagrama** (5 unidades de cómputo: OXP, Impuestos, Contabilidad, Asistente + host compartido Terceros/DatosRef/EO); se eliminaron los otros dos diagramas. EO corregido de "brecha" a tercer ocupante ya desplegado; renombre a `SoporteDeDatos` como consideración de naming pendiente (no como hecho); aclaración conceptual EO ≠ front de Terceros. |
