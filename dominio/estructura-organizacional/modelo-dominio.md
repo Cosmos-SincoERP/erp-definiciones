@@ -1,7 +1,7 @@
 # Modelo de Dominio — Estructura Organizacional
 
-**Versión:** 1.6
-**Fecha:** 2026-06-19
+**Versión:** 1.7
+**Fecha:** 2026-06-23
 
 ---
 
@@ -257,7 +257,7 @@ Estos datos viven solo en el stream de eventos para auditoría narrativa; el agr
 | Comando / proceso | SIs que el implementador debe aplicar |
 |-------------------|---------------------------------------|
 | `CrearGrupo` (F9) | `[SI01]`, `[SI02]`, `[SI03]`, `[SI06]` |
-| `CrearUnidad` (F1 — admin, directa o desde la bandeja de sugerencias) | `[SI01]`, `[SI03]`, `[SI04]`, `[SI06]` |
+| `CrearUnidad` (F1 — admin) | `[SI01]`, `[SI03]`, `[SI04]`, `[SI06]` |
 | `ActivarUnidad` (F3) | `[SI03]`, `[SI06]` |
 | `SuspenderUnidad` (F4) / `ReactivarUnidad` (F5) | `[SI03]`, `[SI06]` |
 | `ReabrirUnidad` (F6) | `[SI03]`, `[SI06]` |
@@ -271,7 +271,6 @@ Estos datos viven solo en el stream de eventos para auditoría narrativa; el agr
 | `ModificarUnidad` / `ModificarGrupo` (F15) | `[SI06]` |
 | `AgregarTipoUnidad` / `ModificarTipoUnidad` / `InactivarTipoUnidad` | `[SI06]` |
 | Proceso `DescarteAutomaticoBorradores` (`[SI05]`) | `[SI04]` (lectura) |
-| Recepción de la señal de demanda de unidad (desde consumidores) | `[SI07]` (idempotencia), `[SI11]` (bandeja de sugerencias) |
 
 ---
 
@@ -311,7 +310,7 @@ Mantener una proyección que indique el estado vigente del grupo padre de cada u
 
 Soporta los flujos F3 (activación) y F8 (descarte manual) y el proceso `[SI05]`.
 
-Proyección que lista todas las unidades en `Borrador` —preparaciones del administrador— con su `fechaUltimaActividadBorrador` y antigüedad. Es la fuente para la UI del administrador (F3, F8) y para el proceso programado de descarte automático (`[SI05]`). No contiene demandas de consumidores: esas viven en la bandeja de sugerencias (`[SI11]`), que es una proyección distinta y previa a que exista cualquier unidad.
+Proyección que lista todas las unidades en `Borrador` —preparaciones del administrador— con su `fechaUltimaActividadBorrador` y antigüedad. Es la fuente para la UI del administrador (F3, F8) y para el proceso programado de descarte automático (`[SI05]`). Contiene solo unidades reales en preparación del administrador (no demandas de consumidores).
 
 El campo `fechaUltimaActividadBorrador` se actualiza **atómicamente** con cada evento que modifique la unidad en estado `Borrador` (`UnidadCreada`, `UnidadModificada`). Nunca se calcula desde un timestamp de BD externo — siempre proviene del evento mismo.
 
@@ -359,27 +358,17 @@ Cada agregado mantiene un `versionAgregado` (entero) que se incrementa con cada 
 - La UI captura el error, re-lee el estado actual del agregado y notifica al usuario: "El estado de la unidad cambió desde su última consulta; revise y confirme nuevamente".
 - Optimistic concurrency previene Silent Writes (dos comandos concurrentes sin que el segundo se entere), pero no reemplaza la lógica de negocio: dos administradores activando la misma unidad simultáneamente verán el conflicto y deben confirmar de nuevo.
 
-#### `[SI07]` Idempotencia de la señal de demanda desde consumidores
+#### `[SI07]` Idempotencia de los comandos del administrador
 
-Materializa `[R30]`.
+Los comandos del administrador (F1, F3, F4, F5, F6, F7, F8, F9, F10, F11, F14, F15) pueden reintentarse (reenvío de la UI, reintento de red). La idempotencia no requiere una tabla de mensajes recibidos: se garantiza por la combinación de mecanismos que el modelo ya tiene:
 
-La **señal de demanda** que un consumidor emite cuando necesita una unidad inexistente (ver `[SI11]`) es un mensaje entrante que puede llegar repetido (reenvío del bus, reintento del consumidor). Para que un reenvío no genere dos sugerencias idénticas en la bandeja del administrador, cada señal lleva un identificador único (`senalId`) que Estructura Organizacional persiste; si la misma señal llega dos veces, la segunda se ignora.
+- **Concurrencia optimista (`[SI06]`):** el comando lleva `expectedVersion`; un reintento sobre una versión ya aplicada se detecta como `version-conflict` y no duplica el efecto.
+- **Validación de unicidad (`[SI01]`):** la unicidad de código por tenant rechaza una segunda creación con el mismo código.
+- **Control en la UI:** deshabilitar el botón de envío tras el clic y confirmación explícita en operaciones críticas.
 
-> Este patrón **protege la visibilidad, no la corrección**: la señal solo alimenta la bandeja de sugerencias (`[SI11]`); no crea unidades ni dispara comandos. La consistencia de la operación del consumidor depende del mecanismo de diferir (`[D15]`), no de esta señal. Por eso la señal puede tratarse como aviso seguro de repetir sin garantías fuertes — si se perdiera, el sistema seguiría siendo correcto (ver `[D15]`).
+Los procesos internos del propio sub-dominio (`[SI05]` `DescarteAutomaticoBorradores`) gestionan su idempotencia con `jobExecutionId` (ver `[SI05]`).
 
-**Mensajes cubiertos por este patrón:**
-
-- La señal de demanda de unidad inexistente (desde OXP, Contabilidad, futuros consumidores).
-
-**Mecanismo de persistencia:**
-
-- Tabla `SenalRecibida(senalId, tenantId, resultadoProyectado, fechaRecepcion)` con TTL de 7 días (configurable). Tras el TTL, los registros se purgan — una señal posterior con el mismo identificador se trataría como nueva.
-- La tabla es por tenant para evitar colisiones entre clientes distintos.
-
-**No cubiertos por este patrón:**
-
-- Comandos originados por el administrador desde la UI propia del módulo (F1, F3, F4, F5, F6, F7, F8, F9, F10, F11, F14, F15): la idempotencia se gestiona en la UI (deshabilitar el botón de envío tras el clic, validación de formulario, confirmación explícita en operaciones críticas). La unicidad de código la valida `[SI01]` al recibir el comando.
-- Procesos internos del propio sub-dominio (`[SI05]` `DescarteAutomaticoBorradores`): la idempotencia se gestiona con `jobExecutionId` (ver `[SI05]`).
+> **Nota — reorientación (issue #72).** Entre el #46 y el #72, `[SI07]` cubrió la idempotencia de la **señal de demanda** entrante. Al retirarse esa señal (ver `[SI11]`), `[SI07]` vuelve a su objeto original: la idempotencia de los comandos del administrador, que no necesita tabla propia porque la resuelven `[SI06]` y `[SI01]`.
 
 #### `[SI08]` Saga `CascadaInactivacionGrupo` — política de completud
 
@@ -428,24 +417,7 @@ SagaEventEmitted(
 
 > **Nota — `[SI10]` retirada (issue #56).** Existió una "proyección local de última imputación por unidad" para validar la `fechaEfectiva` contra el historial transaccional. Con el **replanteamiento de `[R25]`/`[I08]`** —la coherencia de la fecha con la actividad transaccional la responde el administrador, y el sistema solo valida localmente contra la jerarquía vigente— esa proyección ya no es necesaria y se retira. Se conserva la numeración de `[SI11]`/`[SI12]` para no romper referencias. El detalle vive en el historial de git.
 
-#### `[SI11]` Bandeja de sugerencias de creación (señal de demanda)
-
-Materializa `[R30]`.
-
-Proyección que lista las **demandas de unidades inexistentes** que los consumidores hicieron visibles, como sugerencias para que el administrador cree la unidad si corresponde. Es la fuente de la UI de "sugerencias de creación" del administrador. Es distinta de la bandeja de Borradores (`[SI04]`): una sugerencia **no es una unidad** —es un aviso previo a que exista cualquier unidad—; el administrador la atiende creando la unidad por F1 (`CrearUnidad`) o la descarta de la bandeja.
-
-**Cómo se alimenta — señal de demanda entrante.** Cuando un consumidor necesita una unidad que no existe en su copia local, además de diferir su operación (`[D15]`), emite una señal informativa que Estructura Organizacional proyecta en esta bandeja:
-
-```
-DemandaDeUnidadSenalada { senalId, tenantId, subDominioOrigen, datosSugeridos?, fechaSenal }
-```
-
-**Comportamiento:**
-
-- La señal es **informativa y no bloqueante**: no crea unidades ni dispara comandos, solo agrega o actualiza una entrada en la bandeja. La creación sigue siendo acto deliberado del administrador (`[D15]`, `[R30]`).
-- La idempotencia de la señal la garantiza `[SI07]` (`senalId`): un reenvío no genera dos sugerencias.
-- La señal **no es condición de la operación del consumidor**: si se perdiera, la operación del consumidor sigue correcta porque su integridad la sostiene el mecanismo de diferir, no la señal. La bandeja es una mejora de la gestión, no parte del camino crítico de nadie.
-- En F2+ una señal con contexto inequívoco puede habilitar la creación automática (`[PD01]`).
+> **Nota — `[SI11]` retirada (issue #72).** Existió una "bandeja de sugerencias de creación" alimentada por una **señal de demanda** (`DemandaDeUnidadSenalada`) que un consumidor emitía cuando necesitaba una unidad inexistente, para que el administrador la creara. Una vez implementada la asignación/distribución de la unidad en los consumidores —la UI elige unidades de la fuente de verdad y las reglas de distribución se parametrizan contra ella—, una unidad referenciada **siempre existe** en Estructura Organizacional; el caso "unidad que el administrador aún no ha creado" deja de ocurrir en el camino operativo (`[P05]` reformulada), y este aparato quedó sin disparador → se retira junto con `[R30]` y la parte 4 de `[D15]`. La creación de unidades sigue su curso normal por planeación del administrador (F1). Se conserva la numeración de `[SI12]` para no romper referencias. El detalle vive en el historial de git.
 
 #### `[SI12]` Punto de resincronización de respaldo
 
@@ -587,79 +559,18 @@ Esta política evita introducir una dependencia entre el job y una proyección d
 
 ### 3.8. Comportamiento de integración con consumidores (`[D15]`)
 
-Las FSM de la Sección 4 describen el ciclo de vida **interno** de la unidad. Esta sub-sección describe el comportamiento **entre dominios** que introduce `[D15]`: qué pasa cuando un consumidor (OXP, Contabilidad) necesita una unidad que aún no existe. Es el flujo nuevo del replanteamiento #46 y el más sutil, porque combina tres mecanismos independientes (copia local, diferir, señal). El fundamento de patrones está en [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md).
+Las FSM de la Sección 4 describen el ciclo de vida **interno** de la unidad. Esta sub-sección describe el comportamiento **entre dominios** que introduce `[D15]`: cómo opera un consumidor (OXP, Contabilidad) contra su copia local y qué hace ante el desfase de consistencia eventual. El fundamento de patrones está en [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md).
 
-**Escenario:** a OXP le llega un documento imputado a una unidad que todavía no existe en su copia local.
+**Dos planos, dos lecturas del mismo dato.** El desacople es del backend; la UI es una capa de composición y lee al dueño en vivo:
 
-```
-      ┌──────────────────┐
-      │ [OXP] imputa     │
-      │ contra su copia; │
-      │ la unidad no     │
-      │ existe aún       │
-      └──────────────────┘
-                │
-                ▼
-      ┌──────────────────┐
-      │ CORRECCIÓN:      │
-      │ [OXP] DIFIERE    │
-      │ y espera (no     │
-      │ se detiene)      │
-      └──────────────────┘
-                │
-                ▼
-      ┌──────────────────┐
-      │ VISIBILIDAD:     │
-      │ [OXP] emite la   │
-      │ señal de         │
-      │ demanda ([SI07]) │
-      └──────────────────┘
-                │
-                ▼
-      ┌──────────────────┐
-      │ [EO] proyecta    │
-      │ en la bandeja    │
-      │ de sugerencias   │
-      │ ([SI11])         │
-      └──────────────────┘
-                │
-                ▼
-      ┌──────────────────┐
-      │ [ADMIN EO] ve    │
-      │ y decide crear   │
-      │ la unidad (F1)   │
-      └──────────────────┘
-                │
-                ▼
-      ┌──────────────────┐
-      │ [EO] emite       │
-      │ UnidadActivada   │
-      │ a consumidores   │
-      └──────────────────┘
-                │
-                ▼
-      ┌──────────────────┐
-      │ [OXP] recibe el  │
-      │ evento; el       │
-      │ diferido se      │
-      │ resuelve solo    │
-      └──────────────────┘
-                │
-                ▼
-      ┌──────────────────┐
-      │ causación        │
-      │ completa contra  │
-      │ la unidad real   │
-      │ (= Contabilidad) │
-      └──────────────────┘
-```
+- **UI / BFF — lee a Estructura Organizacional en vivo** (fuente de verdad): selección de unidades, nombres, jerarquía, parametrización de reglas. La UI compone de los servicios que necesita y, si Estructura Organizacional no está disponible, degrada apoyándose en la capacidad del dominio de operar y diferir. **La UI no consume la copia local del consumidor.**
+- **Dominio del consumidor — valida contra su copia local** (`[R13]`); nunca consulta a Estructura Organizacional en el camino crítico. La copia es una proyección para **validación e integridad**, no una API de lectura para la pantalla.
 
-**Lo que el diagrama hace explícito** (la CORRECCIÓN y la VISIBILIDAD son dos caminos independientes que arrancan a la vez tras el primer paso; el diagrama los presenta en secuencia por claridad de lectura):
+**Diferir por consistencia eventual.** Como una unidad solo se referencia tras existir en Estructura Organizacional (la UI elige de la fuente de verdad; las reglas de distribución se parametrizan contra ella), una unidad referenciada **siempre existe en el dueño**. Lo único que puede pasar es que el evento de ciclo de vida (`UnidadCreada`/`UnidadActivada`) aún no haya llegado a la copia local del consumidor (desfase normal de propagación). En ese caso el consumidor **no se detiene**: registra lo que puede y difiere solo la parte que requiere la unidad, que se resuelve sola cuando el evento llega a su copia. Si una copia se desfasa por más tiempo (evento perdido, consumidor caído), se repara de fondo por el punto de resincronización (`[SI12]`), nunca en el camino crítico.
 
-- **Camino de la *corrección* vs camino de la *visibilidad*.** El primero (diferir y esperar el evento `UnidadActivada`) es el que deja el sistema correcto; el segundo (la señal a la bandeja) solo acelera que el administrador se entere.
-- **La señal no es condición de nada.** Si se perdiera, el diferido sigue en pie y la unidad puede crearse igual por la planeación del administrador; cuando exista, la resolución ocurre de todos modos. Por eso la señal puede ser fire-and-forget.
-- **Nadie consulta a EO en caliente.** OXP siempre lee su copia local (`[R13]`). Si una copia se desfasa, se repara de fondo por el punto de resincronización (`[SI12]`), nunca en el camino crítico.
-- **La unidad nunca se aproxima.** No hay unidad de tránsito ni provisional: se difiere hasta que exista la real, porque debe coincidir exacto con la contabilidad.
+**La unidad nunca se aproxima.** No hay unidad de tránsito ni provisional: se difiere hasta que el evento llegue a la copia, porque la unidad debe coincidir exacto con la contabilidad.
+
+> **Nota — qué cambió respecto al replanteamiento #46.** El #46 introdujo, además, una **señal de demanda** del consumidor hacia Estructura Organizacional y una **bandeja de sugerencias de creación** (`[SI11]`), pensadas para el caso "el consumidor necesita una unidad que el administrador aún no ha creado". Una vez implementada la asignación/distribución de la unidad en los consumidores (la UI elige de la fuente de verdad; las reglas resuelven sobre unidades existentes), ese caso deja de ocurrir en el camino operativo y ese aparato quedó **sin disparador** → se retiró (`[SI11]`, `[R30]`, la parte 4 de `[D15]`). Lo que permanece es la copia local para validar, el diferir por consistencia eventual y la resincronización de respaldo.
 
 ---
 
@@ -790,7 +701,7 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 
 | Aspecto | Detalle |
 |---------|---------|
-| **Descripción** | Una unidad organizacional fue registrada en el sistema. Siempre nace por **acto deliberado del administrador** (F1): directamente operativa (`Activa`) o en preparación (`Borrador`). La creación nunca se origina en un consumidor — la demanda de un consumidor solo se hace visible como sugerencia en la bandeja (`[SI11]`); el administrador decide si la atiende creando la unidad por F1. |
+| **Descripción** | Una unidad organizacional fue registrada en el sistema. Siempre nace por **acto deliberado del administrador** (F1): directamente operativa (`Activa`) o en preparación (`Borrador`). La creación nunca se origina en un consumidor. |
 | **Causalidad** | Directa (comando `CrearUnidad`). |
 | **Agregado** | `UnidadOrganizacional` |
 | **Estado previo** | — (creación) |
@@ -1131,7 +1042,7 @@ El atributo `motivoBaja` se proyecta en el modelo de lectura para reportería, b
 | `D12` | **Cascada de inactivación de grupos modelada como saga** (`CascadaInactivacionGrupo`). Emite un evento por nodo afectado (no un evento agregado tipo `GrupoInactivadoEnCascada`) para que los consumidores puedan reaccionar granularmente sin parsear listas. Sin cascada inversa al reactivar (`[R20]`); el sistema inteligente identifica candidatos a reabrir vía `correlationId` correlacionado (`[SI08]`). | Granularidad de eventos = granularidad de reacción. La asimetría reactivación-sin-cascada es coherente con que `Inactiva` no es terminal en F1 — el admin puede reabrir hijos que vea pertinentes sin que el sistema lo presuma. | Plan, decisión cerrada con el usuario en familia 2 grupos |
 | `D13` | **Reactivación de tipos de unidad no modelada en F1.** La FSM de `TipoUnidad` tiene transición `Activo → Inactivo` (vía `TipoUnidadInactivado`) pero no la inversa. El alcance v1.0 no la requiere — no hay un caso de negocio identificado que justifique reactivar un tipo previamente inactivado. | Si en F2+ el negocio lo solicita, se evalúa modelarlo como evento `TipoUnidadReactivado` análogo a `GrupoReactivado`, con transición `Inactivo → Activo` en la FSM de `TipoUnidad`. No se mantiene como pendiente formal (`[PD##]`) porque no hay demanda actual ni horizonte definido — es una extensión natural si surge. La asunción de F1 es que `TipoUnidadInactivado` es terminal. | Auditoría Bloque Media, M9. |
 | `D14` | **Herencia dinámica del catálogo de tipos desde el grupo raíz** (sin replicación). El catálogo `tiposUnidad` vive solo en el grupo raíz; los sub-grupos lo heredan dinámicamente vía el comportamiento `tiposVigentes()` que recorre la jerarquía hasta el raíz por la proyección `[SI02]`. | Fuente única — modificar el catálogo del raíz se refleja inmediatamente en todos los sub-grupos sin migración explícita. Evita problemas de desincronización entre raíz y sub-grupos. El costo de lectura es despreciable porque la jerarquía es poco profunda (raramente >5 niveles en empresas de hasta 2.000 unidades, `[P04]`) y la proyección de jerarquía ya está materializada. Alternativa descartada: copia estática al crear sub-grupo (requiere migración manual si el raíz cambia y produce versiones divergentes del catálogo por sub-grupo). | Auditoría Bloque Baja, B3. |
-| `D15` | **La unidad organizacional es un dato gobernado con dueño único (Estructura Organizacional); los consumidores operan contra copia local, difieren cuando falta y nunca crean ni bloquean.** Cuatro consecuencias de modelo: **(1) Dueño único** — solo Estructura Organizacional crea, modifica y da de baja unidades; ningún consumidor las origina. **(2) Copia local por eventos** — OXP, Contabilidad y futuros consumidores mantienen su copia de unidades por suscripción a los eventos de ciclo de vida y operan contra ella; nunca consultan a Estructura Organizacional en el camino crítico (`[R13]`, `[SI12]` repara la copia de fondo). **(3) Diferir, no bloquear** — cuando un consumidor necesita una unidad que aún no existe, registra lo que puede y difiere solo la parte que la requiere; esa parte se resuelve sola cuando llega `UnidadActivada` a su copia local (consistencia eventual). La unidad es parte de la integridad del hecho del consumidor y debe coincidir exacto con la contabilidad, así que **no se aproxima con un valor de tránsito o provisional** —aproximarla desconciliaría operación y contabilidad— (estrategia "diferir" de la guía `datos-entre-dominios.md`). **(4) Demanda por señal informativa** — la necesidad de una unidad inexistente se hace visible como señal no bloqueante (`[R30]`, `[SI11]`) que solo alimenta la bandeja de sugerencias; **no es un comando, no crea nada y la corrección del sistema no depende de ella**. | Elimina los acoplamientos de ejecución y proceso entre Estructura Organizacional y los consumidores (issue #45/#46): el consumidor nunca queda detenido por la disponibilidad ni por el ciclo de creación de Estructura Organizacional, y Estructura Organizacional no queda atada a la disponibilidad de los consumidores para reestructurar. Reemplaza el patrón anterior (creación desde consumidor vía BFF → unidad en `Borrador` → activación → cancelación en cascada al descartar), que acoplaba la operación del consumidor al gesto humano del administrador. Fundamento completo en [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md). | Replanteamiento #46; guía `datos-entre-dominios.md`. |
+| `D15` | **La unidad organizacional es un dato gobernado con dueño único (Estructura Organizacional); los consumidores operan contra copia local, difieren ante el desfase y nunca crean ni bloquean.** Tres consecuencias de modelo: **(1) Dueño único** — solo Estructura Organizacional crea, modifica y da de baja unidades; ningún consumidor las origina. **(2) Copia local por eventos, para validación** — OXP, Contabilidad y futuros consumidores mantienen su copia de unidades por suscripción a los eventos de ciclo de vida y **validan contra ella** en su dominio; nunca consultan a Estructura Organizacional en el camino crítico (`[R13]`, `[SI12]` repara la copia de fondo). La copia es una proyección para validación e integridad — **no una API de lectura para la UI**: la UI lee a Estructura Organizacional en vivo (ver §3.8 y `datos-entre-dominios.md`). **(3) Diferir por consistencia eventual, no bloquear** — como una unidad solo se referencia tras existir en Estructura Organizacional (la UI elige de la fuente de verdad; las reglas se parametrizan contra ella), una unidad referenciada siempre existe en el dueño; si su evento de ciclo de vida aún no llegó a la copia local, el consumidor registra lo que puede y difiere solo la parte que la requiere, que se resuelve sola cuando el evento llega (consistencia eventual). La unidad debe coincidir exacto con la contabilidad, así que **no se aproxima con un valor de tránsito o provisional** (estrategia "diferir" de la guía `datos-entre-dominios.md`). | Elimina los acoplamientos de ejecución y proceso entre Estructura Organizacional y los consumidores (issue #45/#46): el consumidor nunca queda detenido por la disponibilidad ni por el ciclo de creación de Estructura Organizacional, y Estructura Organizacional no queda atada a la disponibilidad de los consumidores para reestructurar. Reemplaza el patrón anterior (creación desde consumidor vía BFF → unidad en `Borrador` → activación → cancelación en cascada al descartar), que acoplaba la operación del consumidor al gesto humano del administrador. **Nota (issue #72):** la parte 4 original —"demanda por señal informativa" (`[R30]`/`[SI11]`)— se retiró: una vez la asignación de la unidad se hace contra la fuente de verdad, el caso "unidad que el administrador aún no creó" deja de ocurrir en operación y la señal queda sin disparador. Fundamento completo en [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md). | Replanteamiento #46; ajuste #72; guía `datos-entre-dominios.md`. |
 
 ---
 
@@ -1143,7 +1054,7 @@ El atributo `motivoBaja` se proyecta en el modelo de lectura para reportería, b
 | `P02` | **La estructura jerárquica de las empresas evoluciona constantemente.** Fusiones, divisiones, traslados; las empresas reorganizan sus áreas con frecuencia. | Justifica la jerarquía versionada (`[DA1]`) y los tres procesos de reestructuración como eventos de dominio de primera clase. |
 | `P03` | **La identificación de una unidad debe ser estable a lo largo del tiempo.** Auditorías retrospectivas pueden ocurrir años después; la comparabilidad histórica IFRS 8 exige que cada periodo se reporte con la estructura de entonces. | Justifica la inmutabilidad del código (`I04`), la conservación del historial al inactivar (`Inactiva` no borra; `[R27]` historial referenciado al origen en F12/F13) y la fecha efectiva como eje de la jerarquía versionada. |
 | `P04` | **Las empresas operan con estructuras de hasta ~2.000 unidades organizacionales por empresa con jerarquías de múltiples niveles.** Límite documentado en el alcance. | Acota el dimensionamiento de las proyecciones (`[SI01]`-`[SI04]`) y los costos esperados de la cascada (`CascadaInactivacionGrupo` debe manejar miles de descendientes en grupos amplios). |
-| `P05` | **La demanda de unidades inexistentes desde la operación es habitual**, no excepcional. OXP y Contabilidad encuentran con frecuencia documentos asociados a unidades aún no registradas. La diferencia con F1 es que esa demanda **no crea** la unidad ni detiene la operación del consumidor. | Justifica que la demanda tenga un canal de primera clase sin acoplar: el consumidor difiere su operación (`[D15]`, `[R29]`), hace visible la necesidad como señal no bloqueante (`[R30]`) y Estructura Organizacional la proyecta en la bandeja de sugerencias (`[SI11]`, idempotente por `[SI07]`). La creación sigue siendo acto deliberado del administrador. |
+| `P05` | **El consumidor asigna la unidad contra la fuente de verdad, así que referenciar una unidad inexistente no ocurre en el camino operativo.** La UI elige unidades de Estructura Organizacional en vivo y las reglas de distribución del consumidor se parametrizan contra ella; una unidad referenciada siempre existe en el dueño. Lo único que puede pasar es el **desfase de propagación**: el evento de ciclo de vida aún no llegó a la copia local del consumidor. | Justifica que el consumidor opere contra su copia local y **difiera por consistencia eventual** (`[D15]`, `[R29]`) la parte que requiere una unidad cuyo evento aún no llegó, sin bloquear ni aproximar. Ya no se requiere un canal de demanda hacia Estructura Organizacional (la señal/bandeja se retiraron, issue #72): la creación de unidades sigue su curso normal por planeación del administrador. |
 
 ---
 
@@ -1176,7 +1087,7 @@ El bounded context de Estructura Organizacional protege dos recursos principales
 | Tipo de unidad (sub-recurso del grupo) | Agregar | `agregar_tipo_unidad` |
 | Tipo de unidad | Modificar | `modificar_tipo_unidad` |
 | Tipo de unidad | Inactivar | `inactivar_tipo_unidad` |
-| Unidad organizacional | Crear (F1 — directa o desde la bandeja de sugerencias) | `crear_unidad` |
+| Unidad organizacional | Crear (F1) | `crear_unidad` |
 | Unidad organizacional | Activar | `activar_unidad` |
 | Unidad organizacional | Suspender | `suspender_unidad` |
 | Unidad organizacional | Reactivar (desde Suspendida) | `reactivar_unidad` |
@@ -1205,3 +1116,4 @@ Total: **22 permisos atómicos**.
 | **1.4** | **2026-05-28** | **Aplicados 4 ajustes del comité de producto (D1-D4) sobre el modelo.** **D1 — Eliminada la duplicidad de los servicios** `ReestructuracionUnidad` y `DescarteAutomaticoBorradores` en Sección 3.6 (versiones obsoletas que habían quedado por error tras el Bloque Alta). Conservadas únicamente las versiones completas con write-ack, punto de no retorno, tabla de compensación detallada, idempotencia explícita y protocolo de proceso. **D2 — Conteo de invariantes** corregido en el encabezado de Sección 7 (15 → 16) para alinear con la realidad de la tabla (`[I01]`-`[I16]`). **D3 — Reclasificación de `[I08]`** de Local a Eventual / Cross-domain: la validación de "fecha efectiva no anterior al historial" requiere consultar información transaccional que vive en los sub-dominios consumidores, no en `UnidadOrganizacional`; agregado en agregado afectado `UnidadOrganizacional + consumidores` y referencia adicional a `[SI10]`. **D4 — Nueva sugerencia de implementación `[SI10]` Proyección de última imputación por unidad** que materializa `[I08]` y `[R25]`; contrato mínimo `obtenerUltimaImputacion(unidadId, tenantId) → fecha | null`; tres opciones de implementación (proyección transversal, consulta federada, proyección materializada del motor contable); política de rechazo por defecto si el contrato no está disponible; nota cruzada con Sección 7 del alcance. Tabla de mapeo SIs ↔ comandos actualizada para incluir `[SI10]` en F12, F13 y F14. **Conteos actualizados: 10 sugerencias de implementación** (+1: `[SI10]`); las **16 invariantes** ahora reflejan correctamente que `[I08]` es Eventual / Cross-domain. Alcance bumpeado a v1.2 con los 11 ajustes A1-A11 + consecuencia de D4 en Sección 7. |
 | **1.5** | **2026-06-19** | **Replanteamiento — eliminación de acoplamientos de ejecución y proceso con los consumidores (issue #45/#46), Hito 2 (modelo).** Acompaña al alcance v1.3. **Nueva decisión `[D15]`** que fija el modelo: unidad = dato gobernado con dueño único; consumidores con copia local por eventos; **diferir** (no bloquear ni aproximar) cuando falta la unidad; **demanda por señal informativa** (no comando, no crea nada). **Eliminado el patrón viejo de creación desde consumidor:** se retiran el comando `SolicitarCreacionDeUnidad`, el atributo almacenado `origenSolicitud`, el VO `OrigenSolicitud` y la cancelación en cascada al descartar; `UnidadCreada`/`UnidadActivada`/`UnidadDescartada` limpiados de F2/BFF/`origenSolicitud`; `Borrador` acotado a preparación del administrador (FSM, notas); `I10` sin F2. **`[SI07]` reorientada** de idempotencia del comando a idempotencia de la **señal de demanda** (`SenalRecibida`, materializa `[R30]`); se retira el endpoint BFF `verificarDisponibilidadCodigo`. **`[SI05]` y el servicio `DescarteAutomaticoBorradores` simplificados** (sin notificación/compensación a consumidores: un borrador no es referenciado por nadie). **`[SI04]`** acotada a borradores del administrador. **`[SI10]` cerrada** a una proyección local de última imputación alimentada por eventos de imputación entrantes (se retiran la consulta federada y la política de "rechazar si el consumidor está inaccesible"); `I08` ajustada. **Nuevas `[SI11]`** (bandeja de sugerencias de creación, proyección de la señal entrante) y **`[SI12]`** (punto de resincronización de respaldo, Capa 2 de la guía). **`I07`** deja de referenciar `[R29]` (cambió de significado) → Flujo 3 de activación. **`P05`** reescrita (demanda habitual sin crear ni bloquear). **Permiso `solicitar_creacion_unidad` eliminado.** Fundamento en `guias-de-modelado/datos-entre-dominios.md`. Conteos actualizados: **12 sugerencias de implementación** (+2: `[SI11]`, `[SI12]`), **15 decisiones** (+1: `[D15]`), **22 permisos atómicos** (−1). Catálogo de 18 eventos propios sin cambios (la señal de demanda y los eventos de imputación son entrantes, de otros dominios, documentados en `[SI11]`/`[SI10]`). **Eliminado el `anexo-orquestacion-creacion.md`** (superado por `[D15]`; su contenido histórico vive en git) y limpiadas sus referencias vivas en `[D08]`, `[D09]`, `[SI05]`, `UnidadDescartada`, `PD01`, la Sección 11 y el documento consolidado del ERP. **Tras revisión del PR #50:** la guía `datos-entre-dominios.md` se sube a la tabla de documentos relacionados (Sección 1) para que el *por qué* de la copia local sea visible; nueva sub-sección **3.8 — Comportamiento de integración con consumidores** con diagrama (ASCII) del flujo copia local + diferir + señal, mostrando los dos caminos independientes (corrección / visibilidad). |
 | **1.6** | **2026-06-19** | **Consistencia del modelo de comunicación — replanteamiento de la validación de fecha efectiva (issue #56).** Se **retira `[SI10]`** (proyección local de última imputación) y con ella el acoplamiento que obligaba a EO a importar las imputaciones de todos los consumidores. **`[R25]`/`[I08]` replanteadas** (la regla no se quita, se replantea repartiendo responsabilidad): la fecha efectiva se gobierna en dos planos — validación local contra la jerarquía vigente (sistema) + coherencia con la actividad transaccional (responsabilidad del administrador, acto deliberado; transacciones inmutables + vista actual/histórica). Limpiadas las referencias a `[SI10]`/imputación (tabla comando↔SI, `[SI07]`, `[D15]`, sub-sección 3.8, VO `FechaEfectiva`, precondiciones F12/F13). Se conserva la numeración de `[SI11]`/`[SI12]` (hueco en SI10). Conteos: **11 sugerencias de implementación** (−1: `[SI10]` retirada); 16 invariantes (`[I08]` reformulada, no eliminada); 15 decisiones; 22 permisos — sin cambios. Acompaña al alcance v1.4 y a OXP v4.1 (retira el aviso de imputación) / Contabilidad v1.10. |
+| **1.7** | **2026-06-23** | **Retiro del aparato de señal/bandeja — la copia local es para validación, no para la UI (issue #72/#73).** Una vez la asignación/distribución de la unidad en los consumidores se hace contra la fuente de verdad (la UI elige de Estructura Organizacional en vivo; las reglas se parametrizan contra ella), el caso "el consumidor necesita una unidad que el administrador aún no creó" deja de ocurrir en operación y `[P05]` se reformula. En consecuencia: **se retira `[SI11]`** (bandeja de sugerencias) y la **señal de demanda** entrante (`DemandaDeUnidadSenalada`) → SIs **11 → 10** (hueco en SI11, conserva numeración); **`[D15]` pasa de 4 partes a 3** (se retira "demanda por señal informativa"); **`[R30]` retirada** del alcance; **§3.8 reescrita** (se elimina el camino de visibilidad y el diagrama de señal/bandeja; se reencuadra el diferir a **consistencia eventual** y se agrega el **principio de capas**: la UI lee al dueño en vivo, la copia local es para validación, no API de lectura de la UI); **`[SI07]` reorientada** de idempotencia de la señal a idempotencia de los comandos del administrador (resuelta por `[SI06]`/`[SI01]`, sin tabla propia). Limpiadas las referencias a la bandeja/señal (tabla comando↔SI, `[SI04]`, evento `UnidadCreada`, permiso `crear_unidad`). Sin cambios en invariantes (16), decisiones (15, `[D15]` reformulada) ni permisos (22). Acompaña al alcance v1.5, a OXP (retira la emisión de la señal; aclara que la copia es para validación) y a la guía `datos-entre-dominios.md` (principio de capas). |
