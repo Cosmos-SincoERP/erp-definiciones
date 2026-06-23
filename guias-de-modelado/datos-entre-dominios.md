@@ -34,6 +34,19 @@ Por qué no consultar en caliente:
 
 La copia local es una **proyección** (un *read model*, en CQRS): una vista materializada, **derivada y reconstruible**. Si se corrompe o se pierde, se rehace desde el dueño. No es una segunda fuente de verdad — la fuente de verdad siempre es el dueño.
 
+### 2.1. El plano de la UI vs el plano del dominio
+
+El desacople de un bounded context es una propiedad de su **backend/runtime**, no de su interfaz. La **UI / BFF es una capa de composición**: puede consumir componentes de varios dominios y leer al **dueño en vivo** (fuente de verdad) para mostrar, seleccionar o parametrizar. Si un dominio compuesto no está disponible, la UI **degrada** apoyándose en la capacidad del dominio principal de operar y diferir.
+
+Dos consecuencias que conviene tener explícitas:
+
+- **La UI lee al dueño, no a la copia local del consumidor.** La copia es una proyección eventualmente consistente y de propósito interno (validación e integridad del dominio); usarla para pintar datos en pantalla expondría datos *stale* y acoplaría la UI a un detalle interno del consumidor. Para mostrar y seleccionar, la UI va a la fuente de verdad.
+- **La degradación de la UI se apoya en el dominio.** Que la UI permita completar una acción cuando un dominio compuesto cae solo es posible porque el dominio principal admite **operar y diferir** (sección 4). El desacople del backend es lo que habilita esa degradación — no son mecanismos independientes.
+
+> **Regla práctica:** la **UI consume al dueño (en vivo)**; el **dominio del consumidor valida contra su copia local**. Es el mismo dato leído en dos planos distintos, por propósito y momento distintos (mostrar/seleccionar vs validar/imputar) — no es duplicación ni contradicción.
+
+En la práctica, sobre el tamaño y el disparador de la copia: si la operación del consumidor **siempre elige el dato de la fuente de verdad** (vía la UI o reglas parametrizadas contra el dueño), el dato referenciado siempre existe en el dueño, y la copia local sirve sobre todo para **validar** (incluida la detección de cambios de estado posteriores, p. ej. una baja) y para **diferir** ante el desfase de propagación. No hace falta, en ese caso, un canal por el que el consumidor le "pida" al dueño crear el dato: ese canal solo se justifica si el consumidor puede referenciar algo que el dueño aún no tiene.
+
 ---
 
 ## 3. Sincronización: dos capas
@@ -122,3 +135,4 @@ La distinción:
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
 | 1.0 | Junio 2026 | Versión inicial. Surge del análisis de diseño del replanteamiento de Estructura Organizacional (eliminar acoplamientos de ejecución y proceso entre dominios, issue #45/#46). Consolida: principio de dueño único, réplica local por Event-Carried State Transfer, sincronización en dos capas (tiempo real + reconciliación de respaldo), las tres estrategias para datos faltantes con su criterio de elección, el caso del dato autovalidable (Nugget), anti-patrones y ejemplos aplicados (Terceros, Estructura Organizacional, OXP→Contabilidad). |
+| 1.1 | Junio 2026 | **Principio de capas UI vs dominio (issue #72/#75).** Nueva sub-sección 2.1: el desacople es del backend/runtime, no de la UI; la UI compone y lee al dueño en vivo (fuente de verdad), no a la copia local del consumidor (que es para validación del dominio); la degradación de la UI se apoya en la capacidad del dominio de operar y diferir. En consecuencia: si el consumidor siempre elige el dato de la fuente de verdad, la copia sirve para validar y diferir, y no se requiere un canal de "demanda de creación" hacia el dueño. Surge del análisis con el equipo de desarrollo que motivó retirar el aparato de señal/bandeja de Estructura Organizacional. |
