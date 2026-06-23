@@ -255,13 +255,13 @@ Matiz sobre "qué está vivo": como OXP no se vende sin los demás, los BC del n
 
 **El caso.** EO es el único BC del set que todavía no tiene repo `*.Infraestructura`. Como EO y Terceros son ambos **soporte de datos** (baja carga, graduación tardía — criterio #7 de la sección 3), no se justifica pagarle a EO una VM dedicada desde el día uno. La propuesta: que **compartan el host físico** —una sola VM con Docker Swarm y un solo servidor PostgreSQL— **sin quedar acoplados**.
 
-**Definición.** Un único repo de infraestructura aprovisiona el *host* de los BC de soporte de datos; cada BC sigue siendo dueño de su lógica, sus datos y su contrato. Como deja de ser "de un BC", el repo se nombra por su rol, no por Terceros:
+**Definición.** Un único repo de infraestructura aprovisiona el *host* de los ocupantes de soporte de datos; cada uno sigue siendo dueño de su lógica, sus datos y su contrato. Como deja de ser "de un BC", el repo se nombra por su rol, no por Terceros:
 
 - **Repo:** `Cosmos.Terceros.Infraestructura` se renombra a **`Cosmos.SoporteDeDatos.Infraestructura`** (familia de *host*, como `ApplicationPlane.Infraestructura`; ya no de la familia `Cosmos.<BC>.Infraestructura`).
 - **Aprovisiona:** 1 VNet, 1 VM + Docker Swarm, 1 PostgreSQL Flexible, ACR/Key Vault y runner (`swarm-deploy-sop`), con código CAF propio (`sop` → `rg-sop-dev-eus2-001`).
-- **Hoy ese repo ya hospeda dos conjuntos** (`tercerosdb` + `datosreferenciadb`); la propuesta suma `estructuraorganizacionaldb`. El nombre `Terceros` ya se quedaba corto.
+- **Tres ocupantes.** Ese host **ya corre dos**: Terceros (`tercerosdb`) y **Datos de Referencia** (servicio compartido de catálogos, repo `Cosmos.DatosReferencia`, base `datosreferenciadb`). La propuesta suma el tercero, **EO** (`estructuraorganizacionaldb`). El nombre `Terceros` ya se quedaba corto — de ahí el renombre por rol.
 
-El diagrama es el mismo de la sección 5, con la 4.ª columna convertida en host compartido:
+El diagrama es el mismo de la sección 5, con la 4.ª columna convertida en el host compartido de soporte de datos:
 
 ```
                     Usuarios del ERP (HTTPS)
@@ -278,11 +278,11 @@ El diagrama es el mismo de la sección 5, con la 4.ª columna convertida en host
           ┌──────────────┬──────┴───────┬──────────────┐
           ▼              ▼              ▼              ▼
     ┌───────────┐  ┌───────────┐  ┌───────────┐  ┌───────────┐
-    │   BC OXP  │  │ Impuestos │  │Contabilid.│  │ Terc. + EO│ ◄ host compartido: Terceros + EO (2 BC)
-    │ VM propia │  │ VM propia │  │ VM propia │  │ 1 VM Swarm│   1 VM + Docker Swarm + 1 Postgres (los mismos)
-    │           │  │           │  │           │  │           │   bases · contenedores · redes · topics SEPARADOS
-    │ servicios │  │ servicios │  │ servicios │  │ servicios │   repo: Cosmos.SoporteDeDatos.Infraestructura
-    │   del BC  │  │   del BC  │  │   del BC  │  │  de ambos │
+    │   BC OXP  │  │ Impuestos │  │Contabilid.│  │ Host datos│ ◄ host COMPARTIDO  (repo Cosmos.SoporteDeDatos.Infraestructura)
+    │ VM propia │  │ VM propia │  │ VM propia │  │ 1 VM Swarm│   ocupantes: Terceros · Datos de Referencia · EO
+    │           │  │           │  │           │  │           │   bases: tercerosdb · datosreferenciadb · estructuraorganizacionaldb
+    │ servicios │  │ servicios │  │ servicios │  │ servicios │   contenedores · redes · topics SEPARADOS  → no acoplados (mover c/u luego = redeploy)
+    │   del BC  │  │   del BC  │  │   del BC  │  │  de los 3 │
     │ ········· │  │ ········· │  │ ········· │  │ ········· │
     │  RabbitMQ │  │  RabbitMQ │  │  RabbitMQ │  │  RabbitMQ │
     │  + Redis  │  │  + Redis  │  │  + Redis  │  │  + Redis  │
@@ -295,20 +295,20 @@ El diagrama es el mismo de la sección 5, con la 4.ª columna convertida en host
           │   publican / se suscriben a eventos de dominio
           ▼              ▼              ▼              ▼
     ┌─────┬──────────────┬──────────────┬──────────────┬─────┐
-    │ Azure Service Bus — único, compartido (topic por BC):  │
+    │ Azure Service Bus — único, compartido. Topics:         │
     │ oxp · impuestos · contabilidad · terceros ·            │
-    │ estructuraorganizacional       (.events)               │
+    │ datosreferencia · estructuraorganizacional  (.events)  │
     └─────┴──────────────┴──────────────┴──────────────┴─────┘
 ```
 
 **Qué los mantiene desacoplados** (lo mismo que rige a cualquier par de BC):
 
-- **Base de datos propia** por BC en el mismo servidor — nadie toca las tablas del otro.
-- **Contenedor y red overlay propios** por BC dentro del Swarm; los repos de aplicación (`Cosmos.Terceros*`, `Cosmos.EstructuraOrganizacional*`) despliegan sus servicios con el patrón `onboard-dotnet-repo`, cada uno con su stack.
-- **Topic propio en el bus** (`terceros.events`, `estructuraorganizacional.events`) — se hablan solo por eventos, nunca en proceso (ADR-002), aunque vivan en el mismo host.
-- **Reversible:** mover EO a su propia VM más adelante (más carga, equipo propio, aislamiento de fallo) es un cambio de **despliegue**, no de diseño ni de código. Solo se relaja la *capa 4* (aislamiento de infra) de la sección 2, que es la que la guía define como reversible.
+- **Base de datos propia** por ocupante en el mismo servidor — nadie toca las tablas del otro.
+- **Contenedor y red overlay propios** por ocupante dentro del Swarm; los repos de aplicación (`Cosmos.Terceros*`, `Cosmos.DatosReferencia`, `Cosmos.EstructuraOrganizacional*`) despliegan sus servicios con el patrón `onboard-dotnet-repo`, cada uno con su stack.
+- **Topic propio en el bus** (`terceros.events`, `datosreferencia.events`, `estructuraorganizacional.events`) — se hablan solo por eventos, nunca en proceso (ADR-002), aunque vivan en el mismo host.
+- **Reversible:** mover cualquiera a su propia VM más adelante (más carga, equipo propio, aislamiento de fallo) es un cambio de **despliegue**, no de diseño ni de código. Solo se relaja la *capa 4* (aislamiento de infra) de la sección 2, que es la que la guía define como reversible.
 
-**Trade-offs honestos.** Compartir host = compartir *blast radius* (si la VM cae, caen ambos) y ventana de parcheo; y el repo del host lo opera **un solo equipo**. Aceptable para dos BC de soporte de datos de baja carga. Es una **excepción deliberada al ADR-001** ("1 VM por BC"), justificada por costo (criterio #7) y reversibilidad — el equipo decide si enmienda el ADR o la registra como excepción.
+**Trade-offs honestos.** Compartir host = compartir *blast radius* (si la VM cae, caen los tres) y ventana de parcheo; y el repo del host lo opera **un solo equipo**. Aceptable para ocupantes de soporte de datos de baja carga. Es una **excepción deliberada al ADR-001** ("1 VM por BC"), justificada por costo (criterio #7) y reversibilidad — el equipo decide si enmienda el ADR o la registra como excepción.
 
 ---
 
