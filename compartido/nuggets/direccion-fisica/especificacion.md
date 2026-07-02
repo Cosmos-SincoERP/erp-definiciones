@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Estado** | En especificación — borrador para revisión |
-| **Versión** | 0.1 |
+| **Versión** | 0.2 |
 | **Gobernanza** | [gobernanza-nuggets.md](../gobernanza-nuggets.md) |
 | **Catálogo** | [catalogo-nuggets.md](../catalogo-nuggets.md) |
 | **Hereda de** | Servicio de Direcciones v1.0 (eliminado en el replanteamiento de jun-2026; conservado en el historial del repositorio) — ver Sección 8 |
@@ -91,11 +91,11 @@ Se evalúan al construir, en orden, sin salir del proceso (filtro 3 de la gobern
 
 ## Sección 6: Datos embebidos
 
-Por producir por el custodio (Datos de Referencia) a partir de las fuentes heredadas — las cinco primeras ya están construidas y validadas en el servicio de Direcciones v1.0 (su carpeta `configuracion/` fue eliminada junto con el servicio; los archivos fuente se conservan en el historial del repositorio) y en Datos de Referencia:
+**Producidos por el custodio (Datos de Referencia)** a partir de las fuentes heredadas del servicio de Direcciones v1.0 (rescatadas del historial del repositorio, commit del replanteamiento de jun-2026). Publicados en `compartido/datos-referencia/catalogos/` (fuente del custodio) y embebidos en `compartido/nuggets/direccion-fisica/datos/`:
 
 | Archivo | Contenido | Fuente | Ajuste requerido |
 |---------|-----------|--------|------------------|
-| `perfiles-direccion.json` | Perfil por país: niveles territoriales y su obligatoriedad, formato y obligatoriedad del código postal, habilitación de captura estructurada, etiquetas de presentación. 5 países: CO, DO, PA, MX, US. | `formatos-direccion.json` (5 países) | ⚠️ **Corregir el perfil CO**: `tipoVia`/`numeroVia`/`numeroPredio` pasan de obligatorios a **modo de captura opcional**, y `codigoPostal` pasa a **opcional** — la exigencia documentada no corresponde al Anexo Técnico FE v1.9 (ver Sección 8). |
+| `perfiles-direccion.json` | Perfil por país: niveles territoriales y su obligatoriedad, formato y obligatoriedad del código postal, habilitación de captura estructurada, etiquetas de presentación. 5 países: CO, DO, PA, MX, US. | `formatos-direccion.json` (5 países) | ✅ **Aplicado**: reestructurado al modelo del Nugget (`niveles`/`codigoPostal`/`capturaEstructurada`/`presentacion`). Perfil CO corregido — captura estructurada y código postal **opcionales** (Anexo FE v1.9, Sección 8). MX/US en **modo genérico** hasta habilitación productiva (P4). |
 | Divisiones territoriales | `[V02]` valida contra el catálogo del Nugget [`DivisionTerritorial`](../division-territorial/especificacion.md) (CO 1.188 / DO 221 / PA 108) — fuente única de la jerarquía territorial dentro del paquete (jun-2026). | Vía Nugget `DivisionTerritorial`. Corregimientos PA: pendiente transferido a ese Nugget. |
 | `tipos-via-co.json` | 21 tipos de vía (catálogo DIAN: CL, CR, DG, TV, AC, AK…) | `configuracion/` del servicio eliminado (historial del repositorio) | Sin cambios — pasa a servir la captura estructurada opcional. |
 | `tipos-complemento.json` | 16 tipos (APT, TRR, PIS, OFC, LOC, BDG, BLQ, INT, CSA, LTE, ETP, CNJ, URB, BRR, EDF, UND) | ídem | Sin cambios. |
@@ -213,7 +213,6 @@ Adopción prevista según la [matriz del catálogo](../catalogo-nuggets.md#matri
 
 | # | Pendiente | Owner | Criterio de cierre |
 |---|----------|-------|--------------------|
-| P1 | **Producir `datos/`** desde las fuentes heredadas, aplicando la corrección del perfil CO (estructura y CP opcionales) y agregando al perfil la habilitación de captura estructurada y las etiquetas de presentación por país. | Custodio | Carpeta `datos/` completa y validada. |
 | ~~P2~~ | ➡️ **Transferido (jun-2026)** al Nugget `DivisionTerritorial` (P1 de esa especificación): los corregimientos de Panamá pertenecen a la jerarquía territorial, no a la dirección. | — | — |
 | P3 | **Origen normativo del catálogo de tipos de vía:** la nomenclatura DIAN (CL, CR, DG…) no es exigida en FE (verificado); confirmar su fuente real (formulario RUT / estándar de captura) para citarla en los datos, o reclasificar el catálogo como convención del producto. | Custodio | Fuente citada en `tipos-via-co.json`. |
 | P4 | **Perfiles MX y US:** se heredan como referencia (las notas del SAT/CFDI 4.0 son valiosas), pero quedan en modo genérico hasta la habilitación productiva de cada país (alineado con `[D7]` de Impuestos). Ratificar al abrir F2. | Custodio | Perfiles ratificados o ajustados al habilitar el país. |
@@ -225,4 +224,5 @@ Adopción prevista según la [matriz del catálogo](../catalogo-nuggets.md#matri
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
+| 0.2 | Julio 2026 | **Datos producidos (cierra P1, issue #77).** Los 5 catálogos embebidos se rescataron del historial del repositorio (servicio de Direcciones v1.0) y se publicaron en `compartido/datos-referencia/catalogos/` (fuente del custodio) y `compartido/nuggets/direccion-fisica/datos/` (embebidos): `tipos-via-co` (21), `tipos-complemento` (16), `tipos-direccion` (5), `codigos-postales-co` (248, 10 ciudades) y `perfiles-direccion` (5 países). El perfil se **reestructuró al modelo del Nugget** (`niveles`/`codigoPostal`/`capturaEstructurada`/`presentacion`), aplicando la corrección del perfil CO (captura estructurada y CP opcionales, Anexo FE v1.9) y dejando MX/US en modo genérico (P4). |
 | 0.1 | Junio 2026 | Borrador inicial. Hereda del servicio de Direcciones v1.0 la estructura genérica + perfil por país, los catálogos (21 tipos de vía, 16 complementos, 5 tipos de uso, perfiles de 5 países, 248 códigos postales) y las validaciones; elimina identidad, persistencia centralizada y eventos de sincronización. **Corrección verificada contra el Anexo Técnico FE v1.9 (Res. DIAN 000165/2023):** la dirección en FE es texto libre 1–300 (FAJ14) y el código postal es opcional con validación de notificación (FAJ73) — la captura estructurada CO pasa a modo opcional que compone la línea canónica, y lo estructurado por obligación es la división territorial (FAJ11/FAJ12, tablas DANE). 6 reglas `[V01]`–`[V06]`, igualdad por valor canónico (línea normalizada), política de advertencia para código postal, 5 pendientes P1–P5. |
