@@ -1,6 +1,6 @@
 # Modelo de Dominio — Estructura Organizacional
 
-**Versión:** 1.9
+**Versión:** 2.0
 **Fecha:** 2026-07-08
 
 ---
@@ -50,7 +50,7 @@ Las reglas de negocio se referencian como `[R##]` y su texto completo vive en `d
   - `[D##]` decisiones de este modelo (Sección 9).
   - `[DA##]` decisiones del anexo arquitectónico (`anexo-decisiones-arquitectonicas.md`).
   - `[I##]` invariantes del dominio (Sección 7).
-  - `[SI##]` sugerencias de implementación (Sección 3.5).
+  - `[SI##]` sugerencias de implementación (Sección 3.6).
   - `[P##]` premisas de negocio (Sección 10).
   - `[PD##]` pendientes por definir (Sección 11).
 - **Alcance del glosario canónico:** Los domain services, entidades internas y value objects son artefactos del modelo de dominio — no requieren entrada en el glosario canónico.
@@ -123,7 +123,7 @@ Los eventos cuyo nombre termina en `Modificado` (`UnidadModificada`, `GrupoModif
 
 ### 3.1. Estructura Organizacional como Bounded Context
 
-El bounded context contiene dos agregados raíz (`GrupoOrganizacional` y `UnidadOrganizacional`) y dos domain services que coordinan procesos multi-agregado.
+El bounded context contiene tres agregados raíz (`GrupoOrganizacional`, `UnidadOrganizacional` y `TipoUnidad`) y dos domain services que coordinan procesos multi-agregado.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -135,7 +135,7 @@ El bounded context contiene dos agregados raíz (`GrupoOrganizacional` y `Unidad
 │  │                     │                  │                      │   │
 │  │  · Jerarquía        │                  │  · Estado operativo  │   │
 │  │  · Cascada          │                  │  · Reestructuración  │   │
-│  │  · Tipos de unidad  │                  │  · motivoBaja        │   │
+│  │                     │                  │  · motivoBaja        │   │
 │  └─────────┬───────────┘                  └──────────┬───────────┘   │
 │            │                                          │              │
 │            │                                          │              │
@@ -153,9 +153,11 @@ El bounded context contiene dos agregados raíz (`GrupoOrganizacional` y `Unidad
             Sub-dominios consumidores (OXP, Contabilidad)
 ```
 
+El tercer agregado raíz, **`TipoUnidad`** (ámbito del tenant, FSM de 2 estados — ver Sección 3.4), no aparece en el diagrama porque no participa de la jerarquía ni de los domain services: las unidades lo referencian por `tipoUnidadId` y el catálogo de tipos es la proyección de todos los `TipoUnidad` del tenant.
+
 ### 3.2. Agregado: `GrupoOrganizacional`
 
-**Descripción:** Nodo agrupador de la jerarquía organizacional. No recibe imputaciones operativas. Su ciclo de vida es binario (`Activo` / `Inactivo`) y su inactivación dispara una cascada hacia todos sus descendientes (sub-grupos y unidades). Contiene además el catálogo de tipos de unidad disponibles para la empresa, como configuración estructural del propio agregado (ver `[D10]`).
+**Descripción:** Nodo agrupador de la jerarquía organizacional. No recibe imputaciones operativas. Su ciclo de vida es binario (`Activo` / `Inactivo`) y su inactivación dispara una cascada hacia todos sus descendientes (sub-grupos y unidades).
 
 **Composición:**
 
@@ -168,7 +170,6 @@ El bounded context contiene dos agregados raíz (`GrupoOrganizacional` y `Unidad
 | `esRaiz` | Boolean | Marca el grupo raíz único del tenant (creado automáticamente). | true / false |
 | `nivel` | Entero (calculado, no almacenado) | Profundidad del grupo en la jerarquía vigente. Se proyecta desde `[SI02]` (proyección de jerarquía vigente). No se appendea en eventos ni se persiste en el agregado. | 0 para raíz |
 | `estado` | Enum FSM | `Activo` o `Inactivo`. | |
-| `tiposUnidad` | Entidades internas (lista) | Catálogo de tipos de unidad. **Vive únicamente en el grupo raíz**; los sub-grupos lo heredan dinámicamente (ver `tiposVigentes()` y `[D13]`). La lista del raíz se reconstruye reproduciendo los eventos `TipoUnidadAgregado`, `TipoUnidadModificado` y `TipoUnidadInactivado` sobre el agregado raíz; una proyección de catálogo vigente la materializa para consulta rápida desde la UI y para validar al crear unidades hijas. | lista de `TipoUnidad { nombre, activo }` (solo poblada en el grupo raíz; vacía en sub-grupos) |
 | `versionAgregado` | Entero (atributo interno de plataforma) | Stamp de concurrencia optimista materializado por `[SI06]`. No es atributo de negocio — se usa solo en validación de `expectedVersion` al hacer append. No aparece en los payloads de los eventos. | |
 
 **Comportamiento calculado (no almacenado):**
@@ -177,13 +178,11 @@ El bounded context contiene dos agregados raíz (`GrupoOrganizacional` y `Unidad
 |--------|---------|-----------|
 | `descendientesActivos()` | Recorrido recursivo de la proyección de jerarquía vigente (`[SI02]`), filtrando sub-grupos `Activo` y unidades `Activa` o `Suspendida`. | F10 (Inactivación de grupo con cascada). El domain service `CascadaInactivacionGrupo` invoca este método del agregado — no consulta la proyección directamente — para mantener la fuente única de verdad en el dominio. |
 | `descendientesAfectablesPorCascada()` | Recorrido recursivo: sub-grupos `Activo` + unidades `Activa`/`Suspendida` + unidades `Borrador`. Devuelve lista clasificada por tipo. | F10, para mostrar al administrador el impacto previsto (`[R21]`) y para que la saga itere todos los nodos afectados. |
-| `tiposVigentes()` | **Herencia dinámica desde el grupo raíz** (ver `[D14]`): recorre la jerarquía vía proyección `[SI02]` hasta el grupo raíz y devuelve `tiposUnidad` con `activo = true` del raíz. Sin replicación: los sub-grupos no almacenan tipos propios — siempre ven los del raíz vigente. El catálogo se administra en un único lugar (el raíz); cualquier cambio se refleja inmediatamente en todos los sub-grupos sin migración. | Validación al crear unidades hijas en cualquier punto de la jerarquía. |
 | `puedeInactivarse()` | `estado == Activo` y `(esRaiz == false OR sinContenido())` | Validación previa a F10. Si retorna false, el comando `InactivarGrupo` se rechaza. |
 
-**Eventos propios (7):**
+**Eventos propios (4):**
 
 - Ciclo de vida del grupo: `GrupoCreado`, `GrupoInactivado`, `GrupoReactivado`, `GrupoModificado`.
-- Configuración del catálogo de tipos: `TipoUnidadAgregado`, `TipoUnidadModificado`, `TipoUnidadInactivado`.
 
 ### 3.3. Agregado: `UnidadOrganizacional`
 
@@ -196,14 +195,14 @@ El bounded context contiene dos agregados raíz (`GrupoOrganizacional` y `Unidad
 | `unidadId` | Identidad | Identificador único de la unidad. | uuid generado al crear |
 | `codigo` | VO `Codigo` | Identificador alfanumérico plano, único por tenant, inmutable. | 4-12 caracteres |
 | `nombre` | VO `Nombre` | Denominación descriptiva. | texto |
-| `tipoUnidad` | Referencia | Nombre del tipo de unidad (del catálogo del grupo padre o de un ancestro). | texto que existe en `tiposUnidad` vigentes |
+| `tipoUnidadId` | Referencia | Identificador del tipo de unidad (agregado `TipoUnidad` del tenant, Sección 3.4). Referencia **por identidad**: renombrar el tipo no afecta a las unidades. Los eventos de la unidad incluyen además `tipoUnidad` (nombre vigente del tipo) como dato informativo para consumidores. | uuid de un `TipoUnidad` vigente (`[I07]`) |
 | `descripcion` | Texto opcional | Descripción libre. | |
 | `grupoPadreId` | Referencia | Identificador del grupo padre. | uuid no nulo |
 | `estado` | Enum FSM | `Borrador`, `Activa`, `Suspendida`, `Inactiva`, `Descartada`. | |
 | `motivoBaja` | Enum opcional (proyectado en read model) | Causa de la baja cuando `estado in {Inactiva, Descartada}`. Valores: `operativa`, `fusion`, `division`, `cascada_grupo`. Ver `[D06]`. | null si está operando |
 | `causalidadBaja` | Referencia opcional | Cuando `motivoBaja in {fusion, division}`, referencia a la unidad destino o lista de destinos. | uuid o lista de uuid |
 | `fechaEstimadaReactivacion` | Fecha opcional (proyectada en read model) | Dato informativo para el administrador mientras la unidad está en `Suspendida`: expresa la transitoriedad esperada de la pausa y cuándo se espera reactivarla — ayuda a distinguir suspender (retorno esperado) de inactivar (sin expectativa de retorno). Ningún proceso la lee ni dispara reactivación automática (la reactivación F5 es siempre manual). Capturada en `UnidadSuspendida`. | null salvo en `Suspendida` |
-| `fechaEfectiva` | `FechaEfectiva` opcional | Solo presente cuando la unidad fue parte de una reestructuración (`motivoBaja in {fusion, division}`). Capturada en `UnidadInactivada` y proyectada para reconstrucción histórica. Ver Sección 3.4 (VO `FechaEfectiva`). | null en operación normal |
+| `fechaEfectiva` | `FechaEfectiva` opcional | Solo presente cuando la unidad fue parte de una reestructuración (`motivoBaja in {fusion, division}`). Capturada en `UnidadInactivada` y proyectada para reconstrucción histórica. Ver Sección 3.5 (VO `FechaEfectiva`). | null en operación normal |
 | `versionAgregado` | Entero (atributo interno de plataforma) | Stamp de concurrencia optimista materializado por `[SI06]`. No es atributo de negocio — se usa solo en validación de `expectedVersion` al hacer append. No aparece en los payloads de los eventos. | |
 
 **Datos transaccionales capturados en eventos pero no almacenados como atributos del agregado:**
@@ -237,7 +236,27 @@ Este dato vive solo en el stream de eventos para auditoría narrativa; el agrega
 - Modificación: `UnidadModificada`.
 - Reestructuración: `UnidadFusionada`, `UnidadDividida`, `UnidadTrasladada`.
 
-### 3.4. Value Objects compartidos
+### 3.4. Agregado: `TipoUnidad`
+
+**Descripción:** Clasificación de una unidad organizacional según su naturaleza (centro de costo, proyecto, sucursal, inmueble, departamento, y los que cada empresa agregue). Es un agregado raíz pequeño con **ámbito del tenant**: no pertenece a ningún nodo de la jerarquía (ver `[D10]`). El "catálogo de tipos" no es un agregado contenedor — es la **proyección de todos los `TipoUnidad` del tenant**. Las unidades lo referencian por identidad (`tipoUnidadId`), lo que permite renombrar un tipo sin romper referencias.
+
+**Composición:**
+
+| Componente | Tipo | Descripción | Atributos clave |
+|------------|------|-------------|-----------------|
+| `tipoUnidadId` | Identidad | Identificador único del tipo. | uuid generado al crear |
+| `nombre` | VO `Nombre` | Denominación del tipo. **Única por tenant** (`[SI13]`) y **modificable** — las unidades referencian por id, no por nombre. | texto |
+| `descripcion` | Texto opcional | Descripción libre del propósito del tipo. | |
+| `estado` | Enum FSM | `Activo` o `Inactivo` (ver Sección 4.3). Inactivar un tipo no afecta a las unidades existentes que lo usan; solo impide nuevas asignaciones. | |
+| `versionAgregado` | Entero (atributo interno de plataforma) | Concurrencia optimista materializada por `[SI06]`, igual que en los demás agregados. | |
+
+**Proyección de catálogo vigente — `tiposVigentes(tenant)`:** consulta de los `TipoUnidad` del tenant con `estado == Activo`. La usan las validaciones de creación, activación y cambio de tipo de unidades (`[I07]`) y la UI del administrador. Reemplaza la herencia dinámica desde el grupo raíz de la `[D14]` retirada: ya no se recorre la jerarquía — el catálogo es plano, del tenant.
+
+**Eventos propios (3):** `TipoUnidadAgregado`, `TipoUnidadModificado`, `TipoUnidadInactivado` (Sección 5.4). Cada tipo vive en su propio stream.
+
+**Tipos precargados:** al inicializar el tenant se crean como agregados `TipoUnidad` los tipos sugeridos de la Sección 6.1.
+
+### 3.5. Value Objects compartidos
 
 | VO | Usado por | Descripción |
 |----|-----------|-------------|
@@ -247,7 +266,7 @@ Este dato vive solo en el stream de eventos para auditoría narrativa; el agrega
 | `FechaEfectiva` | Eventos de reestructuración y de transición de jerarquía | Momento a partir del cual una versión de la jerarquía o una reestructuración rige. No puede ser anterior a la última versión vigente de jerarquía de las unidades involucradas (`[I08]`, validable localmente); su coherencia con la actividad transaccional la define y responde el administrador (`[R25]`). |
 | `ReferenciaJerarquica` | Composición de ambos agregados | Combinación `padreId + nivel` que ubica un nodo en el árbol. El nivel es calculado, no almacenado en el código (`[DA1]`). |
 
-### 3.5. Sugerencias de implementación
+### 3.6. Sugerencias de implementación
 
 **Mapping rápido — Comando ↔ sugerencias de implementación aplicables:**
 
@@ -266,7 +285,7 @@ Este dato vive solo en el stream de eventos para auditoría narrativa; el agrega
 | `DividirUnidad` (F13) | `[SI02]`, `[SI06]`, `[SI09]` |
 | `TrasladarUnidad` (F14) | `[SI02]`, `[SI03]`, `[SI06]` |
 | `ModificarUnidad` / `ModificarGrupo` (F15) | `[SI06]` |
-| `AgregarTipoUnidad` / `ModificarTipoUnidad` / `InactivarTipoUnidad` | `[SI06]` |
+| `AgregarTipoUnidad` / `ModificarTipoUnidad` / `InactivarTipoUnidad` | `[SI06]`, `[SI13]` |
 
 ---
 
@@ -342,7 +361,7 @@ Los comandos del administrador (F1, F3, F4, F5, F6, F7, F8, F9, F10, F11, F14, F
 
 Materializa `[I12]`, `[I16]`, `[R19]`, `[R20]`.
 
-El domain service `CascadaInactivacionGrupo` (Sección 3.6) usa un `correlationId` único para enlazar el `GrupoInactivado` raíz con todos los eventos derivados (`GrupoInactivado` de sub-grupos, `UnidadInactivada` y `UnidadDescartada` de unidades hijas). Cada evento derivado lleva el `correlationId`.
+El domain service `CascadaInactivacionGrupo` (Sección 3.7) usa un `correlationId` único para enlazar el `GrupoInactivado` raíz con todos los eventos derivados (`GrupoInactivado` de sub-grupos, `UnidadInactivada` y `UnidadDescartada` de unidades hijas). Cada evento derivado lleva el `correlationId`.
 
 **Política de completud — "at-least-once con convergencia":**
 
@@ -387,6 +406,12 @@ SagaEventEmitted(
 
 > **Nota — `[SI11]` retirada (issue #72).** Existió una "bandeja de sugerencias de creación" alimentada por una **señal de demanda** (`DemandaDeUnidadSenalada`) que un consumidor emitía cuando necesitaba una unidad inexistente, para que el administrador la creara. Una vez implementada la asignación/distribución de la unidad en los consumidores —la UI elige unidades de la fuente de verdad y las reglas de distribución se parametrizan contra ella—, una unidad referenciada **siempre existe** en Estructura Organizacional; el caso "unidad que el administrador aún no ha creado" deja de ocurrir en el camino operativo (`[P05]` reformulada), y este aparato quedó sin disparador → se retira junto con `[R30]` y la parte 4 de `[D15]`. La creación de unidades sigue su curso normal por planeación del administrador (F1). Se conserva la numeración de `[SI12]` para no romper referencias. El detalle vive en el historial de git.
 
+#### `[SI13]` Índice único de nombre de `TipoUnidad` por tenant
+
+Análoga a `[SI01]` (índice único del código — se referencia explícitamente como patrón fuente). Mantener un índice único por `(tenantId, nombre normalizado)` sobre los agregados `TipoUnidad`. Los comandos `AgregarTipoUnidad` y `ModificarTipoUnidad` (cuando el delta incluye `nombre`) validan contra el índice antes de aceptar; la concurrencia se resuelve con la misma política de `version-conflict` de `[SI01]`/`[SI06]`.
+
+El índice cubre **todos** los tipos del tenant, activos e inactivos: el nombre de un tipo inactivado **no se libera** — dos tipos homónimos (uno inactivo y uno nuevo) harían ambigua la lectura de reportes históricos que denormalizan el nombre.
+
 #### `[SI12]` Punto de resincronización de respaldo
 
 Soporta `[R13]`, `[R29]` y la copia local de los consumidores.
@@ -399,7 +424,7 @@ Estructura Organizacional ofrece un punto de lectura de respaldo para que un con
 - Puede materializarse como reproceso de los eventos de ciclo de vida desde un punto, o como una foto del estado vigente de las unidades del tenant.
 - La fuente de verdad sigue siendo Estructura Organizacional; la copia del consumidor es derivada y reconstruible.
 
-### 3.6. Domain services
+### 3.7. Domain services
 
 #### Servicio: `CascadaInactivacionGrupo`
 
@@ -462,7 +487,7 @@ Análogo a Fusión pero con un origen y N destinos. `UnidadDividida` incluye `co
 
 **Protocolo de proceso:** mismo patrón que `CascadaInactivacionGrupo` — estado persistido, `correlationId` único, política de convergencia eventual sin compensación inversa.
 
-### 3.7. Relaciones entre agregados
+### 3.8. Relaciones entre agregados
 
 ```
    ┌──────────────────────────┐
@@ -494,8 +519,9 @@ Análogo a Fusión pero con un origen y N destinos. `UnidadDividida` incluye `co
 - `UnidadOrganizacional` N:1 `GrupoOrganizacional` (padre obligatorio; `[R01]`).
 - Mezcla libre de hijos en grupos (`[R05]`).
 - `GrupoOrganizacional` `esRaiz` 1:1 por tenant (`[R02]`, `[I13]`).
+- `UnidadOrganizacional` N:1 `TipoUnidad` (referencia por `tipoUnidadId`; el tipo es agregado del tenant y no participa de la jerarquía — no aparece en el diagrama).
 
-### 3.8. Comportamiento de integración con consumidores (`[D15]`)
+### 3.9. Comportamiento de integración con consumidores (`[D15]`)
 
 Las FSM de la Sección 4 describen el ciclo de vida **interno** de la unidad. Esta sub-sección describe el comportamiento **entre dominios** que introduce `[D15]`: cómo opera un consumidor (OXP, Contabilidad) contra su copia local y qué hace ante el desfase de consistencia eventual. El fundamento de patrones está en [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md).
 
@@ -592,9 +618,6 @@ Dos estados con transición bidireccional. Sin estados terminales.
    │ Eventos  │                      │  Eventos    │
    │  prog.:  │                      │   prog.:    │
    │  · GrupoModif.                  │  · GrupoModif. (no en cascada)
-   │  · TipoUnidadAgregado           │             │
-   │  · TipoUnidadModificado         │             │
-   │  · TipoUnidadInactivado         │             │
    └──────────┘                      └─────┬───────┘
         ▲                                  │
         └──────────────────────────────────┘
@@ -604,14 +627,14 @@ Dos estados con transición bidireccional. Sin estados terminales.
 
 **Notas estado por estado:**
 
-- **`Activo`** — Estado inicial al crear (F9, `GrupoCreado` directamente en `Activo`; no hay `Borrador` para grupos). Admite gestión del catálogo de tipos de unidad como eventos de progreso (`TipoUnidadAgregado`, `TipoUnidadModificado`, `TipoUnidadInactivado`) y modificación general (`GrupoModificado`). Transición de salida: a `Inactivo` mediante `GrupoInactivado` (F10) que dispara la saga `CascadaInactivacionGrupo`.
-- **`Inactivo`** — El grupo no organiza nuevos descendientes operativos. Admite `GrupoModificado` (puede corregirse el nombre, por ejemplo, sin reactivar). **No admite** los eventos de configuración de catálogo de tipos (`TipoUnidadAgregado`, `TipoUnidadModificado`, `TipoUnidadInactivado`) — el catálogo queda **congelado de solo lectura** durante el período `Inactivo`. Las unidades existentes que usan tipos del catálogo no se ven afectadas. Transición de salida: a `Activo` mediante `GrupoReactivado` (F11) — sin cascada inversa a los hijos; el administrador reabre los hijos uno a uno con apoyo del sistema inteligente.
+- **`Activo`** — Estado inicial al crear (F9, `GrupoCreado` directamente en `Activo`; no hay `Borrador` para grupos). Admite modificación general (`GrupoModificado`) como evento de progreso. Transición de salida: a `Inactivo` mediante `GrupoInactivado` (F10) que dispara la saga `CascadaInactivacionGrupo`.
+- **`Inactivo`** — El grupo no organiza nuevos descendientes operativos. Admite `GrupoModificado` (puede corregirse el nombre, por ejemplo, sin reactivar). Transición de salida: a `Activo` mediante `GrupoReactivado` (F11) — sin cascada inversa a los hijos; el administrador reabre los hijos uno a uno con apoyo del sistema inteligente. *(El catálogo de tipos ya no guarda relación con el estado del grupo: desde el #86 los tipos son agregados del tenant — la regla del "catálogo congelado" desapareció con la reubicación.)*
 
   > **Nota sobre asimetría con unidades:** A diferencia de las unidades en `Inactiva` (que NO admiten modificaciones), los grupos en `Inactivo` SÍ admiten `GrupoModificado`. La razón es que los grupos **no participan en historial transaccional** — son nodos agrupadores. Corregir el nombre o la descripción de un grupo inactivo no afecta la semántica de operaciones pasadas. La asimetría es intencional y refleja la diferencia funcional entre los dos tipos de nodo.
 
 **Caso especial — Grupo raíz:** El grupo raíz (`esRaiz = true`) nunca puede inactivarse mientras tenga contenido (`[R03]`, `[I13]`). La validación se hace en el comando `InactivarGrupo` antes de iniciar la saga.
 
-### 4.3. FSM de `TipoUnidad` (entidad interna)
+### 4.3. FSM de `TipoUnidad` (agregado)
 
 Dos estados. La inactivación de un tipo no afecta unidades existentes que lo usan; solo impide nuevas asignaciones.
 
@@ -643,8 +666,8 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 | **Agregado** | `UnidadOrganizacional` |
 | **Estado previo** | — (creación) |
 | **Estado resultante** | `Borrador` (default) o `Activa` (cuando el administrador elige activar directamente — en ese caso se emite `UnidadActivada` en el mismo append). |
-| **Precondiciones** | `[R08]` (código único), `[R07]` (grupo padre Activo), tipo válido en el catálogo vigente del grupo padre o ancestros (`[R05]` jerarquía), formato del código válido (`[R10]`), `[I09]` (unicidad cruzada en tenant). |
-| **Información capturada** | `unidadId`, `codigo`, `nombre`, `tipoUnidad`, `descripcion`, `grupoPadreId`, `estadoInicial` (`Borrador` o `Activa` — **es un parámetro del comando que se captura para auditoría; el estado actual de la unidad se reconstruye reproduciendo la secuencia de eventos, no se lee de este campo**), `usuarioId`, `timestamp`. |
+| **Precondiciones** | `[R08]` (código único), `[R07]` (grupo padre Activo), tipo vigente en el catálogo de tipos del tenant (`[I07]`, Sección 3.4), formato del código válido (`[R10]`), `[I09]` (unicidad cruzada en tenant). |
+| **Información capturada** | `unidadId`, `codigo`, `nombre`, `tipoUnidadId`, `tipoUnidad` (nombre vigente, informativo), `descripcion`, `grupoPadreId`, `estadoInicial` (`Borrador` o `Activa` — **es un parámetro del comando que se captura para auditoría; el estado actual de la unidad se reconstruye reproduciendo la secuencia de eventos, no se lee de este campo**), `usuarioId`, `timestamp`. |
 | **Efectos** | Se crea el agregado en el estado inicial elegido. Si nace en `Activa`, se emite también `UnidadActivada`. Los consumidores reciben la notificación y actualizan su copia local; un diferido pendiente por esta unidad (`[R29]`, `[D15]`) se resuelve solo al llegar este evento. |
 
 #### `UnidadActivada`
@@ -657,7 +680,7 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 | **Estado previo** | `Borrador` (F3) o ninguno si se emite junto con `UnidadCreada` (F1). |
 | **Estado resultante** | `Activa` |
 | **Precondiciones** | Datos mínimos completos (`[I07]`), grupo padre en estado `Activo` (`[I10]`, `[R07]`), no existe otra unidad `Activa` con el mismo `codigo` (`[I09]`). |
-| **Información capturada** | `unidadId`, `codigo`, `tipoUnidad`, `grupoPadreId`, `estadoAnterior` (`Borrador` o `null` si vino con `UnidadCreada` en F1), `motivo` (opcional, texto libre), `usuarioId`, `timestamp`. |
+| **Información capturada** | `unidadId`, `codigo`, `tipoUnidadId`, `tipoUnidad` (nombre vigente, informativo), `grupoPadreId`, `estadoAnterior` (`Borrador` o `null` si vino con `UnidadCreada` en F1), `motivo` (opcional, texto libre), `usuarioId`, `timestamp`. |
 | **Efectos** | La unidad acepta imputaciones (`[R13]`). Los consumidores actualizan su copia local; las operaciones que estaban diferidas a la espera de esta unidad se resuelven solas (`[R29]`, `[D15]`). El payload self-contained permite a los consumidores actualizar referencias locales sin consultas adicionales. |
 
 #### `UnidadSuspendida`
@@ -709,7 +732,7 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 | **Estado previo** | `Activa` o `Suspendida` |
 | **Estado resultante** | `Inactiva` (reabrible) |
 | **Precondiciones** | Unidad en `Activa` o `Suspendida` (`[R17]`); en F12/F13 además se aplican `[R22]`-`[R25]`. |
-| **Información capturada** | `unidadId`, `codigo`, `tipoUnidad`, `grupoPadreId`, `motivoBaja` (`operativa` \| `fusion` \| `division`), `causalidadBaja` (opcional, referencia rápida: `unidadId` destino para fusión, lista de `unidadId` destinos para división; null cuando `motivoBaja == "operativa"`), `fechaEfectiva` (nullable; presente cuando `motivoBaja in {fusion, division}`; null cuando `motivoBaja == "operativa"` — la baja rige desde el `timestamp`), `esCascada` (boolean; `true` cuando es derivado de F10/F12/F13), `correlationId` (presente cuando `esCascada == true` o cuando proviene de saga), `motivo` (texto libre opcional), `usuarioId`, `timestamp`. |
+| **Información capturada** | `unidadId`, `codigo`, `tipoUnidadId`, `tipoUnidad` (nombre vigente, informativo), `grupoPadreId`, `motivoBaja` (`operativa` \| `fusion` \| `division`), `causalidadBaja` (opcional, referencia rápida: `unidadId` destino para fusión, lista de `unidadId` destinos para división; null cuando `motivoBaja == "operativa"`), `fechaEfectiva` (nullable; presente cuando `motivoBaja in {fusion, division}`; null cuando `motivoBaja == "operativa"` — la baja rige desde el `timestamp`), `esCascada` (boolean; `true` cuando es derivado de F10/F12/F13), `correlationId` (presente cuando `esCascada == true` o cuando proviene de saga), `motivo` (texto libre opcional), `usuarioId`, `timestamp`. |
 | **Efectos** | Los consumidores bloquean nuevas imputaciones. El atributo `motivoBaja` se proyecta para reportería y bandejas. Los registros históricos se conservan. La unidad puede reabrirse posteriormente con F6 (excepto cuando `motivoBaja in {fusion, division}` — en esos casos reabrir es semánticamente raro pero técnicamente posible; el sistema inteligente debe advertir). |
 
 > **Nota sobre `causalidadBaja`:** es una referencia rápida (uuid o lista de uuids). La información completa del proceso de reestructuración (todos los participantes, fecha efectiva, motivo) se consulta en el evento de proceso correlacionado (`UnidadFusionada` o `UnidadDividida`) usando el `correlationId`. Esta distribución entre dos streams (proceso + agregado) es por diseño: el agregado mantiene una referencia mínima; el stream de proceso mantiene el detalle completo (`[D04]`).
@@ -724,7 +747,7 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 | **Estado previo** | `Borrador` |
 | **Estado resultante** | `Descartada` ■ (terminal estricto, `[R14]`) |
 | **Precondiciones** | Unidad en `Borrador`. |
-| **Información capturada** | `unidadId`, `codigo`, `tipoUnidad`, `grupoPadreId`, `motivoBaja` (`operativa` cuando es rechazo manual del admin en F8; `cascada_grupo` cuando es descarte por cascada F10), `esCascada` (boolean; `true` cuando es derivado de F10), `correlationId` (presente cuando `esCascada == true`: el `correlationId` de la saga F10), `motivo` (texto libre opcional), `usuarioId` (el administrador que descarta en F8, o el que inactivó el grupo origen en F10), `timestamp`. |
+| **Información capturada** | `unidadId`, `codigo`, `tipoUnidadId`, `tipoUnidad` (nombre vigente, informativo), `grupoPadreId`, `motivoBaja` (`operativa` cuando es rechazo manual del admin en F8; `cascada_grupo` cuando es descarte por cascada F10), `esCascada` (boolean; `true` cuando es derivado de F10), `correlationId` (presente cuando `esCascada == true`: el `correlationId` de la saga F10), `motivo` (texto libre opcional), `usuarioId` (el administrador que descarta en F8, o el que inactivó el grupo origen en F10), `timestamp`. |
 | **Efectos** | El `codigo` de la unidad queda libre para una nueva creación (`[R11]`). La unidad se filtra de reportes históricos. Descartar un borrador del administrador no afecta a ningún consumidor — un borrador nunca fue referenciado por la operación de otro sub-dominio (ningún consumidor opera ni difiere contra borradores; difiere a la espera de una unidad `Activa`, `[D15]`). |
 
 #### `UnidadModificada`
@@ -737,7 +760,7 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 | **Estado previo** | `Borrador`, `Activa` o `Suspendida` |
 | **Estado resultante** | Sin cambio de estado |
 | **Precondiciones** | Unidad en estado modificable (`[R17]`, `[I15]`); si cambia el tipo, el nuevo tipo está vigente en el catálogo (`[I07]`). |
-| **Información capturada** | `unidadId`, `changes` (map de `{ fieldName: nuevoValor }` solo con los campos efectivamente modificados; claves posibles: `nombre`, `tipoUnidad`, `descripcion`), `motivo` (opcional), `usuarioId`, `timestamp`. Formato delta canónico según Sección 2.3.1. |
+| **Información capturada** | `unidadId`, `changes` (map de `{ fieldName: nuevoValor }` solo con los campos efectivamente modificados; claves posibles: `nombre`, `tipoUnidadId`, `descripcion`; cuando cambia `tipoUnidadId`, el payload incluye además `tipoUnidad` (nombre vigente, informativo)), `motivo` (opcional), `usuarioId`, `timestamp`. Formato delta canónico según Sección 2.3.1. |
 | **Efectos** | El estado proyectado refleja los nuevos valores (si se modificó en `Borrador`, la bandeja `[SI04]` refresca la fecha de última actividad del borrador). Los consumidores con interés en los campos modificados (ej: Contabilidad al cambio de tipo) actualizan su vista local. |
 
 ### 5.2. Eventos del ciclo de vida de grupos
@@ -811,7 +834,7 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 | **Información capturada** | `correlationId`, `unidadesOrigen` (lista de `unidadId`), `codigosOrigen` (lista de `codigo` paralela a `unidadesOrigen`), `unidadDestino` (`unidadId`), `codigoDestino`, `fechaEfectiva`, `motivo`, `usuarioId`, `timestamp`. |
 | **Efectos** | Marca el inicio del proceso. Le siguen N `UnidadInactivada` (una por origen, con `motivoBaja: "fusion"` y el mismo `correlationId`). Los consumidores que reciben el evento reasignan sus referencias del conjunto origen al destino con fecha efectiva. El payload self-contained (incluye códigos) permite reconstruir el cambio histórico sin queries adicionales. Habilita reportes con "vista actual" (todo al destino desde fecha efectiva) o "vista histórica" (cada periodo con su estructura). |
 
-> **Nota sobre boundaries:** Este evento vive en un **stream propio del proceso de reestructuración** (un stream por proceso, identificado por `correlationId`); no se appendea al stream de las unidades involucradas. **No existe un agregado backend `ReestructuracionUnidad`** — el evento es generado directamente por el **domain service** del mismo nombre (Sección 3.6) que coordina la saga. Los streams de las unidades reciben sus propios `UnidadInactivada` correlacionados por `correlationId`.
+> **Nota sobre boundaries:** Este evento vive en un **stream propio del proceso de reestructuración** (un stream por proceso, identificado por `correlationId`); no se appendea al stream de las unidades involucradas. **No existe un agregado backend `ReestructuracionUnidad`** — el evento es generado directamente por el **domain service** del mismo nombre (Sección 3.7) que coordina la saga. Los streams de las unidades reciben sus propios `UnidadInactivada` correlacionados por `correlationId`.
 
 #### `UnidadDividida`
 
@@ -826,7 +849,7 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 | **Información capturada** | `correlationId`, `unidadOrigen` (`unidadId`), `codigoOrigen`, `unidadesDestino` (lista de `unidadId`), `codigosDestino` (lista de `codigo` paralela a `unidadesDestino`), `fechaEfectiva`, `motivo`, `usuarioId`, `timestamp`. |
 | **Efectos** | Marca el inicio del proceso. Le sigue 1 `UnidadInactivada` para la origen (con `motivoBaja: "division"` y el mismo `correlationId`). Los consumidores reasignan sus referencias futuras según corresponda; el historial previo a la fecha efectiva queda referenciado al origen (`[R27]`). El payload self-contained (incluye códigos) permite a los consumidores reconstruir la división histórica sin queries adicionales. |
 
-> **Nota sobre boundaries:** análogo a `UnidadFusionada` — vive en stream propio del proceso de reestructuración (un stream por `correlationId`), no se appendea al stream de las unidades involucradas, y no existe agregado backend. El servicio `ReestructuracionUnidad` (Sección 3.6) es el emisor.
+> **Nota sobre boundaries:** análogo a `UnidadFusionada` — vive en stream propio del proceso de reestructuración (un stream por `correlationId`), no se appendea al stream de las unidades involucradas, y no existe agregado backend. El servicio `ReestructuracionUnidad` (Sección 3.7) es el emisor.
 
 #### `UnidadTrasladada`
 
@@ -837,39 +860,39 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 | **Agregado** | `UnidadOrganizacional` (el cambio impacta también la proyección de jerarquía, pero el evento se appendea al stream de la unidad). |
 | **Estado previo** | `Activa` o `Suspendida` |
 | **Estado resultante** | Sin cambio de estado (la posición en el árbol cambia, no el ciclo de vida) |
-| **Precondiciones** | Unidad en `Activa` o `Suspendida` (`[R23]`); nuevo grupo padre existente, en `Activo` y distinto del padre actual (`[R07]`, `[I10]`); fecha efectiva coherente con la versión vigente (`[R25]`, `[I08]`); el nuevo padre admite el tipo de la unidad (catálogo vigente). |
-| **Información capturada** | `unidadId`, `codigo`, `tipoUnidad`, `grupoPadreAnterior`, `grupoPadreNuevo`, `fechaEfectiva`, `motivo`, `usuarioId`, `timestamp`. |
-| **Efectos** | La jerarquía registra una nueva versión vigente a partir de la fecha efectiva. La unidad sigue operando con el mismo código. Los consumidores con interés jerárquico (reportería) actualizan su vista. El payload self-contained (incluye `codigo` y `tipoUnidad`) permite a los consumidores que mantienen mapeos `código → padre` actualizar deterministicamente sin queries adicionales (`[P03]`). |
+| **Precondiciones** | Unidad en `Activa` o `Suspendida` (`[R23]`); nuevo grupo padre existente, en `Activo` y distinto del padre actual (`[R07]`, `[I10]`); fecha efectiva coherente con la versión vigente (`[R25]`, `[I08]`). |
+| **Información capturada** | `unidadId`, `codigo`, `tipoUnidadId`, `tipoUnidad` (nombre vigente, informativo), `grupoPadreAnterior`, `grupoPadreNuevo`, `fechaEfectiva`, `motivo`, `usuarioId`, `timestamp`. |
+| **Efectos** | La jerarquía registra una nueva versión vigente a partir de la fecha efectiva. La unidad sigue operando con el mismo código. Los consumidores con interés jerárquico (reportería) actualizan su vista. El payload self-contained (incluye `codigo`, `tipoUnidadId` y el nombre vigente del tipo) permite a los consumidores que mantienen mapeos `código → padre` actualizar deterministicamente sin queries adicionales (`[P03]`). |
 
-### 5.4. Eventos de configuración del catálogo de tipos
+### 5.4. Eventos del agregado `TipoUnidad`
 
-> **Nota terminológica:** Estos tres eventos (`TipoUnidadAgregado`, `TipoUnidadModificado`, `TipoUnidadInactivado`) son **eventos de configuración del catálogo** dentro del agregado `GrupoOrganizacional`. Modifican el estado de la entidad interna `TipoUnidad`, no el del propio grupo — por eso el grupo aparece como "estado resultante: sin cambio de estado del grupo". Lo que sí cambia es el catálogo (`TipoUnidadAgregado` añade, `TipoUnidadModificado` actualiza, `TipoUnidadInactivado` desactiva un tipo). Esta distinción importa para los consumidores que mantengan proyecciones del catálogo: deben reaccionar al evento aunque la FSM del grupo no cambie.
+> **Nota:** Estos tres eventos son de **configuración del catálogo del tenant**: cambian un agregado `TipoUnidad` (Sección 3.4), no la jerarquía ni el estado de ningún grupo o unidad. Cada evento se appendea al **stream propio del tipo**. Los consumidores que mantengan proyecciones del catálogo reaccionan a estos eventos.
 
 #### `TipoUnidadAgregado`
 
 | Aspecto | Detalle |
 |---------|---------|
-| **Descripción** | Se agrega un nuevo tipo de unidad al catálogo del grupo. En F1 se administra al nivel del grupo raíz y se hereda hacia abajo. |
+| **Descripción** | Se agrega un nuevo tipo de unidad al catálogo del tenant. |
 | **Causalidad** | Directa (comando `AgregarTipoUnidad`). |
-| **Agregado** | `GrupoOrganizacional` |
-| **Estado previo** | `Activo` |
-| **Estado resultante** | Sin cambio de estado del grupo (evento de progreso). |
-| **Precondiciones** | Grupo en `Activo` (si está `Inactivo`, el catálogo queda congelado y el comando se rechaza). El nombre del tipo no está duplicado en el catálogo del grupo. |
-| **Información capturada** | `grupoId`, `nombreTipoUnidad`, `descripcion` (opcional), `usuarioId`, `timestamp`. |
-| **Efectos** | El catálogo del grupo (y heredado por sub-grupos) incluye el nuevo tipo, disponible para asignar a unidades nuevas. |
+| **Agregado** | `TipoUnidad` |
+| **Estado previo** | — (creación) |
+| **Estado resultante** | `Activo` |
+| **Precondiciones** | El `nombre` no duplica el de otro tipo del tenant (`[SI13]`, cubre activos e inactivos). |
+| **Información capturada** | `tipoUnidadId`, `nombre`, `descripcion` (opcional), `usuarioId`, `timestamp`. |
+| **Efectos** | El catálogo del tenant incluye el nuevo tipo, disponible para asignar a unidades nuevas en cualquier punto de la jerarquía. |
 
 #### `TipoUnidadModificado`
 
 | Aspecto | Detalle |
 |---------|---------|
-| **Descripción** | Cambian datos descriptivos de un tipo de unidad existente. |
+| **Descripción** | Cambian el nombre o la descripción de un tipo existente. Renombrar es seguro: las unidades referencian el tipo por `tipoUnidadId`, no por nombre. |
 | **Causalidad** | Directa (comando `ModificarTipoUnidad`). |
-| **Agregado** | `GrupoOrganizacional` |
+| **Agregado** | `TipoUnidad` |
 | **Estado previo** | `Activo` |
-| **Estado resultante** | Sin cambio de estado del grupo. |
-| **Precondiciones** | Tipo existente y vigente. Grupo en `Activo` (si está `Inactivo`, el catálogo queda congelado y el comando se rechaza). |
-| **Información capturada** | `grupoId`, `nombreTipoUnidad`, `changes` (map de `{ fieldName: nuevoValor }` solo con campos efectivamente modificados; clave principal: `descripcion`), `motivo` (opcional), `usuarioId`, `timestamp`. Formato delta canónico según Sección 2.3.1. |
-| **Efectos** | El catálogo refleja los nuevos valores. |
+| **Estado resultante** | Sin cambio de estado. |
+| **Precondiciones** | Tipo existente y `Activo`. Si el delta incluye `nombre`, el nuevo nombre no duplica el de otro tipo del tenant (`[SI13]`). |
+| **Información capturada** | `tipoUnidadId`, `changes` (map de `{ fieldName: nuevoValor }` solo con campos efectivamente modificados; claves posibles: `nombre`, `descripcion`), `motivo` (opcional), `usuarioId`, `timestamp`. Formato delta canónico según Sección 2.3.1. |
+| **Efectos** | El catálogo refleja los nuevos valores. Las unidades que referencian el tipo no requieren acción (referencia por id); las proyecciones y consumidores que denormalizan el nombre lo refrescan con este evento. |
 
 #### `TipoUnidadInactivado`
 
@@ -877,12 +900,12 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 |---------|---------|
 | **Descripción** | Un tipo de unidad se inactiva — no podrá asignarse a unidades nuevas. Las unidades existentes que ya lo usan no se ven afectadas. |
 | **Causalidad** | Directa (comando `InactivarTipoUnidad`). |
-| **Agregado** | `GrupoOrganizacional` |
-| **Estado previo** | `Activo` (del tipo) |
-| **Estado resultante** | `Inactivo` (del tipo) |
-| **Precondiciones** | Tipo existente y `Activo`. Grupo en `Activo` (si está `Inactivo`, el catálogo queda congelado y el comando se rechaza). |
-| **Información capturada** | `grupoId`, `nombreTipoUnidad`, `motivo` (opcional), `usuarioId`, `timestamp`. |
-| **Efectos** | El tipo deja de aparecer en las opciones de creación de unidades. Las unidades existentes que lo usan no requieren acción. |
+| **Agregado** | `TipoUnidad` |
+| **Estado previo** | `Activo` |
+| **Estado resultante** | `Inactivo` ■ (terminal en F1, `[D13]`) |
+| **Precondiciones** | Tipo existente y `Activo`. |
+| **Información capturada** | `tipoUnidadId`, `motivo` (opcional), `usuarioId`, `timestamp`. |
+| **Efectos** | El tipo deja de aparecer en las opciones de creación de unidades. Las unidades existentes que lo usan no requieren acción. Su `nombre` no se libera (`[SI13]`). |
 
 ---
 
@@ -890,9 +913,9 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 
 ### 6.1. Catálogo de tipos de unidad
 
-Catálogo **interno** al sub-dominio (no proviene de Datos de Referencia — los tipos son conceptos del modelo organizacional, no datos de referencia universales). Se administra al nivel del grupo raíz y se hereda hacia los sub-grupos. Es extensible: cada empresa puede agregar tipos personalizados según su modelo de negocio.
+Catálogo **interno** al sub-dominio (no proviene de Datos de Referencia — los tipos son conceptos del modelo organizacional, no datos de referencia universales). **Ámbito del tenant:** cada tipo es un agregado `TipoUnidad` propio (Sección 3.4) y el catálogo es la proyección de los tipos del tenant. Es extensible: cada empresa puede agregar tipos personalizados según su modelo de negocio.
 
-**Tipos pre-cargados sugeridos al inicializar un tenant:**
+**Tipos pre-cargados sugeridos al inicializar un tenant (se crean como agregados `TipoUnidad`):**
 
 | Nombre | Descripción |
 |--------|-------------|
@@ -931,7 +954,7 @@ El atributo `motivoBaja` se proyecta en el modelo de lectura para reportería, b
 | `I04` | **Inmutabilidad del código.** Una vez asignado, el código de una unidad o grupo no se modifica en ningún comando posterior. | Local | Ambos | `[R09]` |
 | `I05` | **Coherencia `motivoBaja` ↔ flujo.** Cuando `estado in {Inactiva, Descartada}`, el atributo `motivoBaja` está definido y su valor corresponde al flujo que disparó la baja (`operativa` desde F7 o F8 manual; `fusion` desde F12; `division` desde F13; `cascada_grupo` desde F10 cascada para Borradores). | Local | `UnidadOrganizacional` | `[R26]` |
 | `I06` | **Reapertura requiere padre activo.** Un comando `ReabrirUnidad` solo se acepta si el `grupoPadreId` está en `Activo` al momento del comando. | Eventual | `UnidadOrganizacional` | `[R16]` |
-| `I07` | **Datos mínimos para activación.** Una unidad solo transiciona a `Activa` si `codigo`, `nombre`, `tipoUnidad` y `grupoPadreId` están definidos y el tipo está vigente en el catálogo del padre o ancestros. | Local | `UnidadOrganizacional` | Flujo 3 (activación), alcance |
+| `I07` | **Datos mínimos para activación.** Una unidad solo transiciona a `Activa` si `codigo`, `nombre`, `tipoUnidadId` y `grupoPadreId` están definidos y el tipo referenciado está vigente en el catálogo de tipos del tenant (Sección 3.4). | Local | `UnidadOrganizacional` | Flujo 3 (activación), alcance |
 | `I08` | **Fecha efectiva de la reestructuración.** En F12, F13 y F14 la `fechaEfectiva` se gobierna en dos planos: **(a)** no puede ser anterior a la última versión vigente de jerarquía de las unidades involucradas — Estructura Organizacional lo valida **localmente** (es dueña de la jerarquía); **(b)** su coherencia con la actividad transaccional (no fijarla sobre periodos que ya tienen movimientos) la **define y responde el administrador** que ejecuta la reestructuración, como acto deliberado de gestión — el sistema no la valida contra el historial transaccional porque las transacciones/asientos son inmutables y los reportes ofrecen vista actual e histórica. | Local | `UnidadOrganizacional` | `[R25]` |
 | `I09` | **Unicidad de código por tenant.** El `codigo` es único dentro del tenant cruzando grupos y unidades. Las unidades en `Descartada` se excluyen del índice para liberar la identificación (`[R11]`). Enforcement por proyección (`[SI01]`) porque cruza dos agregados. | Eventual | Ambos | `[R08]`, `[R11]` |
 | `I10` | **Padre activo al crear/trasladar/reabrir.** Al crear (F1, F9), trasladar (F14) o reabrir (F6) un nodo, el grupo padre destino debe estar en `Activo`. Enforcement por proyección (`[SI03]`) porque cruza dos agregados. | Eventual | Ambos | `[R07]`, `[R16]` |
@@ -973,12 +996,11 @@ El atributo `motivoBaja` se proyecta en el modelo de lectura para reportería, b
 | `D06` | **Causa de baja (`motivoBaja`) proyectada como atributo del modelo de lectura, no como estado FSM.** Patrón canónico DDD/ES/CQRS: la FSM modela comportamiento permitido; los atributos enriquecidos modelan información contextual. | Mantiene la FSM minimal y extensible. Agregar un nuevo motivo no infla la FSM; solo agrega un valor al enum del catálogo de motivos. | Sección 4 (Familia 3) del alcance |
 | `D07` | **Eventos `*Modificado` capturan delta**, no snapshot completo. El estado se reconstruye reproduciendo el stream. | Decisión transversal del proyecto. Reduce el tamaño del stream y permite identificar qué cambió específicamente. | Decisión del usuario (MEMORY.md) |
 | `D08` | **Un solo evento `UnidadDescartada` cubre el rechazo manual del administrador y el descarte por cascada.** El distinguidor del motivo va en el atributo `motivoBaja` (`operativa` vs `cascada_grupo`). **Alcance específico de esta decisión:** no existe un evento explícito separado de rechazo (`UnidadRechazada`) — el evento `UnidadDescartada` se unifica con diferenciación por atributo. *(El descarte automático por inactividad que originalmente acompañaba esta decisión —`[D09]`/`[SI05]`— fue retirado en el issue #87: su motor original era la creación desde consumidores, eliminada en #46, y el caso residual —borradores que el propio administrador creó y abandonó— no justifica un proceso programado. El descarte de borradores es decisión del administrador: F8 manual o cascada F10.)* | Evita inflar el catálogo de eventos. La auditoría diferencia los casos vía el atributo proyectado, no vía evento separado. | Plan, decisión cerrada con el usuario; ajustada en #87. |
-| `D10` | **Catálogo de tipos de unidad como entidad interna del agregado `GrupoOrganizacional`**. Se administra al nivel del grupo raíz y se hereda hacia sub-grupos. | El catálogo es configuración estructural del árbol y calza con el rol de `GrupoOrganizacional` como nodo agrupador. Evita un tercer agregado (`CatalogoTiposUnidad`) y mantiene la cardinalidad del bounded context controlada. La opción "agregado separado" se evaluó y descartó por tres razones: (1) **alta cohesión funcional** — los tipos se consultan junto con la jerarquía en cada creación de unidad; (2) **sin ciclo de vida independiente** — los tipos no tienen estados ni transiciones complejas (solo `Activo`/`Inactivo` en la entidad interna `TipoUnidad`); (3) **simplificación operacional** — un solo punto de administración (el grupo raíz) en lugar de coordinar dos agregados. Esta decisión reconoce el trade-off: el agregado `GrupoOrganizacional` carga dos responsabilidades (estructura jerárquica + catálogo de tipos). Si en el futuro el catálogo crece en complejidad (tipos con sub-tipos, reglas de aplicabilidad por país, etc.), se evaluará separarlo en F2+. | Plan, decisión cerrada con el usuario; reforzada tras auditoría con análisis de alternativas. |
+| `D10` | **`TipoUnidad` como agregado raíz propio, con ámbito del tenant** (issue #86 — replantea la decisión original de modelarlo como entidad interna del grupo raíz). El "catálogo de tipos" no es un agregado contenedor: es la **proyección** de todos los `TipoUnidad` del tenant. Las unidades referencian el tipo **por identidad** (`tipoUnidadId`), no por nombre. | La frontera de agregado se define por invariantes, identidad y ciclo de vida — no por conteo de estados. `TipoUnidad` cumple los criterios: ciclo de vida propio (comandos, eventos y FSM propios), referenciado por identidad desde otro agregado (`UnidadOrganizacional` — señal fuerte de agregado), y **ninguna invariante cruza dos tipos** que exija un contenedor común — la unicidad del nombre se materializa por índice único (`[SI13]`, patrón `[SI01]`). La decisión original se apoyaba en "pocos estados ⇒ no agregado" (criterio equivocado) y en una cohesión que la herencia dinámica ya había vuelto cross-agregado; producía además dos síntomas: el atributo `tiposUnidad` vacío en todos los grupos salvo el raíz, y el nombre del tipo inmutable de facto por ser la llave de referencia. Con id estable, el nombre es renombrable sin romper referencias. | Issue #86; reemplaza la D10 original (su texto vive en el historial de git). |
 | `D11` | **Mecanismos de plataforma (concurrencia optimista, idempotencia técnica, retry) viven como `[SI##]`**, no se especifican por evento ni como invariantes del dominio. | Decisión transversal del proyecto. Las invariantes y reglas pertenecen al dominio; los mecanismos de plataforma son sugerencias de implementación que materializan invariantes (especialmente las eventuales). | Decisión del usuario (MEMORY.md) |
 | `D12` | **Cascada de inactivación de grupos modelada como saga** (`CascadaInactivacionGrupo`). Emite un evento por nodo afectado (no un evento agregado tipo `GrupoInactivadoEnCascada`) para que los consumidores puedan reaccionar granularmente sin parsear listas. Sin cascada inversa al reactivar (`[R20]`); el sistema inteligente identifica candidatos a reabrir vía `correlationId` correlacionado (`[SI08]`). | Granularidad de eventos = granularidad de reacción. La asimetría reactivación-sin-cascada es coherente con que `Inactiva` no es terminal en F1 — el admin puede reabrir hijos que vea pertinentes sin que el sistema lo presuma. | Plan, decisión cerrada con el usuario en familia 2 grupos |
 | `D13` | **Reactivación de tipos de unidad no modelada en F1.** La FSM de `TipoUnidad` tiene transición `Activo → Inactivo` (vía `TipoUnidadInactivado`) pero no la inversa. El alcance v1.0 no la requiere — no hay un caso de negocio identificado que justifique reactivar un tipo previamente inactivado. | Si en F2+ el negocio lo solicita, se evalúa modelarlo como evento `TipoUnidadReactivado` análogo a `GrupoReactivado`, con transición `Inactivo → Activo` en la FSM de `TipoUnidad`. No se mantiene como pendiente formal (`[PD##]`) porque no hay demanda actual ni horizonte definido — es una extensión natural si surge. La asunción de F1 es que `TipoUnidadInactivado` es terminal. | Auditoría Bloque Media, M9. |
-| `D14` | **Herencia dinámica del catálogo de tipos desde el grupo raíz** (sin replicación). El catálogo `tiposUnidad` vive solo en el grupo raíz; los sub-grupos lo heredan dinámicamente vía el comportamiento `tiposVigentes()` que recorre la jerarquía hasta el raíz por la proyección `[SI02]`. | Fuente única — modificar el catálogo del raíz se refleja inmediatamente en todos los sub-grupos sin migración explícita. Evita problemas de desincronización entre raíz y sub-grupos. El costo de lectura es despreciable porque la jerarquía es poco profunda (raramente >5 niveles en empresas de hasta 2.000 unidades, `[P04]`) y la proyección de jerarquía ya está materializada. Alternativa descartada: copia estática al crear sub-grupo (requiere migración manual si el raíz cambia y produce versiones divergentes del catálogo por sub-grupo). | Auditoría Bloque Baja, B3. |
-| `D15` | **La unidad organizacional es un dato gobernado con dueño único (Estructura Organizacional); los consumidores operan contra copia local, difieren ante el desfase y nunca crean ni bloquean.** Tres consecuencias de modelo: **(1) Dueño único** — solo Estructura Organizacional crea, modifica y da de baja unidades; ningún consumidor las origina. **(2) Copia local por eventos, para validación** — OXP, Contabilidad y futuros consumidores mantienen su copia de unidades por suscripción a los eventos de ciclo de vida y **validan contra ella** en su dominio; nunca consultan a Estructura Organizacional en el camino crítico (`[R13]`, `[SI12]` repara la copia de fondo). La copia es una proyección para validación e integridad — **no una API de lectura para la UI**: la UI lee a Estructura Organizacional en vivo (ver §3.8 y `datos-entre-dominios.md`). **(3) Diferir por consistencia eventual, no bloquear** — como una unidad solo se referencia tras existir en Estructura Organizacional (la UI elige de la fuente de verdad; las reglas se parametrizan contra ella), una unidad referenciada siempre existe en el dueño; si su evento de ciclo de vida aún no llegó a la copia local, el consumidor registra lo que puede y difiere solo la parte que la requiere, que se resuelve sola cuando el evento llega (consistencia eventual). La unidad debe coincidir exacto con la contabilidad, así que **no se aproxima con un valor de tránsito o provisional** (estrategia "diferir" de la guía `datos-entre-dominios.md`). | Elimina los acoplamientos de ejecución y proceso entre Estructura Organizacional y los consumidores (issue #45/#46): el consumidor nunca queda detenido por la disponibilidad ni por el ciclo de creación de Estructura Organizacional, y Estructura Organizacional no queda atada a la disponibilidad de los consumidores para reestructurar. Reemplaza el patrón anterior (creación desde consumidor vía BFF → unidad en `Borrador` → activación → cancelación en cascada al descartar), que acoplaba la operación del consumidor al gesto humano del administrador. **Nota (issue #72):** la parte 4 original —"demanda por señal informativa" (`[R30]`/`[SI11]`)— se retiró: una vez la asignación de la unidad se hace contra la fuente de verdad, el caso "unidad que el administrador aún no creó" deja de ocurrir en operación y la señal queda sin disparador. Fundamento completo en [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md). | Replanteamiento #46; ajuste #72; guía `datos-entre-dominios.md`. |
+| `D15` | **La unidad organizacional es un dato gobernado con dueño único (Estructura Organizacional); los consumidores operan contra copia local, difieren ante el desfase y nunca crean ni bloquean.** Tres consecuencias de modelo: **(1) Dueño único** — solo Estructura Organizacional crea, modifica y da de baja unidades; ningún consumidor las origina. **(2) Copia local por eventos, para validación** — OXP, Contabilidad y futuros consumidores mantienen su copia de unidades por suscripción a los eventos de ciclo de vida y **validan contra ella** en su dominio; nunca consultan a Estructura Organizacional en el camino crítico (`[R13]`, `[SI12]` repara la copia de fondo). La copia es una proyección para validación e integridad — **no una API de lectura para la UI**: la UI lee a Estructura Organizacional en vivo (ver §3.9 y `datos-entre-dominios.md`). **(3) Diferir por consistencia eventual, no bloquear** — como una unidad solo se referencia tras existir en Estructura Organizacional (la UI elige de la fuente de verdad; las reglas se parametrizan contra ella), una unidad referenciada siempre existe en el dueño; si su evento de ciclo de vida aún no llegó a la copia local, el consumidor registra lo que puede y difiere solo la parte que la requiere, que se resuelve sola cuando el evento llega (consistencia eventual). La unidad debe coincidir exacto con la contabilidad, así que **no se aproxima con un valor de tránsito o provisional** (estrategia "diferir" de la guía `datos-entre-dominios.md`). | Elimina los acoplamientos de ejecución y proceso entre Estructura Organizacional y los consumidores (issue #45/#46): el consumidor nunca queda detenido por la disponibilidad ni por el ciclo de creación de Estructura Organizacional, y Estructura Organizacional no queda atada a la disponibilidad de los consumidores para reestructurar. Reemplaza el patrón anterior (creación desde consumidor vía BFF → unidad en `Borrador` → activación → cancelación en cascada al descartar), que acoplaba la operación del consumidor al gesto humano del administrador. **Nota (issue #72):** la parte 4 original —"demanda por señal informativa" (`[R30]`/`[SI11]`)— se retiró: una vez la asignación de la unidad se hace contra la fuente de verdad, el caso "unidad que el administrador aún no creó" deja de ocurrir en operación y la señal queda sin disparador. Fundamento completo en [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md). | Replanteamiento #46; ajuste #72; guía `datos-entre-dominios.md`. |
 
 ---
 
@@ -1020,7 +1042,7 @@ El bounded context de Estructura Organizacional protege dos recursos principales
 | Grupo organizacional | Reactivar | `reactivar_grupo` |
 | Grupo organizacional | Consultar | `consultar_grupo` |
 | Grupo organizacional | Consultar jerarquía completa | `consultar_jerarquia` |
-| Tipo de unidad (sub-recurso del grupo) | Agregar | `agregar_tipo_unidad` |
+| Tipo de unidad | Agregar | `agregar_tipo_unidad` |
 | Tipo de unidad | Modificar | `modificar_tipo_unidad` |
 | Tipo de unidad | Inactivar | `inactivar_tipo_unidad` |
 | Unidad organizacional | Crear (F1) | `crear_unidad` |
@@ -1055,3 +1077,4 @@ Total: **22 permisos atómicos**.
 | **1.7** | **2026-06-23** | **Retiro del aparato de señal/bandeja — la copia local es para validación, no para la UI (issue #72/#73).** Una vez la asignación/distribución de la unidad en los consumidores se hace contra la fuente de verdad (la UI elige de Estructura Organizacional en vivo; las reglas se parametrizan contra ella), el caso "el consumidor necesita una unidad que el administrador aún no creó" deja de ocurrir en operación y `[P05]` se reformula. En consecuencia: **se retira `[SI11]`** (bandeja de sugerencias) y la **señal de demanda** entrante (`DemandaDeUnidadSenalada`) → SIs **11 → 10** (hueco en SI11, conserva numeración); **`[D15]` pasa de 4 partes a 3** (se retira "demanda por señal informativa"); **`[R30]` retirada** del alcance; **§3.8 reescrita** (se elimina el camino de visibilidad y el diagrama de señal/bandeja; se reencuadra el diferir a **consistencia eventual** y se agrega el **principio de capas**: la UI lee al dueño en vivo, la copia local es para validación, no API de lectura de la UI); **`[SI07]` reorientada** de idempotencia de la señal a idempotencia de los comandos del administrador (resuelta por `[SI06]`/`[SI01]`, sin tabla propia). Limpiadas las referencias a la bandeja/señal (tabla comando↔SI, `[SI04]`, evento `UnidadCreada`, permiso `crear_unidad`). Sin cambios en invariantes (16), decisiones (15, `[D15]` reformulada) ni permisos (22). Acompaña al alcance v1.5, a OXP (retira la emisión de la señal; aclara que la copia es para validación) y a la guía `datos-entre-dominios.md` (principio de capas). |
 | **1.8** | **2026-07-08** | **Propósito documentado de `fechaEstimadaReactivacion` — dato informativo consistente con la suspensión (issue #88).** El campo deja de ser un dato capturado sin destino: se incorpora a la composición de `UnidadOrganizacional` (Sección 3.3) como dato **proyectado en read model** (molde de `motivoBaja`), presente solo mientras la unidad está en `Suspendida` y null al salir de ese estado. Su propósito queda explícito: expresa la **transitoriedad esperada de la suspensión** — quien suspende espera volver a operar la unidad; sin expectativa de retorno el camino es la inactivación — y es información de consulta para el administrador. **Ningún proceso la lee ni dispara reactivación automática**: la reactivación (F5) sigue siendo un gesto manual. Evento `UnidadSuspendida` (Sección 5.1) anotado en información capturada y efectos. Sale de la lista de "datos capturados no almacenados" (queda solo `motivo`). Acompaña al alcance v1.6. |
 | **1.9** | **2026-07-08** | **Retiro del descarte automático de Borradores — perdió su driver original (issue #87).** El mecanismo nació para limpiar solicitudes de consumidores no atendidas; al eliminarse la creación desde consumidores (#46), solo cubría borradores que el propio administrador creó y abandonó — caso inocuo que no justifica un proceso programado por tenant con estado persistido y lock distribuido. Se retiran: **`[D09]`** (hueco en la numeración), **`[SI05]`** (hueco), el servicio **`DescarteAutomaticoBorradores`** de la Sección 3.6, el atributo **`fechaUltimaActividadBorrador`** y el guard **`puedeDescartarseAutomáticamente(umbral)`**. **`[SI04]` reorientada:** la antigüedad del borrador pasa a ser dato informativo derivado de los eventos, para decisión del administrador (mismo criterio del #88); ninguna política automática la lee. El descarte queda con dos vías con dueño claro: **F8 manual** (decisión del administrador) y **cascada F10** (se conserva intacta). **Literal `abandono_por_inactividad` renombrado a `cascada_grupo`** — su único uso restante es la cascada F10 y el nombre viejo ya no correspondía a ninguna inactividad real (2.5, composición, `validarCoherenciaBaja()`, VO `MotivoBaja`, saga F10, FSM, `UnidadDescartada`, catálogo 6.2, `[I05]`, `[D08]`). Nota de `Inactiva` en la FSM corregida: el motivo de cascada no aplica a `Inactiva` (un Borrador arrastrado por la cascada termina en `Descartada`). Conteos: **9 sugerencias de implementación** (−1), **14 decisiones** (−1), **2 domain services** (−1); invariantes (16) y permisos (22) sin cambios. Acompaña al alcance v1.7. |
+| **2.0** | **2026-07-08** | **Replanteamiento — `TipoUnidad` pasa de entidad interna del grupo raíz a agregado raíz propio con ámbito del tenant (issue #86).** La decisión original se apoyaba en "pocos estados ⇒ no agregado" — un criterio equivocado: la frontera de agregado se define por invariantes, identidad y ciclo de vida. `TipoUnidad` cumple los criterios de agregado (ciclo de vida propio, referenciado por identidad desde `UnidadOrganizacional`, sin invariantes cross-tipo) y el diseño anterior producía síntomas visibles: `tiposUnidad` vacío en todos los grupos salvo el raíz, nombre del tipo inmutable de facto (era la llave de referencia), lectura siempre cross-agregado vía la herencia dinámica, y la regla del "catálogo congelado" en grupo `Inactivo` aplicable solo a un raíz sin contenido (letra muerta frente a `[R03]`). **Cambios:** nueva **Sección 3.4** (agregado `TipoUnidad`: id estable, nombre único por tenant y **modificable**, ámbito tenant); `GrupoOrganizacional` pierde `tiposUnidad`, `tiposVigentes()` y los 3 eventos de configuración (eventos propios 7 → 4); `UnidadOrganizacional` referencia por **`tipoUnidadId`** y sus eventos incluyen además el nombre vigente como dato informativo para consumidores; Sección 5.4 reescrita (eventos en stream propio del tipo, `TipoUnidadModificado` admite renombrar); **`[D10]` reescrita** con la decisión y el criterio correctos; **`[D14]` retirada** (hueco — la herencia dinámica desaparece; el catálogo es plano del tenant); nueva **`[SI13]`** (índice único de nombre por tenant, patrón `[SI01]`; el nombre de un tipo inactivado no se libera); `[I07]` valida contra el catálogo del tenant; FSM del grupo sin eventos `TipoUnidad*` y sin regla de congelamiento; precondición muerta de `UnidadTrasladada` ("el nuevo padre admite el tipo") eliminada; Sección 6.1 (precargados = agregados creados al inicializar el tenant), relaciones (3.8) y permisos ajustados; secciones 3.4-3.8 renumeradas a 3.5-3.9 con sus referencias vivas. Conteos: **3 agregados raíz** (+1), **0 entidades internas**, 18 eventos (sin cambio: 11 unidad + 4 grupo + 3 tipo), **13 decisiones** (−1), **10 sugerencias de implementación** (+1), 16 invariantes y 22 permisos sin cambios. Alcance sin cambios (ya describía el catálogo como extensible por empresa; "catálogo vigente" sigue siendo válido). Prepara el terreno del #85: el grupo raíz pierde el propósito de alojar el catálogo. |
