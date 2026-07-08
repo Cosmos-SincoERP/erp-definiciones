@@ -1,6 +1,6 @@
 # Modelo de Dominio — Estructura Organizacional
 
-**Versión:** 1.8
+**Versión:** 1.9
 **Fecha:** 2026-07-08
 
 ---
@@ -115,7 +115,7 @@ Los eventos cuyo nombre termina en `Modificado` (`UnidadModificada`, `GrupoModif
 | **Inactivación** | Proceso operativo del dominio (Flujos F7 y F10 del alcance) que lleva una unidad o grupo a su estado no operativo. No es terminal: la unidad puede reabrirse; el grupo puede reactivarse. |
 | **Descarte** | Proceso operativo (Flujo F8) que lleva una unidad en `Borrador` al estado terminal estricto `Descartada`. Se diferencia de la inactivación porque la unidad nunca operó. |
 | **Reestructuración** | Familia de procesos (F12 Fusión, F13 División, F14 Traslado) que cambian la estructura preservando trazabilidad histórica para comparabilidad IFRS 8. |
-| **motivoBaja** | Atributo del modelo de lectura (no estado FSM) que registra por qué una unidad quedó `Inactiva` o `Descartada`. Valores literales fijos del dominio: `operativa`, `fusion`, `division`, `abandono_por_inactividad`. |
+| **motivoBaja** | Atributo del modelo de lectura (no estado FSM) que registra por qué una unidad quedó `Inactiva` o `Descartada`. Valores literales fijos del dominio: `operativa`, `fusion`, `division`, `cascada_grupo`. |
 
 ---
 
@@ -123,7 +123,7 @@ Los eventos cuyo nombre termina en `Modificado` (`UnidadModificada`, `GrupoModif
 
 ### 3.1. Estructura Organizacional como Bounded Context
 
-El bounded context contiene dos agregados raíz (`GrupoOrganizacional` y `UnidadOrganizacional`) y tres domain services que coordinan procesos multi-agregado.
+El bounded context contiene dos agregados raíz (`GrupoOrganizacional` y `UnidadOrganizacional`) y dos domain services que coordinan procesos multi-agregado.
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -144,7 +144,6 @@ El bounded context contiene dos agregados raíz (`GrupoOrganizacional` y `Unidad
 │   │  Domain Services                                        │        │
 │   │   · CascadaInactivacionGrupo (orquesta F10)            │        │
 │   │   · ReestructuracionUnidad (orquesta F12/F13)          │        │
-│   │   · DescarteAutomaticoBorradores (proceso programado)  │        │
 │   └─────────────────────────────────────────────────────────┘        │
 │                                                                       │
 └──────────────────────────────────────────────────────────────────────┘
@@ -201,9 +200,8 @@ El bounded context contiene dos agregados raíz (`GrupoOrganizacional` y `Unidad
 | `descripcion` | Texto opcional | Descripción libre. | |
 | `grupoPadreId` | Referencia | Identificador del grupo padre. | uuid no nulo |
 | `estado` | Enum FSM | `Borrador`, `Activa`, `Suspendida`, `Inactiva`, `Descartada`. | |
-| `motivoBaja` | Enum opcional (proyectado en read model) | Causa de la baja cuando `estado in {Inactiva, Descartada}`. Valores: `operativa`, `fusion`, `division`, `abandono_por_inactividad`. Ver `[D06]`. | null si está operando |
+| `motivoBaja` | Enum opcional (proyectado en read model) | Causa de la baja cuando `estado in {Inactiva, Descartada}`. Valores: `operativa`, `fusion`, `division`, `cascada_grupo`. Ver `[D06]`. | null si está operando |
 | `causalidadBaja` | Referencia opcional | Cuando `motivoBaja in {fusion, division}`, referencia a la unidad destino o lista de destinos. | uuid o lista de uuid |
-| `fechaUltimaActividadBorrador` | Timestamp | Última modificación mientras la unidad estuvo en `Borrador`. Habilita la política de descarte automático por inactividad. Ver `[D09]` y `[SI05]`. | null cuando deja de estar en Borrador |
 | `fechaEstimadaReactivacion` | Fecha opcional (proyectada en read model) | Dato informativo para el administrador mientras la unidad está en `Suspendida`: expresa la transitoriedad esperada de la pausa y cuándo se espera reactivarla — ayuda a distinguir suspender (retorno esperado) de inactivar (sin expectativa de retorno). Ningún proceso la lee ni dispara reactivación automática (la reactivación F5 es siempre manual). Capturada en `UnidadSuspendida`. | null salvo en `Suspendida` |
 | `fechaEfectiva` | `FechaEfectiva` opcional | Solo presente cuando la unidad fue parte de una reestructuración (`motivoBaja in {fusion, division}`). Capturada en `UnidadInactivada` y proyectada para reconstrucción histórica. Ver Sección 3.4 (VO `FechaEfectiva`). | null en operación normal |
 | `versionAgregado` | Entero (atributo interno de plataforma) | Stamp de concurrencia optimista materializado por `[SI06]`. No es atributo de negocio — se usa solo en validación de `expectedVersion` al hacer append. No aparece en los payloads de los eventos. | |
@@ -227,8 +225,7 @@ Este dato vive solo en el stream de eventos para auditoría narrativa; el agrega
 | `puedeDividirse()` | `estado in {Activa, Suspendida}` | Validación previa a F13 — análogo a `puedeFusionarse()`. |
 | `puedeTrasladarse()` | `estado in {Activa, Suspendida}` y `padreNuevoActivo()*` | Validación previa a F14 (`[I10]`). |
 | `puedeModificarse()` | `estado in {Borrador, Activa, Suspendida}` | Validación previa a F15 (`[I15]`). |
-| `puedeDescartarseAutomáticamente(umbral)` | `estado == Borrador` y `fechaUltimaActividadBorrador + umbral < ahora()` | Validación que el agregado aplica al recibir `UnidadDescartada` con `motivoBaja: "abandono_por_inactividad"` desde el proceso `[SI05]`. Si la condición no se cumple, el evento se rechaza. |
-| `validarCoherenciaBaja()` | Verifica `[I05]` cuando `estado in {Inactiva, Descartada}`: (a) `motivoBaja` está definido; (b) si `motivoBaja in {fusion, division}`, entonces `causalidadBaja` y `fechaEfectiva` están presentes; (c) si `motivoBaja in {operativa, abandono_por_inactividad}`, entonces `causalidadBaja` y `fechaEfectiva` son null. | Guard interno que el agregado invoca al recibir `UnidadInactivada` o `UnidadDescartada`. Si la coherencia falla, el evento se rechaza antes del append. Refuerza la invariante `[I05]` y la propiedad write-once de los atributos de baja. |
+| `validarCoherenciaBaja()` | Verifica `[I05]` cuando `estado in {Inactiva, Descartada}`: (a) `motivoBaja` está definido; (b) si `motivoBaja in {fusion, division}`, entonces `causalidadBaja` y `fechaEfectiva` están presentes; (c) si `motivoBaja in {operativa, cascada_grupo}`, entonces `causalidadBaja` y `fechaEfectiva` son null. | Guard interno que el agregado invoca al recibir `UnidadInactivada` o `UnidadDescartada`. Si la coherencia falla, el evento se rechaza antes del append. Refuerza la invariante `[I05]` y la propiedad write-once de los atributos de baja. |
 
 `*` Consulta la proyección documentada en sugerencias de implementación (`[SI03]`). No es método local del agregado.
 
@@ -246,7 +243,7 @@ Este dato vive solo en el stream de eventos para auditoría narrativa; el agrega
 |----|-----------|-------------|
 | `Codigo` | `GrupoOrganizacional`, `UnidadOrganizacional` | Cadena alfanumérica plana de longitud parametrizable entre 4 y 12 caracteres (`[R10]`). **Codificación plana, sin estructura jerárquica embebida** — la jerarquía se modela como agregado separado y se proyecta vía `[SI02]` (ver `[DA1]`). Inmutable una vez asignado (`[R09]`). Único por tenant cruzando grupos y unidades (`[R08]`, `[I09]`). |
 | `Nombre` | Ambos agregados | Cadena descriptiva no vacía para lectura humana. Sin restricción de unicidad. Modificable. |
-| `MotivoBaja` | `UnidadOrganizacional` (atributo proyectado) | Enum cerrado del dominio: `operativa`, `fusion`, `division`, `abandono_por_inactividad`. Los cuatro valores son literales fijos del modelo — no son catálogo configurable (ver `[D08]`, `[D09]`). |
+| `MotivoBaja` | `UnidadOrganizacional` (atributo proyectado) | Enum cerrado del dominio: `operativa`, `fusion`, `division`, `cascada_grupo`. Los cuatro valores son literales fijos del modelo — no son catálogo configurable (ver `[D08]`). |
 | `FechaEfectiva` | Eventos de reestructuración y de transición de jerarquía | Momento a partir del cual una versión de la jerarquía o una reestructuración rige. No puede ser anterior a la última versión vigente de jerarquía de las unidades involucradas (`[I08]`, validable localmente); su coherencia con la actividad transaccional la define y responde el administrador (`[R25]`). |
 | `ReferenciaJerarquica` | Composición de ambos agregados | Combinación `padreId + nivel` que ubica un nodo en el árbol. El nivel es calculado, no almacenado en el código (`[DA1]`). |
 
@@ -270,7 +267,6 @@ Este dato vive solo en el stream de eventos para auditoría narrativa; el agrega
 | `TrasladarUnidad` (F14) | `[SI02]`, `[SI03]`, `[SI06]` |
 | `ModificarUnidad` / `ModificarGrupo` (F15) | `[SI06]` |
 | `AgregarTipoUnidad` / `ModificarTipoUnidad` / `InactivarTipoUnidad` | `[SI06]` |
-| Proceso `DescarteAutomaticoBorradores` (`[SI05]`) | `[SI04]` (lectura) |
 
 ---
 
@@ -308,37 +304,11 @@ Mantener una proyección que indique el estado vigente del grupo padre de cada u
 
 #### `[SI04]` Bandeja de Borradores pendientes
 
-Soporta los flujos F3 (activación) y F8 (descarte manual) y el proceso `[SI05]`.
+Soporta los flujos F3 (activación) y F8 (descarte manual).
 
-Proyección que lista todas las unidades en `Borrador` —preparaciones del administrador— con su `fechaUltimaActividadBorrador` y antigüedad. Es la fuente para la UI del administrador (F3, F8) y para el proceso programado de descarte automático (`[SI05]`). Contiene solo unidades reales en preparación del administrador (no demandas de consumidores).
+Proyección que lista todas las unidades en `Borrador` —preparaciones del administrador— con su antigüedad (fecha de última actividad). Es la fuente para la UI del administrador (F3, F8). Contiene solo unidades reales en preparación del administrador (no demandas de consumidores).
 
-El campo `fechaUltimaActividadBorrador` se actualiza **atómicamente** con cada evento que modifique la unidad en estado `Borrador` (`UnidadCreada`, `UnidadModificada`). Nunca se calcula desde un timestamp de BD externo — siempre proviene del evento mismo.
-
-#### `[SI05]` Proceso programado de descarte automático de Borradores
-
-Materializa `[D09]`.
-
-**Definición:** job recurrente del propio sub-dominio que recorre la bandeja de Borradores (`[SI04]`), identifica unidades con antigüedad mayor al umbral configurado por tenant (default sugerido: 30 días) y emite `UnidadDescartada` con `motivoBaja: "abandono_por_inactividad"`.
-
-**Trigger:** cron configurable por tenant; default 02:00 UTC diario. Garantía de ejecución única vía lock distribuido por `(tenantId, fecha)`: si dos nodos intentan iniciar el job el mismo día, solo uno lo ejecuta.
-
-**Estado persistido del job:**
-
-- `JobDescarteEjecucion(jobExecutionId, tenantId, fechaInicio, fechaFin, estado: Running | Completed | Failed)` — una entrada por ejecución.
-- `JobDescarteUnidadProcesada(jobExecutionId, unidadId, fechaProcesamiento, resultadoEmision: Emitido | Rechazado | NotificacionPendiente)` — una entrada por unidad procesada.
-
-**Flujo:**
-
-1. Crear `JobDescarteEjecucion` con estado `Running`.
-2. Consultar candidatos en `[SI04]` con `fechaUltimaActividadBorrador + umbral < ahora()`.
-3. Por cada candidato: validar que **no haya sido procesado** en la ejecución actual (consultar `JobDescarteUnidadProcesada`). Si ya fue procesado, saltar.
-4. Emitir `UnidadDescartada` con `usuarioId: "sistema:descarte-automatico"`, `motivoBaja: "abandono_por_inactividad"`, `correlationId: jobExecutionId`. El agregado valida `puedeDescartarseAutomáticamente(umbral)` y rechaza si la condición ya no se cumple (carrera aceptable: el evento simplemente no se emite).
-5. Registrar `JobDescarteUnidadProcesada` con `resultadoEmision: Emitido`.
-6. Al terminar el recorrido: marcar `JobDescarteEjecucion` como `Completed` (o `Failed` si hubo errores no recuperables).
-
-Los borradores son preparaciones del administrador y no fueron referenciados por la operación de ningún consumidor, así que el descarte no notifica ni compensa a otros sub-dominios (`[D15]`).
-
-**Idempotencia:** garantizada por `(unidadId, jobExecutionId)`. Si el job crashea y se reinicia con el mismo `jobExecutionId`, los registros ya procesados se saltan.
+La fecha de última actividad del borrador es un **dato informativo derivado de los eventos** (`UnidadCreada`, `UnidadModificada` — siempre del timestamp del evento mismo, nunca de un timestamp de BD externo): le permite al administrador identificar borradores antiguos y decidir si los activa (F3) o los descarta (F8). Ninguna política automática la lee — el descarte de un borrador es siempre una decisión del administrador o consecuencia de la cascada F10 (el descarte automático por inactividad fue retirado; ver control de versiones v1.9).
 
 #### `[SI06]` Concurrencia optimista por agregado
 
@@ -365,8 +335,6 @@ Los comandos del administrador (F1, F3, F4, F5, F6, F7, F8, F9, F10, F11, F14, F
 - **Concurrencia optimista (`[SI06]`):** el comando lleva `expectedVersion`; un reintento sobre una versión ya aplicada se detecta como `version-conflict` y no duplica el efecto.
 - **Validación de unicidad (`[SI01]`):** la unicidad de código por tenant rechaza una segunda creación con el mismo código.
 - **Control en la UI:** deshabilitar el botón de envío tras el clic y confirmación explícita en operaciones críticas.
-
-Los procesos internos del propio sub-dominio (`[SI05]` `DescarteAutomaticoBorradores`) gestionan su idempotencia con `jobExecutionId` (ver `[SI05]`).
 
 > **Nota — reorientación (issue #72).** Entre el #46 y el #72, `[SI07]` cubrió la idempotencia de la **señal de demanda** entrante. Al retirarse esa señal (ver `[SI11]`), `[SI07]` vuelve a su objeto original: la idempotencia de los comandos del administrador, que no necesita tabla propia porque la resuelven `[SI06]` y `[SI01]`.
 
@@ -446,7 +414,7 @@ Estructura Organizacional ofrece un punto de lectura de respaldo para que un con
 5. Tras el write-ack, emite los eventos derivados en paralelo (no espera write-ack individual de cada uno; cada uno se valida vía `[SI09]` para evitar duplicados):
    - Por cada sub-grupo descendiente, emite `GrupoInactivado` con `esCascada: true`, `correlationId` y `grupoIdOrigen: <grupoOrigenId>`.
    - Por cada unidad descendiente en estado `Activa` o `Suspendida`, emite `UnidadInactivada` con `motivoBaja: "operativa"`, `esCascada: true` y `correlationId`.
-   - Por cada unidad descendiente en estado `Borrador`, emite `UnidadDescartada` con `motivoBaja: "abandono_por_inactividad"`, `esCascada: true` y `correlationId` (interpretación: el grupo padre se inactivó, los borradores quedan sin razón de ser).
+   - Por cada unidad descendiente en estado `Borrador`, emite `UnidadDescartada` con `motivoBaja: "cascada_grupo"`, `esCascada: true` y `correlationId` (interpretación: el grupo padre se inactivó, los borradores quedan sin razón de ser).
 6. Cada evento exitoso actualiza `SagaCascadaEstado` (mueve el descendiente de `pendientes` a `completados`).
 7. Al completar todos los descendientes: marcar la saga como `Completed`.
 
@@ -493,36 +461,6 @@ Análogo a Fusión pero con un origen y N destinos. `UnidadDividida` incluye `co
 | 4 | `UnidadInactivada` por origen | Stream de cada unidad origen | Max 5 reintentos por unidad. **Idempotencia por `(unidadId, correlationId)`** vía `[SI09]`. Si tras 5 reintentos no converge, entra en `dead-letter`; alerta operacional tras 15 min sin completar. |
 
 **Protocolo de proceso:** mismo patrón que `CascadaInactivacionGrupo` — estado persistido, `correlationId` único, política de convergencia eventual sin compensación inversa.
-
-#### Servicio: `DescarteAutomaticoBorradores`
-
-**Trigger:** Proceso programado del propio sub-dominio (cron diario por tenant con lock distribuido). Ver `[SI05]` para el detalle completo del trigger, el estado persistido (`JobDescarteEjecucion`, `JobDescarteUnidadProcesada`) y la idempotencia por `jobExecutionId`. Esta sección documenta solo el flujo y la compensación; el resto de detalles operativos vive en `[SI05]` para evitar duplicación.
-
-**Flujo principal (resumido):**
-
-1. Iniciar la ejecución registrando estado (ver `[SI05]`).
-2. Consultar la bandeja de Borradores pendientes (`[SI04]`) filtrando por antigüedad.
-3. Por cada unidad candidata, emitir `UnidadDescartada` con `usuarioId: "sistema:descarte-automatico"`, `motivoBaja: "abandono_por_inactividad"`, `correlationId: jobExecutionId`. El agregado valida `puedeDescartarseAutomáticamente(umbral)`.
-4. Cerrar la ejecución con estado final.
-
-Los borradores son preparaciones del administrador; ningún consumidor los referencia en su operación, por lo que el descarte no notifica ni compensa a otros sub-dominios (`[D15]`).
-
-**Tabla de compensación:**
-
-| Paso | Evento / Acción | Estrategia ante fallo |
-|------|-----------------|-----------------------|
-| 3 | `UnidadDescartada` | Reintento con backoff (3 intentos: 1 s / 5 s / 30 s). Idempotencia por `(unidadId, jobExecutionId)`. Si persiste, marca `resultadoEmision: NoEmitido` y continúa con la siguiente unidad; alerta operacional al cierre del job si hubo > N fallos. |
-
-**Idempotencia:** garantizada por `(unidadId, jobExecutionId)`. Si el job se cae y se reinicia con el mismo `jobExecutionId`, los registros ya marcados en `JobDescarteUnidadProcesada` se saltan.
-
-**Coexistencia con `CascadaInactivacionGrupo`:** un `Borrador` puede ser candidato simultáneamente del job y de una saga de cascada activa cuyo grupo padre se está inactivando. **No se implementa exclusión previa entre los dos procesos** — se acepta como race tolerable resuelto por dedup natural del agregado:
-
-- Ambos procesos pueden emitir `UnidadDescartada` con sus respectivos `correlationId` (`jobExecutionId` en el caso del job; `correlationId` de la saga en F10).
-- El agregado `UnidadOrganizacional` aplica `puedeDescartarseAutomáticamente(umbral)` al recibir el evento. El primero que llegue cambia el estado de `Borrador` a `Descartada`; el segundo es **rechazado silenciosamente** por el guard porque el `estado != Borrador`.
-- El `motivoBaja` registrado en el evento persistido es siempre `abandono_por_inactividad` (idéntico en ambos casos), por lo que no hay ambigüedad semántica para los consumidores.
-- El `correlationId` del evento persistido apunta a quien llegó primero — útil para auditoría pero no compromete la integridad de la transición.
-
-Esta política evita introducir una dependencia entre el job y una proyección de "sagas activas", manteniendo cada proceso independiente y resolviendo la coordinación con mecanismos del propio dominio.
 
 ### 3.7. Relaciones entre agregados
 
@@ -587,8 +525,7 @@ Cinco estados, siete transiciones permitidas. `Descartada` es el único terminal
                                             ▲
                                             │ UnidadDescartada
                                             │ (F8 manual o
-                                            │  F10 cascada o
-                                            │  SI05 automático)
+                                            │  F10 cascada)
                                             │
 ┌──────────────────┐  UnidadActivada   ┌────┴─────────────┐
 │    Borrador      │──────(F3)────────►│      Activa      │◄────┐
@@ -629,10 +566,10 @@ Cinco estados, siete transiciones permitidas. `Descartada` es el único terminal
 
 **Notas estado por estado:**
 
-- **`Borrador`** — Estado de **preparación del administrador**: la unidad que el administrador deja a medio definir antes de activarla. No transaccional y **no se origina desde sub-dominios consumidores** (la demanda de un consumidor no crea unidades — ver `[D15]`, `[R29]`). Admite eventos de progreso (`UnidadModificada`) sin cambio de estado. Transiciones de salida: a `Activa` mediante `UnidadActivada` (F3), o a `Descartada` mediante `UnidadDescartada` (F8 manual, F10 cascada al inactivar grupo padre, o `[SI05]` proceso automático tras umbral de inactividad).
+- **`Borrador`** — Estado de **preparación del administrador**: la unidad que el administrador deja a medio definir antes de activarla. No transaccional y **no se origina desde sub-dominios consumidores** (la demanda de un consumidor no crea unidades — ver `[D15]`, `[R29]`). Admite eventos de progreso (`UnidadModificada`) sin cambio de estado. Transiciones de salida: a `Activa` mediante `UnidadActivada` (F3), o a `Descartada` mediante `UnidadDescartada` (F8 manual, o F10 cascada al inactivar el grupo padre).
 - **`Activa`** — Estado operativo. Recibe imputaciones de los consumidores (`[R13]`). También es el estado inicial cuando el administrador elige "crear y activar directamente" en F1; en ese caso, el agregado emite `UnidadCreada` + `UnidadActivada` en el mismo append. Admite eventos de progreso (`UnidadModificada`). Transiciones de salida: a `Suspendida` (F4), a `Inactiva` (F7).
 - **`Suspendida`** — Estado transitorio. No recibe nuevas imputaciones pero sigue consultable y reportable. Admite `UnidadModificada`. Transiciones de salida: a `Activa` (F5, `UnidadReactivada`) o a `Inactiva` (F7, `UnidadInactivada`).
-- **`Inactiva`** — Estado de baja post-operación. Se conserva el historial. No admite imputaciones (`[R13]`) ni modificaciones (`[R17]`, `[I15]`). Admite reapertura mediante `UnidadReabierta` (F6), que la lleva a `Activa`. Lleva atributo `motivoBaja` proyectado (`operativa`, `fusion`, `division` o `abandono_por_inactividad` solo cuando viene desde Borrador en cascada).
+- **`Inactiva`** — Estado de baja post-operación. Se conserva el historial. No admite imputaciones (`[R13]`) ni modificaciones (`[R17]`, `[I15]`). Admite reapertura mediante `UnidadReabierta` (F6), que la lleva a `Activa`. Lleva atributo `motivoBaja` proyectado (`operativa`, `fusion` o `division` — `cascada_grupo` no aplica aquí: un `Borrador` arrastrado por la cascada termina en `Descartada`, nunca en `Inactiva`).
 
   > **Nota sobre asimetría con grupos:** A diferencia de los grupos (que sí admiten `GrupoModificado` en estado `Inactivo`), las unidades en `Inactiva` **no admiten modificaciones**. La razón es que las unidades participan en historial transaccional — corregir su nombre o tipo tras la baja alteraría la lectura del histórico. Si se requiere corregir un dato erróneo, el flujo es F6 Reabrir → F15 Modificar → F7 Inactivar de nuevo.
 
@@ -708,7 +645,7 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 | **Estado resultante** | `Borrador` (default) o `Activa` (cuando el administrador elige activar directamente — en ese caso se emite `UnidadActivada` en el mismo append). |
 | **Precondiciones** | `[R08]` (código único), `[R07]` (grupo padre Activo), tipo válido en el catálogo vigente del grupo padre o ancestros (`[R05]` jerarquía), formato del código válido (`[R10]`), `[I09]` (unicidad cruzada en tenant). |
 | **Información capturada** | `unidadId`, `codigo`, `nombre`, `tipoUnidad`, `descripcion`, `grupoPadreId`, `estadoInicial` (`Borrador` o `Activa` — **es un parámetro del comando que se captura para auditoría; el estado actual de la unidad se reconstruye reproduciendo la secuencia de eventos, no se lee de este campo**), `usuarioId`, `timestamp`. |
-| **Efectos** | Se crea el agregado en el estado inicial elegido. Se inicializa `fechaUltimaActividadBorrador` si nace en `Borrador`. Si nace en `Activa`, se emite también `UnidadActivada`. Los consumidores reciben la notificación y actualizan su copia local; un diferido pendiente por esta unidad (`[R29]`, `[D15]`) se resuelve solo al llegar este evento. |
+| **Efectos** | Se crea el agregado en el estado inicial elegido. Si nace en `Activa`, se emite también `UnidadActivada`. Los consumidores reciben la notificación y actualizan su copia local; un diferido pendiente por esta unidad (`[R29]`, `[D15]`) se resuelve solo al llegar este evento. |
 
 #### `UnidadActivada`
 
@@ -781,13 +718,13 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 
 | Aspecto | Detalle |
 |---------|---------|
-| **Descripción** | Una unidad que nunca operó se descarta (F8). Aplica al rechazo manual del administrador sobre un borrador suyo, al abandono por inactividad (proceso automático `[SI05]`) o a la cascada cuando el grupo padre se inactiva con borradores colgando (F10). |
-| **Causalidad** | Directa en F8 (comando `DescartarUnidad`); reactiva en `[SI05]`; efecto inter-agregado en F10. |
+| **Descripción** | Una unidad que nunca operó se descarta. Aplica al rechazo manual del administrador sobre un borrador suyo (F8) o a la cascada cuando el grupo padre se inactiva con borradores colgando (F10). |
+| **Causalidad** | Directa en F8 (comando `DescartarUnidad`); efecto inter-agregado en F10. |
 | **Agregado** | `UnidadOrganizacional` |
 | **Estado previo** | `Borrador` |
 | **Estado resultante** | `Descartada` ■ (terminal estricto, `[R14]`) |
-| **Precondiciones** | Unidad en `Borrador`. Si proviene de `[SI05]`: además, `fechaUltimaActividadBorrador + umbral < ahora()` validado por el agregado vía `puedeDescartarseAutomáticamente(umbral)`. |
-| **Información capturada** | `unidadId`, `codigo`, `tipoUnidad`, `grupoPadreId`, `motivoBaja` (`operativa` cuando es rechazo manual del admin; `abandono_por_inactividad` cuando es automático o por cascada F10 sobre Borrador), `esCascada` (boolean; `true` cuando es derivado de F10 o `[SI05]`), `correlationId` (presente cuando `esCascada == true`: `jobExecutionId` en `[SI05]`; `correlationId` de la saga en F10), `motivo` (texto libre opcional), `usuarioId` (`sistema:descarte-automatico` cuando proviene de `[SI05]`; identificador del administrador en F8), `timestamp`. |
+| **Precondiciones** | Unidad en `Borrador`. |
+| **Información capturada** | `unidadId`, `codigo`, `tipoUnidad`, `grupoPadreId`, `motivoBaja` (`operativa` cuando es rechazo manual del admin en F8; `cascada_grupo` cuando es descarte por cascada F10), `esCascada` (boolean; `true` cuando es derivado de F10), `correlationId` (presente cuando `esCascada == true`: el `correlationId` de la saga F10), `motivo` (texto libre opcional), `usuarioId` (el administrador que descarta en F8, o el que inactivó el grupo origen en F10), `timestamp`. |
 | **Efectos** | El `codigo` de la unidad queda libre para una nueva creación (`[R11]`). La unidad se filtra de reportes históricos. Descartar un borrador del administrador no afecta a ningún consumidor — un borrador nunca fue referenciado por la operación de otro sub-dominio (ningún consumidor opera ni difiere contra borradores; difiere a la espera de una unidad `Activa`, `[D15]`). |
 
 #### `UnidadModificada`
@@ -801,7 +738,7 @@ Dos estados. La inactivación de un tipo no afecta unidades existentes que lo us
 | **Estado resultante** | Sin cambio de estado |
 | **Precondiciones** | Unidad en estado modificable (`[R17]`, `[I15]`); si cambia el tipo, el nuevo tipo está vigente en el catálogo (`[I07]`). |
 | **Información capturada** | `unidadId`, `changes` (map de `{ fieldName: nuevoValor }` solo con los campos efectivamente modificados; claves posibles: `nombre`, `tipoUnidad`, `descripcion`), `motivo` (opcional), `usuarioId`, `timestamp`. Formato delta canónico según Sección 2.3.1. |
-| **Efectos** | El estado proyectado refleja los nuevos valores. Si se modificó en `Borrador`, se actualiza `fechaUltimaActividadBorrador` para reiniciar el conteo de antigüedad de `[SI05]`. Los consumidores con interés en los campos modificados (ej: Contabilidad al cambio de tipo) actualizan su vista local. |
+| **Efectos** | El estado proyectado refleja los nuevos valores (si se modificó en `Borrador`, la bandeja `[SI04]` refresca la fecha de última actividad del borrador). Los consumidores con interés en los campos modificados (ej: Contabilidad al cambio de tipo) actualizan su vista local. |
 
 ### 5.2. Eventos del ciclo de vida de grupos
 
@@ -976,7 +913,7 @@ Catálogo de **literales fijos del dominio**. No es configurable; agregar un nue
 | `operativa` | Baja por decisión operativa normal (cierre de sucursal, fin de proyecto, etc.) o rechazo manual de un Borrador. | F7 (unidades operativas); F8 manual (Borradores) |
 | `fusion` | Baja como parte de una fusión: la unidad origen quedó integrada en una unidad destino. | F12 |
 | `division` | Baja como parte de una división: la unidad origen quedó separada en N unidades destino. | F13 |
-| `abandono_por_inactividad` | Baja automática de un Borrador que excedió el umbral de inactividad configurado. | `[SI05]` (proceso programado) |
+| `cascada_grupo` | Descarte de un Borrador arrastrado por la cascada de inactivación de su grupo padre. | F10 (cascada) |
 
 El atributo `motivoBaja` se proyecta en el modelo de lectura para reportería, bandejas y auditoría (`[D06]`).
 
@@ -992,7 +929,7 @@ El atributo `motivoBaja` se proyecta en el modelo de lectura para reportería, b
 | `I02` | **Transiciones FSM válidas de grupo.** Solo se permiten `Activo → Inactivo` y `Inactivo → Activo`. | Local | `GrupoOrganizacional` | `[R18]` |
 | `I03` | **Formato del código.** El código es alfanumérico de longitud entre 4 y 12 caracteres. La longitud específica admitida por tenant es parametrizable dentro de ese rango. | Local | Ambos | `[R10]` |
 | `I04` | **Inmutabilidad del código.** Una vez asignado, el código de una unidad o grupo no se modifica en ningún comando posterior. | Local | Ambos | `[R09]` |
-| `I05` | **Coherencia `motivoBaja` ↔ flujo.** Cuando `estado in {Inactiva, Descartada}`, el atributo `motivoBaja` está definido y su valor corresponde al flujo que disparó la baja (`operativa` desde F7 o F8 manual; `fusion` desde F12; `division` desde F13; `abandono_por_inactividad` desde `[SI05]` o F10 cascada para Borradores). | Local | `UnidadOrganizacional` | `[R26]` |
+| `I05` | **Coherencia `motivoBaja` ↔ flujo.** Cuando `estado in {Inactiva, Descartada}`, el atributo `motivoBaja` está definido y su valor corresponde al flujo que disparó la baja (`operativa` desde F7 o F8 manual; `fusion` desde F12; `division` desde F13; `cascada_grupo` desde F10 cascada para Borradores). | Local | `UnidadOrganizacional` | `[R26]` |
 | `I06` | **Reapertura requiere padre activo.** Un comando `ReabrirUnidad` solo se acepta si el `grupoPadreId` está en `Activo` al momento del comando. | Eventual | `UnidadOrganizacional` | `[R16]` |
 | `I07` | **Datos mínimos para activación.** Una unidad solo transiciona a `Activa` si `codigo`, `nombre`, `tipoUnidad` y `grupoPadreId` están definidos y el tipo está vigente en el catálogo del padre o ancestros. | Local | `UnidadOrganizacional` | Flujo 3 (activación), alcance |
 | `I08` | **Fecha efectiva de la reestructuración.** En F12, F13 y F14 la `fechaEfectiva` se gobierna en dos planos: **(a)** no puede ser anterior a la última versión vigente de jerarquía de las unidades involucradas — Estructura Organizacional lo valida **localmente** (es dueña de la jerarquía); **(b)** su coherencia con la actividad transaccional (no fijarla sobre periodos que ya tienen movimientos) la **define y responde el administrador** que ejecuta la reestructuración, como acto deliberado de gestión — el sistema no la valida contra el historial transaccional porque las transacciones/asientos son inmutables y los reportes ofrecen vista actual e histórica. | Local | `UnidadOrganizacional` | `[R25]` |
@@ -1035,8 +972,7 @@ El atributo `motivoBaja` se proyecta en el modelo de lectura para reportería, b
 | `D05` | **Modelo multi-dimensional desde el diseño** (referencia al anexo arquitectónico, decisión 4). En F1 se expone solo `Unidad Organizacional`. El contrato de líneas de traducción con Contabilidad acepta solo esa dimensión. | El costo de prever extensibilidad en F1 es bajo; el costo de migrar de mono-jerárquico a multi-dimensional en producción es altísimo. | `[DA4]` |
 | `D06` | **Causa de baja (`motivoBaja`) proyectada como atributo del modelo de lectura, no como estado FSM.** Patrón canónico DDD/ES/CQRS: la FSM modela comportamiento permitido; los atributos enriquecidos modelan información contextual. | Mantiene la FSM minimal y extensible. Agregar un nuevo motivo no infla la FSM; solo agrega un valor al enum del catálogo de motivos. | Sección 4 (Familia 3) del alcance |
 | `D07` | **Eventos `*Modificado` capturan delta**, no snapshot completo. El estado se reconstruye reproduciendo el stream. | Decisión transversal del proyecto. Reduce el tamaño del stream y permite identificar qué cambió específicamente. | Decisión del usuario (MEMORY.md) |
-| `D08` | **Un solo evento `UnidadDescartada` cubre rechazo del admin y abandono por inactividad.** El distinguidor del motivo va en el atributo `motivoBaja` (`operativa` vs `abandono_por_inactividad`). **Alcance específico de esta decisión:** no existe un evento explícito separado de rechazo (`UnidadRechazada`) — el evento `UnidadDescartada` se unifica con diferenciación por atributo. La política operativa de descarte automático en sí (cuándo y cómo se ejecuta, umbrales, proceso programado) se resuelve por separado en `[D09]` + `[SI05]`. Los dos cierres son complementarios y cubren aspectos distintos de la misma área. | Evita inflar el catálogo de eventos. La auditoría diferencia los casos vía el atributo proyectado, no vía evento separado. | Plan, decisión cerrada con el usuario. |
-| `D09` | **Descarte automático de Borradores por inactividad** mediante proceso programado del propio sub-dominio (`[SI05]`). Política: borrador con `fechaUltimaActividadBorrador` > umbral configurado por tenant (default sugerido 30 días) → emite `UnidadDescartada` con `motivoBaja: "abandono_por_inactividad"`. | Reduce ruido operativo de Borradores abandonados. El umbral es parametrizable para que cada tenant ajuste según su realidad operativa. | Plan, decisión cerrada con el usuario. |
+| `D08` | **Un solo evento `UnidadDescartada` cubre el rechazo manual del administrador y el descarte por cascada.** El distinguidor del motivo va en el atributo `motivoBaja` (`operativa` vs `cascada_grupo`). **Alcance específico de esta decisión:** no existe un evento explícito separado de rechazo (`UnidadRechazada`) — el evento `UnidadDescartada` se unifica con diferenciación por atributo. *(El descarte automático por inactividad que originalmente acompañaba esta decisión —`[D09]`/`[SI05]`— fue retirado en el issue #87: su motor original era la creación desde consumidores, eliminada en #46, y el caso residual —borradores que el propio administrador creó y abandonó— no justifica un proceso programado. El descarte de borradores es decisión del administrador: F8 manual o cascada F10.)* | Evita inflar el catálogo de eventos. La auditoría diferencia los casos vía el atributo proyectado, no vía evento separado. | Plan, decisión cerrada con el usuario; ajustada en #87. |
 | `D10` | **Catálogo de tipos de unidad como entidad interna del agregado `GrupoOrganizacional`**. Se administra al nivel del grupo raíz y se hereda hacia sub-grupos. | El catálogo es configuración estructural del árbol y calza con el rol de `GrupoOrganizacional` como nodo agrupador. Evita un tercer agregado (`CatalogoTiposUnidad`) y mantiene la cardinalidad del bounded context controlada. La opción "agregado separado" se evaluó y descartó por tres razones: (1) **alta cohesión funcional** — los tipos se consultan junto con la jerarquía en cada creación de unidad; (2) **sin ciclo de vida independiente** — los tipos no tienen estados ni transiciones complejas (solo `Activo`/`Inactivo` en la entidad interna `TipoUnidad`); (3) **simplificación operacional** — un solo punto de administración (el grupo raíz) en lugar de coordinar dos agregados. Esta decisión reconoce el trade-off: el agregado `GrupoOrganizacional` carga dos responsabilidades (estructura jerárquica + catálogo de tipos). Si en el futuro el catálogo crece en complejidad (tipos con sub-tipos, reglas de aplicabilidad por país, etc.), se evaluará separarlo en F2+. | Plan, decisión cerrada con el usuario; reforzada tras auditoría con análisis de alternativas. |
 | `D11` | **Mecanismos de plataforma (concurrencia optimista, idempotencia técnica, retry) viven como `[SI##]`**, no se especifican por evento ni como invariantes del dominio. | Decisión transversal del proyecto. Las invariantes y reglas pertenecen al dominio; los mecanismos de plataforma son sugerencias de implementación que materializan invariantes (especialmente las eventuales). | Decisión del usuario (MEMORY.md) |
 | `D12` | **Cascada de inactivación de grupos modelada como saga** (`CascadaInactivacionGrupo`). Emite un evento por nodo afectado (no un evento agregado tipo `GrupoInactivadoEnCascada`) para que los consumidores puedan reaccionar granularmente sin parsear listas. Sin cascada inversa al reactivar (`[R20]`); el sistema inteligente identifica candidatos a reabrir vía `correlationId` correlacionado (`[SI08]`). | Granularidad de eventos = granularidad de reacción. La asimetría reactivación-sin-cascada es coherente con que `Inactiva` no es terminal en F1 — el admin puede reabrir hijos que vea pertinentes sin que el sistema lo presuma. | Plan, decisión cerrada con el usuario en familia 2 grupos |
@@ -1118,3 +1054,4 @@ Total: **22 permisos atómicos**.
 | **1.6** | **2026-06-19** | **Consistencia del modelo de comunicación — replanteamiento de la validación de fecha efectiva (issue #56).** Se **retira `[SI10]`** (proyección local de última imputación) y con ella el acoplamiento que obligaba a EO a importar las imputaciones de todos los consumidores. **`[R25]`/`[I08]` replanteadas** (la regla no se quita, se replantea repartiendo responsabilidad): la fecha efectiva se gobierna en dos planos — validación local contra la jerarquía vigente (sistema) + coherencia con la actividad transaccional (responsabilidad del administrador, acto deliberado; transacciones inmutables + vista actual/histórica). Limpiadas las referencias a `[SI10]`/imputación (tabla comando↔SI, `[SI07]`, `[D15]`, sub-sección 3.8, VO `FechaEfectiva`, precondiciones F12/F13). Se conserva la numeración de `[SI11]`/`[SI12]` (hueco en SI10). Conteos: **11 sugerencias de implementación** (−1: `[SI10]` retirada); 16 invariantes (`[I08]` reformulada, no eliminada); 15 decisiones; 22 permisos — sin cambios. Acompaña al alcance v1.4 y a OXP v4.1 (retira el aviso de imputación) / Contabilidad v1.10. |
 | **1.7** | **2026-06-23** | **Retiro del aparato de señal/bandeja — la copia local es para validación, no para la UI (issue #72/#73).** Una vez la asignación/distribución de la unidad en los consumidores se hace contra la fuente de verdad (la UI elige de Estructura Organizacional en vivo; las reglas se parametrizan contra ella), el caso "el consumidor necesita una unidad que el administrador aún no creó" deja de ocurrir en operación y `[P05]` se reformula. En consecuencia: **se retira `[SI11]`** (bandeja de sugerencias) y la **señal de demanda** entrante (`DemandaDeUnidadSenalada`) → SIs **11 → 10** (hueco en SI11, conserva numeración); **`[D15]` pasa de 4 partes a 3** (se retira "demanda por señal informativa"); **`[R30]` retirada** del alcance; **§3.8 reescrita** (se elimina el camino de visibilidad y el diagrama de señal/bandeja; se reencuadra el diferir a **consistencia eventual** y se agrega el **principio de capas**: la UI lee al dueño en vivo, la copia local es para validación, no API de lectura de la UI); **`[SI07]` reorientada** de idempotencia de la señal a idempotencia de los comandos del administrador (resuelta por `[SI06]`/`[SI01]`, sin tabla propia). Limpiadas las referencias a la bandeja/señal (tabla comando↔SI, `[SI04]`, evento `UnidadCreada`, permiso `crear_unidad`). Sin cambios en invariantes (16), decisiones (15, `[D15]` reformulada) ni permisos (22). Acompaña al alcance v1.5, a OXP (retira la emisión de la señal; aclara que la copia es para validación) y a la guía `datos-entre-dominios.md` (principio de capas). |
 | **1.8** | **2026-07-08** | **Propósito documentado de `fechaEstimadaReactivacion` — dato informativo consistente con la suspensión (issue #88).** El campo deja de ser un dato capturado sin destino: se incorpora a la composición de `UnidadOrganizacional` (Sección 3.3) como dato **proyectado en read model** (molde de `motivoBaja`), presente solo mientras la unidad está en `Suspendida` y null al salir de ese estado. Su propósito queda explícito: expresa la **transitoriedad esperada de la suspensión** — quien suspende espera volver a operar la unidad; sin expectativa de retorno el camino es la inactivación — y es información de consulta para el administrador. **Ningún proceso la lee ni dispara reactivación automática**: la reactivación (F5) sigue siendo un gesto manual. Evento `UnidadSuspendida` (Sección 5.1) anotado en información capturada y efectos. Sale de la lista de "datos capturados no almacenados" (queda solo `motivo`). Acompaña al alcance v1.6. |
+| **1.9** | **2026-07-08** | **Retiro del descarte automático de Borradores — perdió su driver original (issue #87).** El mecanismo nació para limpiar solicitudes de consumidores no atendidas; al eliminarse la creación desde consumidores (#46), solo cubría borradores que el propio administrador creó y abandonó — caso inocuo que no justifica un proceso programado por tenant con estado persistido y lock distribuido. Se retiran: **`[D09]`** (hueco en la numeración), **`[SI05]`** (hueco), el servicio **`DescarteAutomaticoBorradores`** de la Sección 3.6, el atributo **`fechaUltimaActividadBorrador`** y el guard **`puedeDescartarseAutomáticamente(umbral)`**. **`[SI04]` reorientada:** la antigüedad del borrador pasa a ser dato informativo derivado de los eventos, para decisión del administrador (mismo criterio del #88); ninguna política automática la lee. El descarte queda con dos vías con dueño claro: **F8 manual** (decisión del administrador) y **cascada F10** (se conserva intacta). **Literal `abandono_por_inactividad` renombrado a `cascada_grupo`** — su único uso restante es la cascada F10 y el nombre viejo ya no correspondía a ninguna inactividad real (2.5, composición, `validarCoherenciaBaja()`, VO `MotivoBaja`, saga F10, FSM, `UnidadDescartada`, catálogo 6.2, `[I05]`, `[D08]`). Nota de `Inactiva` en la FSM corregida: el motivo de cascada no aplica a `Inactiva` (un Borrador arrastrado por la cascada termina en `Descartada`). Conteos: **9 sugerencias de implementación** (−1), **14 decisiones** (−1), **2 domain services** (−1); invariantes (16) y permisos (22) sin cambios. Acompaña al alcance v1.7. |

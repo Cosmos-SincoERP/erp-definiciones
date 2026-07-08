@@ -210,7 +210,7 @@ Escenario en el que un sub-dominio consumidor (OXP, Contabilidad, etc.) imputa c
 
 #### Flujo 3 — Activación de una unidad en `Borrador`
 
-Escenario en el que el administrador activa una unidad que fue creada en estado `Borrador` — típicamente una solicitada por un consumidor (Flujo 2) o una que el administrador dejó provisionalmente en borrador para completar datos.
+Escenario en el que el administrador activa una unidad que fue creada en estado `Borrador` — una que dejó provisionalmente en preparación (Flujo 1) mientras completaba sus datos.
 
 ```
  Administrador revisa bandeja de unidades en Borrador
@@ -219,8 +219,6 @@ Escenario en el que el administrador activa una unidad que fue creada en estado 
        ▼
  ┌────────────────────────────────────────────┐
  │ Sistema inteligente muestra:               │
- │   · origen de la solicitud (si vino de     │
- │     un consumidor: qué documento/flujo)    │
  │   · unidades similares existentes          │
  │     (por si conviene reutilizar)           │
  │   · datos faltantes sugeridos              │
@@ -244,8 +242,9 @@ Escenario en el que el administrador activa una unidad que fue creada en estado 
                         │
                         ▼
  Consumidores (OXP, Contabilidad, ...) reciben
- el evento y destraban operaciones pendientes
- que referenciaban la unidad en Borrador.
+ el evento, actualizan su copia local y las
+ operaciones diferidas a la espera de esta
+ unidad se resuelven solas.
 ```
 
 - **Actor principal:** Administrador de estructura organizacional.
@@ -409,18 +408,6 @@ Escenario terminal en el que una unidad **que nunca operó** se descarta antes d
        │  (opcionalmente registra motivo)
        ▼
  ┌────────────────────────────────────────────┐
- │ Sistema inteligente                        │
- │  Si hay operaciones pendientes en          │
- │  consumidores que dependen de la futura    │
- │  activación, advierte al admin del         │
- │  impacto (cuántas operaciones se           │
- │  cancelarán en cascada). No bloquea —      │
- │  el admin decide si procede.               │
- └──────────────────────┬─────────────────────┘
-                        │
-                        │  Admin confirma
-                        ▼
- ┌────────────────────────────────────────────┐
  │ Estructura Organizacional                  │
  │ Valida:                                    │
  │   · la unidad está en estado Borrador      │
@@ -430,18 +417,17 @@ Escenario terminal en el que una unidad **que nunca operó** se descarta antes d
                Emite: UnidadDescartada
                         │
                         ▼
- Consumidores reciben el evento y cancelan
- sus operaciones dependientes en cascada
- (ej: OXP cancela las obligaciones marcadas
- "pendiente por unidad organizacional"). El
- usuario operativo es notificado con el
- motivo. La identificación queda libre.
+ Consumidores reciben el evento y actualizan
+ su copia local. Un borrador nunca es
+ referenciado por la operación de otro
+ sub-dominio, así que no hay nada que
+ cancelar. La identificación queda libre.
 ```
 
 - **Actor principal:** Administrador de estructura organizacional.
-- **Pre-condiciones:** la unidad está en estado `Borrador`. Si hay operaciones pendientes en consumidores, el sistema inteligente advierte el impacto previo, pero no bloquea la decisión.
+- **Pre-condiciones:** la unidad está en estado `Borrador`.
 - **Eventos emitidos:** `UnidadDescartada`.
-- **Estado resultante:** `Descartada` (terminal estricto, no reabrible; identificación liberada; las operaciones dependientes en consumidores se cancelan en cascada al recibir el evento).
+- **Estado resultante:** `Descartada` (terminal estricto, no reabrible; identificación liberada).
 
 ---
 
@@ -987,7 +973,7 @@ Las reglas se numeran `[R##]` y se organizan por tema operativo.
 | R23 | **Origen en `Activa` o `Suspendida`** | En F12 y F13, las unidades origen deben estar en `Activa` o `Suspendida`. Las unidades en `Borrador`, `Inactiva` o `Descartada` no se reestructuran. | No |
 | R24 | **Destino distinto del conjunto origen** | En F12, la unidad destino no puede estar dentro del conjunto de unidades origen. En F13, la unidad origen no puede estar dentro del conjunto de unidades destino. | No |
 | R25 | **Fecha efectiva de la reestructuración** | La fecha efectiva de una fusión, división o traslado (F12, F13, F14) se gobierna en dos planos: **(a) validación del sistema** — no puede ser anterior a la versión vigente de jerarquía de las unidades involucradas; Estructura Organizacional lo valida localmente por ser dueña de la jerarquía. **(b) responsabilidad del administrador** — la coherencia de la fecha con la actividad transaccional de las unidades (no fijarla sobre periodos que ya tienen movimientos) la **define y la responde el administrador** que ejecuta la reestructuración, como acto deliberado de gestión. El sistema no la verifica contra el historial transaccional porque las transacciones/asientos son inmutables y los reportes ofrecen vista actual e histórica. | No |
-| R26 | **Motivo de baja proyectado** | Las unidades que pasan a `Inactiva` o `Descartada` llevan en el modelo de lectura un atributo `motivoBaja` que permite identificar la causa de la baja. Para unidades `Inactiva`, los valores son `operativa`, `fusion` o `division`, según el flujo que originó la inactivación. Para unidades `Descartada`, los valores son `operativa` cuando corresponde a rechazo manual del administrador, o `abandono_por_inactividad` cuando corresponde a descarte automático o descarte por cascada de inactivación de grupo. Los valores son literales fijos del dominio. | No |
+| R26 | **Motivo de baja proyectado** | Las unidades que pasan a `Inactiva` o `Descartada` llevan en el modelo de lectura un atributo `motivoBaja` que permite identificar la causa de la baja. Para unidades `Inactiva`, los valores son `operativa`, `fusion` o `division`, según el flujo que originó la inactivación. Para unidades `Descartada`, los valores son `operativa` cuando corresponde a rechazo manual del administrador (Flujo 8), o `cascada_grupo` cuando corresponde al descarte por cascada de inactivación del grupo padre (Flujo 10). Los valores son literales fijos del dominio. | No |
 | R27 | **Historial referenciado al origen** | En F12 y F13, el historial transaccional previo a la fecha efectiva permanece referenciado a las unidades origen. Las unidades destino arrancan limpias y solo reciben las nuevas imputaciones desde la fecha efectiva. | No |
 | R28 | **Traslado preserva identidad** | El traslado de una unidad (F14) conserva su identidad, código, estado e historial transaccional. Solo cambia su posición en el árbol y la versión vigente de jerarquía. | No |
 
@@ -1110,3 +1096,4 @@ Las capacidades adicionales que el sub-dominio pueda soportar en el futuro (acti
 | 1.4 | 2026-06-19 | **Consistencia del modelo de comunicación — replanteamiento de R25 (issue #56).** `R25` **se replantea (no se quita)**: la fecha efectiva se gobierna en dos planos — EO valida localmente que no sea anterior a la versión vigente de jerarquía, y la coherencia con la actividad transaccional es **responsabilidad del administrador** (acto deliberado; transacciones inmutables + vista actual/histórica). Se **retira la integración entrante de eventos de imputación** y la dependencia de la Sección 7 correspondiente (EO ya no mantiene proyección de última imputación, `[SI10]` retirada en el modelo); el **diagrama de integraciones pasa de 4 a 3 flujos**; precondiciones de F12/F13 ajustadas al replanteamiento. Acompaña al modelo v1.6 (`[SI10]` retirada, `[I08]` reformulada). |
 | 1.5 | 2026-06-23 | **Retiro del aparato de señal/bandeja — la copia local es para validación, no para la UI (issue #72/#73).** Una vez la asignación/distribución de la unidad en los consumidores se hace contra la fuente de verdad (la UI lee EO en vivo; las reglas se parametrizan contra ella), referenciar una unidad inexistente no ocurre en el camino operativo. En consecuencia: **`R30` (demanda de unidad no bloqueante) retirada** → 30 → 29 reglas; **`R29` reformulada** (operación sin bloqueo + diferir por **consistencia eventual**: la unidad existe en el dueño, solo puede faltar la propagación del evento); **Flujo 2 reescrito** (sin el camino de señal/visibilidad); **diagrama de integraciones pasa de 3 a 2 flujos** (eventos salientes + resincronización); responsabilidades de actores, principio de Sección 5, capacidades (se retira "Atención de la demanda…") y notas de fase limpiadas de la señal/sugerencia. La creación de unidades sigue su curso normal por planeación del administrador. Acompaña al modelo v1.7 (retiro de `[SI11]`, parte 4 de `[D15]`, reorientación de `[SI07]`, §3.8 con el principio de capas) y a la guía `datos-entre-dominios.md`. |
 | 1.6 | 2026-07-08 | **Flujo 4 — propósito de la fecha estimada de reactivación (issue #88).** Se documenta el uso del dato que el flujo ya capturaba sin destino declarado: la fecha estimada de reactivación es **informativa para el administrador** y consistente con la naturaleza transitoria de la suspensión (quien suspende espera volver a operar la unidad; sin expectativa de retorno, el camino correcto es la inactivación — Flujo 7). Ningún proceso reacciona a la fecha: la reactivación (Flujo 5) sigue siendo siempre un gesto manual del administrador. Acompaña al modelo v1.8, que proyecta el dato en el read model de la unidad para su consulta. |
+| 1.7 | 2026-07-08 | **Retiro del descarte automático de Borradores + limpieza de residuos del #46 (issue #87).** **R26:** el motivo de `Descartada` por cascada pasa de `abandono_por_inactividad` a **`cascada_grupo`** y desaparece la mención al descarte automático — descartar un borrador es siempre decisión del administrador (Flujo 8) o consecuencia de la cascada (Flujo 10). **Flujo 8 reescrito:** se retiran la advertencia del sistema inteligente sobre operaciones dependientes y la cancelación en cascada en consumidores — residuos del patrón anterior al #46: un borrador nunca es referenciado por la operación de otro sub-dominio, no hay nada que cancelar. **Flujo 3 limpiado:** el borrador ya no se describe como "solicitado por un consumidor (Flujo 2)" ni el sistema inteligente muestra "origen de la solicitud"; los consumidores actualizan su copia local y las operaciones diferidas a la espera de la unidad se resuelven solas (`[D15]`). Acompaña al modelo v1.9. |
