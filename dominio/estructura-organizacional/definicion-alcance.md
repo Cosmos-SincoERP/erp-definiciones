@@ -73,7 +73,7 @@ La decisión de nombre está resuelta en [`anexo-definicion-contexto-inicial.md`
 | 5 | **Código** | Identificador alfanumérico plano de una unidad o grupo organizacional, único por tenant. No embebe información jerárquica — la jerarquía se modela como estructura separada. Longitud sugerida entre 4 y 12 caracteres. |
 | 6 | **Nombre** | Denominación descriptiva de la unidad o grupo organizacional, destinada a la lectura humana en UI y reportes. |
 | 7 | **Jerarquía** | Estructura de árbol que enlaza grupos y unidades organizacionales mediante relaciones padre-hijo con vigencia por fecha efectiva. Se modela como agregado separado del código de cada unidad o grupo. |
-| 8 | **Grupo raíz** | Grupo organizacional único por tenant, creado automáticamente al inicializar la estructura. Es el ancestro de toda la jerarquía. No puede inactivarse mientras existan otros nodos colgando de él. |
+| 8 | **Grupo tope** | Grupo organizacional sin padre: es la raíz de su propio árbol. Un tenant puede tener **varios** grupos tope — la estructura es un bosque, no un árbol único. Ningún grupo se crea automáticamente: todos son actos deliberados del administrador. La consolidación "total compañía" no depende de un nodo tope: la da el tenant (todas las unidades del tenant). *(Reemplaza al término "Grupo raíz" — único, automático y protegido — retirado en el issue #85.)* |
 | 9 | **Nivel** | Profundidad de un nodo (grupo o unidad) dentro de la jerarquía. Se calcula a partir de la estructura, no se almacena en el código. |
 | 10 | **Estado de la unidad** | Condición del ciclo de vida de una unidad organizacional. Cinco estados: **Borrador** (en preparación, no transaccional), **Activa** (recibe imputaciones), **Suspendida** (transitoriamente no recibe imputaciones, pero consultable), **Inactiva** (dada de baja después de haber operado; el historial se conserva; reabrible si la unidad retoma operación) y **Descartada** (terminal estricto, nunca llegó a operar; se filtra de reportes históricos). |
 | 11 | **Borrador** | Estado de **preparación del administrador**: una unidad que aún no es transaccional, mientras el administrador termina de definirla antes de activarla (Flujo 1). **No se origina desde sub-dominios consumidores** (ver R29). Permite su referencia en flujos de planeación pero bloquea la imputación hasta que se active. |
@@ -455,9 +455,11 @@ Los grupos solo los crea el administrador (no se solicitan desde sub-dominios co
  │ Estructura Organizacional                  │
  │ Valida:                                    │
  │   · código único por tenant                │
- │   · grupo padre existente y en Activo      │
- │   · posición válida en la jerarquía        │
- │     (no se permiten ciclos)                │
+ │   · si se indica padre: existe y está      │
+ │     en Activo, y la posición no            │
+ │     introduce ciclos                       │
+ │   · sin padre: el grupo nace como tope     │
+ │     del bosque (puede haber varios)        │
  └──────────────────────┬─────────────────────┘
                         │
                         ▼
@@ -471,7 +473,7 @@ Los grupos solo los crea el administrador (no se solicitan desde sub-dominios co
 ```
 
 - **Actor principal:** Administrador de estructura organizacional.
-- **Pre-condiciones:** el grupo padre existe y está en estado `Activo`; el código propuesto no está en uso.
+- **Pre-condiciones:** el código propuesto no está en uso; si se indica grupo padre, existe y está en estado `Activo` (sin padre, el grupo nace como tope del bosque — R31).
 - **Eventos emitidos:** `GrupoCreado` (estado `Activo`).
 - **Estado resultante:** `Activo`.
 
@@ -494,8 +496,6 @@ Escenario en el que se inactiva un grupo. Como el grupo agrupa sub-grupos y/o un
  │   · N unidades Activas → Inactiva          │
  │   · N unidades Suspendidas → Inactiva      │
  │   · N unidades en Borrador → Descartada    │
- │   · N operaciones pendientes en            │
- │     consumidores que se cancelarán         │
  │  Exige confirmación explícita.             │
  └──────────────────────┬─────────────────────┘
                         │
@@ -505,10 +505,6 @@ Escenario en el que se inactiva un grupo. Como el grupo agrupa sub-grupos y/o un
  │ Estructura Organizacional                  │
  │ Valida:                                    │
  │   · el grupo está en estado Activo         │
- │   · el grupo no es el grupo raíz con       │
- │     contenido (el raíz está protegido y    │
- │     no se inactiva por el flujo estándar   │
- │     mientras existan nodos colgando)       │
  │ Aplica cascada recursiva:                  │
  │   · sub-grupos → Inactivo                  │
  │   · unidades en Activa/Suspendida →        │
@@ -524,14 +520,15 @@ Escenario en el que se inactiva un grupo. Como el grupo agrupa sub-grupos y/o un
    Borrador colgando del grupo)
                         │
                         ▼
- Consumidores reciben los eventos y reaccionan
- según corresponda: bloquean nuevas
- imputaciones (Inactivada) o cancelan
- operaciones pendientes (Descartada).
+ Consumidores reciben los eventos, actualizan
+ su copia local y bloquean nuevas imputaciones
+ contra las unidades inactivadas (un borrador
+ descartado nunca fue referenciado — no hay
+ nada que cancelar).
 ```
 
 - **Actor principal:** Administrador de estructura organizacional.
-- **Pre-condiciones:** el grupo está en estado `Activo` y no es el grupo raíz; el administrador confirmó el impacto previsto.
+- **Pre-condiciones:** el grupo está en estado `Activo`; el administrador confirmó el impacto previsto.
 - **Eventos emitidos:** `GrupoInactivado` (por el grupo y cada sub-grupo afectado), `UnidadInactivada` (por cada unidad operativa afectada), `UnidadDescartada` (por cada unidad en `Borrador` afectada).
 - **Estado resultante:** el grupo y todos sus descendientes pasan a estado no operativo (`Inactivo` para grupos y unidades operativas; `Descartada` para unidades en borrador). El grupo y sus sub-grupos pueden reactivarse posteriormente; las unidades inactivadas pueden reabrirse una a una.
 
@@ -929,8 +926,6 @@ Las reglas se numeran `[R##]` y se organizan por tema operativo.
 | # | Regla | Descripción | Configurable |
 |---|-------|-------------|:------------:|
 | R1 | **Pertenencia obligatoria a grupo padre** | Toda unidad organizacional pertenece a exactamente un grupo padre. No existen unidades huérfanas. | No |
-| R2 | **Grupo raíz único por tenant** | Cada tenant tiene un grupo raíz único, creado automáticamente al inicializar la estructura. Es el ancestro de toda la jerarquía. | No |
-| R3 | **Grupo raíz protegido** | El grupo raíz no puede ser inactivado mientras existan otros nodos colgando de él. En operación normal, esto equivale a que no se inactiva mientras la estructura tenga contenido. Si el grupo raíz no tiene contenido, su inactivación solo puede considerarse como operación administrativa excepcional de inicialización o reversión, no como flujo estándar de negocio. | No |
 | R4 | **No ciclos en la jerarquía** | Un grupo no puede ser su propio ancestro directo ni indirecto. El árbol mantiene su naturaleza acíclica. | No |
 | R5 | **Mezcla libre de hijos en grupos** | Un grupo puede contener cualquier combinación de sub-grupos y unidades organizacionales como hijos. No se restringe la mezcla. | No |
 | R6 | **Unidad siempre hoja** | Una unidad organizacional nunca tiene hijos. Si un caso de negocio requiere estructura adicional bajo lo que parece una unidad, se modela con un grupo intermedio. | No |
@@ -982,6 +977,7 @@ Las reglas se numeran `[R##]` y se organizan por tema operativo.
 | # | Regla | Descripción | Configurable |
 |---|-------|-------------|:------------:|
 | R29 | **Operación del consumidor sin bloqueo** | El consumidor opera contra su copia local de unidades. Una unidad solo se referencia tras existir en Estructura Organizacional (la UI la elige de la fuente de verdad; las reglas de distribución del consumidor se parametrizan contra ella), de modo que la única demora posible es de propagación: si el evento de ciclo de vida aún no llegó a su copia local, su operación **no se detiene** — registra lo que puede y difiere solo la parte que requiere la unidad, que se resuelve cuando el evento llega (consistencia eventual). La creación de una unidad es siempre **acto deliberado de Estructura Organizacional** (administrador o integración) — ningún flujo consumidor crea unidades ni las origina en un estado bloqueante. | No |
+| R31 | **Estructura en bosque y consolidación por tenant** | La estructura organizacional es un bosque: los grupos sin padre son los **topes** y un tenant puede tener varios (estructura financiera, gerencial, u otras que el negocio necesite como topes separados). Ningún grupo se crea automáticamente al inicializar el tenant. La consolidación "total compañía" (balances, estados de resultados, estados financieros) es responsabilidad de la **frontera del tenant** — totaliza todas las unidades del tenant — y no requiere un nodo único que las contenga; cada tope consolida su propio sub-árbol, como los centros de costo maestros del ERP actual consolidan sus auxiliares. | No |
 
 ---
 
@@ -1097,3 +1093,4 @@ Las capacidades adicionales que el sub-dominio pueda soportar en el futuro (acti
 | 1.5 | 2026-06-23 | **Retiro del aparato de señal/bandeja — la copia local es para validación, no para la UI (issue #72/#73).** Una vez la asignación/distribución de la unidad en los consumidores se hace contra la fuente de verdad (la UI lee EO en vivo; las reglas se parametrizan contra ella), referenciar una unidad inexistente no ocurre en el camino operativo. En consecuencia: **`R30` (demanda de unidad no bloqueante) retirada** → 30 → 29 reglas; **`R29` reformulada** (operación sin bloqueo + diferir por **consistencia eventual**: la unidad existe en el dueño, solo puede faltar la propagación del evento); **Flujo 2 reescrito** (sin el camino de señal/visibilidad); **diagrama de integraciones pasa de 3 a 2 flujos** (eventos salientes + resincronización); responsabilidades de actores, principio de Sección 5, capacidades (se retira "Atención de la demanda…") y notas de fase limpiadas de la señal/sugerencia. La creación de unidades sigue su curso normal por planeación del administrador. Acompaña al modelo v1.7 (retiro de `[SI11]`, parte 4 de `[D15]`, reorientación de `[SI07]`, §3.8 con el principio de capas) y a la guía `datos-entre-dominios.md`. |
 | 1.6 | 2026-07-08 | **Flujo 4 — propósito de la fecha estimada de reactivación (issue #88).** Se documenta el uso del dato que el flujo ya capturaba sin destino declarado: la fecha estimada de reactivación es **informativa para el administrador** y consistente con la naturaleza transitoria de la suspensión (quien suspende espera volver a operar la unidad; sin expectativa de retorno, el camino correcto es la inactivación — Flujo 7). Ningún proceso reacciona a la fecha: la reactivación (Flujo 5) sigue siendo siempre un gesto manual del administrador. Acompaña al modelo v1.8, que proyecta el dato en el read model de la unidad para su consulta. |
 | 1.7 | 2026-07-08 | **Retiro del descarte automático de Borradores + limpieza de residuos del #46 (issue #87).** **R26:** el motivo de `Descartada` por cascada pasa de `abandono_por_inactividad` a **`cascada_grupo`** y desaparece la mención al descarte automático — descartar un borrador es siempre decisión del administrador (Flujo 8) o consecuencia de la cascada (Flujo 10). **Flujo 8 reescrito:** se retiran la advertencia del sistema inteligente sobre operaciones dependientes y la cancelación en cascada en consumidores — residuos del patrón anterior al #46: un borrador nunca es referenciado por la operación de otro sub-dominio, no hay nada que cancelar. **Flujo 3 limpiado:** el borrador ya no se describe como "solicitado por un consumidor (Flujo 2)" ni el sistema inteligente muestra "origen de la solicitud"; los consumidores actualizan su copia local y las operaciones diferidas a la espera de la unidad se resuelven solas (`[D15]`). Acompaña al modelo v1.9. |
+| 1.8 | 2026-07-08 | **Replanteamiento — bosque en lugar de raíz única obligatoria (issue #85).** Glosario término 8: "Grupo raíz" (único, automático, protegido) se reemplaza por **"Grupo tope"** (grupo sin padre; un tenant puede tener varios; ninguno se crea automáticamente). **Se retiran `R2` y `R3`** (huecos — la numeración se conserva) y entra **`R31`**: estructura en bosque + consolidación "total compañía" por la frontera del tenant, con la homologación del ERP actual (centros de costo maestros consolidan reportes de sus auxiliares; hay varios maestros por empresa, nunca un "maestro único"). **Flujo 9**: crear grupo sin padre = nace como tope. **Flujo 10**: desaparece la validación "no es el grupo raíz con contenido"; de paso se limpian residuos del #46 en el impacto previsto y los efectos (ya no hay "operaciones pendientes en consumidores que se cancelarán" — un borrador descartado nunca fue referenciado). Acompaña al modelo v2.1 (`[D16]`, `[I13]` retirada) y al anexo de decisiones v1.3 (Decisión 2 actualizada). |
