@@ -70,13 +70,13 @@ La decisión de nombre está resuelta en [`anexo-definicion-contexto-inicial.md`
 | 2 | **Grupo organizacional** | Nodo agrupador de la jerarquía. Puede contener cualquier combinación de sub-grupos y unidades organizacionales como hijos. No recibe transacciones ni admite imputaciones. Tiene ciclo de vida propio con dos estados (`Activo`, `Inactivo`); inactivar un grupo propaga la inactivación en cascada a todos sus hijos. |
 | 3 | **Unidad organizacional** | Nodo hoja de la jerarquía donde se imputan las transacciones. Representa el destino concreto de un hecho económico para efectos de control de gestión. Pertenece a exactamente un grupo padre y nunca tiene hijos — si un caso de negocio requiere estructura adicional bajo una unidad, se modela mediante un grupo intermedio. Su ciclo de vida está definido por los cinco estados descritos en el término 10. |
 | 4 | **Tipo de unidad** | Clasificación de una unidad organizacional según su naturaleza: centro de costo, proyecto, sucursal, inmueble, departamento, entre otros. Permite a cada sub-dominio consumidor interpretar la unidad según su contexto. |
-| 5 | **Código** | Identificador alfanumérico plano de una unidad o grupo organizacional, único por tenant. No embebe información jerárquica — la jerarquía se modela como estructura separada. Longitud sugerida entre 4 y 12 caracteres. |
+| 5 | **Código** | Identificador plano de texto libre de una unidad o grupo organizacional, único por tenant (sin distinguir mayúsculas de minúsculas). No embebe información jerárquica — la jerarquía se modela como estructura separada; los separadores (guion, punto, barra) son cosméticos. Su longitud cumple el rango configurado por el tenant (por defecto 2 a 12 caracteres) dentro de la envolvente del dominio (R8). |
 | 6 | **Nombre** | Denominación descriptiva de la unidad o grupo organizacional, destinada a la lectura humana en UI y reportes. |
 | 7 | **Jerarquía** | Estructura de árbol que enlaza grupos y unidades organizacionales mediante relaciones padre-hijo con vigencia por fecha efectiva. Se modela como agregado separado del código de cada unidad o grupo. |
-| 8 | **Grupo raíz** | Grupo organizacional único por tenant, creado automáticamente al inicializar la estructura. Es el ancestro de toda la jerarquía. No puede inactivarse mientras existan otros nodos colgando de él. |
+| 8 | **Grupo de primer nivel** | Grupo organizacional sin padre: encabeza su propio árbol. Un tenant puede tener **varios** grupos de primer nivel — la estructura no es un árbol único: cada uno encabeza su propio árbol independiente. Ningún grupo se crea automáticamente: todos son actos deliberados del administrador. La consolidación "total compañía" no depende de un grupo de primer nivel: la da el tenant (todas las unidades del tenant). En el modelo es una condición **derivada** de no tener padre (comportamiento `esDePrimerNivel()`), no un atributo almacenado. *(Reemplaza al término "Grupo raíz" — único, automático y protegido — retirado en el issue #85.)* |
 | 9 | **Nivel** | Profundidad de un nodo (grupo o unidad) dentro de la jerarquía. Se calcula a partir de la estructura, no se almacena en el código. |
 | 10 | **Estado de la unidad** | Condición del ciclo de vida de una unidad organizacional. Cinco estados: **Borrador** (en preparación, no transaccional), **Activa** (recibe imputaciones), **Suspendida** (transitoriamente no recibe imputaciones, pero consultable), **Inactiva** (dada de baja después de haber operado; el historial se conserva; reabrible si la unidad retoma operación) y **Descartada** (terminal estricto, nunca llegó a operar; se filtra de reportes históricos). |
-| 11 | **Borrador** | Estado de **preparación del administrador**: una unidad que aún no es transaccional, mientras el administrador termina de definirla antes de activarla (Flujo 1). **No se origina desde sub-dominios consumidores** (ver R29). Permite su referencia en flujos de planeación pero bloquea la imputación hasta que se active. |
+| 11 | **Borrador** | Estado de **preparación del administrador**: una unidad que aún no es transaccional, mientras el administrador termina de definirla antes de activarla (Flujo 1). **No se origina desde sub-dominios consumidores** (ver R27). Permite su referencia en flujos de planeación pero bloquea la imputación hasta que se active. |
 | 12 | **Activa** | Estado operativo de una unidad organizacional. Recibe imputaciones en nuevas transacciones. |
 | 13 | **Suspendida** | Estado transitorio en el que una unidad organizacional no recibe nuevas imputaciones pero sigue siendo consultable y reportable. Aplica a situaciones como cierre temporal, disputa en curso o congelamiento gerencial. |
 | 14 | **Inactiva** | Estado en el que una unidad organizacional deja de recibir imputaciones después de haber operado. Los registros históricos que la referencian se conservan intactos y siguen apareciendo en reportes históricos. **Puede reabrirse** si la unidad retoma operación (ej: sucursal que reabre, proyecto que se reanuda); la reapertura emite un evento de auditoría dedicado (`UnidadReabierta`) distinto del de reactivación desde `Suspendida`. |
@@ -210,7 +210,7 @@ Escenario en el que un sub-dominio consumidor (OXP, Contabilidad, etc.) imputa c
 
 #### Flujo 3 — Activación de una unidad en `Borrador`
 
-Escenario en el que el administrador activa una unidad que fue creada en estado `Borrador` — típicamente una solicitada por un consumidor (Flujo 2) o una que el administrador dejó provisionalmente en borrador para completar datos.
+Escenario en el que el administrador activa una unidad que fue creada en estado `Borrador` — una que dejó provisionalmente en preparación (Flujo 1) mientras completaba sus datos.
 
 ```
  Administrador revisa bandeja de unidades en Borrador
@@ -219,8 +219,6 @@ Escenario en el que el administrador activa una unidad que fue creada en estado 
        ▼
  ┌────────────────────────────────────────────┐
  │ Sistema inteligente muestra:               │
- │   · origen de la solicitud (si vino de     │
- │     un consumidor: qué documento/flujo)    │
  │   · unidades similares existentes          │
  │     (por si conviene reutilizar)           │
  │   · datos faltantes sugeridos              │
@@ -244,8 +242,9 @@ Escenario en el que el administrador activa una unidad que fue creada en estado 
                         │
                         ▼
  Consumidores (OXP, Contabilidad, ...) reciben
- el evento y destraban operaciones pendientes
- que referenciaban la unidad en Borrador.
+ el evento, actualizan su copia local y las
+ operaciones diferidas a la espera de esta
+ unidad se resuelven solas.
 ```
 
 - **Actor principal:** Administrador de estructura organizacional.
@@ -258,6 +257,8 @@ Escenario en el que el administrador activa una unidad que fue creada en estado 
 #### Flujo 4 — Suspensión de una unidad activa
 
 Escenario en el que una unidad activa entra en un período transitorio durante el cual no debe recibir nuevas imputaciones pero sigue siendo consultable y reportable (sucursal cerrada por remodelación, proyecto en hold por disputa, centro de costo congelado por decisión gerencial).
+
+La fecha estimada de reactivación es un dato informativo para el administrador, consistente con la naturaleza transitoria de la suspensión: quien suspende espera volver a operar la unidad, y esta fecha expresa cuándo. Si no existe expectativa de retorno, el camino correcto es la inactivación (Flujo 7). Ningún proceso reacciona a esta fecha — la reactivación (Flujo 5) es siempre un gesto manual del administrador.
 
 ```
  Administrador selecciona una unidad Activa
@@ -407,18 +408,6 @@ Escenario terminal en el que una unidad **que nunca operó** se descarta antes d
        │  (opcionalmente registra motivo)
        ▼
  ┌────────────────────────────────────────────┐
- │ Sistema inteligente                        │
- │  Si hay operaciones pendientes en          │
- │  consumidores que dependen de la futura    │
- │  activación, advierte al admin del         │
- │  impacto (cuántas operaciones se           │
- │  cancelarán en cascada). No bloquea —      │
- │  el admin decide si procede.               │
- └──────────────────────┬─────────────────────┘
-                        │
-                        │  Admin confirma
-                        ▼
- ┌────────────────────────────────────────────┐
  │ Estructura Organizacional                  │
  │ Valida:                                    │
  │   · la unidad está en estado Borrador      │
@@ -428,18 +417,17 @@ Escenario terminal en el que una unidad **que nunca operó** se descarta antes d
                Emite: UnidadDescartada
                         │
                         ▼
- Consumidores reciben el evento y cancelan
- sus operaciones dependientes en cascada
- (ej: OXP cancela las obligaciones marcadas
- "pendiente por unidad organizacional"). El
- usuario operativo es notificado con el
- motivo. La identificación queda libre.
+ Consumidores reciben el evento y actualizan
+ su copia local. Un borrador nunca es
+ referenciado por la operación de otro
+ sub-dominio, así que no hay nada que
+ cancelar. La identificación queda libre.
 ```
 
 - **Actor principal:** Administrador de estructura organizacional.
-- **Pre-condiciones:** la unidad está en estado `Borrador`. Si hay operaciones pendientes en consumidores, el sistema inteligente advierte el impacto previo, pero no bloquea la decisión.
+- **Pre-condiciones:** la unidad está en estado `Borrador`.
 - **Eventos emitidos:** `UnidadDescartada`.
-- **Estado resultante:** `Descartada` (terminal estricto, no reabrible; identificación liberada; las operaciones dependientes en consumidores se cancelan en cascada al recibir el evento).
+- **Estado resultante:** `Descartada` (terminal estricto, no reabrible; identificación liberada).
 
 ---
 
@@ -467,9 +455,11 @@ Los grupos solo los crea el administrador (no se solicitan desde sub-dominios co
  │ Estructura Organizacional                  │
  │ Valida:                                    │
  │   · código único por tenant                │
- │   · grupo padre existente y en Activo      │
- │   · posición válida en la jerarquía        │
- │     (no se permiten ciclos)                │
+ │   · si se indica padre: existe y está      │
+ │     en Activo, y la posición no            │
+ │     introduce ciclos                       │
+ │   · sin padre: el grupo nace como grupo    │
+ │     de primer nivel (puede haber varios)   │
  └──────────────────────┬─────────────────────┘
                         │
                         ▼
@@ -483,7 +473,7 @@ Los grupos solo los crea el administrador (no se solicitan desde sub-dominios co
 ```
 
 - **Actor principal:** Administrador de estructura organizacional.
-- **Pre-condiciones:** el grupo padre existe y está en estado `Activo`; el código propuesto no está en uso.
+- **Pre-condiciones:** el código propuesto no está en uso; si se indica grupo padre, existe y está en estado `Activo` (sin padre, nace como grupo de primer nivel — R28).
 - **Eventos emitidos:** `GrupoCreado` (estado `Activo`).
 - **Estado resultante:** `Activo`.
 
@@ -506,8 +496,6 @@ Escenario en el que se inactiva un grupo. Como el grupo agrupa sub-grupos y/o un
  │   · N unidades Activas → Inactiva          │
  │   · N unidades Suspendidas → Inactiva      │
  │   · N unidades en Borrador → Descartada    │
- │   · N operaciones pendientes en            │
- │     consumidores que se cancelarán         │
  │  Exige confirmación explícita.             │
  └──────────────────────┬─────────────────────┘
                         │
@@ -517,10 +505,6 @@ Escenario en el que se inactiva un grupo. Como el grupo agrupa sub-grupos y/o un
  │ Estructura Organizacional                  │
  │ Valida:                                    │
  │   · el grupo está en estado Activo         │
- │   · el grupo no es el grupo raíz con       │
- │     contenido (el raíz está protegido y    │
- │     no se inactiva por el flujo estándar   │
- │     mientras existan nodos colgando)       │
  │ Aplica cascada recursiva:                  │
  │   · sub-grupos → Inactivo                  │
  │   · unidades en Activa/Suspendida →        │
@@ -536,14 +520,15 @@ Escenario en el que se inactiva un grupo. Como el grupo agrupa sub-grupos y/o un
    Borrador colgando del grupo)
                         │
                         ▼
- Consumidores reciben los eventos y reaccionan
- según corresponda: bloquean nuevas
- imputaciones (Inactivada) o cancelan
- operaciones pendientes (Descartada).
+ Consumidores reciben los eventos, actualizan
+ su copia local y bloquean nuevas imputaciones
+ contra las unidades inactivadas (un borrador
+ descartado nunca fue referenciado — no hay
+ nada que cancelar).
 ```
 
 - **Actor principal:** Administrador de estructura organizacional.
-- **Pre-condiciones:** el grupo está en estado `Activo` y no es el grupo raíz; el administrador confirmó el impacto previsto.
+- **Pre-condiciones:** el grupo está en estado `Activo`; el administrador confirmó el impacto previsto.
 - **Eventos emitidos:** `GrupoInactivado` (por el grupo y cada sub-grupo afectado), `UnidadInactivada` (por cada unidad operativa afectada), `UnidadDescartada` (por cada unidad en `Borrador` afectada).
 - **Estado resultante:** el grupo y todos sus descendientes pasan a estado no operativo (`Inactivo` para grupos y unidades operativas; `Descartada` para unidades en borrador). El grupo y sus sub-grupos pueden reactivarse posteriormente; las unidades inactivadas pueden reabrirse una a una.
 
@@ -652,7 +637,7 @@ Escenario en el que dos o más unidades organizacionales se integran en una sola
 ```
 
 - **Actor principal:** Administrador de estructura organizacional.
-- **Pre-condiciones:** todas las unidades origen están en `Activa` o `Suspendida`; el destino existe en `Activa` y no está en el conjunto origen; la fecha efectiva no es anterior a la versión vigente de jerarquía (validable localmente); su coherencia con la actividad transaccional la define y responde el administrador (R25).
+- **Pre-condiciones:** todas las unidades origen están en `Activa` o `Suspendida`; el destino existe en `Activa` y no está en el conjunto origen; la fecha efectiva no es anterior a la versión vigente de jerarquía (validable localmente); su coherencia con la actividad transaccional la define y responde el administrador (R23).
 - **Eventos emitidos:** `UnidadFusionada` (una vez, evento de proceso) + `UnidadInactivada` por cada unidad origen (con `motivoBaja: "fusion"` y referencia al destino).
 - **Estado resultante:** las unidades origen quedan en `Inactiva` con `motivoBaja: "fusion"`; la unidad destino mantiene su estado `Activa` y absorbe las nuevas imputaciones desde la fecha efectiva.
 
@@ -712,7 +697,7 @@ Escenario en el que una unidad organizacional se separa en varias unidades desti
 ```
 
 - **Actor principal:** Administrador de estructura organizacional.
-- **Pre-condiciones:** la unidad origen está en `Activa` o `Suspendida`; existen al menos dos unidades destino, todas en `Activa`, distintas del origen; la fecha efectiva no es anterior a la versión vigente de jerarquía (validable localmente); su coherencia con la actividad transaccional la define y responde el administrador (R25).
+- **Pre-condiciones:** la unidad origen está en `Activa` o `Suspendida`; existen al menos dos unidades destino, todas en `Activa`, distintas del origen; la fecha efectiva no es anterior a la versión vigente de jerarquía (validable localmente); su coherencia con la actividad transaccional la define y responde el administrador (R23).
 - **Eventos emitidos:** `UnidadDividida` (una vez, evento de proceso) + `UnidadInactivada` por la unidad origen (con `motivoBaja: "division"` y referencia a los destinos).
 - **Estado resultante:** la unidad origen queda en `Inactiva` con `motivoBaja: "division"`; las unidades destino mantienen su estado `Activa` y reciben las nuevas imputaciones desde la fecha efectiva. El historial previo a la fecha efectiva permanece referenciado al origen.
 
@@ -849,7 +834,7 @@ Estructura Organizacional es el **propietario** de la estructura jerárquica de 
 
 En procesos de reestructuración, Estructura Organizacional emite los eventos que describen la fusión, división o traslado, pero no modifica directamente las transacciones ni las vistas internas de los consumidores. Cada sub-dominio consumidor es responsable de interpretar los eventos recibidos y aplicar, según sus propias reglas, la reasignación, bloqueo, reclasificación, advertencia o reconstrucción de sus vistas locales.
 
-Los consumidores **operan contra su copia local** de unidades y **nunca consultan a Estructura Organizacional en el camino crítico** de sus operaciones (ver [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md)). Estructura Organizacional no responde consultas en el flujo transaccional de los consumidores: publica eventos y ofrece un punto de resincronización de respaldo. La unidad se elige siempre de la fuente de verdad (la UI la lee en vivo), así que el consumidor solo difiere por desfase de propagación, sin señalar nada de vuelta (R29).
+Los consumidores **operan contra su copia local** de unidades y **nunca consultan a Estructura Organizacional en el camino crítico** de sus operaciones (ver [`../../guias-de-modelado/datos-entre-dominios.md`](../../guias-de-modelado/datos-entre-dominios.md)). Estructura Organizacional no responde consultas en el flujo transaccional de los consumidores: publica eventos y ofrece un punto de resincronización de respaldo. La unidad se elige siempre de la fuente de verdad (la UI la lee en vivo), así que el consumidor solo difiere por desfase de propagación, sin señalar nada de vuelta (R27).
 
 ### Integraciones de entrada
 
@@ -919,7 +904,7 @@ Estructura Organizacional **no recibe integraciones de entrada por eventos**: es
 
 ### Notas de la primera fase
 
-- En F1 los consumidores son **OXP** y **Contabilidad** únicamente. Ambos operan contra su copia local de unidades; ante un desfase de propagación (el evento de una unidad aún no llegó a la copia), difieren la parte que la requiere sin detener su operación (R29).
+- En F1 los consumidores son **OXP** y **Contabilidad** únicamente. Ambos operan contra su copia local de unidades; ante un desfase de propagación (el evento de una unidad aún no llegó a la copia), difieren la parte que la requiere sin detener su operación (R27).
 - La creación de unidades es siempre **acto deliberado del administrador** en F1 (o por integración con sistemas de origen, ej: presupuesto). En fases posteriores el sistema inteligente puede crear unidades automáticamente cuando el contexto sea inequívoco.
 - En F1 solo se expone la dimensión **Unidad Organizacional** como dimensión de imputación. El contrato de líneas de traducción con Contabilidad acepta solo esa dimensión.
 - Las **direcciones** de las unidades (por ejemplo de sucursales o inmuebles) **no son responsabilidad** de Estructura Organizacional en F1. Si un sub-dominio consumidor requiere asociar una dirección a una unidad, lo gestiona internamente con el servicio de Direcciones que corresponda.
@@ -941,59 +926,58 @@ Las reglas se numeran `[R##]` y se organizan por tema operativo.
 | # | Regla | Descripción | Configurable |
 |---|-------|-------------|:------------:|
 | R1 | **Pertenencia obligatoria a grupo padre** | Toda unidad organizacional pertenece a exactamente un grupo padre. No existen unidades huérfanas. | No |
-| R2 | **Grupo raíz único por tenant** | Cada tenant tiene un grupo raíz único, creado automáticamente al inicializar la estructura. Es el ancestro de toda la jerarquía. | No |
-| R3 | **Grupo raíz protegido** | El grupo raíz no puede ser inactivado mientras existan otros nodos colgando de él. En operación normal, esto equivale a que no se inactiva mientras la estructura tenga contenido. Si el grupo raíz no tiene contenido, su inactivación solo puede considerarse como operación administrativa excepcional de inicialización o reversión, no como flujo estándar de negocio. | No |
-| R4 | **No ciclos en la jerarquía** | Un grupo no puede ser su propio ancestro directo ni indirecto. El árbol mantiene su naturaleza acíclica. | No |
-| R5 | **Mezcla libre de hijos en grupos** | Un grupo puede contener cualquier combinación de sub-grupos y unidades organizacionales como hijos. No se restringe la mezcla. | No |
-| R6 | **Unidad siempre hoja** | Una unidad organizacional nunca tiene hijos. Si un caso de negocio requiere estructura adicional bajo lo que parece una unidad, se modela con un grupo intermedio. | No |
-| R7 | **Padre debe estar activo** | Al crear o trasladar una unidad o sub-grupo, el grupo padre debe estar en estado `Activo`. No se admiten hijos colgando de padres inactivos. | No |
+| R2 | **No ciclos en la jerarquía** | Un grupo no puede ser su propio ancestro directo ni indirecto. El árbol mantiene su naturaleza acíclica. | No |
+| R3 | **Mezcla libre de hijos en grupos** | Un grupo puede contener cualquier combinación de sub-grupos y unidades organizacionales como hijos. No se restringe la mezcla. | No |
+| R4 | **Unidad siempre hoja** | Una unidad organizacional nunca tiene hijos. Si un caso de negocio requiere estructura adicional bajo lo que parece una unidad, se modela con un grupo intermedio. | No |
+| R5 | **Padre debe estar activo** | Al crear o trasladar una unidad o sub-grupo, el grupo padre debe estar en estado `Activo`. No se admiten hijos colgando de padres inactivos. | No |
 
 ### Reglas de códigos e identidad
 
 | # | Regla | Descripción | Configurable |
 |---|-------|-------------|:------------:|
-| R8 | **Código único por tenant** | El código de una unidad o grupo es único dentro del tenant, considerando unidades y grupos en el mismo espacio de nombres. | No |
-| R9 | **Código inmutable** | Una vez asignado, el código de una unidad o grupo no se modifica en ningún flujo. Es el ancla estable de toda la trazabilidad histórica. | No |
-| R10 | **Formato del código** | Alfanumérico, longitud entre 4 y 12 caracteres. La longitud específica admitida por tenant es parametrizable dentro de ese rango. | Sí (por tenant) |
-| R11 | **Identificación libre tras `Descartada`** | Cuando una unidad pasa a `Descartada`, su código queda disponible para una nueva solicitud. Una unidad en `Inactiva` o `Suspendida` mantiene su código reservado. | No |
+| R6 | **Código único por tenant** | El código de una unidad o grupo es único dentro del tenant, considerando unidades y grupos en el mismo espacio de nombres. | No |
+| R7 | **Código inmutable** | Una vez asignado, el código de una unidad o grupo no se modifica en ningún flujo. Es el ancla estable de toda la trazabilidad histórica. | No |
+| R8 | **Formato y longitud del código** | El código es **texto libre con salvaguardas**: no vacío, sin espacios al inicio/fin ni espacios internos, solo caracteres imprimibles (sin saltos de línea ni caracteres de control); separadores como guion, punto o barra permitidos pero cosméticos (no embeben jerarquía). La unicidad no distingue mayúsculas de minúsculas (`cc-001` = `CC-001`). La longitud es un rango `min`/`max` **configurable por tenant** dentro de la envolvente del dominio (`1 ≤ min ≤ max ≤ 50`); el rango por defecto recomendado es **2 a 12**; longitud fija = `min == max`. Esta configurabilidad es la que permite recibir estructuras legadas con su codificación intacta, sin violar la inmutabilidad del código (R7, P3). | Sí (por tenant) |
+| R9 | **Identificación libre tras `Descartada`** | Cuando una unidad pasa a `Descartada`, su código queda disponible para una nueva solicitud. Una unidad en `Inactiva` o `Suspendida` mantiene su código reservado. | No |
 
 ### Reglas del ciclo de vida de unidades
 
 | # | Regla | Descripción | Configurable |
 |---|-------|-------------|:------------:|
-| R12 | **Transiciones permitidas** | Las transiciones válidas de la FSM de unidad son: `Borrador → Activa`, `Borrador → Descartada`, `Activa → Suspendida`, `Suspendida → Activa`, `Activa → Inactiva`, `Suspendida → Inactiva`, `Inactiva → Activa` (reapertura). Cualquier otra transición es rechazada por el dominio. | No |
-| R13 | **Imputaciones solo contra `Activa`** | Las nuevas transacciones de los consumidores solo se aceptan contra unidades en estado `Activa`. Una unidad en `Borrador`, `Suspendida`, `Inactiva` o `Descartada` no admite nuevas imputaciones. **El consumidor valida esta condición contra su copia local de unidades** (mantenida por los eventos de Estructura Organizacional), no consultando a Estructura Organizacional en el momento de imputar. | No |
-| R14 | **`Descartada` terminal estricto** | Una unidad en `Descartada` no puede transicionar a ningún otro estado. Para volver a operar, se crea una unidad nueva con datos limpios. | No |
-| R15 | **`Inactiva` reabrible** | Una unidad en `Inactiva` puede reabrirse mediante F6 emitiendo `UnidadReabierta`. La unidad conserva su identidad, código e historial; las nuevas imputaciones se enlazan con la operación previa. | No |
-| R16 | **Reapertura requiere padre activo** | Reabrir una unidad inactiva requiere que su grupo padre esté en estado `Activo`. Si el padre fue inactivado por cascada, primero se reactiva el grupo padre. | No |
-| R17 | **Modificación bloqueada en unidades dadas de baja** | Las unidades en `Inactiva` o `Descartada` no admiten modificaciones de datos (F15). Si se requiere corregir datos de una unidad inactiva, el flujo natural es reabrir (F6) → modificar (F15) → inactivar (F7). Esta restricción aplica solo a unidades; los grupos en estado `Inactivo` sí admiten modificación de campos descriptivos porque no participan en historial transaccional. | No |
+| R10 | **Transiciones permitidas** | Las transiciones válidas de la FSM de unidad son: `Borrador → Activa`, `Borrador → Descartada`, `Activa → Suspendida`, `Suspendida → Activa`, `Activa → Inactiva`, `Suspendida → Inactiva`, `Inactiva → Activa` (reapertura). Cualquier otra transición es rechazada por el dominio. | No |
+| R11 | **Imputaciones solo contra `Activa`** | Las nuevas transacciones de los consumidores solo se aceptan contra unidades en estado `Activa`. Una unidad en `Borrador`, `Suspendida`, `Inactiva` o `Descartada` no admite nuevas imputaciones. **El consumidor valida esta condición contra su copia local de unidades** (mantenida por los eventos de Estructura Organizacional), no consultando a Estructura Organizacional en el momento de imputar. | No |
+| R12 | **`Descartada` terminal estricto** | Una unidad en `Descartada` no puede transicionar a ningún otro estado. Para volver a operar, se crea una unidad nueva con datos limpios. | No |
+| R13 | **`Inactiva` reabrible** | Una unidad en `Inactiva` puede reabrirse mediante F6 emitiendo `UnidadReabierta`. La unidad conserva su identidad, código e historial; las nuevas imputaciones se enlazan con la operación previa. | No |
+| R14 | **Reapertura requiere padre activo** | Reabrir una unidad inactiva requiere que su grupo padre esté en estado `Activo`. Si el padre fue inactivado por cascada, primero se reactiva el grupo padre. | No |
+| R15 | **Modificación bloqueada en unidades dadas de baja** | Las unidades en `Inactiva` o `Descartada` no admiten modificaciones de datos (F15). Si se requiere corregir datos de una unidad inactiva, el flujo natural es reabrir (F6) → modificar (F15) → inactivar (F7). Esta restricción aplica solo a unidades; los grupos en estado `Inactivo` sí admiten modificación de campos descriptivos porque no participan en historial transaccional. | No |
 
 ### Reglas del ciclo de vida de grupos
 
 | # | Regla | Descripción | Configurable |
 |---|-------|-------------|:------------:|
-| R18 | **Grupos con dos estados** | La FSM de grupo tiene únicamente dos estados (`Activo`, `Inactivo`). Los grupos no requieren `Borrador` ni `Suspendido` porque no reciben imputaciones. | No |
-| R19 | **Inactivación de grupo en cascada** | Inactivar un grupo propaga la inactivación recursivamente a todos sus descendientes: sub-grupos pasan a `Inactivo`, unidades `Activa`/`Suspendida` pasan a `Inactiva`, unidades `Borrador` pasan a `Descartada`. Cada nodo afectado emite su propio evento de dominio. | No |
-| R20 | **Reactivación de grupo sin cascada inversa** | Reactivar un grupo solo cambia el estado del grupo. Los hijos previamente afectados por la cascada deben reabrirse o reactivarse uno a uno, con apoyo del sistema inteligente que identifica los candidatos. | No |
-| R21 | **Confirmación de impacto obligatoria** | La inactivación de un grupo requiere confirmación explícita del administrador después de que el sistema inteligente muestre el impacto previsto (cantidad de sub-grupos, unidades activas, suspendidas y en borrador que se verán afectadas). | No |
+| R16 | **Grupos con dos estados** | La FSM de grupo tiene únicamente dos estados (`Activo`, `Inactivo`). Los grupos no requieren `Borrador` ni `Suspendido` porque no reciben imputaciones. | No |
+| R17 | **Inactivación de grupo en cascada** | Inactivar un grupo propaga la inactivación recursivamente a todos sus descendientes: sub-grupos pasan a `Inactivo`, unidades `Activa`/`Suspendida` pasan a `Inactiva`, unidades `Borrador` pasan a `Descartada`. Cada nodo afectado emite su propio evento de dominio. | No |
+| R18 | **Reactivación de grupo sin cascada inversa** | Reactivar un grupo solo cambia el estado del grupo. Los hijos previamente afectados por la cascada deben reabrirse o reactivarse uno a uno, con apoyo del sistema inteligente que identifica los candidatos. | No |
+| R19 | **Confirmación de impacto obligatoria** | La inactivación de un grupo requiere confirmación explícita del administrador después de que el sistema inteligente muestre el impacto previsto (cantidad de sub-grupos, unidades activas, suspendidas y en borrador que se verán afectadas). | No |
 
 ### Reglas de reestructuración
 
 | # | Regla | Descripción | Configurable |
 |---|-------|-------------|:------------:|
-| R22 | **Destino debe existir y estar `Activa`** | En F12 (Fusión) y F13 (División), las unidades destino deben existir y estar en estado `Activa` antes de iniciar el proceso. La creación de la unidad destino y la reestructuración son flujos separados. | No |
-| R23 | **Origen en `Activa` o `Suspendida`** | En F12 y F13, las unidades origen deben estar en `Activa` o `Suspendida`. Las unidades en `Borrador`, `Inactiva` o `Descartada` no se reestructuran. | No |
-| R24 | **Destino distinto del conjunto origen** | En F12, la unidad destino no puede estar dentro del conjunto de unidades origen. En F13, la unidad origen no puede estar dentro del conjunto de unidades destino. | No |
-| R25 | **Fecha efectiva de la reestructuración** | La fecha efectiva de una fusión, división o traslado (F12, F13, F14) se gobierna en dos planos: **(a) validación del sistema** — no puede ser anterior a la versión vigente de jerarquía de las unidades involucradas; Estructura Organizacional lo valida localmente por ser dueña de la jerarquía. **(b) responsabilidad del administrador** — la coherencia de la fecha con la actividad transaccional de las unidades (no fijarla sobre periodos que ya tienen movimientos) la **define y la responde el administrador** que ejecuta la reestructuración, como acto deliberado de gestión. El sistema no la verifica contra el historial transaccional porque las transacciones/asientos son inmutables y los reportes ofrecen vista actual e histórica. | No |
-| R26 | **Motivo de baja proyectado** | Las unidades que pasan a `Inactiva` o `Descartada` llevan en el modelo de lectura un atributo `motivoBaja` que permite identificar la causa de la baja. Para unidades `Inactiva`, los valores son `operativa`, `fusion` o `division`, según el flujo que originó la inactivación. Para unidades `Descartada`, los valores son `operativa` cuando corresponde a rechazo manual del administrador, o `abandono_por_inactividad` cuando corresponde a descarte automático o descarte por cascada de inactivación de grupo. Los valores son literales fijos del dominio. | No |
-| R27 | **Historial referenciado al origen** | En F12 y F13, el historial transaccional previo a la fecha efectiva permanece referenciado a las unidades origen. Las unidades destino arrancan limpias y solo reciben las nuevas imputaciones desde la fecha efectiva. | No |
-| R28 | **Traslado preserva identidad** | El traslado de una unidad (F14) conserva su identidad, código, estado e historial transaccional. Solo cambia su posición en el árbol y la versión vigente de jerarquía. | No |
+| R20 | **Destino debe existir y estar `Activa`** | En F12 (Fusión) y F13 (División), las unidades destino deben existir y estar en estado `Activa` antes de iniciar el proceso. La creación de la unidad destino y la reestructuración son flujos separados. | No |
+| R21 | **Origen en `Activa` o `Suspendida`** | En F12 y F13, las unidades origen deben estar en `Activa` o `Suspendida`. Las unidades en `Borrador`, `Inactiva` o `Descartada` no se reestructuran. | No |
+| R22 | **Destino distinto del conjunto origen** | En F12, la unidad destino no puede estar dentro del conjunto de unidades origen. En F13, la unidad origen no puede estar dentro del conjunto de unidades destino. | No |
+| R23 | **Fecha efectiva de la reestructuración** | La fecha efectiva de una fusión, división o traslado (F12, F13, F14) se gobierna en dos planos: **(a) validación del sistema** — no puede ser anterior a la versión vigente de jerarquía de las unidades involucradas; Estructura Organizacional lo valida localmente por ser dueña de la jerarquía. **(b) responsabilidad del administrador** — la coherencia de la fecha con la actividad transaccional de las unidades (no fijarla sobre periodos que ya tienen movimientos) la **define y la responde el administrador** que ejecuta la reestructuración, como acto deliberado de gestión. El sistema no la verifica contra el historial transaccional porque las transacciones/asientos son inmutables y los reportes ofrecen vista actual e histórica. | No |
+| R24 | **Motivo de baja proyectado** | Las unidades que pasan a `Inactiva` o `Descartada` llevan en el modelo de lectura un atributo `motivoBaja` que permite identificar la causa de la baja. Para unidades `Inactiva`, los valores son `operativa`, `fusion` o `division`, según el flujo que originó la inactivación. Para unidades `Descartada`, los valores son `operativa` cuando corresponde a rechazo manual del administrador (Flujo 8), o `cascada_grupo` cuando corresponde al descarte por cascada de inactivación del grupo padre (Flujo 10). Los valores son literales fijos del dominio. | No |
+| R25 | **Historial referenciado al origen** | En F12 y F13, el historial transaccional previo a la fecha efectiva permanece referenciado a las unidades origen. Las unidades destino arrancan limpias y solo reciben las nuevas imputaciones desde la fecha efectiva. | No |
+| R26 | **Traslado preserva identidad** | El traslado de una unidad (F14) conserva su identidad, código, estado e historial transaccional. Solo cambia su posición en el árbol y la versión vigente de jerarquía. | No |
 
 ### Reglas de operación del consumidor
 
 | # | Regla | Descripción | Configurable |
 |---|-------|-------------|:------------:|
-| R29 | **Operación del consumidor sin bloqueo** | El consumidor opera contra su copia local de unidades. Una unidad solo se referencia tras existir en Estructura Organizacional (la UI la elige de la fuente de verdad; las reglas de distribución del consumidor se parametrizan contra ella), de modo que la única demora posible es de propagación: si el evento de ciclo de vida aún no llegó a su copia local, su operación **no se detiene** — registra lo que puede y difiere solo la parte que requiere la unidad, que se resuelve cuando el evento llega (consistencia eventual). La creación de una unidad es siempre **acto deliberado de Estructura Organizacional** (administrador o integración) — ningún flujo consumidor crea unidades ni las origina en un estado bloqueante. | No |
+| R27 | **Operación del consumidor sin bloqueo** | El consumidor opera contra su copia local de unidades. Una unidad solo se referencia tras existir en Estructura Organizacional (la UI la elige de la fuente de verdad; las reglas de distribución del consumidor se parametrizan contra ella), de modo que la única demora posible es de propagación: si el evento de ciclo de vida aún no llegó a su copia local, su operación **no se detiene** — registra lo que puede y difiere solo la parte que requiere la unidad, que se resuelve cuando el evento llega (consistencia eventual). La creación de una unidad es siempre **acto deliberado de Estructura Organizacional** (administrador o integración) — ningún flujo consumidor crea unidades ni las origina en un estado bloqueante. | No |
+| R28 | **Varios grupos de primer nivel y consolidación por tenant** | La estructura organizacional admite **varios grupos de primer nivel** (grupos sin padre), cada uno con su propio árbol independiente (estructura financiera, gerencial, u otras que el negocio necesite como árboles separados). Ningún grupo se crea automáticamente al inicializar el tenant. La consolidación "total compañía" (balances, estados de resultados, estados financieros) es responsabilidad de la **frontera del tenant** — totaliza todas las unidades del tenant — y no requiere un nodo único que las contenga; cada grupo de primer nivel consolida su propio sub-árbol, como los centros de costo maestros del ERP actual consolidan sus auxiliares. | No |
 
 ---
 
@@ -1006,7 +990,7 @@ Estructura Organizacional asume las siguientes responsabilidades funcionales:
 - **Gestión del ciclo de vida de grupos organizacionales** (2 estados: `Activo`, `Inactivo`), incluyendo la inactivación en cascada a sus descendientes y la reactivación sin cascada inversa.
 - **Gestión del ciclo de vida de unidades organizacionales** (5 estados: `Borrador`, `Activa`, `Suspendida`, `Inactiva`, `Descartada`), con todas sus transiciones permitidas.
 - **Estructura jerárquica versionada por fecha efectiva** — el árbol de grupos y unidades, con relaciones padre-hijo, mantiene historia estructural para reportería comparativa.
-- **Codificación de unidades y grupos** — códigos alfanuméricos planos, únicos por tenant, inmutables.
+- **Codificación de unidades y grupos** — códigos planos de texto libre, únicos por tenant, inmutables.
 - **Catálogo interno de tipos de unidad** — clasificación de la unidad según su naturaleza (centro de costo, proyecto, sucursal, inmueble, departamento, etc.), extensible por cada empresa según su modelo de negocio.
 - **Procesos de reestructuración**: fusión, división y traslado, con fecha efectiva, motivo y proyección del motivo de baja (`motivoBaja`) en el modelo de lectura.
 - **Emisión de eventos** — todo cambio de ciclo de vida, jerarquía o reestructuración emite un evento de dominio que los consumidores reciben para mantener su vista local consistente.
@@ -1107,3 +1091,10 @@ Las capacidades adicionales que el sub-dominio pueda soportar en el futuro (acti
 | 1.3 | 2026-06-19 | **Replanteamiento — eliminación de acoplamientos de ejecución y proceso con los consumidores (issue #45/#46).** La creación de unidades desde consumidores deja de ser un flujo bloqueante: el consumidor opera contra su **copia local** y nunca consulta a Estructura Organizacional en el camino crítico; cuando necesita una unidad inexistente, su operación **no se detiene** (difiere lo que la requiere) y la necesidad se hace visible como **sugerencia no bloqueante**. Flujo 2 reescrito; R29 (era 'solicitudes entran en Borrador') y R30 (era 'descarte cancela en cascada') reescritas como 'operación sin bloqueo' y 'demanda no bloqueante'; R13 aclarada (validación contra copia local); glosario de `Borrador` acotado a preparación del administrador; Sección 5 (principio, integraciones, diagrama) alineada — entra el punto de resincronización y los eventos de imputación, salen la solicitud bloqueante y la consulta en caliente del flujo transaccional; Sección 7 (H2) — la última imputación pasa de consulta federada a **proyección local por eventos**. Fundamento en `guias-de-modelado/datos-entre-dominios.md`. Acompaña al modelo de dominio (Hito 2). |
 | 1.4 | 2026-06-19 | **Consistencia del modelo de comunicación — replanteamiento de R25 (issue #56).** `R25` **se replantea (no se quita)**: la fecha efectiva se gobierna en dos planos — EO valida localmente que no sea anterior a la versión vigente de jerarquía, y la coherencia con la actividad transaccional es **responsabilidad del administrador** (acto deliberado; transacciones inmutables + vista actual/histórica). Se **retira la integración entrante de eventos de imputación** y la dependencia de la Sección 7 correspondiente (EO ya no mantiene proyección de última imputación, `[SI10]` retirada en el modelo); el **diagrama de integraciones pasa de 4 a 3 flujos**; precondiciones de F12/F13 ajustadas al replanteamiento. Acompaña al modelo v1.6 (`[SI10]` retirada, `[I08]` reformulada). |
 | 1.5 | 2026-06-23 | **Retiro del aparato de señal/bandeja — la copia local es para validación, no para la UI (issue #72/#73).** Una vez la asignación/distribución de la unidad en los consumidores se hace contra la fuente de verdad (la UI lee EO en vivo; las reglas se parametrizan contra ella), referenciar una unidad inexistente no ocurre en el camino operativo. En consecuencia: **`R30` (demanda de unidad no bloqueante) retirada** → 30 → 29 reglas; **`R29` reformulada** (operación sin bloqueo + diferir por **consistencia eventual**: la unidad existe en el dueño, solo puede faltar la propagación del evento); **Flujo 2 reescrito** (sin el camino de señal/visibilidad); **diagrama de integraciones pasa de 3 a 2 flujos** (eventos salientes + resincronización); responsabilidades de actores, principio de Sección 5, capacidades (se retira "Atención de la demanda…") y notas de fase limpiadas de la señal/sugerencia. La creación de unidades sigue su curso normal por planeación del administrador. Acompaña al modelo v1.7 (retiro de `[SI11]`, parte 4 de `[D15]`, reorientación de `[SI07]`, §3.8 con el principio de capas) y a la guía `datos-entre-dominios.md`. |
+| 1.6 | 2026-07-08 | **Flujo 4 — propósito de la fecha estimada de reactivación (issue #88).** Se documenta el uso del dato que el flujo ya capturaba sin destino declarado: la fecha estimada de reactivación es **informativa para el administrador** y consistente con la naturaleza transitoria de la suspensión (quien suspende espera volver a operar la unidad; sin expectativa de retorno, el camino correcto es la inactivación — Flujo 7). Ningún proceso reacciona a la fecha: la reactivación (Flujo 5) sigue siendo siempre un gesto manual del administrador. Acompaña al modelo v1.8, que proyecta el dato en el read model de la unidad para su consulta. |
+| 1.7 | 2026-07-08 | **Retiro del descarte automático de Borradores + limpieza de residuos del #46 (issue #87).** **R26:** el motivo de `Descartada` por cascada pasa de `abandono_por_inactividad` a **`cascada_grupo`** y desaparece la mención al descarte automático — descartar un borrador es siempre decisión del administrador (Flujo 8) o consecuencia de la cascada (Flujo 10). **Flujo 8 reescrito:** se retiran la advertencia del sistema inteligente sobre operaciones dependientes y la cancelación en cascada en consumidores — residuos del patrón anterior al #46: un borrador nunca es referenciado por la operación de otro sub-dominio, no hay nada que cancelar. **Flujo 3 limpiado:** el borrador ya no se describe como "solicitado por un consumidor (Flujo 2)" ni el sistema inteligente muestra "origen de la solicitud"; los consumidores actualizan su copia local y las operaciones diferidas a la espera de la unidad se resuelven solas (`[D15]`). Acompaña al modelo v1.9. |
+| 1.8 | 2026-07-08 | **Replanteamiento — bosque en lugar de raíz única obligatoria (issue #85).** Glosario término 8: "Grupo raíz" (único, automático, protegido) se reemplaza por **"Grupo tope"** (grupo sin padre; un tenant puede tener varios; ninguno se crea automáticamente). **Se retiran `R2` y `R3`** (huecos — la numeración se conserva) y entra **`R31`**: estructura en bosque + consolidación "total compañía" por la frontera del tenant, con la homologación del ERP actual (centros de costo maestros consolidan reportes de sus auxiliares; hay varios maestros por empresa, nunca un "maestro único"). **Flujo 9**: crear grupo sin padre = nace como tope. **Flujo 10**: desaparece la validación "no es el grupo raíz con contenido"; de paso se limpian residuos del #46 en el impacto previsto y los efectos (ya no hay "operaciones pendientes en consumidores que se cancelarán" — un borrador descartado nunca fue referenciado). Acompaña al modelo v2.1 (`[D16]`, `[I13]` retirada) y al anexo de decisiones v1.3 (Decisión 2 actualizada). |
+| 1.9 | 2026-07-08 | **Término definitivo del #85: "Grupo de primer nivel" (glosario término 8).** Reemplaza a "Grupo tope" (v1.8): definido **en plural** desde la primera frase para que nadie lo lea como un raíz único, y explícito en que es una condición **derivada** de no tener padre (comportamiento `esDePrimerNivel()` del modelo), no un atributo almacenado. Se descartaron "raíz" (colisiona con el concepto retirado) y el atributo almacenado (permitiría estados imposibles). `R31` y Flujo 9 alineados al término. Acompaña al modelo v2.2. |
+| 1.10 | 2026-07-08 | **Formato y longitud del código — texto libre con salvaguardas + rango configurable por tenant (issue #89).** **R10 reescrita:** el código deja de ser "alfanumérico" (contradecía los ejemplos con guion) y pasa a **texto libre con salvaguardas** (no vacío, sin espacios al inicio/fin ni internos, solo imprimibles; separadores cosméticos); unicidad **sin distinguir mayúsculas** (`cc-001` = `CC-001`); longitud como rango `min`/`max` **configurable por tenant** dentro de la envolvente del dominio (`1 ≤ min ≤ max ≤ 50`), con **2–12 por defecto** (ya no tope duro) — lo que permite recibir estructuras legadas con su codificación intacta sin violar la inmutabilidad (R9/P3). **Glosario término 5 reconciliado** con R10 (desaparece la longitud "sugerida"). Acompaña al modelo v2.3. |
+| 1.11 | 2026-07-08 | **Ajuste de lenguaje: se retira el término "bosque"** (tecnicismo de teoría de grafos) del glosario (término 8) y de `R31` (renombrada "Varios grupos de primer nivel y consolidación por tenant"): la estructura admite varios grupos de primer nivel, cada uno con su propio árbol independiente. Acompaña al modelo v2.4. |
+| 1.12 | 2026-07-08 | **Renumeración — se cierran los saltos de numeración en las reglas** (decisión del usuario: precisión en los documentos). **Mapeo:** R4→R2, R5→R3, R6→R4, R7→R5, R8→R6, R9→R7, R10→R8, R11→R9, R12→R10, R13→R11, R14→R12, R15→R13, R16→R14, R17→R15, R18→R16, R19→R17, R20→R18, R21→R19, R22→R20, R23→R21, R24→R22, R25→R23, R26→R24, R27→R25, R28→R26, R29→R27, R31→R28 — quedan **R1-R28 continuas** (desaparecen los huecos de R2/R3, retiradas en #85, y R30, retirada en #72). Todas las referencias del cuerpo ajustadas (35 reemplazos), incluidas las del modelo de dominio. **Las entradas históricas de este control de versiones conservan la numeración de su momento** — leerlas con esta tabla de mapeo. Acompaña al modelo v2.5. |
