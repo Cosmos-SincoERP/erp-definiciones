@@ -1,7 +1,7 @@
 # Anexo — Decisiones arquitectónicas del sub-dominio de Estructura Organizacional
 
 > **Fecha:** 2026-07-08
-> **Versión:** 1.4
+> **Versión:** 1.5
 > **Propósito:** Documentar las decisiones de diseño estructurales del sub-dominio de Estructura Organizacional, sus alternativas evaluadas y la justificación de cada una. Este anexo acompaña a `definicion-alcance.md` y sirve como referencia para el modelo de dominio.
 
 ---
@@ -33,7 +33,7 @@ Las decisiones se tomaron con base en:
 
 ### Decisión tomada
 
-Cada unidad y cada grupo organizacional tiene un **código alfanumérico plano** (longitud sugerida entre 4 y 12 caracteres, único por tenant). La jerarquía padre-hijo **no se embebe en el código**: se modela en un agregado separado, versionado por fecha efectiva.
+Cada unidad y cada grupo organizacional tiene un **código plano de texto libre** (longitud configurable por tenant — por defecto 2 a 12 caracteres —, único por tenant). La jerarquía padre-hijo **no se embebe en el código**: se modela en un agregado separado, versionado por fecha efectiva.
 
 ### Alternativas evaluadas
 
@@ -306,3 +306,4 @@ La codificación y la jerarquía son decisiones arquitectónicas libres. Donde e
 | 1.2 | 2026-05-27 | FSM de unidad ampliada: `Inactiva` deja de ser terminal estricto. Se agrega la transición `Inactiva → Activa` (reapertura tras cierre — sucursal que reabre, proyecto que se reanuda) con evento dedicado `UnidadReabierta`, diferenciado de `UnidadReactivada` (que aplica solo desde `Suspendida`). Solo `Descartada` permanece como terminal estricto. Justificación: la pureza semántica de "terminal" obligaba al usuario a recrear unidades y perder continuidad histórica ante errores de inactivación o cambios de decisión de negocio — los ERPs líderes (SAP, Oracle, Dynamics, Workday) permiten reabrir. Reactivación de grupo sin cascada inversa: los hijos previamente afectados por la cascada se reabren uno a uno con apoyo del sistema inteligente. |
 | 1.3 | 2026-07-08 | **Decisión 2 — se retira el grupo raíz único obligatorio (issue #85).** La regla estructural "raíz única por tenant, creada automáticamente" (introducida en la v1.1 sin justificación registrada — única regla estructural del anexo sin porqué escrito) se reemplaza por la **estructura en bosque**: los grupos sin padre son topes, un tenant puede tener varios, y la frontera de consolidación es el tenant. Fundamento: ningún mecanismo del modelo necesitaba el ancestro único (ciclos, nivel y cascada operan por sub-árbol); el catálogo de tipos dejó de vivir en el raíz (#86); la visión multi-jerarquía de la Decisión 1 es incompatible con un raíz único; y la homologación con el ERP actual (centros de costo **maestros** = contenedores para consolidar reportes de los **auxiliares** transaccionales) muestra que el negocio real opera con varios maestros, sin un "maestro único". Acompaña al alcance v1.8 (término "Grupo tope", R2/R3 retiradas, R31 nueva) y al modelo v2.1 (`[D16]`, `[I13]` retirada, `esRaiz` eliminado). |
 | 1.4 | 2026-07-08 | **Término definitivo para los grupos sin padre: "grupos de primer nivel"** (reemplaza "topes" de la v1.3). Decidido con el usuario tras evaluar alternativas: "raíz" descartado por colisión con el concepto retirado en el #85; atributo almacenado descartado (estado imposible); la condición es derivada de `padreId == null` y se expone con nombre de negocio en glosario, comportamiento calculado y proyección. |
+| 1.5 | 2026-07-08 | **Decisión 1 — el código pasa de "alfanumérico, 4–12 sugerido" a texto libre con longitud configurable por tenant (por defecto 2–12), issue #89.** Alineado con R10/[I03]: salvaguardas mínimas en lugar de charset restringido, unicidad sin distinguir mayúsculas, y rango por tenant dentro de la envolvente del dominio para recibir codificaciones legadas intactas. |
