@@ -243,7 +243,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 3. **Fusión, División y Traslado modelados como eventos de dominio de primera clase**, no como mutaciones silenciosas.
 4. **Modelo multi-dimensional desde el diseño**, aunque en F1 solo se exponga una dimensión.
 
-**Relación con los consumidores — copia local + diferir + señal (`[D15]`, replanteamiento #45):** EO es el **dueño único** de las unidades; no hay creación bloqueante desde consumidores. (1) Los consumidores (OXP, Contabilidad) mantienen **copia local** por eventos y nunca consultan a EO en el camino crítico. (2) Cuando un consumidor necesita una unidad que no existe, **difiere** lo que la requiere (no bloquea ni aproxima). (3) La necesidad se hace visible como **señal de demanda no bloqueante** (`DemandaDeUnidadSenalada`), que no crea nada — la corrección no depende de ella. Se eliminó el patrón viejo de creación desde consumidor (comando `SolicitarCreacionDeUnidad`, `origenSolicitud`, cancelación en cascada) y el anexo de orquestación.
+**Relación con los consumidores — copia local + diferir + señal (`[D13]`, replanteamiento #45):** EO es el **dueño único** de las unidades; no hay creación bloqueante desde consumidores. (1) Los consumidores (OXP, Contabilidad) mantienen **copia local** por eventos y nunca consultan a EO en el camino crítico. (2) Cuando un consumidor necesita una unidad que no existe, **difiere** lo que la requiere (no bloquea ni aproxima). (3) La necesidad se hace visible como **señal de demanda no bloqueante** (`DemandaDeUnidadSenalada`), que no crea nada — la corrección no depende de ella. Se eliminó el patrón viejo de creación desde consumidor (comando `SolicitarCreacionDeUnidad`, `origenSolicitud`, cancelación en cascada) y el anexo de orquestación.
 
 **Patrón EDA:** publica el ciclo de vida de la unidad (`UnidadCreada`, `UnidadActivada`, `UnidadActualizada`, `UnidadSuspendida`, `UnidadReactivada`, `UnidadInactivada`, `UnidadFusionada`, `UnidadDividida`, `UnidadTrasladada`) → los consumidores actualizan su copia local. La reestructuración es un hecho de negocio que la capa de reportería de cada consumidor aplica al leer. La validación de fecha efectiva se replanteó (`[R25]`/`[I08]`, #56): EO valida localmente contra la jerarquía vigente y la coherencia con la actividad transaccional es responsabilidad del administrador (sin importar imputaciones de los consumidores — `[SI10]` retirada).
 
@@ -348,7 +348,7 @@ Cada dominio captura al tercero **en su rol** y emite el contrato de entrada est
                           por su cuenta
 ```
 
-### Unidad organizacional — copia local + diferir + señal (`[D15]`, #45)
+### Unidad organizacional — copia local + diferir + señal (`[D13]`, #45)
 
 EO es el **dueño único**; los consumidores no lo consultan en el camino crítico.
 
@@ -376,7 +376,7 @@ EO es el **dueño único**; los consumidores no lo consultan en el camino críti
 | Contabilidad | OXP | Evento | EntregaAceptada: consecutivo del asiento en destino | Formalizado |
 | OXP, Impuestos (fuentes de rol) | Terceros | Evento | Contrato de entrada estándar del rol (estado completo + secuencia, `[D5]`): OXP rol `Proveedor` (#38), Impuestos `PerfilTributario` (#39) | Formalizado v2.0 |
 | Terceros (bodega) | OXP, Impuestos, Contabilidad, CXC, RRHH | Evento | Publica **decisiones**: señal global Activo/Inactivo + correcciones de identidad por conciliación; cada dominio las aplica por su cuenta (sin consulta en caliente) | Formalizado v2.0 |
-| Estructura Org | OXP, Contabilidad | Eventos EDA | Ciclo de vida de la unidad (Creada/Activada/Suspendida/Reactivada/Inactivada + Fusionada/Dividida/Trasladada) → copia local del consumidor; consumidor difiere si falta y señala demanda (`[D15]`, #45) | Formalizado — modelo v1.6 |
+| Estructura Org | OXP, Contabilidad | Eventos EDA | Ciclo de vida de la unidad (Creada/Activada/Suspendida/Reactivada/Inactivada + Fusionada/Dividida/Trasladada) → copia local del consumidor; consumidor difiere si falta y señala demanda (`[D13]`, #45) | Formalizado — modelo v1.6 |
 | Datos de Referencia | Todos (vía Nuggets) | Lectura | Catálogos (países, divisiones, monedas, tipos doc., tasas de cambio); los Nuggets `Pais`/`Moneda`/`DivisionTerritorial` son la fuente única dentro del paquete | Formalizado v2.0 |
 | Recepción Electrónica | OXP | Evento | Documento validado → radicación automática | Futuro |
 | Emisión Electrónica | CXC | Evento | Hecho de ingreso → emisión de factura electrónica | Futuro |
@@ -445,7 +445,7 @@ Los sub-dominios base (Terceros, Estructura Org, Datos de Referencia, Nuggets) y
 | **Impuestos** | Configuración fiscal multi-país LatAm (CO/DO/PA, 11+5+4 tributos preconfigurados), motor de cálculo, perfiles tributarios con actividad económica por jurisdicción, carga asistida, registro tributario, gestión de jurisdicciones fiscales (incluido Puerto Libre San Andrés), regímenes especiales empresariales (zonas francas, monopolios departamentales CO, ZEEs panameñas) | Reportes de información (exógena, DGII), certificados tributarios, homologación fiscal, apertura multi-país a US/CA (distritos fiscales especiales, soberanías tributarias, resolución por dirección/geocoding) |
 | **Contabilidad** | N1: Motor de traducción + entrega a SincoA&F. Cadena de resolución 3 niveles. Consola de contabilización. Aprendizaje. **MarcoContable** + arquitectura PUC único + libros paralelos (Principal, Fiscal). Validación contractual del motor (rechazos pre-borrador). | N2: Sistema contable propio (asientos, períodos, libros, numeración). Libros adicionales bajo demanda. Adaptadores adicionales (Siigo, Alegra). |
 | **Terceros** | **Bodega consolidadora:** consolidación de roles por clave natural, conciliación de duplicados y divergencias con resolución humana, señal global Activo/Inactivo, asistencia de captura no bloqueante, vista consolidada de lectura. | Resolución de duplicados tardíos adicional, recepción electrónica |
-| **Estructura Org** | Grupos, unidades con codificación plana + jerarquía versionada, FSM de 5 estados, copia local en los consumidores + diferir + señal de demanda (`[D15]`), fusión/división/traslado como eventos de primera clase, eventos EDA | Multi-dimensionalidad expuesta (más allá de la dimensión inicial) |
+| **Estructura Org** | Grupos, unidades con codificación plana + jerarquía versionada, FSM de 5 estados, copia local en los consumidores + diferir + señal de demanda (`[D13]`), fusión/división/traslado como eventos de primera clase, eventos EDA | Multi-dimensionalidad expuesta (más allá de la dimensión inicial) |
 | **Datos de Referencia** | 5 catálogos base (países, divisiones, monedas, tipos de documento, tasas de cambio), estrategia Seed + Sync + Extend | Extensiones por país, validación avanzada |
 | **Nuggets** | 8 value objects transversales empaquetados (identificación legal, dirección física, teléfono, correo, país, moneda, división territorial, contacto) + gobernanza con custodio | Nuggets diferidos (`ValorMonetario`, `Vigencia`) |
 
@@ -828,7 +828,7 @@ El porcentaje de avance combina cinco hitos. Cada hito tiene un peso fijo y se e
 
 **Estructura Organizacional — 75%**
 - ✅ Alcance v1.4, Modelo v1.6, Auditoría completa (101 hallazgos).
-- 🟡 Refinamiento en progreso (~50%) — replanteamiento #45 (copia local + diferir + señal, `[D15]`) aplicado de punta a punta.
+- 🟡 Refinamiento en progreso (~50%) — replanteamiento #45 (copia local + diferir + señal, `[D13]`) aplicado de punta a punta.
 - ⬜ Listo F1 — depende del cierre del refinamiento.
 - **Cálculo:** 20 + 25 + 15 + (30 × 0.50) + 0 = 75 ≈ **75%**.
 
