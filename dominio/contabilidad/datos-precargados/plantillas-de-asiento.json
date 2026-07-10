@@ -1,8 +1,8 @@
 {
   "catalogo": "PlantillaDeAsiento",
-  "version": "1.6",
-  "fechaActualizacion": "2026-06-01",
-  "alcance": "Sub-dominio emisor OXP (Obligaciones por Pagar). 4 plantillas de las 42 del inventario (anexo-ejemplo-plantilla-de-asiento.md, Seccion 5.2).",
+  "version": "1.7",
+  "fechaActualizacion": "2026-07-10",
+  "alcance": "Sub-dominio emisor OXP (Obligaciones por Pagar). 6 plantillas de las 42 del inventario (anexo-ejemplo-plantilla-de-asiento.md, Seccion 5.2).",
   "fuente": "Mapeo canonico de eventos OXP -> tipoTransaccion contable (dominio/obligaciones-por-pagar/modelo-dominio.md, tabla de la seccion 'Integracion con sub-dominio Contabilidad') + estructura del agregado PlantillaDeAsiento (dominio/contabilidad/modelo-dominio.md, Seccion 3.7, [D12], [D13]).",
   "nota": "grupoPucEsperado acota solo el Nivel B (inferencia) de la cadena de resolucion [D12]/[R47]. llevaDescripcionConcepto indica si la partida del componente recibe la descripcionConcepto que envia el consumidor [D13]/[R48] (true en componentes de concepto de negocio; false en impuestos y retenciones). El atributo 'rol' de cada RolPartida es un codigo de conjunto cerrado (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA) que la partida del borrador hereda y se propaga a la entrega [D14]/[R49]. Codigos PUC referidos al Decreto 2650 (Colombia). Los items marcados porValidar:true requieren confirmacion de consultor contable y/o canonizacion en OXP (issue #10).",
   "plantillas": [
@@ -77,6 +77,22 @@
           "esContrapartida": false,
           "componentes": [
             { "tipoComponente": "cruce_obligacion", "grupoPucEsperado": ["2205", "2335"], "llevaDescripcionConcepto": false, "porValidar": false, "notaValidacion": "Lo alimenta solo ExtractoCausado (una linea por Vinculacion). Db CxP del proveedor de la compra cruzada: reclasifica la deuda hacia el banco/emisor (la contrapartida acredita la CxP del banco). La unidad organizacional se rinde segun la politica de empresa [I33] (distribuida con la distribucion de origen que envia OXP, consolidada en una unidad general, o sin unidad). Ver [D29] de OXP." }
+          ]
+        },
+        {
+          "rol": "PARTIDA_POR_ACLARAR",
+          "naturaleza": "debito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "partida_por_aclarar", "grupoPucEsperado": ["1360", "1380"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Lo alimenta solo ExtractoCausado (una linea por partida en disputa). Db a la cuenta transitoria de partidas por aclarar: una reclamacion al banco/emisor por una partida en disputa (fraude, cargo no reconocido), para que la contrapartida (CxP del banco) refleje el total real del extracto. El tercero de la linea es el banco/emisor. Grupo tentativo 1360 (Reclamaciones, recomendada) / 1380 (Deudores varios) - definir cuenta con consultor contable. Ver [D37] de OXP." }
+          ]
+        },
+        {
+          "rol": "PARTIDA_ACLARADA",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "partida_aclarada", "grupoPucEsperado": ["1360", "1380"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Lo alimenta solo ExtractoCausado (una linea por partida de reverso bancario vinculada a una disputa de un extracto anterior, conciliacion trans-mensual de OXP). Cr que cancela la transitoria de partidas por aclarar. El tercero de la linea es el banco/emisor (cierra la reclamacion contra el). Mismo grupo que PARTIDA_POR_ACLARAR. Ver [D37] de OXP." }
           ]
         },
         {
@@ -212,6 +228,32 @@
           "grupoPucEsperado": ["2205", "2335"],
           "porValidar": false,
           "notaContrapartida": "Generada por el motor. Db CxP del proveedor (2205/2335): reduce la cuenta por pagar saldada por el anticipo. Su unidad organizacional sigue la politica de empresa [I33]."
+        }
+      ]
+    },
+    {
+      "tipoTransaccion": "reclasificacion_partida",
+      "descripcion": "Traslado de una partida por aclarar a su destino real. Emitida por PartidaEnDisputaReclasificada (OXP) cuando se identifica el gasto detras de una partida en disputa del extracto y se radica/causa la OxpComercio correspondiente (R06b de OXP). Salda la CxP del proveedor identificado (ya se pago via extracto) contra la transitoria de partidas por aclarar. Sin rol CONTRAPARTIDA: las dos lineas viajan explicitas desde OXP. terceroPrincipal del hecho = banco/emisor. Analoga en su razon de ser a amortizacion_anticipo Caso B: el hecho contable ocurre en un momento distinto de la causacion, gana tipoTransaccion propio ([D26]/[D37] de OXP).",
+      "origen": "estandar",
+      "documentoFuenteObligatorio": false,
+      "porValidar": true,
+      "notaValidacion": "Plantilla definida desde el ciclo contable de la partida en disputa ([D37] de OXP). Validar estructura y asientos de los tres momentos con consultor contable (ver anexo-ejemplo-plantilla-de-asiento.md, Ejemplo 5).",
+      "roles": [
+        {
+          "rol": "CRUCE_OBLIGACION",
+          "naturaleza": "debito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "cruce_obligacion", "grupoPucEsperado": ["2205", "2335"], "llevaDescripcionConcepto": false, "porValidar": false, "notaValidacion": "Db CxP del proveedor de la nueva OxpComercio (su deuda ya fue pagada via extracto). El tercero de la linea es el proveedor." }
+          ]
+        },
+        {
+          "rol": "PARTIDA_ACLARADA",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "partida_aclarada", "grupoPucEsperado": ["1360", "1380"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Cr que cancela la transitoria de partidas por aclarar. El tercero de la linea es el banco/emisor (cierra la reclamacion). Mismo grupo que en causacion_gasto." }
+          ]
         }
       ]
     }
