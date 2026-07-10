@@ -2,8 +2,8 @@
 
 **Sub-dominio emisor:** Obligaciones por Pagar (OXP)
 **Catálogo del modelo:** `PlantillaDeAsiento` (Sección 3.7 de `modelo-dominio.md`)
-**Versión:** 1.6
-**Fecha de actualización:** 2026-06-09
+**Versión:** 1.7
+**Fecha de actualización:** 2026-07-10
 **Archivo de datos:** [`plantillas-de-asiento.json`](plantillas-de-asiento.json)
 
 ---
@@ -28,11 +28,11 @@ Las plantillas de asiento son **contenido del producto** (`origen: estándar`) �
 
 | Concepto | Cantidad |
 |---|---|
-| Plantillas de OXP | 5 |
+| Plantillas de OXP | 6 |
 | Plantillas del inventario total (8 sub-dominios) | 42 |
-| `tipoTransaccion` cubiertos | `causacion_gasto`, `anticipo_a_proveedor`, `nota_credito_gasto`, `reversa_anticipo`, `amortizacion_anticipo` |
+| `tipoTransaccion` cubiertos | `causacion_gasto`, `anticipo_a_proveedor`, `nota_credito_gasto`, `reversa_anticipo`, `amortizacion_anticipo`, `reclasificacion_partida` |
 
-**Alcance de este archivo:** solo las 5 plantillas de **OXP** (único sub-dominio transaccional modelado a la fecha). Las restantes del inventario (CXC, Tesorería, Inventarios, Activos Fijos, Nómina, Arrendamientos, GL) se precargarán cuando esos sub-dominios se modelen.
+**Alcance de este archivo:** solo las 6 plantillas de **OXP** (único sub-dominio transaccional modelado a la fecha). Las restantes del inventario (CXC, Tesorería, Inventarios, Activos Fijos, Nómina, Arrendamientos, GL) se precargarán cuando esos sub-dominios se modelen.
 
 ---
 
@@ -57,9 +57,13 @@ Causación de una obligación por pagar. Emitida por `OxpComercioCausada` y `Ext
 | AMORTIZACION_ANTICIPO | Crédito | `amortizacion_anticipo` | `["1330"]` | ❌ | ⚠️ |
 | AJUSTE_TOLERANCIA | Débito/Crédito | `ajuste_tolerancia` | `["5305","4210"]` | ❌ | ⚠️ |
 | CRUCE_OBLIGACION | Débito | `cruce_obligacion` | `["2205","2335"]` | ❌ | |
+| PARTIDA_POR_ACLARAR | Débito | `partida_por_aclarar` | `["1360","1380"]` | ❌ | ⚠️ |
+| PARTIDA_ACLARADA | Crédito | `partida_aclarada` | `["1360","1380"]` | ❌ | ⚠️ |
 | CONTRAPARTIDA | Crédito | — (genera el motor) | `["2205","2335"]` | ❌ | |
 
 > **Nota — rol `CRUCE_OBLIGACION`:** lo alimenta solo `ExtractoCausado` (una línea por `Vinculacion` del extracto; `OxpComercioCausada` no emite este componente). Es un débito a la cuenta por pagar del proveedor de la compra cruzada — la reclasificación de la deuda hacia el banco/emisor (la contrapartida acredita la CxP del banco). Su unidad organizacional se rinde según la política de empresa **`[I33]`** (igual que la contrapartida): distribuida con la distribución de origen que envía OXP, consolidada en una unidad general, o sin unidad. Ver `[D29]` de OXP.
+
+> **Nota — roles `PARTIDA_POR_ACLARAR` / `PARTIDA_ACLARADA`:** los alimenta solo `ExtractoCausado`. `partida_por_aclarar` (Db) constituye la **cuenta transitoria de partidas por aclarar** — una **reclamación al banco/emisor** por una partida en disputa del extracto (fraude, cargo no reconocido) — para que la contrapartida (CxP del banco) refleje el **total real** que el banco cobra. `partida_aclarada` (Cr) la cancela cuando el **reverso bancario** llega en un extracto futuro (conciliación trans-mensual de OXP, una línea por reverso vinculado a una disputa). El tercero de ambas líneas es el **banco/emisor** (la reclamación es contra él — abre y cierra contra el mismo tercero). Grupo tentativo `["1360","1380"]` (1360 Reclamaciones, recomendada; 1380 Deudores varios) — ⚠️ por validar (ítem 11). Ver `[D37]` de OXP y el Ejemplo 5 del anexo.
 
 ### 4.2. `anticipo_a_proveedor`
 
@@ -107,6 +111,17 @@ Amortización de un anticipo cuando el cruce con la OXP de Comercio ocurre **des
 
 > Espejo de `anticipo_a_proveedor` (que hace Db Anticipos · Cr CxP). La unidad organizacional de la contrapartida (CxP) sigue la política de empresa `[I33]`. Grupo del `amortizacion_anticipo` `porValidar` con consultor contable.
 
+### 4.6. `reclasificacion_partida`
+
+Traslado de una **partida por aclarar** a su destino real. Emitida por `PartidaEnDisputaReclasificada` (OXP) cuando se identifica el gasto detrás de una partida en disputa del extracto y se radica/causa la OxpComercio correspondiente (`R06b` de OXP). **Plantilla nueva.** Salda la cuenta por pagar del proveedor identificado (su compra ya fue pagada vía extracto) contra la transitoria de partidas por aclarar. **Sin rol `CONTRAPARTIDA`:** sus dos líneas viajan explícitas desde OXP; `terceroPrincipal` del hecho = banco/emisor (informativo).
+
+| Rol | Naturaleza | `tipoComponente` | `grupoPucEsperado` | `llevaDescripcionConcepto` | |
+|-----|-----------|------------------|--------------------|:--------------------------:|---|
+| CRUCE_OBLIGACION | Débito | `cruce_obligacion` | `["2205","2335"]` | ❌ | |
+| PARTIDA_ACLARADA | Crédito | `partida_aclarada` | `["1360","1380"]` | ❌ | ⚠️ |
+
+> El débito lleva el tercero del **proveedor** de la nueva OxpComercio (salda su CxP); el crédito, el del **banco/emisor** (cierra la reclamación contra él). Análoga en su razón de ser al Caso B de la amortización (`[D26]` de OXP): cuando el hecho contable ocurre en un momento distinto de la causación, gana `tipoTransaccion` propio. Ver `[D37]` de OXP y el Ejemplo 5 del anexo. ⚠️ Plantilla completa por validar (ítem 12).
+
 ---
 
 ## 5. Revisión pendiente
@@ -125,6 +140,8 @@ Los siguientes puntos requieren confirmación de **consultor contable** y/o **ca
 | 8 | Amortización de anticipo | OXP indica que viaja como `tipoComponente` dentro de `causacion_gasto` (`[D26]`) sin nombre canónico. Definir si requiere un rol/componente propio en esta plantilla. |
 | 9 | `amortizacion_anticipo` (grupo PUC) | Rol nuevo agregado por coordinación cruzada con OXP #10. Grupo `["1330"]` (Anticipos a proveedores, por `[D26]` de OXP). Confirmar con consultor. |
 | 10 | `ajuste_tolerancia` (grupo PUC) | Rol nuevo agregado por coordinación cruzada con OXP #10. Grupo tentativo `["5305","4210"]` (gasto/ingreso financiero). Es una sugerencia — validar con consultor contable. |
+| 11 | Cuenta transitoria de partidas por aclarar (`PARTIDA_POR_ACLARAR`/`PARTIDA_ACLARADA`) | Grupo tentativo `["1360","1380"]` — recomendada **1360 Reclamaciones** (la disputa es materialmente una reclamación al banco/emisor; subcuenta sugerida `136095`), alternativa 1380 Deudores varios. Definir cuenta/subcuenta con consultor contable (issue #90). |
+| 12 | `reclasificacion_partida` (plantilla completa) | Plantilla definida desde el ciclo contable de la partida en disputa (`[D37]` de OXP): Db CxP proveedor · Cr transitoria, **sin** contrapartida del motor. Validar estructura y los asientos de los tres momentos (Ejemplo 5 del anexo) con consultor contable (issue #90). |
 
 ---
 
@@ -139,3 +156,4 @@ Los siguientes puntos requieren confirmación de **consultor contable** y/o **ca
 | 1.4 | Junio 2026 | Rol nuevo `CRUCE_OBLIGACION` (Débito, `cruce_obligacion` → `["2205","2335"]`) en `causacion_gasto` por **ajuste cruzado con OXP** (issue #18). Lo alimenta solo `ExtractoCausado` (una línea por `Vinculacion`): salda la cuenta por pagar del proveedor de la compra cruzada, reclasificando la deuda hacia el banco/emisor. Su unidad organizacional se rinde según `[I33]` (igual que la contrapartida). Alinea con `modelo-dominio.md` de OXP v3.5 [D29]. |
 | 1.6 | Junio 2026 | Nueva plantilla `amortizacion_anticipo` por ajuste cruzado con OXP (issue #25). La emite `PagoOxpComercioViaAnticipoAplicado` cuando la OXP de Comercio ya está Causada (cruce post-causación, Caso B de `[D26]` de OXP): Db CxP proveedor · Cr Anticipos a proveedores (espejo de `anticipo_a_proveedor`, patrón SAP F-54). Cuando el cruce es pre/durante la causación, la amortización sigue viajando como `tipoComponente` dentro de `causacion_gasto` (Caso A). Cobertura OXP: 4 → 5 plantillas. Grupo del `amortizacion_anticipo` `porValidar`. |
 | 1.5 | Junio 2026 | Plantilla `nota_credito_gasto` completada con los componentes que OXP emite y faltaban (issue #20). Se agregan: `inc` al rol IMPUESTO; `reteiva` y `reteica` al rol RETENCION; y un rol nuevo `CARGO_FINANCIERO` (Crédito, `cargo_financiero` → `["5305"]`) — inverso del de `causacion_gasto`, lo emite la nota crédito de un extracto (`CargoFinancieroDevuelto`). Antes la plantilla era un inverso simplificado (solo `concepto_devuelto`/`iva`/`retefuente`) y habría rechazado líneas válidas (`LINEA_SIN_ROL_EN_PLANTILLA`, I27). Los grupos del PUC quedan `porValidar`, igual que sus equivalentes en `causacion_gasto`. No requiere cambios en OXP — su catálogo ya declara estos componentes para `nota_credito_gasto`. |
+| 1.7 | Julio 2026 | **Ciclo contable de la partida en disputa por ajuste cruzado con OXP (issue #90).** Dos roles nuevos en `causacion_gasto`: **`PARTIDA_POR_ACLARAR`** (Db, `partida_por_aclarar` → tentativo `["1360","1380"]`) constituye la transitoria de partidas por aclarar —reclamación al banco/emisor por una partida en disputa— para que la contrapartida refleje el total real del extracto; **`PARTIDA_ACLARADA`** (Cr, `partida_aclarada` → mismo grupo) la cancela cuando el reverso bancario llega en un extracto futuro. **Nueva plantilla `reclasificacion_partida`** (§4.6): traslado de la partida aclarada a su destino real cuando se identifica el gasto (Db `CRUCE_OBLIGACION` CxP del proveedor · Cr `PARTIDA_ACLARADA`, sin contrapartida del motor) — análoga en su razón de ser al Caso B de `[D26]`. Nombres generales de contabilidad (sin "disputa": ese es el motivo en OXP; "por aclarar" es el concepto contable). Terceros: la transitoria siempre lleva el banco/emisor; las CxP, su proveedor. Cobertura OXP: 5 → **6 plantillas**. Ítems 11 y 12 nuevos en revisión pendiente (cuenta 1360/1380 y validación de la plantilla). Ver `[D37]` de OXP y Ejemplo 5 del anexo. |

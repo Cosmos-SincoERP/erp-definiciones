@@ -1,8 +1,8 @@
 # Anexo — Plantillas de asiento y cadena de resolución
 
-> **Fecha:** Marzo 2026
+> **Fecha:** Julio 2026
 > **Propósito:** Ejemplificar cómo los sub-dominios transaccionales emiten líneas de traducción mediante `lineasParaTraduccion()` y cómo el motor de traducción de Contabilidad las transforma en asientos contables mediante la cadena de resolución. Este anexo respalda las definiciones de *plantilla de asiento*, *línea de traducción* y *cadena de resolución* del glosario del sub-dominio de Contabilidad.
-> **Versión:** 1.2
+> **Versión:** 1.4
 
 ---
 
@@ -534,7 +534,7 @@ Nómina ────────────────────────
 
 | Sub-dominio emisor | Plantillas | Principales |
 |---------------------|:----------:|-------------|
-| **OXP** | 6 *(teórico; 4 reales — ver `datos-precargados/plantillas-de-asiento.*`)* | Causación de obligación, nota crédito proveedor, nota débito proveedor, anticipo a proveedor, aplicación de anticipo, diferencia en cambio |
+| **OXP** | 6 *(teórico; 6 reales — ver `datos-precargados/plantillas-de-asiento.*`)* | Causación de obligación, nota crédito proveedor, nota débito proveedor, anticipo a proveedor, aplicación de anticipo, diferencia en cambio |
 | **CXC** | 7 | Causación de ingreso, nota crédito/débito cliente, anticipo de cliente, aplicación de anticipo, diferencia en cambio, provisión cartera |
 | **Tesorería** | 8 | Pago a proveedor, cobro de cliente, transferencia, consignación, cargo bancario, abono bancario, conciliación, reembolso caja menor |
 | **Inventarios** | 6 | Entrada de mercancía, salida por venta (CMV), salida por consumo, transferencia entre bodegas, ajuste de inventario, variación de costo |
@@ -593,6 +593,73 @@ Sin `terceroPrincipal`, el motor no tendría de dónde tomar el tercero del banc
 
 ---
 
+## 8. Ejemplo 5 — Ciclo de la partida en disputa (cuenta transitoria de partidas por aclarar)
+
+> Añadido en el issue #90; conceptualmente extiende el Ejemplo 4. Ilustra los roles `PARTIDA_POR_ACLARAR`/`PARTIDA_ACLARADA` de `causacion_gasto` y la plantilla `reclasificacion_partida` (`[D37]` de OXP). Cuentas ilustrativas — grupos ⚠️ `porValidar` (ítems 11 y 12 de la revisión pendiente del catálogo).
+
+Caso: el extracto de **enero** de la tarjeta de **Bancolombia (890.903.938)** trae tres partidas: dos compras ya causadas —proveedor **A (901.090.486)** por 600.000 y proveedor **B (860.533.413)** por 400.000— y una partida de **500.000 que nadie reconoce** (posible fraude). El usuario la marca **en disputa** (`PartidaEnDisputaMarcada`), lo que permite conciliar al 100% (`R06` de OXP) sin generar anticipos. El banco cobrará el total: **1.500.000**.
+
+### 8.1 Momento 1 — Causación del extracto de enero (`causacion_gasto`)
+
+**A nivel del hecho:** `tipoTransaccion = causacion_gasto`, `terceroPrincipal = 890903938` (Bancolombia).
+
+| # | tipoComponente | tercero (de la línea) | valor |
+|---|---------------|-----------------------|-------|
+| 1 | cruce_obligacion | 901090486 (Prov A) | 600.000 |
+| 2 | cruce_obligacion | 860533413 (Prov B) | 400.000 |
+| 3 | partida_por_aclarar | 890903938 (Bancolombia) | 500.000 |
+
+**Asiento resultante:**
+
+| Partida | Cuenta | Tercero | Débito | Crédito |
+|---------|--------|---------|--------|---------|
+| 1 | 2205-… CxP proveedor | 901090486 (Prov A) | 600.000 | |
+| 2 | 2205-… CxP proveedor | 860533413 (Prov B) | 400.000 | |
+| 3 | 1360-… Reclamaciones (partidas por aclarar) | 890903938 (Bancolombia) | 500.000 | |
+| 4 | 2205-… CxP banco/emisor *(contrapartida del motor)* | 890903938 (Bancolombia) | | 1.500.000 |
+| | | **Totales** | **1.500.000** | **1.500.000** |
+
+Sin la línea 3, la CxP del banco quedaría en 1.000.000 — **subvalorada** frente a los 1.500.000 que el banco cobra. Con ella, el pasivo refleja la deuda real y el derecho de la reclamación queda visible en el activo, **por tercero** (se sabe cuánto se le reclama a cada banco).
+
+### 8.2 Momento 2a — Resolución por descarte: el banco reversa en el extracto de marzo
+
+La línea de "Reverso Bancario" (−500.000) llega en el extracto de **marzo** y el usuario la vincula a la disputa de enero (conciliación trans-mensual, `R10c` de OXP → `PartidaEnDisputaDescartada`). La cancelación viaja **dentro de la causación del extracto de marzo** (supóngase un solo cruce adicional de 300.000):
+
+| # | tipoComponente | tercero (de la línea) | valor |
+|---|---------------|-----------------------|-------|
+| 1 | cruce_obligacion | 901090486 (Prov A) | 300.000 |
+| 2 | partida_aclarada | 890903938 (Bancolombia) | 500.000 |
+
+| Partida | Cuenta | Tercero | Débito | Crédito |
+|---------|--------|---------|--------|---------|
+| 1 | 2205-… CxP proveedor | 901090486 (Prov A) | 300.000 | |
+| 2 | 1360-… Reclamaciones (partidas por aclarar) | 890903938 (Bancolombia) | | 500.000 |
+| 3 | 2205-… CxP banco/emisor *(contrapartida del motor; ya neta del reverso)* | 890903938 (Bancolombia) | 200.000 | |
+| | | **Totales** | **500.000** | **500.000** |
+
+La 1360 queda **en cero** para esa reclamación — abrió y cerró contra el mismo tercero (Bancolombia). *(Nota: si el extracto de marzo trae más movimientos que el reverso, la contrapartida del motor resulta acreedora como de costumbre; el ejemplo se redujo para que se vea el mecanismo.)*
+
+### 8.3 Momento 2b — Resolución por reclasificación: se identifica el gasto real (`reclasificacion_partida`)
+
+Camino alterno: se descubre que los 500.000 corresponden a una compra legítima del proveedor **C (830.037.248)** que nadie había radicado. Se radica y causa la OxpComercio **por el flujo normal** (Db gasto 420.168 + Db IVA 79.832 · Cr CxP proveedor C 500.000 — plantilla `causacion_gasto`, sin novedades). Luego `PartidaEnDisputaReclasificada` emite el hecho propio:
+
+**A nivel del hecho:** `tipoTransaccion = reclasificacion_partida`, `terceroPrincipal = 890903938` (Bancolombia — el hecho pertenece al ciclo del extracto en disputa; informativo: esta plantilla no tiene contrapartida del motor).
+
+| # | tipoComponente | tercero (de la línea) | valor |
+|---|---------------|-----------------------|-------|
+| 1 | cruce_obligacion | 830037248 (Prov C) | 500.000 |
+| 2 | partida_aclarada | 890903938 (Bancolombia) | 500.000 |
+
+| Partida | Cuenta | Tercero | Débito | Crédito |
+|---------|--------|---------|--------|---------|
+| 1 | 2205-… CxP proveedor | 830037248 (Prov C) | 500.000 | |
+| 2 | 1360-… Reclamaciones (partidas por aclarar) | 890903938 (Bancolombia) | | 500.000 |
+| | | **Totales** | **500.000** | **500.000** |
+
+La CxP del proveedor C nace en su causación y se salda aquí (su compra ya fue pagada vía tarjeta — es el "cruce diferido" que en un extracto normal habría viajado en el Momento 1); la 1360 queda en cero. En **cualquiera de los dos caminos** la transitoria abre y cierra, auditable por partida y por tercero.
+
+---
+
 ## Control de versiones
 
 | Versión | Fecha | Descripción |
@@ -601,3 +668,4 @@ Sin `terceroPrincipal`, el motor no tendría de dónde tomar el tercero del banc
 | 1.1 | Mayo 2026 | Grupo del PUC esperado (issue #7). Nota explicativa de `grupoPucEsperado` en la Sección 1.3 y nueva columna "Grupo PUC esperado" en las tablas de plantilla de los 3 ejemplos (causación, anticipo, nota crédito). Alinea con `modelo-dominio.md` v1.3 [D12] y `definicion-alcance.md` v1.3 [R47]. Llenado del inventario completo (Sección 5) y confirmación del grupo del `inc` pendientes de revisión por consultor contable. |
 | 1.2 | Junio 2026 | Encuadre del inventario teórico (issue #7). Nota en la Sección 5 que aclara que las 42 plantillas son un planteamiento inicial de dimensionamiento — no todas se implementarán y el número real se determina al modelar cada sub-dominio; la fuente de verdad es `datos-precargados/plantillas-de-asiento.*`. Fila de OXP del resumen (5.3) marcada como "6 teórico; 4 reales". Acompaña la creación del catálogo precargado `datos-precargados/plantillas-de-asiento.md`/`.json` con las 4 plantillas reales de OXP. |
 | 1.3 | Junio 2026 | Nuevo **Ejemplo 4 — Extracto de cruce puro** (Sección 7, issue #28): ilustra de dónde sale el tercero de la contrapartida cuando las líneas traen varios proveedores y el banco/emisor no viaja en ninguna. Muestra el uso de `terceroPrincipal` (tercero del documento a nivel del hecho económico) para la contrapartida (CxP del banco) y el tercero por línea para los cruces. Se ubica como Sección 7 (tras el resumen) para no renumerar las secciones existentes ni romper referencias cruzadas. Alinea con `modelo-dominio.md` v1.8 (`InformacionTransaccion` con `terceroPrincipal`, paso 4 del `ServicioDeTraduccion`). |
+| 1.4 | Julio 2026 | Nuevo **Ejemplo 5 — Ciclo de la partida en disputa** (Sección 8, issue #90): los tres momentos del ciclo por cuenta transitoria de partidas por aclarar — causación del extracto con la línea `partida_por_aclarar` (la CxP del banco refleja el total real), resolución por descarte (`partida_aclarada` dentro de la causación del extracto donde llega el reverso, conciliación trans-mensual) y resolución por reclasificación (plantilla nueva `reclasificacion_partida`, sin contrapartida del motor). Muestra el tercero de cada línea (la transitoria siempre contra el banco/emisor; las CxP contra su proveedor). Fila de OXP del resumen (5.3) actualizada a "6 reales" y encabezado del anexo corregido (decía v1.2 pese al historial). Alinea con el catálogo precargado v1.7 y `[D37]` de OXP. |
