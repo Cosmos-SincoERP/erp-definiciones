@@ -87,7 +87,7 @@ En esta sección queda únicamente el **contexto de diseño**:
 
 ### INC, ICA — sin condiciones por perfil
 
-INC e ICA no evalúan calidades tributarias del emisor ni del adquiriente. Su aplicación depende únicamente de la clasificación tributaria (INC) y de la ciudad + actividad económica (ICA).
+INC e ICA no evalúan calidades tributarias del emisor ni del adquiriente. Su aplicación depende únicamente de la clasificación tributaria (INC) y de la ciudad + actividad económica (ICA). El ICA tiene además **direccionalidad inherente** (`direccionFiscalAplicable: ingreso`, issue #93): solo se liquida cuando la empresa genera el ingreso — en las compras el comprador practica la retención (RICA), no autoliquida ICA.
 
 ---
 
@@ -135,3 +135,4 @@ Los formatos fiscales se migraron a [`datos-precargados/co-formato-fiscal.json`]
 |---------|-------|-------------|
 | 1.0 | Marzo 2026 | Versión inicial: 11 tributos, 6 clasificaciones, condiciones de aplicación completas, 13 atributos fiscales, formatos DIAN y municipales. |
 | 1.1 | Mayo 2026 | Cambio 3 — Sub-cambio 3.4: nueva Sección 5 con regímenes empresariales precargados (zonas francas, monopolios departamentales, Puerto Libre empresarial). 3 atributos fiscales nuevos en Sección 4 (`inscripcionZonaFranca`, `inscripcionMonopolio`, `inscripcionPuertoLibre`) con `catalogoReferencia`. Renumeración de Sección 5 (Formatos) a Sección 6. `[D13]` `[I16]`. |
+| 1.2 | Julio 2026 | **ICA con direccionalidad inherente `ingreso` (issue #93).** El catálogo declaraba `ICA: ambas`, lo que en dirección gasto hacía liquidar un ICA aditivo del que el comprador no es sujeto pasivo (además de la RICA, con misma base y tarifa) — contradiciendo `R61`. `ICA.direccionFiscalAplicable` pasa a `ingreso` (patrón de `AUTO_RICA`); `RICA` permanece en `ambas` (es retención). Sección "INC, ICA — sin condiciones por perfil" anotada. Alinea la definición fuente con la implementación ya verificada (`Cosmos.Impuestos#116`): catálogo `co-catalogo-tributario.{md,json}` v1.1 y `anexo-ejemplo-direccion-fiscal.md` (el paso de filtro por dirección del Caso A ahora sí descarta un tributo — ICA). |

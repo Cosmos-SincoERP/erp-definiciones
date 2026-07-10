@@ -1,8 +1,8 @@
 {
   "pais": "CO",
   "catalogo": "CatalogoTributario",
-  "version": "1.0",
-  "fechaActualizacion": "2026-05-26",
+  "version": "1.1",
+  "fechaActualizacion": "2026-07-10",
   "fuente": "Estatuto Tributario Nacional (Decreto 624 de 1989) + Decreto Único Reglamentario 1625 de 2016 (DIAN) + Ley 14 de 1983 (ICA) + Ley 1430 de 2010 (autorretenciones) + estatutos tributarios municipales.",
 
   "tributos": [
@@ -37,7 +37,7 @@
       "caracterRetencion": null,
       "nivelJurisdiccional": "municipal",
       "factorDeTarifa": "actividadEconomica",
-      "direccionFiscalAplicable": "ambas",
+      "direccionFiscalAplicable": "ingreso",
       "tributoPadre": null,
       "origen": "estandar",
       "definicion": "Impuesto municipal sobre actividades industriales, comerciales y de servicios. Cada municipio define sus tarifas dentro de los rangos de la Ley 14 de 1983."

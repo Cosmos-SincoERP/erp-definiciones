@@ -2,8 +2,8 @@
 
 **País:** Colombia (`CO`)
 **Catálogo del modelo:** `CatalogoTributario` (Sección 3.2 de `modelo-dominio.md`)
-**Versión:** 1.0
-**Fecha de actualización:** 2026-05-26
+**Versión:** 1.1
+**Fecha de actualización:** 2026-07-10
 **Archivo de datos:** [`co-catalogo-tributario.json`](co-catalogo-tributario.json)
 
 ---
@@ -55,11 +55,13 @@ Este catálogo precarga la configuración estándar del agregado `CatalogoTribut
 |---|---|:---:|:---:|:---:|---|:---:|:---:|
 | `IVA` | Impuesto al Valor Agregado | aditivo | — | nacional | `clasificacion` | ambas | — |
 | `INC` | Impuesto Nacional al Consumo | aditivo | — | nacional | `clasificacion` | ambas | — |
-| `ICA` | Impuesto de Industria y Comercio | aditivo | — | municipal | `actividadEconomica` | ambas | — |
+| `ICA` | Impuesto de Industria y Comercio | aditivo | — | municipal | `actividadEconomica` | ingreso | — |
 | `RETEFUENTE` | Retención en la Fuente | sustractivo | anticipado | nacional | `conceptoPago` | ambas | — |
 | `RIVA` | Retención sobre el IVA | sustractivo | anticipado | nacional | `porcentajeDePadre` | ambas | `IVA` |
 | `RICA` | Retención sobre el ICA | sustractivo | anticipado | municipal | `actividadEconomica` | ambas | — |
 | `SOBRETASA_BOMBERIL` | Sobretasa Bomberil | sustractivo | definitivo | municipal | `porcentajeDePadre` | ambas | `RICA` |
+
+> **Nota (issue #93, v1.1):** `ICA` pasó de `ambas` a `ingreso` — el sujeto pasivo del ICA es **quien genera el ingreso**; en dirección gasto el comprador solo practica la retención (`RICA`), no autoliquida ICA (coherente con `R61` del alcance). `RICA` permanece en `ambas` (retención: en gasto la empresa retiene al proveedor; en ingreso el cliente le retiene a la empresa). Alineado con la implementación ya verificada (`Cosmos.Impuestos#116`).
 
 ### 4.2. Tributos de provisión / autorretenciones (4)
 
