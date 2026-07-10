@@ -1,6 +1,6 @@
 {
   "catalogo": "PlantillaDeAsiento",
-  "version": "1.7",
+  "version": "1.8",
   "fechaActualizacion": "2026-07-10",
   "alcance": "Sub-dominio emisor OXP (Obligaciones por Pagar). 6 plantillas de las 42 del inventario (anexo-ejemplo-plantilla-de-asiento.md, Seccion 5.2).",
   "fuente": "Mapeo canonico de eventos OXP -> tipoTransaccion contable (dominio/obligaciones-por-pagar/modelo-dominio.md, tabla de la seccion 'Integracion con sub-dominio Contabilidad') + estructura del agregado PlantillaDeAsiento (dominio/contabilidad/modelo-dominio.md, Seccion 3.7, [D12], [D13]).",
@@ -37,6 +37,14 @@
             { "tipoComponente": "retefuente", "grupoPucEsperado": ["2365"], "llevaDescripcionConcepto": false, "porValidar": false },
             { "tipoComponente": "reteiva", "grupoPucEsperado": ["2367"], "llevaDescripcionConcepto": false, "porValidar": false },
             { "tipoComponente": "reteica", "grupoPucEsperado": ["2368"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Confirmar si OXP emite reteica como tipoComponente (issue #10)." }
+          ]
+        },
+        {
+          "rol": "IMPUESTO_ASUMIDO",
+          "naturaleza": "debito",
+          "esContrapartida": false,
+          "componentes": [
+            { "tipoComponente": "retencion_asumida", "grupoPucEsperado": ["5315"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Retencion asumida por la empresa cuando el pago del documento ya salio completo (medio de pago tarjeta, [D38] de OXP): la linea de la retencion viaja identica al caso normal (Cr, misma cuenta, tercero proveedor, certificable) y esta linea Db espejo la asume como gasto propio — la contrapartida queda por el total. Aplica a todas las retenciones sustractivas (una linea espejo por cada una). Grupo tentativo 5315 (gastos - impuestos asumidos), por validar con consultor contable. Doctrina de concurrencia validada con consultoria fiscal jul-2026." }
           ]
         },
         {
