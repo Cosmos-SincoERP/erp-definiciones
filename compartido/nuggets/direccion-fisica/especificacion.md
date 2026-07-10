@@ -3,7 +3,7 @@
 | | |
 |---|---|
 | **Estado** | En especificación — borrador para revisión |
-| **Versión** | 0.2 |
+| **Versión** | 0.3 |
 | **Gobernanza** | [gobernanza-nuggets.md](../gobernanza-nuggets.md) |
 | **Catálogo** | [catalogo-nuggets.md](../catalogo-nuggets.md) |
 | **Hereda de** | Servicio de Direcciones v1.0 (eliminado en el replanteamiento de jun-2026; conservado en el historial del repositorio) — ver Sección 8 |
@@ -73,7 +73,7 @@ Se evalúan al construir, en orden, sin salir del proceso (filtro 3 de la gobern
 | `[V03]` | **Línea de dirección obligatoria:** 1–300 caracteres (límite alineado con FAJ14 de la DIAN), no vacía tras normalizar. |
 | `[V04]` | **Código postal por formato:** si se provee, cumple el formato del perfil del país. Si el perfil lo marca obligatorio, debe venir. **Política de existencia: advertencia** — si el catálogo embebido de códigos postales del país está disponible y el código no aparece, la instancia se construye marcada con advertencia, no se rechaza (mismo nivel "notificación" que aplica la DIAN en FAJ73; ver `tieneAdvertenciaCp()`). |
 | `[V05]` | **Captura estructurada solo donde aplica:** `capturaEstructurada` solo se admite en países cuyo perfil la habilita; `tipoVia` debe existir en el catálogo de tipos de vía del país y cada complemento en el catálogo de tipos de complemento. Proveerla en un país sin nomenclatura codificada falla la construcción. |
-| `[V06]` | **Coherencia línea ↔ captura estructurada:** cuando hay `capturaEstructurada`, `lineaDireccion` debe ser la línea compuesta por el Nugget a partir de ella (operación `componerLinea()`). Evita que el detalle y el valor canónico diverjan. |
+| `[V06]` | **Coherencia línea ↔ captura estructurada:** cuando hay `capturaEstructurada`, `lineaDireccion` debe ser **exactamente** la línea compuesta por el Nugget a partir de ella (operación `componerLinea()`, cuya gramática formal está en la Sección 5). Evita que el detalle y el valor canónico diverjan. |
 
 ---
 
@@ -82,7 +82,7 @@ Se evalúan al construir, en orden, sin salir del proceso (filtro 3 de la gobern
 | Operación | Descripción |
 |-----------|-------------|
 | `esIgualA(otra)` | Igualdad por valor canónico — Sección 3. |
-| `componerLinea()` | Compone la línea canónica desde `capturaEstructurada` (ej: `CL 10 # 43A-27, EDF Torre Norte, PIS 12, OFC 1205` → "Calle 10 # 43A-27, Edificio Torre Norte, Piso 12, Oficina 1205"). Falla si no hay captura estructurada. |
+| `componerLinea()` | Compone la línea canónica desde `capturaEstructurada` con la gramática formal: `"{nombreTipoVia} {numeroVia} # {numeroPredio}"` + por cada complemento, en el orden de captura, `", {nombreTipoComplemento} {valor}"`. **Con nombres del catálogo embebido, no con códigos** (la línea es el valor canónico para humanos — documentos, guías, igualdad del VO; los códigos ya viajan en `capturaEstructurada` para usos de máquina), con sus mayúsculas ("Calle", "Apartamento"); números tal como se capturaron (incluidas letras: `43A-27`); separador de complementos coma + espacio; sin punto final. Ejemplo: captura `{ tipoVia: CL, numeroVia: 10, numeroPredio: 43A-27, complementos: [EDF Torre Norte, PIS 12, OFC 1205] }` → `Calle 10 # 43A-27, Edificio Torre Norte, Piso 12, Oficina 1205`. La gramática es determinística al byte — es la que `[V06]` verifica. Falla si no hay captura estructurada. |
 | `tieneAdvertenciaCp()` | `true` cuando el código postal cumplió el formato pero no aparece en el catálogo embebido (`[V04]`). El consumidor decide si exige corrección antes de usos fiscales. |
 | `nivelesTerritoriales()` | Retorna los niveles del perfil del país con sus códigos y nombres resueltos desde el catálogo embebido (para presentación y para consumidores que resuelven jurisdicción — Impuestos). |
 | `presentacion()` | Dirección en una sola cadena con el orden del perfil del país: línea + división territorial + código postal + país. Los formatos de impresión específicos (factura, certificado, sobre) son de cada interfaz. |
@@ -100,7 +100,7 @@ Se evalúan al construir, en orden, sin salir del proceso (filtro 3 de la gobern
 | `tipos-via-co.json` | 21 tipos de vía (catálogo DIAN: CL, CR, DG, TV, AC, AK…) | `configuracion/` del servicio eliminado (historial del repositorio) | Sin cambios — pasa a servir la captura estructurada opcional. |
 | `tipos-complemento.json` | 16 tipos (APT, TRR, PIS, OFC, LOC, BDG, BLQ, INT, CSA, LTE, ETP, CNJ, URB, BRR, EDF, UND) | ídem | Sin cambios. |
 | `tipos-direccion.json` | 5 tipos de uso (FSC, COM, COR, ENT, SUC) — **vocabulario compartido para los consumidores**, no atributo del VO (Sección 9). | ídem | Sin cambios. |
-| `codigos-postales-co.json` | 248 códigos de las 10 ciudades principales (de 3.685 totales DIAN/4-72) | ídem | Alimenta la política `advertencia` de `[V04]`. El catálogo completo y los de otros países son datos vivos — fuera del paquete (Sección 9). |
+| `codigos-postales-co.json` | 248 códigos de las 10 ciudades principales (de 3.685 totales DIAN/4-72) | ídem | Alimenta la política `advertencia` de `[V04]`. El catálogo completo y los de otros países son datos vivos — fuera del paquete (Sección 9). *Pregunta abierta (no bloquea): si en operación real el ruido de advertencias en ciudades no cubiertas molesta, evaluar ampliar el embebido CO a los 3.685 totales — el argumento "no embebible" pesa para MX/US, no para CO.* |
 
 ---
 
@@ -224,5 +224,6 @@ Adopción prevista según la [matriz del catálogo](../catalogo-nuggets.md#matri
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
+| 0.3 | Julio 2026 | **Gramática formal de `componerLinea()` (issue #100, consulta del equipo de desarrollo).** `[V06]` exige igualdad exacta entre `lineaDireccion` y la composición, pero la operación estaba definida solo por ejemplo — el equipo propuso componer con códigos DIAN, contradiciendo el ejemplo de la spec. Se formaliza en la Sección 5: nombres del catálogo (no códigos — ratificado con el usuario: la línea es el valor canónico para humanos; los códigos viajan en `capturaEstructurada`), mayúsculas del catálogo, números tal como se capturaron, complementos en orden de captura con coma + espacio, sin punto final. Nota de pregunta abierta en la Sección 6: posible ampliación del embebido de códigos postales CO a los 3.685 totales si el ruido de advertencias molesta en operación. |
 | 0.2 | Julio 2026 | **Datos producidos (cierra P1, issue #77).** Los 5 catálogos embebidos se rescataron del historial del repositorio (servicio de Direcciones v1.0) y se publicaron en `compartido/nuggets/direccion-fisica/datos/` — como insumos exclusivos del Nugget, no se duplican en `datos-referencia/catalogos/`: `tipos-via-co` (21), `tipos-complemento` (16), `tipos-direccion` (5), `codigos-postales-co` (248, 10 ciudades) y `perfiles-direccion` (5 países). El perfil se **reestructuró al modelo del Nugget** (`niveles`/`codigoPostal`/`capturaEstructurada`/`presentacion`), aplicando la corrección del perfil CO (captura estructurada y CP opcionales, Anexo FE v1.9) y dejando MX/US en modo genérico (P4). |
 | 0.1 | Junio 2026 | Borrador inicial. Hereda del servicio de Direcciones v1.0 la estructura genérica + perfil por país, los catálogos (21 tipos de vía, 16 complementos, 5 tipos de uso, perfiles de 5 países, 248 códigos postales) y las validaciones; elimina identidad, persistencia centralizada y eventos de sincronización. **Corrección verificada contra el Anexo Técnico FE v1.9 (Res. DIAN 000165/2023):** la dirección en FE es texto libre 1–300 (FAJ14) y el código postal es opcional con validación de notificación (FAJ73) — la captura estructurada CO pasa a modo opcional que compone la línea canónica, y lo estructurado por obligación es la división territorial (FAJ11/FAJ12, tablas DANE). 6 reglas `[V01]`–`[V06]`, igualdad por valor canónico (línea normalizada), política de advertencia para código postal, 5 pendientes P1–P5. |
