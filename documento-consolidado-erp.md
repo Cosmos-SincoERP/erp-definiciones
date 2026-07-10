@@ -63,7 +63,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 | Agregados | Eventos | Domain Services | Invariantes | Decisiones | Premisas | Pendientes | Sugerencias |
 |:---------:|:-------:|:---------------:|:-----------:|:----------:|:--------:|:----------:|:-----------:|
-| 5 (+2 config) | 53 | 3 | 25 | 36 (D1-D36) | 3 | 4 | 10 |
+| 5 (+2 config) | 53 | 3 | 25 | 38 (D1-D38) | 3 | 4 | 10 |
 
 **Componentes:**
 
@@ -83,11 +83,11 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **3 domain services:** ServicioDeConciliacion (vinculación extracto ↔ comercio), ServicioDeRegularizacion (cruce anticipos ↔ comercio), ServicioDeAplicacionDevolucion (3 ramas por tipo de devolución).
 
-**Integración con Contabilidad (cerrada):** causación del Anticipo (D25), generalización terminológica hacia "sistema contable" (D26), mapeo `tipoTransaccion` evento → plantilla de asiento (D27), canonización de `tipoComponente` con código fiscal específico (`iva`/`inc`/`retefuente`/`reteiva`/`reteica`) 1:1 con el catálogo de Contabilidad, y manejo de rechazos del sistema contable vía outbox del consumidor (D28).
+**Integración con Contabilidad (cerrada):** causación del Anticipo (D25), generalización terminológica hacia "sistema contable" (D26), mapeo `tipoTransaccion` evento → plantilla de asiento (D27), canonización de `tipoComponente` con código fiscal específico (`iva`/`inc`/`retefuente`/`reteiva`/`reteica`) 1:1 con el catálogo de Contabilidad, y manejo de rechazos del sistema contable vía outbox del consumidor (D28). De jul-2026: ciclo contable de la **partida en disputa** vía cuenta transitoria de partidas por aclarar (`[D37]`, #90) y **retenciones asumidas** por pago con tarjeta (`[D38]`, #94 — la retención se practica siempre, doctrina de concurrencia; con tarjeta no se descuenta del pagable, la asume la empresa). El mapeo canónico quedó en **17 `tipoComponente` y 6 plantillas**.
 
 **Replanteamiento (#31/#45) y refinamientos recientes:** `Proveedor` como rol del tercero hacia la bodega de Terceros (#38); la **unidad organizacional se consume como copia local** por eventos de Estructura Organizacional —no agregado— y la causación **se difiere** cuando la unidad no existe (`[D34]`, `[SI8]`, #48); control de doble pago vía constancia humana (`[R38]`, `[D33]`, #30); resolución del emisor del extracto por número de tarjeta (`[D35]`, #57); **asignación de la unidad por cadena de niveles** (Nivel A reglas configurables + Nivel B aprendizaje, `[D36]`, #51).
 
-**Estado:** Alcance v1.15, modelo v4.3 (junio 2026). En refinamiento continuo (Fase 2). Integración OXP ↔ Contabilidad **cerrada**; integración con Estructura Organizacional documentada (copia local + diferir + señal).
+**Estado:** Alcance v1.17, modelo v4.7 (julio 2026). En refinamiento continuo (Fase 2). Integración OXP ↔ Contabilidad **cerrada**; integración con Estructura Organizacional documentada (**copia local + diferir por consistencia eventual** — la señal de demanda se retiró en el #72: la copia es para validación, la UI lee a EO en vivo).
 
 > Detalle: [`dominio/obligaciones-por-pagar/modelo-dominio.md`](dominio/obligaciones-por-pagar/modelo-dominio.md)
 
@@ -129,7 +129,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 - **F1 — LatAm completo:** CO/DO/PA con regímenes territoriales y empresariales precargados.
 - **F2 — Apertura US/CA:** activación de tipos `distrito-fiscal-especial` y `soberania-tributaria`, resolución de jurisdicción por dirección/geocoding, decisión arquitectónica proveedor fiscal externo vs catálogo propio (ver `[PD11]`).
 
-**Catálogos fiscales precargados (F1):** 27 pares de archivos (`.md` + `.json`), 962 entradas que cubren los 3 países F1 (CO: 493, DO: 260, PA: 209). Son **parte del producto** (`origen: estándar`) — pendiente refinamiento por consultores fiscales (cada `.md` lleva sección "Revisión pendiente").
+**Catálogos fiscales precargados (F1):** 27 pares de archivos (`.md` + `.json`), 962 entradas que cubren los 3 países F1 (CO: 493, DO: 260, PA: 209). Son **parte del producto** (`origen: estándar`) — pendiente refinamiento por consultores fiscales (cada `.md` lleva sección "Revisión pendiente"). Catálogo tributario CO **v1.1** (#93, validado con la consultoría fiscal): `ICA` solo en dirección `ingreso` — el sujeto pasivo es quien genera el ingreso; en gasto solo aplica la retención `RICA`.
 
 **Replanteamiento (#31, #39):** el alta del `PerfilTributario` ya no depende de un registro centralizado de terceros — el comando `AsegurarPerfilTributario` crea-o-reutiliza por identificación × país (`[D16]`), validando la identidad con la pieza del paquete `IdentificacionLegal`; los eventos del perfil se publican hacia la bodega de Terceros (Impuestos es fuente, no consumidor).
 
@@ -145,7 +145,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 | Agregados | Eventos | Domain Services | Invariantes | Decisiones | Premisas | Pendientes | Sugerencias | Permisos |
 |:---------:|:-------:|:---------------:|:-----------:|:----------:|:--------:|:----------:|:-----------:|:--------:|
-| 13 | 59 | 3 | 32 (22 L + 10 E) | 14 (D1-D14) | 7 | 3 | 7 | 17 |
+| 13 | 59 | 3 | 33 (22 L + 11 E) | 14 (D1-D14) | 7 | 3 | 7 | 17 |
 
 **Componentes:**
 
@@ -156,7 +156,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 | PlanDeCuentas | N1 | Catálogo jerárquico de cuentas (maestras y auxiliares). Atributo `marcoContable` como referencia inmutable al código del marco que rige el PUC. |
 | MarcoContable | N1 (configuración) | Define el marco normativo bajo el cual se construye un PUC (ej: NIIF, US-GAAP, marco local). Habilita coexistencia controlada y arquitectura PUC único + libros paralelos. |
 | ReglaDeDerivacion | N1 | Mapeo manual: dimensiones de transacción → cuenta auxiliar (Nivel A de resolución). |
-| PlantillaDeAsiento | N1 | Estructura de débitos/créditos por tipo de transacción. Catálogo precargado con 5 plantillas OXP (causacion_gasto, anticipo_a_proveedor, nota_credito_gasto, reversa_anticipo, amortizacion_anticipo). |
+| PlantillaDeAsiento | N1 | Estructura de débitos/créditos por tipo de transacción. Catálogo precargado **v1.8** con **6 plantillas OXP** (causacion_gasto, anticipo_a_proveedor, nota_credito_gasto, reversa_anticipo, amortizacion_anticipo, reclasificacion_partida). |
 | EntregaContable | N1 | Entrega individual a sistema contable destino. Resultado: aceptado/rechazado. |
 | SistemaContableDestino | N1 | Configuración del destino (SincoA&F en F1, adaptable a Siigo/Alegra). |
 | AsientoContable | N2 | Registro inmutable del hecho contable. |
@@ -180,11 +180,11 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **17 permisos atómicos** definidos con convención `accion_recurso`.
 
-**Refinamientos aplicados (integración con OXP):** grupo del PUC esperado por componente para acotar la inferencia Nivel B (D12), narración del borrador — descripción general + descripción de concepto por partida (D13), herencia del `rol` de la partida desde la plantilla y propagación a la entrega (D14), rol `CRUCE_OBLIGACION` en `causacion_gasto` (#18), plantilla `nota_credito_gasto` completada (#20), `terceroPrincipal` como fuente del tercero de la contrapartida (#28).
+**Refinamientos aplicados (integración con OXP):** grupo del PUC esperado por componente para acotar la inferencia Nivel B (D12), narración del borrador — descripción general + descripción de concepto por partida (D13), herencia del `rol` de la partida desde la plantilla y propagación a la entrega (D14), rol `CRUCE_OBLIGACION` en `causacion_gasto` (#18), plantilla `nota_credito_gasto` completada (#20), `terceroPrincipal` como fuente del tercero de la contrapartida (#28). De jul-2026: roles `PARTIDA_POR_ACLARAR`/`PARTIDA_ACLARADA` y plantilla `reclasificacion_partida` para el ciclo de la partida en disputa (#90), y rol `IMPUESTO_ASUMIDO` para las retenciones asumidas por pago con tarjeta (#94) — cuentas `porValidar` por consultor contable.
 
 **Replanteamiento (#45, #47):** Estructura Organizacional deja de ser "fuente de verdad que se consulta" — N1 valida terceros y unidades contra **copia local por suscripción**, sin consulta en caliente (`R07`, `I7b`); la reestructuración de unidades es un hecho de negocio que la capa de reportería aplica al leer (no regla nueva). Contabilidad también realiza transacciones propias de ajuste (N2): no todo proviene de dominios externos.
 
-**Estado:** Alcance v1.10, modelo v1.9 (junio 2026). N1 listo para desarrollo F1 (N2 en F2) — refinamiento con el equipo de desarrollo en curso.
+**Estado:** Alcance v1.10, modelo v1.11 (julio 2026); catálogo de plantillas v1.8, anexo de ejemplos v1.4 (5 ejemplos). N1 listo para desarrollo F1 (N2 en F2) — refinamiento con el equipo de desarrollo en curso.
 
 > Detalle: [`dominio/contabilidad/modelo-dominio.md`](dominio/contabilidad/modelo-dominio.md), [`dominio/contabilidad/anexo-marco-contable-y-arquitectura-puc.md`](dominio/contabilidad/anexo-marco-contable-y-arquitectura-puc.md)
 
@@ -225,29 +225,30 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Propósito:** Estructura centralizada de las unidades de la empresa a las que se imputan transacciones para control de gestión (centros de costo, proyectos, sucursales, departamentos). Fuente de verdad de la pregunta "¿a qué unidad de la organización pertenece esta transacción?".
 
-| Agregados raíz | Entidad interna | Value Objects | Eventos | Invariantes | Decisiones | Premisas | Pendientes | Sugerencias | Permisos |
-|:--------------:|:---------------:|:-------------:|:-------:|:-----------:|:----------:|:--------:|:----------:|:-----------:|:--------:|
-| 2 | 1 | 5 | 18 | 16 | 15 (+4 heredadas) | 5 | 3 | 11 | 22 |
+| Agregados raíz | Value Objects | Eventos | Invariantes | Decisiones | Premisas | Pendientes | Sugerencias | Permisos |
+|:--------------:|:-------------:|:-------:|:-----------:|:----------:|:--------:|:----------:|:-----------:|:--------:|
+| 3 | 5 | 18 | 15 (I01-I15) | 14 (D01-D14, +4 heredadas) | 5 | 3 | 10 (SI01-SI10) | 22 |
 
-**Dos niveles (dos agregados raíz):**
-- **GrupoOrganizacional:** Agrupador para presentación en reportes. No recibe transacciones. FSM de 2 estados.
-- **UnidadOrganizacional:** Nivel de detalle donde se imputan transacciones. FSM de 5 estados.
+**Tres agregados raíz:**
+- **GrupoOrganizacional:** Agrupador para presentación en reportes. No recibe transacciones. FSM de 2 estados. La estructura admite **varios grupos de primer nivel** (grupos sin padre — condición derivada `esDePrimerNivel()`), cada uno con su propio árbol; la consolidación "total compañía" la da la frontera del tenant (#85 — se retiró el grupo raíz único obligatorio, que nació sin justificación registrada; homologa con el ERP actual: los CC maestros son varios por empresa).
+- **UnidadOrganizacional:** Nivel de detalle donde se imputan transacciones. FSM de 5 estados. Referencia su tipo por `tipoUnidadId`.
+- **TipoUnidad:** Catálogo de tipos con ámbito del tenant (#86 — dejó de ser entidad interna del grupo raíz): id estable, nombre único por tenant y **renombrable**; el catálogo es la proyección de los tipos del tenant.
 
 **FSM de la unidad (5 estados, 7 transiciones):** `Borrador` (preparación del administrador, antes de operar) o `Activa` → opera → `Suspendida` (pausada) → reactivable → `Inactiva` (reabrible) → reabrir, o `Descartada` (único terminal estricto, antes de operar). `GrupoOrganizacional` admite `GrupoModificado` en estado `Inactivo`; la unidad no, porque participa en historial transaccional.
 
-**Gestiona:** Creación, jerarquía versionada por fecha efectiva, tipos de unidad heredados del grupo raíz, ciclo de vida, reestructuración (fusión, división, traslado como eventos de primera clase con respaldo IFRS 8).
+**Gestiona:** Creación, jerarquía versionada por fecha efectiva, tipos de unidad del tenant, ciclo de vida (descartar un borrador es siempre decisión del administrador o cascada del grupo — el descarte automático por inactividad se retiró, #87), reestructuración (fusión, división, traslado como eventos de primera clase con respaldo IFRS 8).
 
 **Cuatro decisiones arquitectónicas (anexo dedicado):**
-1. **Codificación plana + jerarquía versionada aparte** — código alfanumérico plano (sin embeber jerarquía en el código). Rompe con el patrón posicional de SincoA&F que tenía techo combinatorio y bloqueaba reestructuraciones.
+1. **Codificación plana + jerarquía versionada aparte** — código plano de **texto libre** (sin embeber jerarquía; longitud mín/máx configurable por tenant, por defecto 2-12; unicidad sin distinguir mayúsculas — #89). Rompe con el patrón posicional de SincoA&F que tenía techo combinatorio y bloqueaba reestructuraciones.
 2. **Ciclo de vida con 4 estados** (Borrador, Activa, Suspendida, Inactiva) en lugar de la dupla activo/inactivo.
 3. **Fusión, División y Traslado modelados como eventos de dominio de primera clase**, no como mutaciones silenciosas.
 4. **Modelo multi-dimensional desde el diseño**, aunque en F1 solo se exponga una dimensión.
 
-**Relación con los consumidores — copia local + diferir + señal (`[D13]`, replanteamiento #45):** EO es el **dueño único** de las unidades; no hay creación bloqueante desde consumidores. (1) Los consumidores (OXP, Contabilidad) mantienen **copia local** por eventos y nunca consultan a EO en el camino crítico. (2) Cuando un consumidor necesita una unidad que no existe, **difiere** lo que la requiere (no bloquea ni aproxima). (3) La necesidad se hace visible como **señal de demanda no bloqueante** (`DemandaDeUnidadSenalada`), que no crea nada — la corrección no depende de ella. Se eliminó el patrón viejo de creación desde consumidor (comando `SolicitarCreacionDeUnidad`, `origenSolicitud`, cancelación en cascada) y el anexo de orquestación.
+**Relación con los consumidores — copia local + diferir (`[D13]`, replanteamientos #45/#72):** EO es el **dueño único** de las unidades; no hay creación bloqueante desde consumidores. (1) Los consumidores (OXP, Contabilidad) mantienen **copia local** por eventos — una proyección **para validación del dominio, no una API de lectura para la UI**: la UI lee a EO en vivo (principio de capas, guía `datos-entre-dominios.md` §2.1). (2) Como la unidad se elige de la fuente de verdad, una unidad referenciada siempre existe en EO; si su evento aún no llegó a la copia, el consumidor **difiere** solo lo que la requiere — consistencia eventual, sin bloquear ni aproximar. (3) La **señal de demanda se retiró** (#72): con la asignación resuelta contra la fuente de verdad, quedó sin disparador. Se eliminó el patrón viejo de creación desde consumidor (comando `SolicitarCreacionDeUnidad`, `origenSolicitud`, cancelación en cascada) y el anexo de orquestación.
 
-**Patrón EDA:** publica el ciclo de vida de la unidad (`UnidadCreada`, `UnidadActivada`, `UnidadActualizada`, `UnidadSuspendida`, `UnidadReactivada`, `UnidadInactivada`, `UnidadFusionada`, `UnidadDividida`, `UnidadTrasladada`) → los consumidores actualizan su copia local. La reestructuración es un hecho de negocio que la capa de reportería de cada consumidor aplica al leer. La validación de fecha efectiva se replanteó (`[R25]`/`[I08]`, #56): EO valida localmente contra la jerarquía vigente y la coherencia con la actividad transaccional es responsabilidad del administrador (sin importar imputaciones de los consumidores — `[SI10]` retirada).
+**Patrón EDA:** publica el ciclo de vida de la unidad (`UnidadCreada`, `UnidadActivada`, `UnidadModificada`, `UnidadSuspendida`, `UnidadReactivada`, `UnidadReabierta`, `UnidadInactivada`, `UnidadDescartada`, `UnidadFusionada`, `UnidadDividida`, `UnidadTrasladada`) → los consumidores actualizan su copia local. La reestructuración es un hecho de negocio que la capa de reportería de cada consumidor aplica al leer. La validación de fecha efectiva se replanteó (`[R25]`/`[I08]`, #56): EO valida localmente contra la jerarquía vigente y la coherencia con la actividad transaccional es responsabilidad del administrador (la proyección de última imputación se retiró, #56).
 
-**Estado:** Alcance v1.4, modelo v1.6 (junio 2026). Auditoría completa (101 hallazgos) + replanteamiento #45 (copia local + diferir + señal) aplicado. Listo para desarrollo F1.
+**Estado:** Alcance v1.12, modelo v2.5, anexo de decisiones v1.6 (julio 2026). Auditoría completa (101 hallazgos) + replanteamientos #45/#72 + lote de refinamiento #85-#89 (PR #91) aplicados; numeración continua sin saltos (R1-R28, D01-D14, I01-I15, SI01-SI10 — la decisión de copia local es `[D13]`, antes D15). Listo para desarrollo F1.
 
 > Detalle: [`dominio/estructura-organizacional/definicion-alcance.md`](dominio/estructura-organizacional/definicion-alcance.md), [`dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md`](dominio/estructura-organizacional/anexo-decisiones-arquitectonicas.md)
 
@@ -273,9 +274,9 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Estrategia Seed + Sync + Extend:** carga inicial desde JSON precargados, sincronización periódica desde fuentes oficiales (Banco de la República CO, Banco Central RD), extensible por administrador.
 
-**Replanteamiento (#31):** con la eliminación del servicio de Direcciones y la introducción de los Nuggets, el alcance pasó a v2.0 — el servicio se centra en **producción de catálogos + tasas de cambio** (la estructura de direcciones la empaqueta el Nugget `DireccionFisica`).
+**Replanteamiento (#31):** con la eliminación del servicio de Direcciones y la introducción de los Nuggets, el alcance pasó a v2.0 — el servicio se centra en **producción de catálogos + tasas de cambio** (la estructura de direcciones la empaqueta el Nugget `DireccionFisica`). Los catálogos de dirección (perfiles por país, tipos de vía/complemento, códigos postales CO) se produjeron y publicaron en el #77.
 
-**Estado:** Alcance v2.0, especificación de servicio v1.0. Listo para desarrollo.
+**Estado:** Alcance v2.0 (la especificación de servicio independiente se absorbió en el replanteamiento — el alcance v2.0 y los catálogos publicados son los artefactos vigentes). Listo para desarrollo.
 
 > Detalle: [`compartido/datos-referencia/definicion-alcance.md`](compartido/datos-referencia/definicion-alcance.md)
 
@@ -289,7 +290,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Gobernanza:** filtros de admisión, proceso con custodio, versionado (catálogo y gobernanza en `compartido/nuggets/`).
 
-**Estado:** Gobernanza + catálogo, 8 nuggets aceptados en borrador (replanteamiento #31).
+**Estado:** Gobernanza + catálogo, 8 nuggets aceptados en borrador (replanteamiento #31). `DireccionFisica` es el más avanzado: datos embebidos producidos (#77) y especificación **v0.3** con la gramática formal de la línea de dirección, resuelta con el equipo de desarrollo (#100).
 
 > Detalle: [`compartido/nuggets/catalogo-nuggets.md`](compartido/nuggets/catalogo-nuggets.md), [`compartido/nuggets/gobernanza-nuggets.md`](compartido/nuggets/gobernanza-nuggets.md)
 >
@@ -348,19 +349,22 @@ Cada dominio captura al tercero **en su rol** y emite el contrato de entrada est
                           por su cuenta
 ```
 
-### Unidad organizacional — copia local + diferir + señal (`[D13]`, #45)
+### Unidad organizacional — copia local + diferir (`[D13]`, #45/#72)
 
-EO es el **dueño único**; los consumidores no lo consultan en el camino crítico.
+EO es el **dueño único**; los consumidores no lo consultan en el camino crítico. La copia local es **para validación del dominio** — la UI lee a EO en vivo (principio de capas, guía §2.1).
 
 ```
   ┌──────────┐  ciclo de vida   ┌──────────────┐
   │ Estruct. │ ───────────────► │  copia local │
   │ Organiz. │  (eventos)       │ (OXP/Contab.)│
   └──────────┘                  └──────┬───────┘
-       ▲                               │ ¿falta unidad?
-       │  señal de demanda             ▼
-       │  (no bloquea,            difiere lo que
-       └── no crea nada) ◄─────── la requiere
+                                       │ ¿el evento aún
+                                       │  no llega?
+                                       ▼
+                                difiere solo lo que la
+                                requiere — consistencia
+                                eventual, sin bloquear
+                                ni aproximar
 ```
 
 ### Tabla de integraciones
@@ -376,7 +380,7 @@ EO es el **dueño único**; los consumidores no lo consultan en el camino críti
 | Contabilidad | OXP | Evento | EntregaAceptada: consecutivo del asiento en destino | Formalizado |
 | OXP, Impuestos (fuentes de rol) | Terceros | Evento | Contrato de entrada estándar del rol (estado completo + secuencia, `[D5]`): OXP rol `Proveedor` (#38), Impuestos `PerfilTributario` (#39) | Formalizado v2.0 |
 | Terceros (bodega) | OXP, Impuestos, Contabilidad, CXC, RRHH | Evento | Publica **decisiones**: señal global Activo/Inactivo + correcciones de identidad por conciliación; cada dominio las aplica por su cuenta (sin consulta en caliente) | Formalizado v2.0 |
-| Estructura Org | OXP, Contabilidad | Eventos EDA | Ciclo de vida de la unidad (Creada/Activada/Suspendida/Reactivada/Inactivada + Fusionada/Dividida/Trasladada) → copia local del consumidor; consumidor difiere si falta y señala demanda (`[D13]`, #45) | Formalizado — modelo v1.6 |
+| Estructura Org | OXP, Contabilidad | Eventos EDA | Ciclo de vida de la unidad y del tipo de unidad → copia local del consumidor (para validación; la UI lee a EO en vivo); el consumidor difiere por consistencia eventual (`[D13]`, #45/#72) | Formalizado — modelo v2.5 |
 | Datos de Referencia | Todos (vía Nuggets) | Lectura | Catálogos (países, divisiones, monedas, tipos doc., tasas de cambio); los Nuggets `Pais`/`Moneda`/`DivisionTerritorial` son la fuente única dentro del paquete | Formalizado v2.0 |
 | Recepción Electrónica | OXP | Evento | Documento validado → radicación automática | Futuro |
 | Emisión Electrónica | CXC | Evento | Hecho de ingreso → emisión de factura electrónica | Futuro |
@@ -416,10 +420,10 @@ Datos de Referencia ──► Nuggets ──► (terceros y unidades
 | Datos de Referencia | Todos (catálogos) | Ninguno | **v2.0 — listo para desarrollo** |
 | Nuggets | Todos (validación empaquetada) | Datos de Referencia | **8 nuggets aceptados (borrador)** |
 | Terceros (bodega) | Consolida roles; publica señal global | Nuggets (clave natural) | **v2.0.2 — cerrado para desarrollo F1** |
-| Estructura Org | OXP, Contabilidad (copia local de unidades) | Datos de Referencia | **v1.6 — listo para desarrollo F1** |
+| Estructura Org | OXP, Contabilidad (copia local de unidades) | Datos de Referencia | **v2.5 — listo para desarrollo F1** |
 | Impuestos | OXP (cálculo tributario) | Nuggets, Datos de Referencia | **v2.0.5 — modelo completo + catálogos F1** |
-| Contabilidad | OXP (confirmación de asiento) | Terceros, Estructura Org (copia local) | **v1.9 — N1 listo para desarrollo F1** |
-| OXP | Terceros (rol Proveedor) | Impuestos, Contabilidad, Estructura Org (copia local) | **v4.3 — Fase 2 (refinamiento continuo)** |
+| Contabilidad | OXP (confirmación de asiento) | Terceros, Estructura Org (copia local) | **v1.11 — N1 listo para desarrollo F1** |
+| OXP | Terceros (rol Proveedor) | Impuestos, Contabilidad, Estructura Org (copia local) | **v4.7 — Fase 2 (refinamiento continuo)** |
 
 ### Estado actual de construcción
 
@@ -427,9 +431,9 @@ Datos de Referencia ──► Nuggets ──► (terceros y unidades
 - 🟡 **Nuggets** — 8 nuggets aceptados en borrador (gobernanza + catálogo).
 - ✅ **Terceros** — v2.0.2 cerrado para desarrollo F1 (bodega consolidadora, 2 auditorías).
 - ✅ **Impuestos** — modelo v2.0.5 completo + catálogos F1 (LatAm CO/DO/PA, apertura US/CA F2).
-- ✅ **Estructura Organizacional** — modelo v1.6 listo F1 (replanteamiento #45: copia local + diferir + señal).
-- ✅ **Contabilidad** — v1.9, N1 listo F1 (MarcoContable + arquitectura PUC + grupo PUC esperado + copia local de datos maestros).
-- 🔄 **OXP** — v4.3, Fase 2. Integración con Contabilidad **cerrada** y con Estructura Organizacional documentada; refinamiento continuo.
+- ✅ **Estructura Organizacional** — modelo v2.5 listo F1 (copia local + diferir; lote #85-#89 aplicado: varios grupos de primer nivel, `TipoUnidad` agregado propio, código de texto libre).
+- ✅ **Contabilidad** — v1.11, N1 listo F1 (MarcoContable + arquitectura PUC + grupo PUC esperado + copia local de datos maestros; catálogo de plantillas v1.8 con 6 plantillas).
+- 🔄 **OXP** — v4.7, Fase 2. Integración con Contabilidad **cerrada** y con Estructura Organizacional documentada; refinamiento continuo.
 
 ### Siguiente paso
 
@@ -445,7 +449,7 @@ Los sub-dominios base (Terceros, Estructura Org, Datos de Referencia, Nuggets) y
 | **Impuestos** | Configuración fiscal multi-país LatAm (CO/DO/PA, 11+5+4 tributos preconfigurados), motor de cálculo, perfiles tributarios con actividad económica por jurisdicción, carga asistida, registro tributario, gestión de jurisdicciones fiscales (incluido Puerto Libre San Andrés), regímenes especiales empresariales (zonas francas, monopolios departamentales CO, ZEEs panameñas) | Reportes de información (exógena, DGII), certificados tributarios, homologación fiscal, apertura multi-país a US/CA (distritos fiscales especiales, soberanías tributarias, resolución por dirección/geocoding) |
 | **Contabilidad** | N1: Motor de traducción + entrega a SincoA&F. Cadena de resolución 3 niveles. Consola de contabilización. Aprendizaje. **MarcoContable** + arquitectura PUC único + libros paralelos (Principal, Fiscal). Validación contractual del motor (rechazos pre-borrador). | N2: Sistema contable propio (asientos, períodos, libros, numeración). Libros adicionales bajo demanda. Adaptadores adicionales (Siigo, Alegra). |
 | **Terceros** | **Bodega consolidadora:** consolidación de roles por clave natural, conciliación de duplicados y divergencias con resolución humana, señal global Activo/Inactivo, asistencia de captura no bloqueante, vista consolidada de lectura. | Resolución de duplicados tardíos adicional, recepción electrónica |
-| **Estructura Org** | Grupos, unidades con codificación plana + jerarquía versionada, FSM de 5 estados, copia local en los consumidores + diferir + señal de demanda (`[D13]`), fusión/división/traslado como eventos de primera clase, eventos EDA | Multi-dimensionalidad expuesta (más allá de la dimensión inicial) |
+| **Estructura Org** | Grupos, unidades con codificación plana + jerarquía versionada, FSM de 5 estados, copia local en los consumidores + diferir por consistencia eventual (`[D13]`), fusión/división/traslado como eventos de primera clase, eventos EDA | Multi-dimensionalidad expuesta (más allá de la dimensión inicial) |
 | **Datos de Referencia** | 5 catálogos base (países, divisiones, monedas, tipos de documento, tasas de cambio), estrategia Seed + Sync + Extend | Extensiones por país, validación avanzada |
 | **Nuggets** | 8 value objects transversales empaquetados (identificación legal, dirección física, teléfono, correo, país, moneda, división territorial, contacto) + gobernanza con custodio | Nuggets diferidos (`ValorMonetario`, `Vigencia`) |
 
@@ -744,7 +748,7 @@ Un cliente puede empezar con un producto y escalar sin fricción. Cada módulo s
 | [`compartido/nuggets/catalogo-nuggets.md`](compartido/nuggets/catalogo-nuggets.md) | Catálogo de Nuggets (8 aceptados en borrador) |
 | [`compartido/asistente-onboarding/`](compartido/asistente-onboarding/) | Asistente de Onboarding (caso PUC v1.0): patrón transversal de carga inicial |
 | [`compartido/anexo-decision-i18n-l10n.md`](compartido/anexo-decision-i18n-l10n.md) | Decisión transversal de internacionalización/localización |
-| [`guias-de-modelado/datos-entre-dominios.md`](guias-de-modelado/datos-entre-dominios.md) | Criterio transversal: dueño único + réplica local por eventos + diferir/señalar (fundamento del replanteamiento #31/#45) |
+| [`guias-de-modelado/datos-entre-dominios.md`](guias-de-modelado/datos-entre-dominios.md) | Criterio transversal: dueño único + réplica local por eventos + diferir; principio de capas §2.1 — la copia es para validación, la UI lee al dueño en vivo (fundamento de los replanteamientos #31/#45/#72) |
 | [`guias-de-modelado/topologia-equipos-despliegue.md`](guias-de-modelado/topologia-equipos-despliegue.md) | Topología de equipos y despliegue |
 | [`integraciones/entre-dominios/catalogo-conceptos-por-dominio.md`](integraciones/entre-dominios/catalogo-conceptos-por-dominio.md) | Modelo federado de catálogos, contratos entre dominios |
 | [`plan-trabajo-junio.md`](plan-trabajo-junio.md) | Plan de ejecución con orden de prioridad |
@@ -753,7 +757,7 @@ Un cliente puede empezar con un producto y escalar sin fricción. Cada módulo s
 
 ## 8. Avance por sub-dominio
 
-> Snapshot al **22 de junio de 2026**. Refleja completitud de los artefactos de diseño que habilitan el inicio de desarrollo, no el avance de la implementación en código.
+> Snapshot al **10 de julio de 2026**. Refleja completitud de los artefactos de diseño que habilitan el inicio de desarrollo, no el avance de la implementación en código.
 
 ### Metodología
 
@@ -778,47 +782,48 @@ El porcentaje de avance combina cinco hitos. Cada hito tiene un peso fijo y se e
 | **Refinamiento** | 30% | Consultas del equipo de diseño y del equipo de desarrollo resueltas y aplicadas. |
 | **Listo para F1** | 10% | Catálogos precargados disponibles, contratos con consumidores cerrados |
 
-> **Nota — peso del Refinamiento (30%):** Refleja que ningún artefacto puede considerarse listo para desarrollo hasta que sea validado por el equipo de desarrollo que lo va a usar. La auditoría asegura coherencia interna del modelo; el refinamiento asegura coherencia con la realidad operativa del diseño y la viabilidad técnica. Hoy **OXP, Impuestos y Contabilidad** tienen refinamiento en progreso (issues del equipo de desarrollo aplicados — ej: #18/#25/#28/#30/#38/#51 en OXP, #39 en Impuestos, #17/#18/#20/#28/#47 en Contabilidad), y **Terceros y Estructura Organizacional** absorbieron el replanteamiento arquitectónico #31/#45 (bodega consolidadora y copia local + diferir + señal) además de sus auditorías.
+> **Nota — peso del Refinamiento (30%):** Refleja que ningún artefacto puede considerarse listo para desarrollo hasta que sea validado por el equipo de desarrollo que lo va a usar. La auditoría asegura coherencia interna del modelo; el refinamiento asegura coherencia con la realidad operativa del diseño y la viabilidad técnica. Hoy **OXP, Impuestos y Contabilidad** tienen refinamiento en progreso (issues del equipo de desarrollo aplicados — ej: #18/#25/#28/#30/#38/#51/#90/#94 en OXP, #39/#93 en Impuestos, #17/#18/#20/#28/#47/#90/#94 en Contabilidad), **Estructura Organizacional** cerró además el lote #85-#89 del refinamiento (jul-2026) sobre los replanteamientos #31/#45/#72, y **Terceros** absorbió el replanteamiento #31 (bodega consolidadora) además de sus auditorías.
 
 ### Tabla de avance
 
 | Sub-dominio | Alcance | Modelo / Especificación | Auditoría | Refinamiento | Listo F1 | **Avance** |
 |-------------|:-------:|:-----------------------:|:---------:|:------------:|:--------:|:----------:|
-| Datos de Referencia | ✅ | ✅ | — | 🟡 (50%) | ⬜ | **75%** |
-| Nuggets | ✅ | 🟡 (40%) | — | ⬜ | ⬜ | **42%** |
+| Datos de Referencia | ✅ | ✅ | — | 🟡 (60%) | ⬜ | **78%** |
+| Nuggets | ✅ | 🟡 (45%) | — | 🟡 (10%) | ⬜ | **47%** |
 | Terceros | ✅ | ✅ | ✅ | 🟡 (50%) | ⬜ | **75%** |
-| Estructura Organizacional | ✅ | ✅ | ✅ | 🟡 (50%) | ⬜ | **75%** |
-| OXP | ✅ | ✅ | ✅ | 🟡 (70%) | ⬜ | **81%** |
-| Contabilidad | ✅ | ✅ | ✅ | 🟡 (70%) | ⬜ | **81%** |
-| Impuestos | ✅ | ✅ | ✅ | 🟡 (80%) | ⬜ | **84%** |
+| Estructura Organizacional | ✅ | ✅ | ✅ | 🟡 (70%) | ⬜ | **81%** |
+| OXP | ✅ | ✅ | ✅ | 🟡 (75%) | ⬜ | **82%** |
+| Contabilidad | ✅ | ✅ | ✅ | 🟡 (75%) | ⬜ | **82%** |
+| Impuestos | ✅ | ✅ | ✅ | 🟡 (85%) | ⬜ | **85%** |
 
 > Los porcentajes son estimaciones del snapshot bajo la metodología de arriba; el factor que falta para el 100% en todos es la validación final con el equipo de desarrollo y el cierre formal de "Listo F1".
 
 **Lectura del cuadro:**
-- **Impuestos lidera** con 84% — refinamiento por consultores fiscales más avanzado, catálogos F1 entregados.
-- **OXP y Contabilidad (81%)** tienen refinamiento del equipo de desarrollo activo; OXP está en Fase 2 (refinamiento continuo) con el modelo ya maduro (v4.3) y la integración con Contabilidad y Estructura Organizacional cerrada.
-- **Terceros y Estructura Organizacional (75%)** absorbieron el replanteamiento arquitectónico #31/#45 (bodega consolidadora; copia local + diferir + señal) además de sus auditorías; resta la validación final con el equipo de desarrollo.
-- **Datos de Referencia (75%)** completó alcance v2.0 + especificación; **Nuggets (42%)** tiene gobernanza y catálogo, con las 8 especificaciones en borrador.
+- **Impuestos lidera** con 85% — refinamiento por consultores fiscales más avanzado (activo: #93 resuelto con la consultoría), catálogos F1 entregados.
+- **OXP y Contabilidad (82%)** tienen refinamiento del equipo de desarrollo activo (últimos: partida en disputa #90 y retenciones asumidas #94, con la consultoría fiscal); OXP está en Fase 2 (refinamiento continuo) con el modelo maduro (v4.7) y la integración con Contabilidad y Estructura Organizacional cerrada.
+- **Estructura Organizacional (81%)** cerró el lote #85-#89 (varios grupos de primer nivel, `TipoUnidad` agregado propio, retiro del descarte automático, código de texto libre, numeración continua) sobre los replanteamientos #31/#45/#72; resta la validación final con el equipo de desarrollo.
+- **Terceros (75%)** absorbió el replanteamiento #31 (bodega consolidadora) además de sus auditorías; resta la validación final con el equipo de desarrollo.
+- **Datos de Referencia (78%)** completó alcance v2.0 y publicó los catálogos de dirección (#77); **Nuggets (47%)** tiene gobernanza y catálogo, con `DireccionFisica` v0.3 ya consultada por el equipo de desarrollo (#100) y las demás especificaciones en borrador.
 
 ### Detalle de los parciales
 
-**Impuestos — 84%**
-- ✅ Alcance v1.5, Modelo v2.0.5, Auditoría aplicada (2 rondas).
-- 🟡 Refinamiento en progreso (~80%) — catálogos fiscales F1 entregados (962 entradas CO/DO/PA); #39 (perfil sin registro centralizado) aplicado; resta el refinamiento por consultores fiscales sobre las secciones "Revisión pendiente".
+**Impuestos — 85%**
+- ✅ Alcance v1.5, Modelo v2.0.5, Auditoría aplicada (2 rondas). Catálogo tributario CO v1.1.
+- 🟡 Refinamiento en progreso (~85%) — catálogos fiscales F1 entregados (962 entradas CO/DO/PA); #39 (perfil sin registro centralizado) y #93 (ICA solo ingreso, validado con la consultoría fiscal) aplicados; resta el refinamiento por consultores sobre las secciones "Revisión pendiente" (abierto: #97, cuantía mínima como política de empresa).
 - ⬜ Listo F1 — depende del cierre del refinamiento.
-- **Cálculo:** 20 + 25 + 15 + (30 × 0.80) + 0 = 84 ≈ **84%**.
+- **Cálculo:** 20 + 25 + 15 + (30 × 0.85) + 0 = 85.5 ≈ **85%**.
 
-**OXP — 81%**
-- ✅ Alcance v1.15, Modelo v4.3, Auditoría: 3 rondas aplicadas. Modelo maduro: integración con Contabilidad y con Estructura Organizacional **cerradas**; ubicaciones hacia Impuestos resueltas (`lugarEjecucion`).
-- 🟡 Refinamiento en progreso (~70%, Fase 2 continuo) — #18/#25/#26/#28/#30/#38/#48/#51/#57 aplicados.
+**OXP — 82%**
+- ✅ Alcance v1.17, Modelo v4.7, Auditoría: 3 rondas aplicadas. Modelo maduro: integración con Contabilidad y con Estructura Organizacional **cerradas**; ubicaciones hacia Impuestos resueltas (`lugarEjecucion`).
+- 🟡 Refinamiento en progreso (~75%, Fase 2 continuo) — #18/#25/#26/#28/#30/#38/#48/#51/#57/#72/#90/#94 aplicados (abierto: #96, canonización del medio de pago).
 - ⬜ Listo F1 — depende del cierre del refinamiento.
-- **Cálculo:** 20 + 25 + 15 + (30 × 0.70) + 0 = 81 ≈ **81%**.
+- **Cálculo:** 20 + 25 + 15 + (30 × 0.75) + 0 = 82.5 ≈ **82%**.
 
-**Contabilidad — 81%**
-- ✅ Alcance v1.10, Modelo v1.9, Auditoría aplicada.
-- 🟡 Refinamiento en progreso (~70%) — #7/#8/#9 (grupo PUC, narración, herencia del rol), #17 (unidad de la contrapartida), #18 (rol CRUCE_OBLIGACION), #20 (nota_credito_gasto), #28 (terceroPrincipal) y #47 (copia local de datos maestros) aplicados.
+**Contabilidad — 82%**
+- ✅ Alcance v1.10, Modelo v1.11, Auditoría aplicada. Catálogo de plantillas v1.8 (6 plantillas), anexo de ejemplos v1.4.
+- 🟡 Refinamiento en progreso (~75%) — #7/#8/#9 (grupo PUC, narración, herencia del rol), #17 (unidad de la contrapartida), #18 (rol CRUCE_OBLIGACION), #20 (nota_credito_gasto), #28 (terceroPrincipal), #47 (copia local de datos maestros), #90 (partida en disputa) y #94 (retenciones asumidas) aplicados (abierto: #98, IVA descontable vs mayor valor).
 - ⬜ Listo F1 — depende del cierre del refinamiento.
-- **Cálculo:** 20 + 25 + 15 + (30 × 0.70) + 0 = 81 ≈ **81%**.
+- **Cálculo:** 20 + 25 + 15 + (30 × 0.75) + 0 = 82.5 ≈ **82%**.
 
 **Terceros — 75%**
 - ✅ Alcance v2.0, Modelo v2.0.2, Auditoría aplicada (2 rondas: 28 + 6 hallazgos).
@@ -826,11 +831,11 @@ El porcentaje de avance combina cinco hitos. Cada hito tiene un peso fijo y se e
 - ⬜ Listo F1 — depende del cierre del refinamiento.
 - **Cálculo:** 20 + 25 + 15 + (30 × 0.50) + 0 = 75 ≈ **75%**.
 
-**Estructura Organizacional — 75%**
-- ✅ Alcance v1.4, Modelo v1.6, Auditoría completa (101 hallazgos).
-- 🟡 Refinamiento en progreso (~50%) — replanteamiento #45 (copia local + diferir + señal, `[D13]`) aplicado de punta a punta.
+**Estructura Organizacional — 81%**
+- ✅ Alcance v1.12, Modelo v2.5 (anexo de decisiones v1.6), Auditoría completa (101 hallazgos).
+- 🟡 Refinamiento en progreso (~70%) — replanteamientos #45/#72 (copia local + diferir, `[D13]`) y el lote #85-#89 (varios grupos de primer nivel, `TipoUnidad` agregado propio, retiro del descarte automático, código de texto libre, numeración continua sin saltos) aplicados de punta a punta.
 - ⬜ Listo F1 — depende del cierre del refinamiento.
-- **Cálculo:** 20 + 25 + 15 + (30 × 0.50) + 0 = 75 ≈ **75%**.
+- **Cálculo:** 20 + 25 + 15 + (30 × 0.70) + 0 = 81 ≈ **81%**.
 
 ### Camino crítico restante
 
