@@ -15,7 +15,7 @@ Definición de los sub-dominios de un ERP mediante documentos de diseño convers
 | `dominio/estructura-organizacional/` | Estructura Organizacional | Alcance v1.4, Modelo v1.6 — replanteamiento #45 (copia local + diferir + señal), listo para desarrollo (F1) |
 | `compartido/datos-referencia/` | Datos de Referencia (catálogos base del ERP) | Alcance v2.0 — replanteamiento jun-2026 (catálogos como Nuggets + tasas de cambio) |
 | `compartido/nuggets/` | Nuggets (value objects transversales empaquetados: identificación legal, dirección, contacto, país, moneda, etc.) | Catálogo + gobernanza — 8 nuggets aceptados (replanteamiento #31) |
-| `compartido/asistente-onboarding/` | Asistente de Onboarding (caso PUC en v1.0; transversal a otros casos futuros) | Alcance v1.0, Modelo v1.0, Caso PUC v1.0 — Listo para desarrollo (F1) |
+| `compartido/asistente-onboarding/` | Asistente de Onboarding (caso PUC en v1.0; transversal a otros casos futuros) | Alcance v1.0, Modelo v1.0, Caso PUC v1.0 — en refinamiento |
 | *(pendiente)* | Tesorería | No iniciado |
 | *(pendiente)* | Emisión Electrónica | No iniciado |
 | *(pendiente)* | Recepción Electrónica | No iniciado |
