@@ -2,7 +2,7 @@
 
 > **Fecha:** Julio 2026
 > **Propósito:** Ejemplificar cómo los sub-dominios transaccionales emiten líneas de traducción mediante `lineasParaTraduccion()` y cómo el motor de traducción de Contabilidad las transforma en asientos contables mediante la cadena de resolución. Este anexo respalda las definiciones de *plantilla de asiento*, *línea de traducción* y *cadena de resolución* del glosario del sub-dominio de Contabilidad.
-> **Versión:** 1.4
+> **Versión:** 1.5
 
 ---
 
@@ -51,7 +51,7 @@ Todos los sub-dominios emiten líneas con el mismo contrato. Contabilidad es agn
 |-------|-------------|---------------|----------------------|
 | `tipoTransaccion` | Tipo de transacción contable. Define qué plantilla de asiento aplica. | `causacion_gasto` | `causacion_ingreso` |
 | `tipoComponente` | Tipo del componente del hecho económico. Define el rol dentro del asiento. | `gasto`, `iva`, `retefuente` | `ingreso`, `iva_generado`, `retefuente_practicada` |
-| `clasificacion` | Clasificación de negocio del componente. Clave para derivar la cuenta. | `honorarios`, `servicios` | `venta_inmueble`, `administracion` |
+| `clasificacion` | Texto semántico de emparejamiento, compuesto mecánicamente por el consumidor según el tipo de componente a partir de datos de sus catálogos. Obligatorio en toda línea [R52]. Insumo de la resolución de cuenta en las tres capas (similitud en A/C, comparación contra descripciones del PUC en B). | `"Servicios de auditoría externa · honorarios · servicios profesionales"` | `"venta apartamento proyecto Alameda · vivienda nueva"` |
 | `tercero` | Identificación del tercero (tipo, número, razón social). | `{ NIT, 900123456, "Auditoría SAS" }` | `{ CC, 1234567, "Juan Pérez" }` |
 | `empresa` | Identificación de la empresa que produce el hecho económico. | `COSMOS-SAS` | `COSMOS-SAS` |
 | `unidadOrganizacional` | Código del destino de negocio (Shared Kernel). | `VTA-001` | `PRY-042` |
@@ -61,12 +61,13 @@ Todos los sub-dominios emiten líneas con el mismo contrato. Contabilidad es agn
 | `referenciaOrigen` | ID del agregado + evento que originó la línea. Referencia técnica para trazabilidad interna. | `oxp-comercio-{id}/OxpComercioCausada` | `factura-{id}/FacturaEmitida` |
 | `documentoFuente` | Identificador del documento que origina el asiento. Es lo que el usuario ve en el auxiliar contable como columna de referencia. Cada consumidor envía lo que es relevante para su documento (número de factura, número de obligación, número de pago, etc.). Contabilidad no interpreta este campo — solo lo persiste y lo muestra. | `OXP-COM-5678` | `FV-001234` |
 | `subDominioOrigen` | Sub-dominio que emite. | `OXP` | `CXC` |
-| `referenciaHechoRelacionado` | (Opcional) Referencia al hecho económico original cuando la línea corresponde a una devolución, nota crédito u otro hecho derivado. Null para hechos originales. N1 conserva esta referencia en el borrador y la propaga al destino. Una OXP puede tener múltiples hechos relacionados (varias devoluciones), pero cada hecho relacionado referencia a un solo hecho original. | `null` | `factura-{id}/FacturaEmitida` |
+| `referenciaHechoRelacionado` | (Opcional) Referencia al hecho económico original cuando la línea corresponde a una devolución, nota crédito u otro hecho derivado. Null para hechos originales. N1 conserva esta referencia en el borrador y la propaga al destino. Una OXP puede tener múltiples hechos relacionados (varias devoluciones), pero cada hecho relacionado referencia a un solo hecho original. **Además habilita la resolución por espejo [R53]:** cuando el componente está marcado con `resolucionPorEspejo` en la plantilla (cruces, aclaraciones, amortizaciones/reversas de anticipo, nota crédito), el motor copia la cuenta de la partida del rol espejado en el borrador de este hecho relacionado. | `null` | `factura-{id}/FacturaEmitida` |
 
 **Principios del contrato:**
 - Cada sub-dominio tiene sus propios componentes internos, pero todos implementan `lineasParaTraduccion()` que produce `List<LineaTraduccion>` con este contrato.
 - El valor llega **ya distribuido** — Contabilidad no distribuye.
-- La clasificación usa **códigos de referencia** de los catálogos del sub-dominio emisor e Impuestos — no valores fiscales específicos de un país.
+- La clasificación es **texto semántico compuesto mecánicamente por el emisor** a partir de datos de sus catálogos y de Impuestos (ej. OXP para el gasto: descripción del concepto + concepto de pago + clasificación tributaria) — no la digita un usuario, no es un código ni una llave, y es **obligatoria en toda línea** [R52]. Las recetas de composición por componente viven en el modelo de cada emisor.
+- La **contrapartida también viaja como línea** (`tipoComponente = contrapartida`), con su tercero y su clasificación (ej. medio de pago + observación general) pero **sin valor ni unidad organizacional**: el valor lo calcula el motor para balancear y la unidad se rinde según la preferencia de la empresa [R54] [I33]. Así Contabilidad no conoce los campos internos de cada consumidor. El `terceroPrincipal` del hecho económico se conserva como informativo.
 - Contabilidad no necesita saber qué agregado o qué dominio generó la línea para traducirla. Solo necesita las dimensiones del contrato.
 - El `documentoFuente` es el campo visible para el usuario en auxiliares y reportes. Es responsabilidad del consumidor decidir qué identificador es relevante (número de factura, número de obligación, número de pago, etc.). La plantilla de asiento puede definir si este campo es obligatorio según el tipo de transacción.
 
@@ -89,33 +90,48 @@ Ejemplos de plantillas universales:
 
 Lo que **varía por empresa** es a qué cuenta auxiliar específica va cada rol. Eso lo resuelve la cadena de resolución.
 
-> **Grupo del PUC esperado (`grupoPucEsperado`):** Cada componente que alimenta un rol declara los grupos del PUC (prefijos de código de cuenta, de longitud variable) a los que debe pertenecer su cuenta. Esto **acota la inferencia (Nivel B)** a las cuentas cuyo código inicia por alguno de esos prefijos — formaliza lo que en los ejemplos de abajo se describe a mano ("busca cuentas… en el grupo 2408"). El grupo vive en el componente porque un rol agrupa varios `tipoComponente` que caen en grupos distintos (RETENCION: `retefuente`→`2365`, `reteiva`→`2367`); la contrapartida lo declara a nivel del rol. No reemplaza la cadena de resolución — solo orienta el Nivel B. Ver `modelo-dominio.md` [D12] y `definicion-alcance.md` [R47]. Los grupos mostrados en este anexo son ilustrativos para los ejemplos de OXP; el grupo del `inc` y el llenado del inventario completo (Sección 5) quedan pendientes de revisión por consultor contable.
+> **Grupo del PUC esperado (`grupoPucEsperado`):** Cada componente que alimenta un rol declara los grupos del PUC (prefijos de código de cuenta, de longitud variable) a los que debe pertenecer su cuenta. Esto **acota la inferencia (Nivel B)** a las cuentas cuyo código inicia por alguno de esos prefijos — formaliza lo que en los ejemplos de abajo se describe a mano ("busca cuentas… en el grupo 2408"). El grupo vive en el componente porque un rol agrupa varios `tipoComponente` que caen en grupos distintos (RETENCION: `retefuente`→`2365`, `reteiva`→`2367`); desde [D15] la contrapartida también lo declara en su componente (`contrapartida`). No reemplaza la cadena de resolución — solo orienta el Nivel B. Ver `modelo-dominio.md` [D12] y `definicion-alcance.md` [R47]. Los grupos mostrados en este anexo son ilustrativos para los ejemplos de OXP; el grupo del `inc` y el llenado del inventario completo (Sección 5) quedan pendientes de revisión por consultor contable.
 
 ### 1.4 Cadena de resolución de cuentas
 
-Para cada rol del asiento, el motor resuelve la cuenta auxiliar con tres niveles en orden de precedencia:
+Para cada rol del asiento, el motor resuelve la cuenta auxiliar. Los componentes que representan la contraparte de un hecho anterior se resuelven **por espejo** [R53]; los demás, por la cadena de tres niveles en orden de precedencia. En los tres niveles el insumo es el mismo: la **clasificación** de la línea [R52].
 
 ```
 ¿Qué cuenta auxiliar corresponde a este rol?
 
+0. Espejo del hecho relacionado (solo componentes marcados)
+   │  ¿La plantilla declara resolucionPorEspejo para este
+   │  componente? (cruces, aclaraciones, amortizaciones y
+   │  reversas de anticipo, nota crédito)
+   │  → Copia la cuenta de la partida del rol espejado en el
+   │     borrador del hecho relacionado (referenciaHechoRelacionado).
+   │  → Si el hecho relacionado no está (ej. saldos migrados):
+   │     borrador PENDIENTE — nunca se adivina por similitud.
+   │
+   │  No es componente de espejo
+   ▼
 1. Nivel A — Regla manual (excepción)
-   │  ¿El analista contable creó una regla específica para esta
-   │  combinación de dimensiones?
+   │  Dentro de la partición exacta (tipoTransaccion, tipoComponente,
+   │  empresa), ¿alguna regla del analista contable tiene un texto
+   │  ancla suficientemente similar a la clasificación de la línea?
    │  Prevalece sobre todo lo demás.
    │
    │  No encontró
    ▼
 2. Nivel C — Aprendizaje (predeterminado)
-   │  ¿El sistema aprendió de un asiento anterior con las mismas
-   │  dimensiones? (el usuario confirmó o corrigió previamente)
-   │  Aplica lo aprendido.
+   │  Dentro de la misma partición, ¿alguna resolución aprendida
+   │  tiene texto igual o suficientemente similar? (el usuario
+   │  confirmó o corrigió previamente)
+   │  Aplica la de mayor similitud. El texto idéntico (compra
+   │  repetida) siempre resuelve.
    │
    │  No encontró
    ▼
 3. Nivel B — Inferencia (predeterminado)
-   │  El sistema analiza el plan de cuentas del cliente
-   │  (nombre, código, jerarquía) y sugiere la cuenta más
-   │  probable.
+   │  El sistema compara la clasificación de la línea contra el
+   │  plan de cuentas del cliente (nombre, código, jerarquía),
+   │  acotado al grupo del PUC esperado, y sugiere la cuenta
+   │  más probable.
    │  → Presenta la sugerencia al usuario
    │  → El usuario confirma o corrige
    │  → Alimenta el nivel C para la próxima vez
@@ -128,7 +144,7 @@ Para cada rol del asiento, el motor resuelve la cuenta auxiliar con tres niveles
    → La asignación alimenta el nivel C para la próxima vez.
 ```
 
-**Ciclo de retroalimentación:** Cada interacción del usuario (confirmación, corrección, asignación manual) enriquece el nivel C. Con el tiempo, el sistema requiere menos intervención. El analista contable puede promover un aprendizaje del nivel C a una regla formal del nivel A cuando quiere que sea explícita e inmutable.
+**Ciclo de retroalimentación:** Cada interacción del usuario (confirmación, corrección, asignación manual) enriquece el nivel C. Con el tiempo, el sistema requiere menos intervención. El analista contable puede promover un aprendizaje del nivel C a una regla formal del nivel A cuando quiere que sea explícita e inmutable — el texto aprendido se copia como texto ancla de la regla. Las partidas resueltas por espejo no alimentan el aprendizaje: su cuenta es determinística, no aprendida.
 
 ---
 
@@ -168,12 +184,15 @@ La función aplana los componentes × destinos y produce líneas con el contrato
 
 | # | tipoTransaccion | tipoComponente | clasificacion | tercero | empresa | unidadOrg | valor | moneda | fecha |
 |---|-----------------|---------------|---------------|---------|---------|-----------|-------|--------|-------|
-| 1 | causacion_gasto | gasto | HONORARIOS | 900123456 | COSMOS-SAS | VTA-001 | 600.000 | COP | 2026-03-15 |
-| 2 | causacion_gasto | gasto | HONORARIOS | 900123456 | COSMOS-SAS | ADM-001 | 400.000 | COP | 2026-03-15 |
-| 3 | causacion_gasto | iva | IVA-19 | 900123456 | COSMOS-SAS | VTA-001 | 114.000 | COP | 2026-03-15 |
-| 4 | causacion_gasto | iva | IVA-19 | 900123456 | COSMOS-SAS | ADM-001 | 76.000 | COP | 2026-03-15 |
-| 5 | causacion_gasto | retefuente | RTFT-HON-11 | 900123456 | COSMOS-SAS | VTA-001 | 66.000 | COP | 2026-03-15 |
-| 6 | causacion_gasto | retefuente | RTFT-HON-11 | 900123456 | COSMOS-SAS | ADM-001 | 44.000 | COP | 2026-03-15 |
+| 1 | causacion_gasto | gasto | "Servicios de auditoría externa · honorarios · servicios profesionales" | 900123456 | COSMOS-SAS | VTA-001 | 600.000 | COP | 2026-03-15 |
+| 2 | causacion_gasto | gasto | "Servicios de auditoría externa · honorarios · servicios profesionales" | 900123456 | COSMOS-SAS | ADM-001 | 400.000 | COP | 2026-03-15 |
+| 3 | causacion_gasto | iva | "honorarios · iva 19%" | 900123456 | COSMOS-SAS | VTA-001 | 114.000 | COP | 2026-03-15 |
+| 4 | causacion_gasto | iva | "honorarios · iva 19%" | 900123456 | COSMOS-SAS | ADM-001 | 76.000 | COP | 2026-03-15 |
+| 5 | causacion_gasto | retefuente | "honorarios · retención en la fuente 11%" | 900123456 | COSMOS-SAS | VTA-001 | 66.000 | COP | 2026-03-15 |
+| 6 | causacion_gasto | retefuente | "honorarios · retención en la fuente 11%" | 900123456 | COSMOS-SAS | ADM-001 | 44.000 | COP | 2026-03-15 |
+| 7 | causacion_gasto | contrapartida | "crédito con el proveedor · honorarios de auditoría externa" | 900123456 | COSMOS-SAS | — | — (motor) | COP | 2026-03-15 |
+
+La clasificación de cada línea la compone OXP según su receta por componente (`gasto`: descripción del concepto + concepto de pago + clasificación tributaria; tributos: concepto de pago + nombre y % del tributo; `contrapartida`: medio de pago + observación general). La línea 7 viaja **sin valor ni unidad organizacional** — el motor balancea y aplica la preferencia de la empresa [R54].
 
 ### 2.3 Plantilla de asiento (código del producto)
 
@@ -184,62 +203,80 @@ El motor identifica `tipoTransaccion = causacion_gasto` y aplica la plantilla un
 | GASTO | Débito | Líneas con `tipoComponente = gasto` | `["51","52","53"]` | Cuenta de gasto según clasificación |
 | IMPUESTO | Débito | Líneas con `tipoComponente = iva, inc, ...` | `iva → ["2408"]` · `inc → [...]` (a validar) | Cuenta de impuesto según tipo de tributo |
 | RETENCION | Crédito | Líneas con `tipoComponente = retefuente, reteiva, ...` | `retefuente → ["2365"]` · `reteiva → ["2367"]` | Cuenta de retención según tipo de tributo |
-| CONTRAPARTIDA | Crédito | Generada por el motor | `["2205","2335"]` (a nivel de rol) | Cuenta por pagar. Valor = suma(débitos) - suma(créditos anteriores) |
+| CONTRAPARTIDA | Crédito | Línea con `tipoComponente = contrapartida` (valor: motor) | `["2205","2335"]` | Cuenta por pagar. Valor = suma(débitos) - suma(créditos anteriores) |
 
 ### 2.4 Cadena de resolución — cuenta por cuenta
 
-**Línea #1 — Rol GASTO (gasto, HONORARIOS, VTA-001):**
+**Línea #1 — Rol GASTO (gasto, "Servicios de auditoría externa · honorarios · servicios profesionales", VTA-001):**
 
 ```
-Nivel A: ¿Regla manual para empresa=COSMOS-SAS + clasificacion=HONORARIOS?
+Partición: (causacion_gasto, gasto, COSMOS-SAS)
+
+Nivel A: ¿Alguna regla manual de la partición con texto ancla
+  suficientemente similar a la clasificación de la línea?
   → No existe.
 
-Nivel C: ¿Aprendizaje previo para gasto + HONORARIOS en COSMOS-SAS?
-  → Sí. En febrero el usuario confirmó: HONORARIOS → cuenta 5110-05-002.
+Nivel C: ¿Alguna resolución aprendida de la partición con texto
+  igual o suficientemente similar?
+  → Sí. En febrero el usuario resolvió una línea con clasificación
+    "Honorarios revisoría fiscal · honorarios · servicios
+    profesionales" → cuenta 5110-05-002. Similitud alta (supera
+    el umbral); el otro aprendizaje de la partición ("Aseo y
+    cafetería · servicios · servicios generales" → 5195-10-001)
+    queda lejos.
   → Resuelto: 5110-05-002 ✓
 ```
 
-**Línea #3 — Rol IMPUESTO (iva, IVA-19, VTA-001):**
+**Línea #3 — Rol IMPUESTO (iva, "honorarios · iva 19%", VTA-001):**
 
 ```
-Nivel A: ¿Regla manual?
+Partición: (causacion_gasto, iva, COSMOS-SAS)
+
+Nivel A: ¿Regla manual con texto similar?
   → No existe.
 
-Nivel C: ¿Aprendizaje previo para iva + IVA-19 en COSMOS-SAS?
+Nivel C: ¿Resolución aprendida con texto similar?
   → No. Primera vez.
 
-Nivel B: El sistema busca en el plan de cuentas de COSMOS-SAS
-  cuentas cuyo nombre/código sugiera "IVA" en el grupo 2408.
+Nivel B: El sistema compara "honorarios · iva 19%" contra las
+  cuentas del plan de COSMOS-SAS, acotado al grupo 2408.
   → Encuentra: 2408-01-001 "IVA descontable"
   → Sugiere al usuario → usuario confirma
   → Resuelto: 2408-01-001 ✓
-  → Almacena en nivel C: {iva, IVA-19, COSMOS-SAS} → 2408-01-001
+  → Almacena en nivel C: (causacion_gasto, iva, COSMOS-SAS) +
+    "honorarios · iva 19%" → 2408-01-001
 ```
 
-**Línea #5 — Rol RETENCION (retefuente, RTFT-HON-11, VTA-001):**
+**Línea #5 — Rol RETENCION (retefuente, "honorarios · retención en la fuente 11%", VTA-001):**
 
 ```
-Nivel A: ¿Regla manual?
+Partición: (causacion_gasto, retefuente, COSMOS-SAS)
+
+Nivel A: ¿Regla manual con texto similar?
   → No existe.
 
-Nivel C: ¿Aprendizaje previo para retefuente + RTFT-HON-11?
+Nivel C: ¿Resolución aprendida con texto similar?
   → No. Primera vez.
 
-Nivel B: El sistema busca cuentas cuyo nombre sugiera
-  "retención" + "honorarios" en el grupo 2365.
+Nivel B: El sistema compara "honorarios · retención en la
+  fuente 11%" contra el plan, acotado al grupo 2365.
   → Encuentra: 2365-05-001 "Retención en la fuente por honorarios"
   → Sugiere al usuario → usuario confirma
   → Resuelto: 2365-05-001 ✓
   → Almacena en nivel C
 ```
 
-**Contrapartida — Rol CONTRAPARTIDA:**
+**Línea #7 — Rol CONTRAPARTIDA (contrapartida, "crédito con el proveedor · honorarios de auditoría externa"):**
 
 ```
-Nivel C: ¿Aprendizaje previo para contrapartida de causacion_gasto
-  con tercero tipo NIT nacional en COSMOS-SAS?
-  → Sí. Siempre ha sido 2205-01-001 "CxP proveedores nacionales".
+Partición: (causacion_gasto, contrapartida, COSMOS-SAS)
+
+Nivel C: ¿Resolución aprendida con texto similar?
+  → Sí. Las compras a crédito con proveedor han resuelto siempre
+    a 2205-01-001 "CxP proveedores nacionales".
   → Resuelto: 2205-01-001 ✓
+  → El tercero de la partida es el de la línea (900123456);
+    la unidad organizacional se rinde según [I33].
   Valor = 600.000 + 400.000 + 114.000 + 76.000 - 66.000 - 44.000 = 1.080.000
 ```
 
@@ -282,9 +319,10 @@ Sin desglose fiscal (P1 — el anticipo no tiene tributos).
 
 | # | tipoTransaccion | tipoComponente | clasificacion | tercero | empresa | unidadOrg | valor | moneda | fecha |
 |---|-----------------|---------------|---------------|---------|---------|-----------|-------|--------|-------|
-| 1 | anticipo_proveedor | anticipo | — | 900123456 | COSMOS-SAS | VTA-001 | 3.000.000 | COP | 2026-03-10 |
+| 1 | anticipo_proveedor | anticipo | "anticipo para servicios de auditoría" | 900123456 | COSMOS-SAS | VTA-001 | 3.000.000 | COP | 2026-03-10 |
+| 2 | anticipo_proveedor | contrapartida | "crédito con el proveedor · anticipo para servicios de auditoría" | 900123456 | COSMOS-SAS | — | — (motor) | COP | 2026-03-10 |
 
-Línea única. Sin clasificación de gasto. Sin distribución compleja.
+Una línea de negocio (la clasificación del anticipo es su descripción) más la línea de contrapartida [R54]. Sin desglose fiscal ni distribución compleja.
 
 ### 3.3 Plantilla de asiento (código del producto)
 
@@ -293,24 +331,31 @@ El motor identifica `tipoTransaccion = anticipo_proveedor` y aplica:
 | Rol | Naturaleza | Alimentado por | Grupo PUC esperado | Descripción |
 |-----|-----------|----------------|--------------------|-------------|
 | ANTICIPO | Débito | Línea con `tipoComponente = anticipo` | `anticipo → ["1330"]` | Cuenta de anticipos a proveedores |
-| CONTRAPARTIDA | Crédito | Generada por el motor | `["2205","2335"]` (a nivel de rol) | Cuenta por pagar. Mismo valor. |
+| CONTRAPARTIDA | Crédito | Línea con `tipoComponente = contrapartida` (valor: motor) | `["2205","2335"]` | Cuenta por pagar. Mismo valor. |
 
 ### 3.4 Cadena de resolución
 
 **Línea #1 — Rol ANTICIPO:**
 
 ```
-Nivel C: ¿Aprendizaje previo para anticipo en COSMOS-SAS?
-  → Sí. Siempre ha sido 1330-05-001 "Anticipos a proveedores".
+Partición: (anticipo_proveedor, anticipo, COSMOS-SAS)
+
+Nivel C: ¿Resolución aprendida con texto similar a
+  "anticipo para servicios de auditoría"?
+  → Sí. Los anticipos han resuelto siempre a
+    1330-05-001 "Anticipos a proveedores".
   → Resuelto: 1330-05-001 ✓
 ```
 
-**Contrapartida:**
+**Línea #2 — Rol CONTRAPARTIDA:**
 
 ```
-Nivel C: ¿Aprendizaje previo para contrapartida de anticipo_proveedor?
+Partición: (anticipo_proveedor, contrapartida, COSMOS-SAS)
+
+Nivel C: ¿Resolución aprendida con texto similar?
   → Sí. 2205-01-001 "CxP proveedores nacionales".
-  → Resuelto: 2205-01-001 ✓
+  → Resuelto: 2205-01-001 ✓ (tercero: el de la línea;
+    valor: lo calcula el motor)
 ```
 
 ### 3.5 Asiento contable resultante
@@ -354,11 +399,12 @@ Devolucion (agregado) — tipo Comercio
 
 | # | tipoTransaccion | tipoComponente | clasificacion | tercero | empresa | unidadOrg | valor | moneda | fecha |
 |---|-----------------|---------------|---------------|---------|---------|-----------|-------|--------|-------|
-| 1 | nota_credito_gasto | concepto_devuelto | HONORARIOS | 900123456 | COSMOS-SAS | VTA-001 | 300.000 | COP | 2026-03-18 |
-| 2 | nota_credito_gasto | iva | IVA-19 | 900123456 | COSMOS-SAS | VTA-001 | 57.000 | COP | 2026-03-18 |
-| 3 | nota_credito_gasto | retefuente | RTFT-HON-11 | 900123456 | COSMOS-SAS | VTA-001 | 33.000 | COP | 2026-03-18 |
+| 1 | nota_credito_gasto | concepto_devuelto | "Servicios de auditoría externa · honorarios · servicios profesionales" | 900123456 | COSMOS-SAS | VTA-001 | 300.000 | COP | 2026-03-18 |
+| 2 | nota_credito_gasto | iva | "honorarios · iva 19%" | 900123456 | COSMOS-SAS | VTA-001 | 57.000 | COP | 2026-03-18 |
+| 3 | nota_credito_gasto | retefuente | "honorarios · retención en la fuente 11%" | 900123456 | COSMOS-SAS | VTA-001 | 33.000 | COP | 2026-03-18 |
+| 4 | nota_credito_gasto | contrapartida | "crédito con el proveedor · devolución parcial de honorarios" | 900123456 | COSMOS-SAS | — | — (motor) | COP | 2026-03-18 |
 
-Los valores son positivos (D19). La plantilla de asiento invierte las naturalezas.
+Los valores son positivos (D19). La plantilla de asiento invierte las naturalezas. Las clasificaciones espejan las de la causación original. **Todas las líneas viajan con `referenciaHechoRelacionado` = la causación del Ejemplo 1** — en esta plantilla todos los componentes se resuelven por espejo [R53].
 
 ### 4.3 Plantilla de asiento (código del producto)
 
@@ -366,23 +412,23 @@ El motor identifica `tipoTransaccion = nota_credito_gasto` y aplica la plantilla
 
 | Rol | Naturaleza | Alimentado por | Grupo PUC esperado | Descripción |
 |-----|-----------|----------------|--------------------|-------------|
-| GASTO | **Crédito** | Líneas con `tipoComponente = concepto_devuelto` | `["51","52","53"]` | Inverso: acredita la cuenta de gasto |
-| IMPUESTO | **Crédito** | Líneas con `tipoComponente = iva` | `iva → ["2408"]` | Inverso: acredita la cuenta de impuesto |
-| RETENCION | **Débito** | Líneas con `tipoComponente = retefuente` | `retefuente → ["2365"]` | Inverso: debita la cuenta de retención |
-| CONTRAPARTIDA | **Débito** | Generada por el motor | `["2205","2335"]` (a nivel de rol) | Reduce CxP |
+| GASTO | **Crédito** | Líneas con `tipoComponente = concepto_devuelto` — espeja GASTO | `["51","52","53"]` | Inverso: acredita la cuenta de gasto |
+| IMPUESTO | **Crédito** | Líneas con `tipoComponente = iva` — espeja IMPUESTO | `iva → ["2408"]` | Inverso: acredita la cuenta de impuesto |
+| RETENCION | **Débito** | Líneas con `tipoComponente = retefuente` — espeja RETENCION | `retefuente → ["2365"]` | Inverso: debita la cuenta de retención |
+| CONTRAPARTIDA | **Débito** | Línea con `tipoComponente = contrapartida` (valor: motor) — espeja CONTRAPARTIDA | `["2205","2335"]` | Reduce CxP |
 
-### 4.4 Cadena de resolución
+### 4.4 Resolución por espejo
 
-Las cuentas son las mismas que en la causación original — el nivel C ya las aprendió:
+La nota crédito debe reversar **exactamente las mismas cuentas** de la causación original — por eso todos sus componentes declaran `resolucionPorEspejo` [R53]. El motor ubica su borrador de la causación del Ejemplo 1 (vía `referenciaHechoRelacionado`) y copia la cuenta del rol homólogo:
 
 ```
-concepto_devuelto + HONORARIOS → 5110-05-002 (nivel C)
-iva + IVA-19 → 2408-01-001 (nivel C)
-retefuente + RTFT-HON-11 → 2365-05-001 (nivel C)
-contrapartida de nota_credito_gasto → 2205-01-001 (nivel C)
+concepto_devuelto → espejo del rol GASTO original → 5110-05-002
+iva               → espejo del rol IMPUESTO original → 2408-01-001
+retefuente        → espejo del rol RETENCION original → 2365-05-001
+contrapartida     → espejo del rol CONTRAPARTIDA original → 2205-01-001
 ```
 
-Sin intervención del usuario. El sistema ya sabe.
+Sin cadena de resolución, sin intervención del usuario y sin alimentar el aprendizaje: la cuenta es determinística. Si la causación original no existiera en Contabilidad (ej. saldos migrados de un sistema anterior), el borrador nacería pendiente para que el contador asigne.
 
 ### 4.5 Asiento contable resultante
 
@@ -553,7 +599,8 @@ Nómina ────────────────────────
 | Estructura del asiento (roles, naturalezas) | El producto (código) | No — es conocimiento contable universal |
 | Contrato de `LineaTraduccion` | El producto (código) | No — es el contrato estandarizado entre sub-dominios |
 | `lineasParaTraduccion()` | Cada sub-dominio emisor | No — cada agregado implementa la función según sus componentes |
-| Resolución de la cuenta auxiliar por rol | La cadena A → C → B | Sí — se enriquece con cada interacción del usuario |
+| Resolución de la cuenta auxiliar por rol | Espejo del hecho relacionado (componentes marcados) o la cadena A → C → B sobre la clasificación de la línea | Sí — la cadena se enriquece con cada interacción del usuario; el espejo es determinístico |
+| Clasificación de la línea | Cada sub-dominio emisor la compone mecánicamente desde sus catálogos (recetas por componente en el modelo del emisor) | No — no la digita un usuario |
 | Plan de cuentas | El cliente (importado) | Sí — cada empresa tiene el suyo |
 | Reglas manuales (nivel A) | El analista contable | Sí — excepciones explícitas |
 
@@ -565,20 +612,21 @@ Nómina ────────────────────────
 
 Caso: el extracto de la tarjeta de **Bancolombia (890.903.938)** del mes cruza dos compras **ya causadas** —proveedor **A (901.090.486)** por 600.000 y proveedor **B (860.533.413)** por 400.000— **sin cargos financieros, diferencia en cambio ni ajustes por tolerancia**. OXP emite solo dos líneas `cruce_obligacion` (`[D29]` de OXP). Ilustra de dónde sale el tercero de la contrapartida.
 
-### 7.1 lineasParaTraduccion() + terceroPrincipal
+### 7.1 lineasParaTraduccion() — el banco viaja en la línea de contrapartida
 
-**A nivel del hecho económico:** `tipoTransaccion = causacion_gasto`, `terceroPrincipal = 890903938` (Bancolombia — el `InformacionTercero` raíz del extracto).
+**A nivel del hecho económico:** `tipoTransaccion = causacion_gasto`, `terceroPrincipal = 890903938` (Bancolombia — el `InformacionTercero` raíz del extracto; **informativo** desde [D15]: el tercero de la contrapartida ya viaja en su propia línea).
 
-| # | tipoComponente | tercero (de la línea) | unidadOrg | valor | moneda |
-|---|---------------|-----------------------|-----------|-------|--------|
-| 1 | cruce_obligacion | 901090486 (Prov A) | — | 600.000 | COP |
-| 2 | cruce_obligacion | 860533413 (Prov B) | — | 400.000 | COP |
+| # | tipoComponente | clasificacion | tercero (de la línea) | referenciaHechoRelacionado | unidadOrg | valor | moneda |
+|---|---------------|---------------|-----------------------|----------------------------|-----------|-------|--------|
+| 1 | cruce_obligacion | "cruce de obligación · factura FV-2201 · Prov A" | 901090486 (Prov A) | causación OxpComercio A | — | 600.000 | COP |
+| 2 | cruce_obligacion | "cruce de obligación · factura FV-0917 · Prov B" | 860533413 (Prov B) | causación OxpComercio B | — | 400.000 | COP |
+| 3 | contrapartida | "tarjeta de crédito Bancolombia · extracto enero" | 890903938 (Bancolombia) | — | — | — (motor) | COP |
 
-El banco **no aparece en ninguna línea** — solo está como `terceroPrincipal`. (La unidad organizacional de la CxP se rinde según `[I33]`; en este ejemplo, consolidada sin unidad.)
+El banco viaja como tercero de la **línea de contrapartida** [R54]. (La unidad organizacional de la CxP se rinde según `[I33]`; en este ejemplo, consolidada sin unidad.)
 
 ### 7.2 Plantilla y resolución
 
-El motor aplica `causacion_gasto`. Las líneas `cruce_obligacion` alimentan el rol **CRUCE_OBLIGACION** (Db CxP del proveedor de **cada línea**, su propio tercero). La **CONTRAPARTIDA** (Cr CxP) toma su tercero del **`terceroPrincipal`** del hecho (Bancolombia), no de las líneas (paso 4 del `ServicioDeTraduccion`).
+El motor aplica `causacion_gasto`. Las líneas `cruce_obligacion` alimentan el rol **CRUCE_OBLIGACION** y se resuelven **por espejo** [R53]: cada una copia la cuenta de la CONTRAPARTIDA (CxP del proveedor) del borrador de su causación cruzada — así el débito salda exactamente la cuenta donde nació la deuda. La **CONTRAPARTIDA** (Cr CxP del banco) toma tercero y clasificación de la línea 3; su cuenta se resuelve por la cadena y su valor lo calcula el motor (paso 4 del `ServicioDeTraduccion`).
 
 ### 7.3 Asiento contable resultante
 
@@ -589,7 +637,7 @@ El motor aplica `causacion_gasto`. Las líneas `cruce_obligacion` alimentan el r
 | 3 | 2205-… CxP banco/emisor | 890903938 (Bancolombia) | | 1.000.000 |
 | | | **Totales** | **1.000.000** | **1.000.000** |
 
-Sin `terceroPrincipal`, el motor no tendría de dónde tomar el tercero del banco (no está en ninguna línea): la contrapartida quedaría sin tercero, el borrador no resolvería (la CxP exige tercero por `obligatoriedadTercero`) y el contador lo completaría a mano en la consola. Con `terceroPrincipal`, queda automático.
+La línea de contrapartida resuelve el problema que originó este ejemplo (issue #28): las líneas de cruce traen varios proveedores y el banco no viajaba en ninguna. Hoy el banco llega como tercero de la línea `contrapartida` [R54]; `terceroPrincipal` se conserva a nivel del hecho como dato informativo. Y el espejo [R53] garantiza que cada cruce debite exactamente la CxP donde nació la deuda de la compra cruzada — sin depender de que la cadena "adivine" la misma cuenta.
 
 ---
 
@@ -601,22 +649,25 @@ Caso: el extracto de **enero** de la tarjeta de **Bancolombia (890.903.938)** tr
 
 ### 8.1 Momento 1 — Causación del extracto de enero (`causacion_gasto`)
 
-**A nivel del hecho:** `tipoTransaccion = causacion_gasto`, `terceroPrincipal = 890903938` (Bancolombia).
+**A nivel del hecho:** `tipoTransaccion = causacion_gasto`, `terceroPrincipal = 890903938` (Bancolombia, informativo).
 
-| # | tipoComponente | tercero (de la línea) | valor |
-|---|---------------|-----------------------|-------|
-| 1 | cruce_obligacion | 901090486 (Prov A) | 600.000 |
-| 2 | cruce_obligacion | 860533413 (Prov B) | 400.000 |
-| 3 | partida_por_aclarar | 890903938 (Bancolombia) | 500.000 |
+| # | tipoComponente | clasificacion | tercero (de la línea) | valor |
+|---|---------------|---------------|-----------------------|-------|
+| 1 | cruce_obligacion | "cruce de obligación · factura FV-2201 · Prov A" | 901090486 (Prov A) | 600.000 |
+| 2 | cruce_obligacion | "cruce de obligación · factura FV-0917 · Prov B" | 860533413 (Prov B) | 400.000 |
+| 3 | partida_por_aclarar | "compra no reconocida por 500.000 · posible fraude" | 890903938 (Bancolombia) | 500.000 |
+| 4 | contrapartida | "tarjeta de crédito Bancolombia · extracto enero" | 890903938 (Bancolombia) | — (motor) |
+
+Los cruces (líneas 1-2) viajan con `referenciaHechoRelacionado` a su causación y se resuelven **por espejo** [R53]; la partida por aclarar (línea 3) se resuelve por la cadena con su clasificación; la contrapartida (línea 4) trae el tercero del banco [R54].
 
 **Asiento resultante:**
 
 | Partida | Cuenta | Tercero | Débito | Crédito |
 |---------|--------|---------|--------|---------|
-| 1 | 2205-… CxP proveedor | 901090486 (Prov A) | 600.000 | |
-| 2 | 2205-… CxP proveedor | 860533413 (Prov B) | 400.000 | |
+| 1 | 2205-… CxP proveedor *(espejo de la causación A)* | 901090486 (Prov A) | 600.000 | |
+| 2 | 2205-… CxP proveedor *(espejo de la causación B)* | 860533413 (Prov B) | 400.000 | |
 | 3 | 1360-… Reclamaciones (partidas por aclarar) | 890903938 (Bancolombia) | 500.000 | |
-| 4 | 2205-… CxP banco/emisor *(contrapartida del motor)* | 890903938 (Bancolombia) | | 1.500.000 |
+| 4 | 2205-… CxP banco/emisor *(línea contrapartida; valor del motor)* | 890903938 (Bancolombia) | | 1.500.000 |
 | | | **Totales** | **1.500.000** | **1.500.000** |
 
 Sin la línea 3, la CxP del banco quedaría en 1.000.000 — **subvalorada** frente a los 1.500.000 que el banco cobra. Con ella, el pasivo refleja la deuda real y el derecho de la reclamación queda visible en el activo, **por tercero** (se sabe cuánto se le reclama a cada banco).
@@ -625,16 +676,19 @@ Sin la línea 3, la CxP del banco quedaría en 1.000.000 — **subvalorada** fre
 
 La línea de "Reverso Bancario" (−500.000) llega en el extracto de **marzo** y el usuario la vincula a la disputa de enero (conciliación trans-mensual, `R10c` de OXP → `PartidaEnDisputaDescartada`). La cancelación viaja **dentro de la causación del extracto de marzo** (supóngase un solo cruce adicional de 300.000):
 
-| # | tipoComponente | tercero (de la línea) | valor |
-|---|---------------|-----------------------|-------|
-| 1 | cruce_obligacion | 901090486 (Prov A) | 300.000 |
-| 2 | partida_aclarada | 890903938 (Bancolombia) | 500.000 |
+| # | tipoComponente | clasificacion | tercero (de la línea) | valor |
+|---|---------------|---------------|-----------------------|-------|
+| 1 | cruce_obligacion | "cruce de obligación · factura FV-3304 · Prov A" | 901090486 (Prov A) | 300.000 |
+| 2 | partida_aclarada | "reverso bancario · compra no reconocida por 500.000 · posible fraude" | 890903938 (Bancolombia) | 500.000 |
+| 3 | contrapartida | "tarjeta de crédito Bancolombia · extracto marzo" | 890903938 (Bancolombia) | — (motor) |
+
+La línea `partida_aclarada` viaja con `referenciaHechoRelacionado` a la **causación del extracto de enero** y se resuelve **por espejo** del rol PARTIDA_POR_ACLARAR [R53]: cancela exactamente la misma cuenta 1360 que abrió la disputa, con naturaleza contraria (Cr).
 
 | Partida | Cuenta | Tercero | Débito | Crédito |
 |---------|--------|---------|--------|---------|
-| 1 | 2205-… CxP proveedor | 901090486 (Prov A) | 300.000 | |
-| 2 | 1360-… Reclamaciones (partidas por aclarar) | 890903938 (Bancolombia) | | 500.000 |
-| 3 | 2205-… CxP banco/emisor *(contrapartida del motor; ya neta del reverso)* | 890903938 (Bancolombia) | 200.000 | |
+| 1 | 2205-… CxP proveedor *(espejo de la causación A)* | 901090486 (Prov A) | 300.000 | |
+| 2 | 1360-… Reclamaciones *(espejo de la partida por aclarar de enero)* | 890903938 (Bancolombia) | | 500.000 |
+| 3 | 2205-… CxP banco/emisor *(línea contrapartida; valor del motor, ya neto del reverso)* | 890903938 (Bancolombia) | 200.000 | |
 | | | **Totales** | **500.000** | **500.000** |
 
 La 1360 queda **en cero** para esa reclamación — abrió y cerró contra el mismo tercero (Bancolombia). *(Nota: si el extracto de marzo trae más movimientos que el reverso, la contrapartida del motor resulta acreedora como de costumbre; el ejemplo se redujo para que se vea el mecanismo.)*
@@ -643,17 +697,19 @@ La 1360 queda **en cero** para esa reclamación — abrió y cerró contra el mi
 
 Camino alterno: se descubre que los 500.000 corresponden a una compra legítima del proveedor **C (830.037.248)** que nadie había radicado. Se radica y causa la OxpComercio **por el flujo normal** (Db gasto 420.168 + Db IVA 79.832 · Cr CxP proveedor C 500.000 — plantilla `causacion_gasto`, sin novedades). Luego `PartidaEnDisputaReclasificada` emite el hecho propio:
 
-**A nivel del hecho:** `tipoTransaccion = reclasificacion_partida`, `terceroPrincipal = 890903938` (Bancolombia — el hecho pertenece al ciclo del extracto en disputa; informativo: esta plantilla no tiene contrapartida del motor).
+**A nivel del hecho:** `tipoTransaccion = reclasificacion_partida`, `terceroPrincipal = 890903938` (Bancolombia — el hecho pertenece al ciclo del extracto en disputa; informativo: esta plantilla no tiene rol de contrapartida, sus dos líneas viajan con valor).
 
-| # | tipoComponente | tercero (de la línea) | valor |
-|---|---------------|-----------------------|-------|
-| 1 | cruce_obligacion | 830037248 (Prov C) | 500.000 |
-| 2 | partida_aclarada | 890903938 (Bancolombia) | 500.000 |
+| # | tipoComponente | clasificacion | tercero (de la línea) | valor |
+|---|---------------|---------------|-----------------------|-------|
+| 1 | cruce_obligacion | "cruce de obligación · factura FV-8812 · Prov C" | 830037248 (Prov C) | 500.000 |
+| 2 | partida_aclarada | "reclasificación · compra no reconocida por 500.000 identificada" | 890903938 (Bancolombia) | 500.000 |
+
+Ambas líneas se resuelven **por espejo** [R53]: el cruce copia la CxP de la causación de la OxpComercio del proveedor C (su `referenciaHechoRelacionado`); la partida aclarada copia la 1360 de la causación del extracto de enero.
 
 | Partida | Cuenta | Tercero | Débito | Crédito |
 |---------|--------|---------|--------|---------|
-| 1 | 2205-… CxP proveedor | 830037248 (Prov C) | 500.000 | |
-| 2 | 1360-… Reclamaciones (partidas por aclarar) | 890903938 (Bancolombia) | | 500.000 |
+| 1 | 2205-… CxP proveedor *(espejo de la causación C)* | 830037248 (Prov C) | 500.000 | |
+| 2 | 1360-… Reclamaciones *(espejo de la partida por aclarar de enero)* | 890903938 (Bancolombia) | | 500.000 |
 | | | **Totales** | **500.000** | **500.000** |
 
 La CxP del proveedor C nace en su causación y se salda aquí (su compra ya fue pagada vía tarjeta — es el "cruce diferido" que en un extracto normal habría viajado en el Momento 1); la 1360 queda en cero. En **cualquiera de los dos caminos** la transitoria abre y cierra, auditable por partida y por tercero.
@@ -669,3 +725,4 @@ La CxP del proveedor C nace en su causación y se salda aquí (su compra ya fue 
 | 1.2 | Junio 2026 | Encuadre del inventario teórico (issue #7). Nota en la Sección 5 que aclara que las 42 plantillas son un planteamiento inicial de dimensionamiento — no todas se implementarán y el número real se determina al modelar cada sub-dominio; la fuente de verdad es `datos-precargados/plantillas-de-asiento.*`. Fila de OXP del resumen (5.3) marcada como "6 teórico; 4 reales". Acompaña la creación del catálogo precargado `datos-precargados/plantillas-de-asiento.md`/`.json` con las 4 plantillas reales de OXP. |
 | 1.3 | Junio 2026 | Nuevo **Ejemplo 4 — Extracto de cruce puro** (Sección 7, issue #28): ilustra de dónde sale el tercero de la contrapartida cuando las líneas traen varios proveedores y el banco/emisor no viaja en ninguna. Muestra el uso de `terceroPrincipal` (tercero del documento a nivel del hecho económico) para la contrapartida (CxP del banco) y el tercero por línea para los cruces. Se ubica como Sección 7 (tras el resumen) para no renumerar las secciones existentes ni romper referencias cruzadas. Alinea con `modelo-dominio.md` v1.8 (`InformacionTransaccion` con `terceroPrincipal`, paso 4 del `ServicioDeTraduccion`). |
 | 1.4 | Julio 2026 | Nuevo **Ejemplo 5 — Ciclo de la partida en disputa** (Sección 8, issue #90): los tres momentos del ciclo por cuenta transitoria de partidas por aclarar — causación del extracto con la línea `partida_por_aclarar` (la CxP del banco refleja el total real), resolución por descarte (`partida_aclarada` dentro de la causación del extracto donde llega el reverso, conciliación trans-mensual) y resolución por reclasificación (plantilla nueva `reclasificacion_partida`, sin contrapartida del motor). Muestra el tercero de cada línea (la transitoria siempre contra el banco/emisor; las CxP contra su proveedor). Fila de OXP del resumen (5.3) actualizada a "6 reales" y encabezado del anexo corregido (decía v1.2 pese al historial). Alinea con el catálogo precargado v1.7 y `[D37]` de OXP. |
+| 1.5 | Julio 2026 | **Clasificación semántica, contrapartida como línea y resolución por espejo (issue #104).** Contrato §1.2: la fila `clasificacion` pasa de "códigos de referencia" a **texto semántico compuesto mecánicamente por el emisor** (obligatorio en toda línea, [R52]); `referenciaHechoRelacionado` documenta su segundo uso — habilitar el **espejo** [R53]; principios reescritos (contrapartida como línea sin valor ni unidad, [R54]; `terceroPrincipal` informativo). Cadena §1.4 con el paso **0 — Espejo del hecho relacionado** y los Niveles A/C redefinidos como partición estable exacta + emparejamiento por similitud. Los 5 ejemplos actualizados: clasificaciones con textos reales (recetas de OXP), línea `contrapartida` en cada hecho con rol de contrapartida, Ejemplo 3 resuelto íntegramente por espejo (la nota crédito reversa exactamente las cuentas de la causación original), Ejemplo 4 reescrito (el banco viaja en la línea de contrapartida; los cruces espejan la CxP de su causación) y Ejemplo 5 con el espejo de la 1360 en ambas resoluciones. Resumen del patrón (§6) con las filas de resolución y clasificación actualizadas. Alinea con el modelo v1.12 ([D15]), el alcance v1.11 ([R52]-[R54]), el catálogo precargado v1.9 y el modelo de OXP v4.8. |

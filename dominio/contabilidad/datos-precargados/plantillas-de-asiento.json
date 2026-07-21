@@ -1,10 +1,10 @@
 {
   "catalogo": "PlantillaDeAsiento",
-  "version": "1.8",
-  "fechaActualizacion": "2026-07-10",
+  "version": "1.9",
+  "fechaActualizacion": "2026-07-17",
   "alcance": "Sub-dominio emisor OXP (Obligaciones por Pagar). 6 plantillas de las 42 del inventario (anexo-ejemplo-plantilla-de-asiento.md, Seccion 5.2).",
   "fuente": "Mapeo canonico de eventos OXP -> tipoTransaccion contable (dominio/obligaciones-por-pagar/modelo-dominio.md, tabla de la seccion 'Integracion con sub-dominio Contabilidad') + estructura del agregado PlantillaDeAsiento (dominio/contabilidad/modelo-dominio.md, Seccion 3.7, [D12], [D13]).",
-  "nota": "grupoPucEsperado acota solo el Nivel B (inferencia) de la cadena de resolucion [D12]/[R47]. llevaDescripcionConcepto indica si la partida del componente recibe la descripcionConcepto que envia el consumidor [D13]/[R48] (true en componentes de concepto de negocio; false en impuestos y retenciones). El atributo 'rol' de cada RolPartida es un codigo de conjunto cerrado (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA) que la partida del borrador hereda y se propaga a la entrega [D14]/[R49]. Codigos PUC referidos al Decreto 2650 (Colombia). Los items marcados porValidar:true requieren confirmacion de consultor contable y/o canonizacion en OXP (issue #10).",
+  "nota": "grupoPucEsperado acota solo el Nivel B (inferencia) de la cadena de resolucion [D12]/[R47]. llevaDescripcionConcepto indica si la partida del componente recibe la descripcionConcepto que envia el consumidor [D13]/[R48] (true en componentes de concepto de negocio; false en impuestos y retenciones). La contrapartida viaja como linea del consumidor (tipoComponente 'contrapartida', con tercero y clasificacion, sin valor ni unidad organizacional — el motor balancea) [D15]/[R54]. resolucionPorEspejo (opcional) indica que la cuenta del componente se copia de la partida del rol indicado en el borrador del hecho relacionado (referenciaHechoRelacionado de la linea) — no pasa por la cadena ni alimenta el aprendizaje [D15]/[R53]. La clasificacion de cada linea es texto semantico obligatorio compuesto por el emisor (recetas por componente en el modelo de OXP) [R52]. El atributo 'rol' de cada RolPartida es un codigo de conjunto cerrado (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA) que la partida del borrador hereda y se propaga a la entrega [D14]/[R49]. Codigos PUC referidos al Decreto 2650 (Colombia). Los items marcados porValidar:true requieren confirmacion de consultor contable y/o canonizacion en OXP (issue #10).",
   "plantillas": [
     {
       "tipoTransaccion": "causacion_gasto",
@@ -17,7 +17,16 @@
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "gasto", "grupoPucEsperado": ["51", "52", "53"], "llevaDescripcionConcepto": true, "porValidar": false }
+            {
+              "tipoComponente": "gasto",
+              "grupoPucEsperado": [
+                "51",
+                "52",
+                "53"
+              ],
+              "llevaDescripcionConcepto": true,
+              "porValidar": false
+            }
           ]
         },
         {
@@ -25,8 +34,21 @@
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "iva", "grupoPucEsperado": ["2408"], "llevaDescripcionConcepto": false, "porValidar": false },
-            { "tipoComponente": "inc", "grupoPucEsperado": [], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "El INC normalmente se reconoce como mayor valor del gasto/costo, no como impuesto descontable. Confirmar grupo o si se modela como rol propio." }
+            {
+              "tipoComponente": "iva",
+              "grupoPucEsperado": [
+                "2408"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": false
+            },
+            {
+              "tipoComponente": "inc",
+              "grupoPucEsperado": [],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "El INC normalmente se reconoce como mayor valor del gasto/costo, no como impuesto descontable. Confirmar grupo o si se modela como rol propio."
+            }
           ]
         },
         {
@@ -34,9 +56,31 @@
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "retefuente", "grupoPucEsperado": ["2365"], "llevaDescripcionConcepto": false, "porValidar": false },
-            { "tipoComponente": "reteiva", "grupoPucEsperado": ["2367"], "llevaDescripcionConcepto": false, "porValidar": false },
-            { "tipoComponente": "reteica", "grupoPucEsperado": ["2368"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Confirmar si OXP emite reteica como tipoComponente (issue #10)." }
+            {
+              "tipoComponente": "retefuente",
+              "grupoPucEsperado": [
+                "2365"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": false
+            },
+            {
+              "tipoComponente": "reteiva",
+              "grupoPucEsperado": [
+                "2367"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": false
+            },
+            {
+              "tipoComponente": "reteica",
+              "grupoPucEsperado": [
+                "2368"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Confirmar si OXP emite reteica como tipoComponente (issue #10)."
+            }
           ]
         },
         {
@@ -44,7 +88,15 @@
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "retencion_asumida", "grupoPucEsperado": ["5315"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Retencion asumida por la empresa cuando el pago del documento ya salio completo (medio de pago tarjeta, [D38] de OXP): la linea de la retencion viaja identica al caso normal (Cr, misma cuenta, tercero proveedor, certificable) y esta linea Db espejo la asume como gasto propio — la contrapartida queda por el total. Aplica a todas las retenciones sustractivas (una linea espejo por cada una). Grupo tentativo 5315 (gastos - impuestos asumidos), por validar con consultor contable. Doctrina de concurrencia validada con consultoria fiscal jul-2026." }
+            {
+              "tipoComponente": "retencion_asumida",
+              "grupoPucEsperado": [
+                "5315"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Retencion asumida por la empresa cuando el pago del documento ya salio completo (medio de pago tarjeta, [D38] de OXP): la linea de la retencion viaja identica al caso normal (Cr, misma cuenta, tercero proveedor, certificable) y esta linea Db espejo la asume como gasto propio — la contrapartida queda por el total. Aplica a todas las retenciones sustractivas (una linea espejo por cada una). Grupo tentativo 5315 (gastos - impuestos asumidos), por validar con consultor contable. Doctrina de concurrencia validada con consultoria fiscal jul-2026."
+            }
           ]
         },
         {
@@ -52,7 +104,15 @@
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "cargo_financiero", "grupoPucEsperado": ["5305"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Nombre de tipoComponente descrito en prosa en OXP, sin canonizar (issue #10). Emitido por OxpExtracto. Revisar si el cargo financiero requiere descripcionConcepto." }
+            {
+              "tipoComponente": "cargo_financiero",
+              "grupoPucEsperado": [
+                "5305"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Nombre de tipoComponente descrito en prosa en OXP, sin canonizar (issue #10). Emitido por OxpExtracto. Revisar si el cargo financiero requiere descripcionConcepto."
+            }
           ]
         },
         {
@@ -60,7 +120,16 @@
           "naturaleza": "debito_credito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "diferencia_en_cambio", "grupoPucEsperado": ["5305", "4215"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Perdida -> gasto financiero (5305); ganancia -> ingreso financiero (4215). Nombre de tipoComponente sin canonizar en OXP (issue #10)." }
+            {
+              "tipoComponente": "diferencia_en_cambio",
+              "grupoPucEsperado": [
+                "5305",
+                "4215"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Perdida -> gasto financiero (5305); ganancia -> ingreso financiero (4215). Nombre de tipoComponente sin canonizar en OXP (issue #10)."
+            }
           ]
         },
         {
@@ -68,7 +137,16 @@
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "amortizacion_anticipo", "grupoPucEsperado": ["1330"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Reclasificacion del anticipo al regularizarlo: Cr Anticipos a proveedores (1330), ver [D26] de OXP. Viaja dentro de causacion_gasto. Confirmar grupo con consultor." }
+            {
+              "tipoComponente": "amortizacion_anticipo",
+              "grupoPucEsperado": [
+                "1330"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Reclasificacion del anticipo al regularizarlo: Cr Anticipos a proveedores (1330), ver [D26] de OXP. Viaja dentro de causacion_gasto. Confirmar grupo con consultor.",
+              "resolucionPorEspejo": "ANTICIPO"
+            }
           ]
         },
         {
@@ -76,7 +154,16 @@
           "naturaleza": "debito_credito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "ajuste_tolerancia", "grupoPucEsperado": ["5305", "4210"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Ajuste por diferencia dentro de tolerancia al conciliar (OxpExtracto). Pequena perdida/ganancia. Grupo tentativo: gasto financiero (5305) / ingreso financiero (4210). Por validar con consultor contable." }
+            {
+              "tipoComponente": "ajuste_tolerancia",
+              "grupoPucEsperado": [
+                "5305",
+                "4210"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Ajuste por diferencia dentro de tolerancia al conciliar (OxpExtracto). Pequena perdida/ganancia. Grupo tentativo: gasto financiero (5305) / ingreso financiero (4210). Por validar con consultor contable."
+            }
           ]
         },
         {
@@ -84,7 +171,17 @@
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "cruce_obligacion", "grupoPucEsperado": ["2205", "2335"], "llevaDescripcionConcepto": false, "porValidar": false, "notaValidacion": "Lo alimenta solo ExtractoCausado (una linea por Vinculacion). Db CxP del proveedor de la compra cruzada: reclasifica la deuda hacia el banco/emisor (la contrapartida acredita la CxP del banco). La unidad organizacional se rinde segun la politica de empresa [I33] (distribuida con la distribucion de origen que envia OXP, consolidada en una unidad general, o sin unidad). Ver [D29] de OXP." }
+            {
+              "tipoComponente": "cruce_obligacion",
+              "grupoPucEsperado": [
+                "2205",
+                "2335"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": false,
+              "notaValidacion": "Lo alimenta solo ExtractoCausado (una linea por Vinculacion). Db CxP del proveedor de la compra cruzada: reclasifica la deuda hacia el banco/emisor (la contrapartida acredita la CxP del banco). La unidad organizacional se rinde segun la politica de empresa [I33] (distribuida con la distribucion de origen que envia OXP, consolidada en una unidad general, o sin unidad). Ver [D29] de OXP.",
+              "resolucionPorEspejo": "CONTRAPARTIDA"
+            }
           ]
         },
         {
@@ -92,7 +189,16 @@
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "partida_por_aclarar", "grupoPucEsperado": ["1360", "1380"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Lo alimenta solo ExtractoCausado (una linea por partida en disputa). Db a la cuenta transitoria de partidas por aclarar: una reclamacion al banco/emisor por una partida en disputa (fraude, cargo no reconocido), para que la contrapartida (CxP del banco) refleje el total real del extracto. El tercero de la linea es el banco/emisor. Grupo tentativo 1360 (Reclamaciones, recomendada) / 1380 (Deudores varios) - definir cuenta con consultor contable. Ver [D37] de OXP." }
+            {
+              "tipoComponente": "partida_por_aclarar",
+              "grupoPucEsperado": [
+                "1360",
+                "1380"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Lo alimenta solo ExtractoCausado (una linea por partida en disputa). Db a la cuenta transitoria de partidas por aclarar: una reclamacion al banco/emisor por una partida en disputa (fraude, cargo no reconocido), para que la contrapartida (CxP del banco) refleje el total real del extracto. El tercero de la linea es el banco/emisor. Grupo tentativo 1360 (Reclamaciones, recomendada) / 1380 (Deudores varios) - definir cuenta con consultor contable. Ver [D37] de OXP."
+            }
           ]
         },
         {
@@ -100,16 +206,35 @@
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "partida_aclarada", "grupoPucEsperado": ["1360", "1380"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Lo alimenta solo ExtractoCausado (una linea por partida de reverso bancario vinculada a una disputa de un extracto anterior, conciliacion trans-mensual de OXP). Cr que cancela la transitoria de partidas por aclarar. El tercero de la linea es el banco/emisor (cierra la reclamacion contra el). Mismo grupo que PARTIDA_POR_ACLARAR. Ver [D37] de OXP." }
+            {
+              "tipoComponente": "partida_aclarada",
+              "grupoPucEsperado": [
+                "1360",
+                "1380"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Lo alimenta solo ExtractoCausado (una linea por partida de reverso bancario vinculada a una disputa de un extracto anterior, conciliacion trans-mensual de OXP). Cr que cancela la transitoria de partidas por aclarar. El tercero de la linea es el banco/emisor (cierra la reclamacion contra el). Mismo grupo que PARTIDA_POR_ACLARAR. Ver [D37] de OXP.",
+              "resolucionPorEspejo": "PARTIDA_POR_ACLARAR"
+            }
           ]
         },
         {
           "rol": "CONTRAPARTIDA",
           "naturaleza": "credito",
           "esContrapartida": true,
-          "grupoPucEsperado": ["2205", "2335"],
-          "porValidar": false,
-          "notaContrapartida": "Generada por el motor. Sin tipoComponente. CxP proveedores nacionales (2205) o costos y gastos por pagar (2335)."
+          "notaContrapartida": "Linea 'contrapartida' del consumidor (tercero y clasificacion; valor y unidad organizacional del motor). CxP proveedores nacionales (2205) o costos y gastos por pagar (2335).",
+          "componentes": [
+            {
+              "tipoComponente": "contrapartida",
+              "grupoPucEsperado": [
+                "2205",
+                "2335"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": false
+            }
+          ]
         }
       ]
     },
@@ -124,16 +249,32 @@
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "anticipo", "grupoPucEsperado": ["1330"], "llevaDescripcionConcepto": true, "porValidar": false }
+            {
+              "tipoComponente": "anticipo",
+              "grupoPucEsperado": [
+                "1330"
+              ],
+              "llevaDescripcionConcepto": true,
+              "porValidar": false
+            }
           ]
         },
         {
           "rol": "CONTRAPARTIDA",
           "naturaleza": "credito",
           "esContrapartida": true,
-          "grupoPucEsperado": ["2205", "2335"],
-          "porValidar": false,
-          "notaContrapartida": "Generada por el motor. CxP por anticipos."
+          "notaContrapartida": "Linea 'contrapartida' del consumidor (tercero y clasificacion; valor y unidad del motor). CxP por anticipos.",
+          "componentes": [
+            {
+              "tipoComponente": "contrapartida",
+              "grupoPucEsperado": [
+                "2205",
+                "2335"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": false
+            }
+          ]
         }
       ]
     },
@@ -149,7 +290,17 @@
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "concepto_devuelto", "grupoPucEsperado": ["51", "52", "53"], "llevaDescripcionConcepto": true, "porValidar": false }
+            {
+              "tipoComponente": "concepto_devuelto",
+              "grupoPucEsperado": [
+                "51",
+                "52",
+                "53"
+              ],
+              "llevaDescripcionConcepto": true,
+              "porValidar": false,
+              "resolucionPorEspejo": "GASTO"
+            }
           ]
         },
         {
@@ -157,8 +308,24 @@
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "iva", "grupoPucEsperado": ["2408"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Componente de impuesto devuelto sin nombre canonico en OXP (issue #10)." },
-            { "tipoComponente": "inc", "grupoPucEsperado": [], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Inverso del inc en causacion_gasto. El INC normalmente se reconoce como mayor valor del gasto/costo. Confirmar grupo o si se modela como rol propio (issue #10)." }
+            {
+              "tipoComponente": "iva",
+              "grupoPucEsperado": [
+                "2408"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Componente de impuesto devuelto sin nombre canonico en OXP (issue #10).",
+              "resolucionPorEspejo": "IMPUESTO"
+            },
+            {
+              "tipoComponente": "inc",
+              "grupoPucEsperado": [],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Inverso del inc en causacion_gasto. El INC normalmente se reconoce como mayor valor del gasto/costo. Confirmar grupo o si se modela como rol propio (issue #10).",
+              "resolucionPorEspejo": "IMPUESTO"
+            }
           ]
         },
         {
@@ -166,9 +333,36 @@
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "retefuente", "grupoPucEsperado": ["2365"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Componente de retencion devuelta sin nombre canonico en OXP (issue #10)." },
-            { "tipoComponente": "reteiva", "grupoPucEsperado": ["2367"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Inverso del reteiva en causacion_gasto. Retencion de IVA devuelta (issue #10)." },
-            { "tipoComponente": "reteica", "grupoPucEsperado": ["2368"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Inverso del reteica en causacion_gasto. Confirmar si OXP emite reteica como tipoComponente (issue #10)." }
+            {
+              "tipoComponente": "retefuente",
+              "grupoPucEsperado": [
+                "2365"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Componente de retencion devuelta sin nombre canonico en OXP (issue #10).",
+              "resolucionPorEspejo": "RETENCION"
+            },
+            {
+              "tipoComponente": "reteiva",
+              "grupoPucEsperado": [
+                "2367"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Inverso del reteiva en causacion_gasto. Retencion de IVA devuelta (issue #10).",
+              "resolucionPorEspejo": "RETENCION"
+            },
+            {
+              "tipoComponente": "reteica",
+              "grupoPucEsperado": [
+                "2368"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Inverso del reteica en causacion_gasto. Confirmar si OXP emite reteica como tipoComponente (issue #10).",
+              "resolucionPorEspejo": "RETENCION"
+            }
           ]
         },
         {
@@ -176,16 +370,35 @@
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "cargo_financiero", "grupoPucEsperado": ["5305"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Inverso del cargo_financiero en causacion_gasto. Lo emite la nota credito de un extracto (CargoFinancieroDevuelto). Confirmar grupo 5305 con consultor contable." }
+            {
+              "tipoComponente": "cargo_financiero",
+              "grupoPucEsperado": [
+                "5305"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Inverso del cargo_financiero en causacion_gasto. Lo emite la nota credito de un extracto (CargoFinancieroDevuelto). Confirmar grupo 5305 con consultor contable.",
+              "resolucionPorEspejo": "CARGO_FINANCIERO"
+            }
           ]
         },
         {
           "rol": "CONTRAPARTIDA",
           "naturaleza": "debito",
           "esContrapartida": true,
-          "grupoPucEsperado": ["2205", "2335"],
-          "porValidar": false,
-          "notaContrapartida": "Generada por el motor. Reduce la CxP."
+          "notaContrapartida": "Linea 'contrapartida' del consumidor. Reduce la CxP — espeja la CONTRAPARTIDA de la causacion devuelta [R53].",
+          "componentes": [
+            {
+              "tipoComponente": "contrapartida",
+              "grupoPucEsperado": [
+                "2205",
+                "2335"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": false,
+              "resolucionPorEspejo": "CONTRAPARTIDA"
+            }
+          ]
         }
       ]
     },
@@ -202,16 +415,34 @@
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "reversa_anticipo", "grupoPucEsperado": ["1330"], "llevaDescripcionConcepto": true, "porValidar": false }
+            {
+              "tipoComponente": "reversa_anticipo",
+              "grupoPucEsperado": [
+                "1330"
+              ],
+              "llevaDescripcionConcepto": true,
+              "porValidar": false,
+              "resolucionPorEspejo": "ANTICIPO"
+            }
           ]
         },
         {
           "rol": "CONTRAPARTIDA",
           "naturaleza": "debito",
           "esContrapartida": true,
-          "grupoPucEsperado": ["2205", "2335"],
-          "porValidar": false,
-          "notaContrapartida": "Generada por el motor."
+          "notaContrapartida": "Linea 'contrapartida' del consumidor. Espeja la CONTRAPARTIDA del anticipo original [R53].",
+          "componentes": [
+            {
+              "tipoComponente": "contrapartida",
+              "grupoPucEsperado": [
+                "2205",
+                "2335"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": false,
+              "resolucionPorEspejo": "CONTRAPARTIDA"
+            }
+          ]
         }
       ]
     },
@@ -226,16 +457,35 @@
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "amortizacion_anticipo", "grupoPucEsperado": ["1330"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Cr Anticipos a proveedores (1330) al consumir el anticipo contra la OXP ya causada. Confirmar grupo con consultor contable." }
+            {
+              "tipoComponente": "amortizacion_anticipo",
+              "grupoPucEsperado": [
+                "1330"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Cr Anticipos a proveedores (1330) al consumir el anticipo contra la OXP ya causada. Confirmar grupo con consultor contable.",
+              "resolucionPorEspejo": "ANTICIPO"
+            }
           ]
         },
         {
           "rol": "CONTRAPARTIDA",
           "naturaleza": "debito",
           "esContrapartida": true,
-          "grupoPucEsperado": ["2205", "2335"],
-          "porValidar": false,
-          "notaContrapartida": "Generada por el motor. Db CxP del proveedor (2205/2335): reduce la cuenta por pagar saldada por el anticipo. Su unidad organizacional sigue la politica de empresa [I33]."
+          "notaContrapartida": "Linea 'contrapartida' del consumidor. Db CxP del proveedor: espeja la CONTRAPARTIDA de la causacion de la OxpComercio cruzada [R53] — garantiza el neteo por cuenta. Su unidad organizacional sigue la politica de empresa [I33].",
+          "componentes": [
+            {
+              "tipoComponente": "contrapartida",
+              "grupoPucEsperado": [
+                "2205",
+                "2335"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": false,
+              "resolucionPorEspejo": "CONTRAPARTIDA"
+            }
+          ]
         }
       ]
     },
@@ -252,7 +502,17 @@
           "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "cruce_obligacion", "grupoPucEsperado": ["2205", "2335"], "llevaDescripcionConcepto": false, "porValidar": false, "notaValidacion": "Db CxP del proveedor de la nueva OxpComercio (su deuda ya fue pagada via extracto). El tercero de la linea es el proveedor." }
+            {
+              "tipoComponente": "cruce_obligacion",
+              "grupoPucEsperado": [
+                "2205",
+                "2335"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": false,
+              "notaValidacion": "Db CxP del proveedor de la nueva OxpComercio (su deuda ya fue pagada via extracto). El tercero de la linea es el proveedor.",
+              "resolucionPorEspejo": "CONTRAPARTIDA"
+            }
           ]
         },
         {
@@ -260,7 +520,17 @@
           "naturaleza": "credito",
           "esContrapartida": false,
           "componentes": [
-            { "tipoComponente": "partida_aclarada", "grupoPucEsperado": ["1360", "1380"], "llevaDescripcionConcepto": false, "porValidar": true, "notaValidacion": "Cr que cancela la transitoria de partidas por aclarar. El tercero de la linea es el banco/emisor (cierra la reclamacion). Mismo grupo que en causacion_gasto." }
+            {
+              "tipoComponente": "partida_aclarada",
+              "grupoPucEsperado": [
+                "1360",
+                "1380"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Cr que cancela la transitoria de partidas por aclarar. El tercero de la linea es el banco/emisor (cierra la reclamacion). Mismo grupo que en causacion_gasto.",
+              "resolucionPorEspejo": "PARTIDA_POR_ACLARAR"
+            }
           ]
         }
       ]

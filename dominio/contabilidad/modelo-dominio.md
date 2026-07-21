@@ -80,7 +80,8 @@ Cada evento se documenta con esta estructura:
 | **Motor de traducción / ServicioDeTraduccion** | El glosario lo llama "Motor de traducción". En el modelo se implementa como domain service `ServicioDeTraduccion`. Son el mismo concepto. |
 | **Servicio de Entrega / EntregaContable** | El glosario lo llama "Servicio de Entrega". En el modelo se implementa como agregado `EntregaContable` (con stream propio). Son el mismo concepto — el agregado registra cada entrega individual. |
 | **Sistema contable de destino** | El sistema que recibe los borradores resueltos. Puede ser N2 o un sistema externo. Solo uno activo por empresa. |
-| **Combinación de dimensiones** | Tupla ordenada de dimensiones de derivación (tipoComponente, clasificacion, empresa, y opcionalmente tipoTransaccion) que identifica unívocamente una resolución de cuenta en ReglaDeDerivacion o Aprendizaje. No confundir con "dimensiones de segmentación" de NumeracionContable (empresa, tipoComprobante, periodo, sucursal) que son un concepto diferente. |
+| **Combinación de dimensiones** | Conjunto de dimensiones con el que ReglaDeDerivacion y Aprendizaje resuelven una cuenta. Tiene dos partes: las **dimensiones estables** (tipoTransaccion, tipoComponente, empresa) — códigos canónicos que se comparan por igualdad exacta y delimitan la partición donde se busca — y la **clasificación** — texto semántico que viaja en la línea de traducción y se empareja **por similitud** contra el texto ancla de las reglas o el texto de las resoluciones aprendidas dentro de esa partición [D15]. No confundir con "dimensiones de segmentación" de NumeracionContable (empresa, tipoComprobante, periodo, sucursal) que son un concepto diferente. |
+| **Clasificación** | Texto semántico de emparejamiento que el consumidor compone mecánicamente por componente a partir de datos de sus catálogos (no lo digita un usuario, no es un código ni una llave). Obligatorio en toda línea de traducción. Las tres capas de la cadena lo comparan por similitud: Niveles A y C contra textos ancla/aprendidos; Nivel B contra las descripciones de las cuentas del PUC [D15]. |
 
 ---
 
@@ -168,9 +169,9 @@ Cada evento se documenta con esta estructura:
 | Componente | Tipo | Descripción | Atributos clave |
 |------------|------|-------------|-----------------|
 | — | Raíz | Atributos de la raíz BorradorContable | id (identificador del stream), estado (PENDIENTE/RESUELTO/DESCARTADO — derivado del stream), descripcion (texto general del hecho económico, opcional — la envía el consumidor; si no la envía, queda vacía, ver [D13]) |
-| PartidaBorrador | Entidad | Línea individual del borrador con débito o crédito | cuenta (auxiliar, puede ser null si no resuelta), tercero, unidadOrganizacional, debito, credito, nivelResolucion (A/C/B/manual/null), rol (código del rol heredado del RolPartida de la plantilla: GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA — conjunto cerrado, ver [D14]), esContrapartida (boolean, heredado del RolPartida — equivale a rol == CONTRAPARTIDA), descripcionConcepto (narración del movimiento, opcional — solo en partidas cuyo componente la lleva, ver [D13]) |
+| PartidaBorrador | Entidad | Línea individual del borrador con débito o crédito | cuenta (auxiliar, puede ser null si no resuelta), tercero, unidadOrganizacional, debito, credito, nivelResolucion (espejo/A/C/B/manual/null), rol (código del rol heredado del RolPartida de la plantilla: GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA — conjunto cerrado, ver [D14]), esContrapartida (boolean, heredado del RolPartida — equivale a rol == CONTRAPARTIDA), clasificacion (texto semántico de la línea de traducción que la originó — insumo de la resolución por similitud y del aprendizaje, ver [D15]), descripcionConcepto (narración del movimiento, opcional — solo en partidas cuyo componente la lleva, ver [D13]) |
 | ReferenciaOrigen | VO | Identificación única del hecho económico que originó el borrador | referenciaOrigen, subDominioOrigen, documentoFuente, referenciaHechoRelacionado (opcional — vincula devoluciones/notas crédito con el hecho original) |
-| InformacionTransaccion | VO | Contexto de la transacción | tipoTransaccion, empresa, moneda, fecha, terceroPrincipal (el tercero del documento que envía el emisor: proveedor en causación de gasto/anticipo/nota crédito, banco o emisor en extracto, etc. — corresponde al `InformacionTercero` de la raíz del agregado emisor; el motor lo usa como tercero de la contrapartida, ver paso 4 y [R01]) |
+| InformacionTransaccion | VO | Contexto de la transacción | tipoTransaccion, empresa, moneda, fecha, terceroPrincipal (el tercero del documento que envía el emisor: proveedor en causación de gasto/anticipo/nota crédito, banco o emisor en extracto, etc. — corresponde al `InformacionTercero` de la raíz del agregado emisor; **informativo** desde [D15]: el tercero de la contrapartida ya no se toma de aquí sino de la línea `contrapartida` que envía el consumidor, ver paso 4) |
 | MotivoRechazo | VO | Motivo del rechazo del destino (si aplica) | motivo, fechaRechazo, entregaId, destino |
 
 **Comportamiento calculado (no almacenado):**
@@ -203,17 +204,20 @@ Cada evento se documenta con esta estructura:
 │  └────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ PartidaBorrador #1 (Entidad)                                   │  │
-│  │  rol: GASTO · esContrapartida: false                          │  │
-│  │  cuenta: 5110-05-002 · tercero: 900123456 · undOrg: VTA-001   │  │
-│  │  debito: 600.000 · credito: 0 · nivelResolucion: C            │  │
-│  │  descripcionConcepto: "Honorarios auditoría externa"          │  │
+│  │  rol: GASTO · esContrapartida: false                           │  │
+│  │  cuenta: 5110-05-002 · tercero: 900123456 · undOrg: VTA-001    │  │
+│  │  debito: 600.000 · credito: 0 · nivelResolucion: C             │  │
+│  │  clasificacion: "Servicios de auditoría externa ·              │  │
+│  │                  honorarios · servicios profesionales"         │  │
+│  │  descripcionConcepto: "Honorarios auditoría externa"           │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────────────┐  │
-│  │ PartidaBorrador #2 (Entidad) — retención (no lleva concepto)  │  │
-│  │  rol: RETENCION · esContrapartida: false                      │  │
+│  │ PartidaBorrador #2 (Entidad) — retención (no lleva concepto)   │  │
+│  │  rol: RETENCION · esContrapartida: false                       │  │
 │  │  cuenta: null · tercero: 900123456 · undOrg: VTA-001           │  │
-│  │  debito: 0 · credito: 66.000 · nivelResolucion: null          │  │
-│  │  descripcionConcepto: — (su componente no lleva descripción)  │  │
+│  │  debito: 0 · credito: 66.000 · nivelResolucion: null           │  │
+│  │  clasificacion: "honorarios · retención en la fuente 11%"      │  │
+│  │  descripcionConcepto: — (su componente no lleva descripción)   │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ MotivoRechazo (VO) — solo si fue rechazado por el destino     │  │
@@ -228,7 +232,7 @@ Cada evento se documenta con esta estructura:
 
 ### 3.3. Agregado: Aprendizaje (N1)
 
-**Descripción:** Registra las resoluciones de cuentas que el contador ha tomado al completar borradores pendientes. Cada resolución asocia una combinación de dimensiones (tipo de componente, clasificación, empresa) con la cuenta auxiliar que el contador eligió. El motor de traducción consulta estos registros como Nivel C de la cadena de resolución.
+**Descripción:** Registra las resoluciones de cuentas que el contador ha tomado al completar borradores pendientes. Cada resolución asocia las dimensiones estables (tipoTransaccion, tipoComponente, empresa) y el texto de clasificación de la línea resuelta con la cuenta auxiliar que el contador eligió. El motor de traducción consulta estos registros como Nivel C de la cadena de resolución: selecciona los aprendizajes de la partición estable y empareja la clasificación de la línea nueva **por similitud** contra los textos aprendidos [D15] [SI8].
 
 **Raíz:** Aprendizaje
 
@@ -240,13 +244,13 @@ Cada evento se documenta con esta estructura:
 
 | Componente | Tipo | Descripción | Atributos clave |
 |------------|------|-------------|-----------------|
-| ResolucionAprendida | Entidad | Una resolución de cuenta aprendida del contador | combinacionDimensiones (tipoComponente, clasificacion, empresa), cuentaAuxiliar, fechaAprendizaje |
+| ResolucionAprendida | Entidad | Una resolución de cuenta aprendida del contador | dimensiones estables (tipoTransaccion, tipoComponente, empresa), clasificacion (texto semántico de la línea que el contador resolvió), cuentaAuxiliar, fechaAprendizaje |
 
 **Comportamiento calculado (no almacenado):**
 
 | Método | Fórmula | Usado por |
 |--------|---------|-----------|
-| `resolver(dimensiones)` | Busca ResolucionAprendida que coincida con las dimensiones | Cadena de resolución, Nivel C [DD2] |
+| `resolver(dimensionesEstables, clasificacion)` | Selecciona las ResolucionAprendida cuya partición estable coincide exactamente y empareja por similitud la clasificación recibida contra los textos aprendidos; resuelve con la de mayor similitud si supera el umbral [SI8]. Una clasificación idéntica (compra repetida) da similitud máxima. | Cadena de resolución, Nivel C [DD2] [D15] |
 
 **Diagrama de composición:**
 
@@ -258,13 +262,16 @@ Cada evento se documenta con esta estructura:
 │                                                                      │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ ResolucionAprendida #1 (Entidad)                               │  │
-│  │  tipoComponente: gasto · clasificacion: HONORARIOS             │  │
+│  │  tipoTransaccion: causacion_gasto · tipoComponente: gasto      │  │
+│  │  clasificacion: "Servicios de auditoría externa ·              │  │
+│  │                  honorarios · servicios profesionales"         │  │
 │  │  empresa: COSMOS-SAS · cuentaAuxiliar: 5110-05-002             │  │
 │  │  fechaAprendizaje: 2026-03-15                                  │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ ResolucionAprendida #2 (Entidad)                               │  │
-│  │  tipoComponente: iva · clasificacion: IVA-19                   │  │
+│  │  tipoTransaccion: causacion_gasto · tipoComponente: iva        │  │
+│  │  clasificacion: "honorarios · iva 19%"                         │  │
 │  │  empresa: COSMOS-SAS · cuentaAuxiliar: 2408-01-001             │  │
 │  │  fechaAprendizaje: 2026-03-15                                  │  │
 │  └────────────────────────────────────────────────────────────────┘  │
@@ -399,7 +406,7 @@ Marcos custom (creados por usuario con permiso especial cuando aplique):
 
 ### 3.6. Agregado: ReglaDeDerivacion (N1, configuración)
 
-**Descripción:** Configuración que determina qué cuenta auxiliar corresponde a una combinación de dimensiones del hecho económico. Las reglas del Nivel A de la cadena de resolución.
+**Descripción:** Configuración que determina qué cuenta auxiliar corresponde a una combinación de dimensiones del hecho económico. Las reglas del Nivel A de la cadena de resolución. Cada regla ancla sus dimensiones estables (tipoTransaccion, tipoComponente, empresa) por igualdad exacta y un **texto ancla** que se empareja por similitud contra la clasificación de la línea [D15]. La regla se distingue del aprendizaje por gobernanza, no por mecánica: es explícita, inmutable y prevalece (al promover un aprendizaje a regla, el texto aprendido se copia como texto ancla).
 
 **Raíz:** ReglaDeDerivacion
 
@@ -411,7 +418,7 @@ Marcos custom (creados por usuario con permiso especial cuando aplique):
 
 | Componente | Tipo | Descripción | Atributos clave |
 |------------|------|-------------|-----------------|
-| Regla | Entidad | Una regla de derivación individual | combinacionDimensiones (tipoComponente, clasificacion, empresa, tipoTransaccion), cuentaAuxiliar, estado (activa/inactiva) |
+| Regla | Entidad | Una regla de derivación individual | dimensiones estables (tipoTransaccion, tipoComponente, empresa), textoAncla (texto de clasificación contra el que se empareja por similitud la línea entrante — copiado del aprendizaje al promover, o registrado por el analista contable), cuentaAuxiliar, estado (activa/inactiva) |
 
 **Diagrama de composición:**
 
@@ -423,9 +430,18 @@ Marcos custom (creados por usuario con permiso especial cuando aplique):
 │                                                                      │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ Regla #1 (Entidad)                                             │  │
-│  │  tipoComponente: gasto · clasificacion: HONORARIOS             │  │
-│  │  empresa: COSMOS-SAS · tipoTransaccion: causacion_gasto        │  │
-│  │  cuentaAuxiliar: 5110-05-002 · estado: activa                 │  │
+│  │  tipoTransaccion: causacion_gasto · tipoComponente: gasto      │  │
+│  │  textoAncla: "Servicios de auditoría externa ·                 │  │
+│  │               honorarios · servicios profesionales"            │  │
+│  │  empresa: COSMOS-SAS · cuentaAuxiliar: 5110-05-002             │  │
+│  │  estado: activa                                                │  │
+│  └────────────────────────────────────────────────────────────────┘  │
+│  ┌────────────────────────────────────────────────────────────────┐  │
+│  │ Regla #2 (Entidad)                                             │  │
+│  │  tipoTransaccion: causacion_gasto · tipoComponente: iva        │  │
+│  │  textoAncla: "honorarios · iva 19%"                            │  │
+│  │  empresa: COSMOS-SAS · cuentaAuxiliar: 2408-01-001             │  │
+│  │  estado: activa                                                │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 │  ┌────────────────────────────────────────────────────────────────┐  │
 │  │ Regla #2 (Entidad)                                             │  │
@@ -455,13 +471,15 @@ Marcos custom (creados por usuario con permiso especial cuando aplique):
 | Componente | Tipo | Descripción | Atributos clave |
 |------------|------|-------------|-----------------|
 | — | Raíz | Atributo de la raíz PlantillaDeAsiento | tipoTransaccion (clave natural de la plantilla) |
-| RolPartida | Entidad | Un rol dentro de la plantilla | rol (código del rol — conjunto cerrado: GASTO, IMPUESTO, RETENCION, CONTRAPARTIDA, etc.; es la clave natural del rol dentro de la plantilla), naturaleza (debito/credito), esContrapartida (boolean), grupoPucEsperado (lista de prefijos PUC de longitud variable — **solo aplica cuando esContrapartida = true**, ver [D12]) |
-| ComponenteDelRol | VO | Cada tipo de componente que alimenta un rol, con su acotación de cuenta. Un rol alimentado por líneas tiene uno o más. | tipoComponente, grupoPucEsperado (lista de prefijos PUC de longitud variable), llevaDescripcionConcepto (boolean — si true, la partida resultante recibe la descripcionConcepto que envía el consumidor; ver [D13]) |
+| RolPartida | Entidad | Un rol dentro de la plantilla | rol (código del rol — conjunto cerrado: GASTO, IMPUESTO, RETENCION, CONTRAPARTIDA, etc.; es la clave natural del rol dentro de la plantilla), naturaleza (debito/credito), esContrapartida (boolean) |
+| ComponenteDelRol | VO | Cada tipo de componente que alimenta un rol, con su acotación de cuenta. Un rol alimentado por líneas tiene uno o más. | tipoComponente, grupoPucEsperado (lista de prefijos PUC de longitud variable), llevaDescripcionConcepto (boolean — si true, la partida resultante recibe la descripcionConcepto que envía el consumidor; ver [D13]), resolucionPorEspejo (opcional — rol del hecho relacionado cuya cuenta se copia; cuando está presente, el componente no se resuelve por la cadena sino por **espejo del hecho relacionado**, ver [D15] y paso 3 del ServicioDeTraduccion) |
 | ConfiguracionPlantilla | VO | Configuración adicional de la plantilla | documentoFuenteObligatorio (boolean) |
 
-**Sobre `grupoPucEsperado` y `ComponenteDelRol`:** Cada componente que alimenta un rol declara su `grupoPucEsperado` — los grupos del PUC (prefijos de código de cuenta, de longitud variable: clase, grupo o cuenta) a los que debe pertenecer la cuenta resuelta. El grupo vive en el componente, no en el rol, porque un mismo rol agrupa varios `tipoComponente` que caen en grupos distintos (ej: el rol RETENCION cubre `retefuente`→`2365` y `reteiva`→`2367`). La **contrapartida** es la excepción: se genera por el motor y carece de `tipoComponente` (ver paso 4 del ServicioDeTraduccion), por lo que su `grupoPucEsperado` se declara a nivel del rol. Detalle del concepto en [D12].
+**Sobre `grupoPucEsperado` y `ComponenteDelRol`:** Cada componente que alimenta un rol declara su `grupoPucEsperado` — los grupos del PUC (prefijos de código de cuenta, de longitud variable: clase, grupo o cuenta) a los que debe pertenecer la cuenta resuelta. El grupo vive en el componente, no en el rol, porque un mismo rol agrupa varios `tipoComponente` que caen en grupos distintos (ej: el rol RETENCION cubre `retefuente`→`2365` y `reteiva`→`2367`). Desde [D15] la contrapartida ya no es excepción: viaja como línea con `tipoComponente = contrapartida`, por lo que el rol CONTRAPARTIDA declara su `ComponenteDelRol` como cualquier otro. Detalle del concepto en [D12].
 
 **Sobre `llevaDescripcionConcepto`:** Cada `ComponenteDelRol` declara si la partida que genera debe recibir la `descripcionConcepto` del hecho económico. Es `true` solo en los componentes que portan concepto de negocio (`gasto`, `concepto_devuelto`, `anticipo`) y `false` en impuestos y retenciones, cuya cuenta ya es autodescriptiva (el nombre de la cuenta basta). Evita repetir el mismo texto en partidas donde no aporta. Detalle en [D13].
+
+**Sobre `resolucionPorEspejo`:** Los componentes que representan la contraparte contable de un hecho económico anterior deben aterrizar en la **misma cuenta** que usó ese hecho — de lo contrario el cruce contable no salda. Para ellos el `ComponenteDelRol` declara `resolucionPorEspejo` con el rol a espejar, y el motor copia la cuenta de la partida de ese rol en el borrador del hecho relacionado (la línea trae `referenciaHechoRelacionado`; la naturaleza Db/Cr la da esta plantilla, normalmente inversa a la original). Es conocimiento del producto, como la naturaleza. Componentes con espejo en el catálogo de OXP: `cruce_obligacion` → CONTRAPARTIDA de la causación cruzada; `partida_aclarada` → PARTIDA_POR_ACLARAR de la causación del extracto con la disputa; `amortizacion_anticipo` y `reversa_anticipo` → ANTICIPO del anticipo original; y en `nota_credito_gasto` **todos** los componentes espejan el rol homólogo de la causación devuelta (GASTO, IMPUESTO, RETENCION, CONTRAPARTIDA). El espejo precede a la cadena de resolución y no alimenta el aprendizaje. Detalle en [D15].
 
 **Diagrama de composición:**
 
@@ -506,7 +524,10 @@ Marcos custom (creados por usuario con permiso especial cuando aplique):
 │  │ RolPartida #4 (Entidad)                                        │  │
 │  │  rol: CONTRAPARTIDA · naturaleza: credito                      │  │
 │  │  esContrapartida: true                                         │  │
-│  │  grupoPucEsperado: ["2205","2335"]  (a nivel de rol)           │  │
+│  │  ComponenteDelRol:                                             │  │
+│  │   { tipoComponente: contrapartida                              │  │
+│  │     · grupoPucEsperado: ["2205","2335"]                        │  │
+│  │     · llevaDescripcionConcepto: false }                        │  │
 │  └────────────────────────────────────────────────────────────────┘  │
 └──────────────────────────────────────────────────────────────────────┘
 ```
@@ -779,9 +800,9 @@ En la arquitectura predeterminada moderna, ambos libros (Principal y Fiscal) apu
 | Paso | Acción | Evento emitido | Stream destino |
 |------|--------|---------------|----------------|
 | 1 | Validar unicidad de referenciaOrigen [R16]. Si ya existe un borrador con la misma referencia y está en PENDIENTE, se aplica R14 (reemplazo). Si ya no está en PENDIENTE, el motor rechaza el hecho económico con motivo estructurado y notifica al consumidor. | — (si reemplazo: BorradorReemplazado; si rechazo: notificación al consumidor con motivo, sin evento de dominio) | — |
-| 2 | Identificar tipoTransaccion → seleccionar PlantillaDeAsiento. Validar que cada tipoComponente recibido en las líneas tenga al menos un RolPartida que lo cubra en la plantilla [I27]. | — (si no existe plantilla o hay líneas sin rol, no se crea borrador y se notifica al consumidor con motivo estructurado) | — |
-| 3 | Para cada rol de la plantilla, resolver cuenta auxiliar mediante cadena: Nivel A (ReglaDeDerivacion) → Nivel C (Aprendizaje) → Nivel B (inferencia sobre PlanDeCuentas) [DD2]. El **Nivel B se acota al `grupoPucEsperado`** del componente que alimenta el rol: solo considera cuentas auxiliares cuyo código inicia por alguno de los prefijos declarados [D12]. Los Niveles A y C no se acotan (resuelven la cuenta explícita/aprendida). En cada nivel, si la cuenta resuelta no está activa en el PUC, se descarta y se continúa al siguiente nivel [I24]. | — | — |
-| 4 | Generar contrapartida: el **tercero** es el `terceroPrincipal` del hecho económico (el tercero del documento que envía el emisor — proveedor en la causación de gasto, banco/emisor en el extracto, etc.); **no** se toma de las líneas, porque estas pueden traer varios terceros distintos (ej. el extracto cruza varios proveedores) o no contener al tercero de la contrapartida. La **unidad organizacional** se asigna según la preferencia de la empresa [I33] (distribuida replicando las partidas de origen, consolidada en una unidad general, o sin unidad organizacional — respetando la obligatoriedad del PUC). La cuenta auxiliar se resuelve por la cadena como cualquier otro rol; al carecer de `tipoComponente`, su Nivel B se acota al `grupoPucEsperado` declarado a nivel del rol contrapartida [D12]. Las partidas alimentadas por línea conservan el tercero de su propia línea. [R01] | — | — |
+| 2 | Identificar tipoTransaccion → seleccionar PlantillaDeAsiento. Validar que cada tipoComponente recibido en las líneas tenga al menos un RolPartida que lo cubra en la plantilla [I27], que **toda línea traiga clasificación no vacía** [I34] y que, si la plantilla tiene rol CONTRAPARTIDA, venga **exactamente una línea `contrapartida`** [I35]. | — (si no existe plantilla, hay líneas sin rol, líneas sin clasificación o falta la línea de contrapartida, no se crea borrador y se notifica al consumidor con motivo estructurado) | — |
+| 3 | Para cada rol de la plantilla, resolver cuenta auxiliar. **Primero, espejo del hecho relacionado:** si el `ComponenteDelRol` declara `resolucionPorEspejo`, el motor busca su propio borrador del hecho relacionado (por `referenciaOrigen` = `referenciaHechoRelacionado` de la línea) y **copia la cuenta** de la partida del rol espejado — garantiza que el cruce contable salde en la misma cuenta [D15]. Si el borrador relacionado no existe (ej. saldos migrados de un sistema anterior) o tiene varias partidas de ese rol con cuentas distintas, la partida queda con cuenta null (borrador PENDIENTE) — nunca se resuelve por similitud, porque una cuenta distinta rompe el cruce; el espejo tampoco alimenta el aprendizaje. **Para los demás componentes, cadena:** Nivel A (ReglaDeDerivacion — partición estable exacta + similitud contra el textoAncla) → Nivel C (Aprendizaje — partición estable exacta + similitud contra los textos aprendidos, umbral [SI8]) → Nivel B (inferencia sobre PlanDeCuentas comparando la clasificación contra la descripción de las cuentas) [DD2] [D15]. El **Nivel B se acota al `grupoPucEsperado`** del componente que alimenta el rol: solo considera cuentas auxiliares cuyo código inicia por alguno de los prefijos declarados [D12]. En cada nivel, si la cuenta resuelta no está activa en el PUC, se descarta y se continúa al siguiente nivel [I24]. | — | — |
+| 4 | Completar la partida de contrapartida a partir de la línea `contrapartida` que envía el consumidor: la línea trae **tercero** propio (proveedor en la causación de gasto, banco/emisor en el extracto — antes esto lo resolvía `terceroPrincipal`, que queda informativo) y **clasificación** (texto compuesto por el consumidor, ej. medio de pago + observación general), pero viaja **sin valor y sin unidad organizacional**: el **valor** lo calcula el motor como la diferencia entre débitos y créditos (es la única línea cuyo valor no viene del consumidor — garantiza el balance [R01]) y la **unidad organizacional** se asigna según la preferencia de la empresa [I33] (distribuida replicando las partidas de origen, consolidada en una unidad general, o sin unidad organizacional — respetando la obligatoriedad del PUC). La cuenta se resuelve en el paso 3 como cualquier otro componente (por cadena, o por espejo en `nota_credito_gasto`). Las partidas alimentadas por las demás líneas conservan el tercero de su propia línea. | — | — |
 | 4b | Asignar narración: a cada partida cuyo componente tiene `llevaDescripcionConcepto = true`, se le copia la `descripcionConcepto` de la línea de traducción que la originó; las demás partidas quedan sin `descripcionConcepto`. La `descripcion` general del hecho económico (si el consumidor la envió) se traslada al encabezado del borrador; si no vino, el borrador queda sin `descripcion` [D13]. | — | — |
 | 5 | Crear borrador con partidas resueltas o pendientes. Cada partida hereda el `rol` del `RolPartida` de la plantilla que la originó (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA) — queda registrado en la partida y se propaga a la entrega para que el destino (ej. SincoA&F) identifique las partidas tributarias [D14]. | BorradorCreado | borrador-contable-{id} |
 | 6 | Si todas las cuentas resueltas y balancea → BorradorResuelto (derivado por transición) | BorradorResuelto | borrador-contable-{id} |
@@ -795,6 +816,8 @@ Cuando el motor rechaza un hecho económico antes de crear el borrador (pasos 1 
 | `REFERENCIA_ORIGEN_DUPLICADA_NO_REEMPLAZABLE` | Paso 1 — ya existe un borrador con la misma `referenciaOrigen` que no está en PENDIENTE [R14][R16]. | `referenciaOrigen`, estado actual del borrador existente, `referenciaDestino` si ya fue contabilizado. | Consumidor (idempotencia: reconoce que el hecho ya fue procesado). |
 | `TIPO_TRANSACCION_SIN_PLANTILLA` | Paso 2 — no existe `PlantillaDeAsiento` para el `tipoTransaccion` recibido. | `referenciaOrigen`, `tipoTransaccion` recibido. | Equipo de producto (corregir catálogo de plantillas). |
 | `LINEA_SIN_ROL_EN_PLANTILLA` | Paso 2 — al menos una línea trae un `tipoComponente` no cubierto por ningún `ComponenteDelRol` de la plantilla [I27]. | `referenciaOrigen`, `tipoTransaccion`, lista de `tipoComponente` no cubiertos. | Equipo de producto (ampliar plantilla) o consumidor (corregir contrato si envió un `tipoComponente` erróneo). |
+| `LINEA_SIN_CLASIFICACION` | Paso 2 — al menos una línea llegó sin texto de clasificación [I34]. | `referenciaOrigen`, `tipoTransaccion`, lista de `tipoComponente` de las líneas sin clasificación. | Consumidor (corregir la composición de la clasificación, ver [D15]). |
+| `LINEA_CONTRAPARTIDA_FALTANTE` | Paso 2 — la plantilla del `tipoTransaccion` tiene rol CONTRAPARTIDA pero el hecho económico no trae exactamente una línea `contrapartida` [I35]. | `referenciaOrigen`, `tipoTransaccion`. | Consumidor (emitir la línea de contrapartida del contrato, ver [D15]). |
 
 La durabilidad del hecho económico mientras se resuelve la causa del rechazo es responsabilidad del consumidor emisor, que conserva el hecho en su propia bandeja de eventos hasta confirmar que fue procesado. El detalle del mecanismo técnico de notificación y reproceso está en [SI7].
 
@@ -1006,13 +1029,22 @@ Se recomienda optimistic concurrency sobre la versión del stream de `entrega-co
 
 #### [SI7] Tratamiento técnico de rechazos previos al borrador
 
-Los rechazos del ServicioDeTraduccion en pasos 1 y 2 (motivos estructurados `REFERENCIA_ORIGEN_DUPLICADA_NO_REEMPLAZABLE`, `TIPO_TRANSACCION_SIN_PLANTILLA`, `LINEA_SIN_ROL_EN_PLANTILLA`) no son eventos de dominio. Se sugiere materializarlos sobre la infraestructura de mensajería con tres elementos:
+Los rechazos del ServicioDeTraduccion en pasos 1 y 2 (motivos estructurados `REFERENCIA_ORIGEN_DUPLICADA_NO_REEMPLAZABLE`, `TIPO_TRANSACCION_SIN_PLANTILLA`, `LINEA_SIN_ROL_EN_PLANTILLA`, `LINEA_SIN_CLASIFICACION`, `LINEA_CONTRAPARTIDA_FALTANTE`) no son eventos de dominio. Se sugiere materializarlos sobre la infraestructura de mensajería con tres elementos:
 
 1. **Respuesta negativa al bus (NACK) con dead-letter queue (DLQ):** el mensaje rechazado se redirige automáticamente a una cola de mensajes no procesados, con política de retención auditable (al menos 30 días sugeridos). Permite reproceso manual reinyectando los mensajes una vez corregido el defecto (plantilla ampliada, regla creada, etc.).
 2. **Logs estructurados:** cada rechazo deja un registro con `referenciaOrigen`, `motivoCodigo`, `motivoDetalle`, `tipoTransaccion`, `subDominioOrigen`, `empresa`, `fechaRecepcion` y payload completo recibido. Soporta investigación forense fuera de la ventana del bus.
 3. **Métricas y alertas:** la tasa de rechazos por motivo se publica como métrica operacional. Un spike de `LINEA_SIN_ROL_EN_PLANTILLA` o `TIPO_TRANSACCION_SIN_PLANTILLA` debe disparar alerta al equipo de producto, ya que corresponde a defectos de configuración del catálogo de plantillas.
 
 La durabilidad del hecho económico mientras se resuelve el rechazo es responsabilidad del consumidor emisor mediante outbox pattern: cada sub-dominio consumidor conserva sus hechos económicos hasta confirmar procesamiento exitoso por el motor. La combinación outbox del consumidor + DLQ del bus garantiza que ningún hecho económico se pierda — sin necesidad de stream propio del motor para rechazos pre-borrador.
+
+#### [SI8] Emparejamiento por similitud de la clasificación (Niveles A y C)
+
+Los Niveles A y C resuelven en dos pasos: filtro exacto por las dimensiones estables (tipoTransaccion, tipoComponente, empresa) y emparejamiento **por similitud semántica** de la clasificación de la línea contra los textos ancla (reglas) o aprendidos (resoluciones) de esa partición [D15]. El equipo de desarrollo elige la técnica (representaciones vectoriales, búsqueda semántica u otras — coherente con la elegida para el Nivel B, [D6]) considerando:
+
+1. **Umbral de resolución automática:** solo se resuelve si la mejor similitud supera un umbral de confianza; por debajo, se continúa al siguiente nivel de la cadena (y del Nivel B en adelante, borrador PENDIENTE). Definir el umbral con medición sobre datos reales, no a priori.
+2. **Coincidencia exacta = similitud máxima:** como las clasificaciones se componen mecánicamente desde catálogos, la repetición de una compra produce el mismo texto — el emparejamiento debe garantizar que el texto idéntico siempre resuelve (conserva el comportamiento de [R12]).
+3. **Desempate:** a igualdad de similitud entre candidatos con cuentas distintas, prevalece el más reciente (coherente con [I9]); si la ambigüedad persiste, no se resuelve automáticamente.
+4. **El índice es por empresa y por partición** — nunca se compara contra textos de otra empresa, otro tipoComponente u otro tipoTransaccion.
 
 ---
 
@@ -1211,7 +1243,7 @@ El bounded context de Contabilidad emite **55 eventos** distribuidos en 12 agreg
 | **Estado previo** | — (creación) |
 | **Estado resultante** | PENDIENTE (si faltan cuentas por resolver) o RESUELTO (si la cadena resolvió todo y balancea — en este caso se emite BorradorResuelto como derivado por transición). |
 | **Precondiciones** | Referencia de origen única [R16]. Datos maestros activos [R07]. Documento fuente según tipo de transacción [R08]. |
-| **Información capturada** | Partidas (cuenta o null, tercero, unidadOrganizacional, debito, credito, nivelResolucion, rol, esContrapartida, descripcionConcepto), referenciaOrigen, subDominioOrigen, documentoFuente, descripcion, tipoTransaccion, empresa, moneda, fecha, terceroPrincipal. |
+| **Información capturada** | Partidas (cuenta o null, tercero, unidadOrganizacional, debito, credito, nivelResolucion, rol, esContrapartida, clasificacion, descripcionConcepto), referenciaOrigen, subDominioOrigen, documentoFuente, descripcion, tipoTransaccion, empresa, moneda, fecha, terceroPrincipal (informativo). |
 | **Efectos** | Si nace RESUELTO → emite BorradorResuelto (derivado por transición). Si nace de un consumidor → el borrador no es descartable [R09]. |
 
 #### CuentaResuelta
@@ -1379,7 +1411,7 @@ El bounded context de Contabilidad emite **55 eventos** distribuidos en 12 agreg
 | **Estado previo** | PENDIENTE |
 | **Estado resultante** | PENDIENTE (sin cambio de estado — toda la información se reemplaza). |
 | **Precondiciones** | Borrador en estado PENDIENTE [R14]. La referenciaOrigen coincide con la del borrador existente. Si el borrador ya no está en PENDIENTE, la re-emisión se rechaza. |
-| **Información capturada** | Datos nuevos completos del consumidor: partidas (cuenta o null, tercero, unidadOrganizacional, debito, credito, nivelResolucion, rol, esContrapartida, descripcionConcepto), descripcion, tipoTransaccion, empresa, moneda, fecha, terceroPrincipal, documentoFuente. El estado anterior no se captura — se reconstruye del stream (ES). |
+| **Información capturada** | Datos nuevos completos del consumidor: partidas (cuenta o null, tercero, unidadOrganizacional, debito, credito, nivelResolucion, rol, esContrapartida, clasificacion, descripcionConcepto), descripcion, tipoTransaccion, empresa, moneda, fecha, terceroPrincipal (informativo), documentoFuente. El estado anterior no se captura — se reconstruye del stream (ES). |
 | **Efectos** | Las resoluciones de cuentas anteriores se pierden [R15]. El borrador vuelve a pasar por la cadena de resolución con los nuevos datos. |
 
 ---
@@ -1388,15 +1420,15 @@ El bounded context de Contabilidad emite **55 eventos** distribuidos en 12 agreg
 
 | Aspecto | Detalle |
 |---------|---------|
-| **Descripción** | El sistema registró la resolución de cuenta que el contador eligió para una combinación de dimensiones. La próxima vez que se presente la misma combinación, el sistema resolverá automáticamente. |
+| **Descripción** | El sistema registró la resolución de cuenta que el contador eligió para una combinación de dimensiones. En adelante, cuando llegue una línea de la misma partición estable con clasificación idéntica o suficientemente similar, el sistema resolverá automáticamente [SI8]. Las partidas resueltas por espejo del hecho relacionado no alimentan el aprendizaje [D15]. |
 | **Causalidad** | Efecto inter-agregado (derivado de CuentaResuelta en BorradorContable) [DD2]. |
 | **Agregado** | Aprendizaje |
 | **Nivel** | N1 |
 | **Estado previo** | — (sin FSM). |
 | **Estado resultante** | — (sin FSM). |
 | **Precondiciones** | Se emitió CuentaResuelta en un borrador. |
-| **Información capturada** | combinacionDimensiones (tipoComponente, clasificacion, empresa), cuentaAuxiliar, fechaAprendizaje. |
-| **Efectos** | El Nivel C de la cadena de resolución usará esta resolución en futuros borradores [R12]. |
+| **Información capturada** | dimensiones estables (tipoTransaccion, tipoComponente, empresa), clasificacion (texto semántico de la partida resuelta), cuentaAuxiliar, fechaAprendizaje. |
+| **Efectos** | El Nivel C de la cadena de resolución usará esta resolución en futuros borradores, emparejando por similitud [R12] [SI8]. |
 
 #### AprendizajePromovidoARegla
 
@@ -1408,9 +1440,9 @@ El bounded context de Contabilidad emite **55 eventos** distribuidos en 12 agreg
 | **Nivel** | N1 |
 | **Estado previo** | — (sin FSM). |
 | **Estado resultante** | — (sin FSM). |
-| **Precondiciones** | Existe una ResolucionAprendida para la combinación de dimensiones. |
-| **Información capturada** | combinacionDimensiones, cuentaAuxiliar, reglaDeDerivacionCreada (referencia). |
-| **Efectos** | Se crea una ReglaAgregada en el agregado ReglaDeDerivacion como efecto inter-agregado eventual [R12]. Si la creación de la regla falla, se reintenta — el evento AprendizajePromovidoARegla es idempotente (la misma combinación de dimensiones produce la misma regla). |
+| **Precondiciones** | Existe una ResolucionAprendida para la partición estable y el texto aprendido. |
+| **Información capturada** | dimensiones estables, clasificacion (texto aprendido que se copia como textoAncla de la regla), cuentaAuxiliar, reglaDeDerivacionCreada (referencia). |
+| **Efectos** | Se crea una ReglaAgregada en el agregado ReglaDeDerivacion como efecto inter-agregado eventual [R12]. Si la creación de la regla falla, se reintenta — el evento AprendizajePromovidoARegla es idempotente (la misma partición estable con el mismo texto ancla produce la misma regla [I14]). |
 
 #### AprendizajeInvalidado
 
@@ -1616,7 +1648,7 @@ Los eventos de configuración siguen un patrón uniforme: el agregado se crea un
 | # | Evento | Descripción | Información capturada | Reglas |
 |:---:|---|---|---|---|
 | 1 | `ReglaDeDerivacionCreada` | Se creó el conjunto de reglas de derivación. | Empresa. | — |
-| 2 | `ReglaAgregada` | Se registró una nueva regla de derivación (Nivel A). Nace activa por defecto. | combinacionDimensiones (tipoComponente, clasificacion, empresa, tipoTransaccion), cuentaAuxiliar. | [DD2] |
+| 2 | `ReglaAgregada` | Se registró una nueva regla de derivación (Nivel A). Nace activa por defecto. | dimensiones estables (tipoTransaccion, tipoComponente, empresa), textoAncla, cuentaAuxiliar. | [DD2] [D15] |
 | 3 | `ReglaModificada` | Se actualizó una regla existente. | combinacionDimensiones (identifica), cuentaAuxiliar nueva. | — |
 | 4 | `ReglaInactivada` | Una regla dejó de aplicarse. Se conserva para trazabilidad. | combinacionDimensiones, motivo. | — |
 | 5 | `ReglaReactivada` | Una regla previamente inactivada volvió a aplicarse. | combinacionDimensiones. | — |
@@ -1683,7 +1715,7 @@ El inventario completo de tipos de transacción y sus plantillas está documenta
 | Arrendamientos (NIIF 16) | 3 | Reconocimiento inicial ROU, depreciación ROU, interés sobre pasivo |
 | Contabilidad (GL) | 3 | Asiento manual, cierre de periodo, apertura |
 
-Cada plantilla define roles con naturaleza fija (débito/crédito) que son conocimiento universal del producto — no los configura el usuario. Lo que varía por empresa es a qué cuenta auxiliar específica va cada rol, que se resuelve mediante la cadena de resolución [DD2].
+Cada plantilla define roles con naturaleza fija (débito/crédito) que son conocimiento universal del producto — no los configura el usuario. Lo que varía por empresa es a qué cuenta auxiliar específica va cada rol, que se resuelve mediante la cadena de resolución [DD2] — o por **espejo del hecho relacionado** en los componentes que la plantilla marca con `resolucionPorEspejo` [D15].
 
 ---
 
@@ -1700,12 +1732,12 @@ Cada plantilla define roles con naturaleza fija (débito/crédito) que son conoc
 | I7a | Un borrador solo puede usar cuentas auxiliares en estado activo. | BorradorContable | Local | [R07] |
 | I7b | Un borrador solo puede usar terceros y unidades organizacionales en estado activo. El estado de estos datos maestros se valida contra la **copia local** de la señal que cada sub-dominio dueño publica por suscripción (Terceros: señal global; Estructura Organizacional: eventos de ciclo de vida de unidades) — **sin consulta en caliente** (replanteamiento jun-2026). La validación se aplica al momento de asignar o modificar — si el dato se inactiva después, el borrador conserva la referencia existente. | BorradorContable | Eventual | [R07] |
 | I8 | La referencia de origen es única en N1. No pueden existir dos borradores con la misma referencia. Si el consumidor re-emite con la misma referencia y el borrador está PENDIENTE, N1 reemplaza las partidas (BorradorReemplazado) — no crea un segundo borrador. Si el borrador ya no está PENDIENTE, la re-emisión se rechaza. | BorradorContable | Local | [R14] [R15] [R16] |
-| I9 | Para una misma combinación de dimensiones en el Aprendizaje, la resolución más reciente prevalece. No se eliminan las anteriores — se acumulan y la última es la vigente. | Aprendizaje | Local | [R12] |
+| I9 | Para una misma partición de dimensiones estables con un texto de clasificación idéntico, la resolución más reciente del Aprendizaje prevalece. No se eliminan las anteriores — se acumulan y la última es la vigente. Textos distintos dentro de la misma partición coexisten como candidatos del emparejamiento por similitud [SI8]. | Aprendizaje | Local | [R12] [D15] |
 | I10 | Un borrador generado desde un consumidor no puede descartarse. | BorradorContable | Local | [R09] |
 | I11 | Un borrador manual solo puede descartarse desde estado PENDIENTE. | BorradorContable | Local | [R10] |
 | I12 | Si la plantilla de asiento define el documento fuente como obligatorio, el borrador debe tener documento fuente no vacío para poder resolverse. | BorradorContable | Local | [R08] |
 | I13 | Para un mismo borrador solo puede existir una entrega en curso (ENVIADO). Un borrador puede acumular múltiples entregas a lo largo de su vida (ej: primera entrega rechazada, segunda aceptada). Se valida mediante consulta (read model o proyección) sobre EntregaContable filtrando por borradorId y estado ENVIADO. Las entregas finalizadas (ACEPTADO, RECHAZADO) no bloquean nuevas entregas. | EntregaContable, BorradorContable | Eventual | [DD6] |
-| I14 | No pueden existir dos reglas activas con la misma combinación de dimensiones en ReglaDeDerivacion. Es el mecanismo de idempotencia para AprendizajePromovidoARegla. | ReglaDeDerivacion | Local | [R12] [DD2] |
+| I14 | No pueden existir dos reglas activas con la misma partición de dimensiones estables y el mismo textoAncla en ReglaDeDerivacion. Es el mecanismo de idempotencia para AprendizajePromovidoARegla y el control del repetido de reglas. | ReglaDeDerivacion | Local | [R12] [DD2] [D15] |
 | I15 | N2 no acepta asientos en periodos cerrados para el tipo de comprobante correspondiente. La acción ante periodo cerrado (rechazo o redirección al mes siguiente) depende de la configuración de la empresa. El enforcement ocurre en ServicioDeContabilizacion que consulta PeriodoContable antes de escribir en AsientoContable. | PeriodoContable, AsientoContable | Eventual | [R28] [R30] |
 | I16 | El consecutivo de un asiento contable no puede repetirse dentro de la misma combinación de dimensiones de segmentación. El enforcement ocurre en ServicioDeContabilizacion que consulta NumeracionContable (paso 2) antes de crear AsientoContable (paso 3). | NumeracionContable, AsientoContable | Eventual | [R24] [SI1] |
 | I17 | Los asientos generados como ajuste de cierre deben tener esAjusteDeCierre = true. El tipo de transacción contable determina si un asiento es de ajuste de cierre. | AsientoContable | Local | [R25] |
@@ -1724,7 +1756,9 @@ Cada plantilla define roles con naturaleza fija (débito/crédito) que son conoc
 | I30 | Una empresa no puede tener dos PlanDeCuentas referenciando el mismo MarcoContable. Cada marco activo en la empresa puede asociarse a lo sumo a un PUC. | PlanDeCuentas, MarcoContable | Eventual | [R46] |
 | I31 | El MarcoContable referenciado por un PlanDeCuentas debe estar activo al momento de crear el PUC. La creación de un PUC sobre un marco desactivado se rechaza. | PlanDeCuentas, MarcoContable | Eventual | [R46] |
 | I32 | El MarcoContable referenciado por un PlanDeCuentas es inmutable tras la creación del PUC. Cambiar el marco semánticamente cambia la naturaleza del PUC; en ese caso se crea un PUC nuevo. | PlanDeCuentas | Local | [R46] |
-| I33 | **(configurable por empresa)** La asignación de la unidad organizacional en la partida de contrapartida tipo cuenta por pagar depende de la configuración de la empresa. Tres comportamientos posibles: (a) **distribuida** — replica la distribución de las partidas con unidad organizacional que originan la obligación (ej. el gasto en la causación); (b) **consolidada** en una unidad organizacional general; o (c) **sin unidad organizacional**. Aplica a toda contrapartida tipo cuenta por pagar — por ejemplo, en `causacion_gasto`, `nota_credito_gasto` y `anticipo_a_proveedor`. Cuando la cuenta exige unidad organizacional en el PUC (`obligatoriedadUnidadOrganizacional`), el modo "sin unidad organizacional" no aplica. El mismo criterio aplica a las partidas tipo cuenta por pagar **alimentadas por línea** (ej. el cruce `cruce_obligacion` del extracto, `[D29 de OXP]`), que deben rendir su unidad organizacional con la misma política para espejar la CxP de la causación original y netear. La forma de almacenar y resolver esta preferencia es decisión de implementación. | ServicioDeTraduccion, PlanDeCuentas | Eventual | [R50] |
+| I33 | **(configurable por empresa)** La asignación de la unidad organizacional en la partida de contrapartida tipo cuenta por pagar depende de la configuración de la empresa. Tres comportamientos posibles: (a) **distribuida** — replica la distribución de las partidas con unidad organizacional que originan la obligación (ej. el gasto en la causación); (b) **consolidada** en una unidad organizacional general; o (c) **sin unidad organizacional**. Aplica a toda contrapartida tipo cuenta por pagar — por ejemplo, en `causacion_gasto`, `nota_credito_gasto` y `anticipo_a_proveedor` (la línea `contrapartida` viaja sin unidad organizacional por esta razón, ver paso 4). Cuando la cuenta exige unidad organizacional en el PUC (`obligatoriedadUnidadOrganizacional`), el modo "sin unidad organizacional" no aplica. El mismo criterio aplica a las partidas tipo cuenta por pagar **alimentadas por línea con valor** (ej. el cruce `cruce_obligacion` del extracto, `[D29 de OXP]`), que deben rendir su unidad organizacional con la misma política para espejar la CxP de la causación original y netear. La forma de almacenar y resolver esta preferencia es decisión de implementación. | ServicioDeTraduccion, PlanDeCuentas | Eventual | [R50] |
+| I34 | Toda línea de traducción debe traer clasificación no vacía — el texto semántico es insumo obligatorio de la resolución confiable de cuentas (el grupo del PUC admite muchas cuentas válidas; sin texto no hay confiabilidad). Si una o más líneas llegan sin clasificación, el motor rechaza el hecho económico completo antes de crear el borrador y notifica al consumidor con motivo estructurado. La validación se aplica en el paso 2 del ServicioDeTraduccion. | ServicioDeTraduccion | Local | [D15] |
+| I35 | Si la plantilla del tipoTransaccion tiene rol CONTRAPARTIDA, el hecho económico debe traer exactamente una línea `contrapartida` (con tercero y clasificación, sin valor ni unidad organizacional). Si falta o llegan varias, el motor rechaza el hecho económico completo antes de crear el borrador y notifica al consumidor con motivo estructurado. La validación se aplica en el paso 2 del ServicioDeTraduccion. | ServicioDeTraduccion, PlantillaDeAsiento | Local | [D15] |
 
 **Clasificación:**
 - **Local:** Se valida dentro de un solo agregado, en la misma transacción.
@@ -1766,9 +1800,10 @@ Las decisiones previas (DD1-DD11) están documentadas en `anexo-decisiones-de-di
 | D9 | N1 tiene autoridad plena sobre el borrador — el contador puede modificar cualquier campo en estado PENDIENTE sin bloqueo ni matriz de restricción. Los campos se categorizan según su impacto [R43]: corrección contable natural (cuenta, tercero, unidad organizacional) y campos que afectan el hecho económico (valor, moneda, documento fuente, partidas). Cuando el contador modifica campos que afectan el hecho económico, el sistema advierte que la mejor práctica es solicitar al consumidor la re-emisión o un nuevo hecho [R44] — la advertencia no bloquea. Esta postura reconoce que el consumidor puede haber finalizado su ciclo de vida y no puede re-emitir, por lo que crear un bloqueo generaría un cuello de botella en la contabilización. La protección se garantiza por: (1) el borrador de consumidor no puede descartarse [R09], (2) re-emisión disponible en PENDIENTE [R14], (3) advertencia del sistema [R44], (4) cada modificación queda como evento individual (ES) con trazabilidad completa. Alternativa descartada: matriz de campos editables por sub-estado o bloqueo de campos sensibles. | [R09] [R14] [R43] [R44] [D2] |
 | D10 | Los agregados de N2 (Secciones 3.8–3.12) se especifican a nivel suficiente para entender la integración con N1. Su refinamiento completo se ejecuta al iniciar la construcción de F2. Varios puntos de operación avanzada (procesos automáticos de cierre, reclasificación) permanecen como pendientes (PD2, PD3). | Sección 8 del alcance |
 | D11 | Arquitectura PUC único + libros paralelos como caso típico moderno. Una empresa típica al onboardear opera con un PlanDeCuentas (PUC NIIF) y dos libros predeterminados (Principal y Fiscal) sobre el mismo PUC. Las diferencias entre tratamientos (NIIF vs ajustes fiscales) se modelan como asientos específicos del libro [R34], no como PUCs paralelos. El agregado MarcoContable identifica formalmente el PUC mediante un código estructurado (NIIF predeterminado + custom bajo demanda). El atributo `tipo` del LibroContable es texto libre con predeterminados Principal/Fiscal — el analista contable puede crear libros con tipos adicionales (Gerencial, Consolidación, sectoriales) según necesite la empresa. EquivalenciaPuc permanece para casos excepcionales (transición a NIIF, sectores regulados con PUC sectorial obligatorio, grupos empresariales con consolidación). Decisión basada en investigación de seis ERPs modernos (SAP S/4HANA, Oracle Fusion, Dynamics 365, NetSuite, Workday, Sage) que convergen hacia "Chart of Accounts único + ledgers paralelos sobre el mismo COA". | [R34] [R46] `anexo-marco-contable-y-arquitectura-puc.md` |
-| D12 | **Grupo del PUC esperado para acotar la inferencia.** Cada componente que alimenta un rol de la plantilla (`ComponenteDelRol`) declara `grupoPucEsperado`: una lista de uno o más prefijos del código PUC, de **longitud variable** (clase = 1 dígito, grupo = 2, cuenta = 4). El **Nivel B** (inferencia) solo considera cuentas auxiliares cuyo código inicia por alguno de los prefijos. La profundidad refleja qué tan determinístico es el componente: estables a 4 dígitos (`iva`→`["2408"]`, `retefuente`→`["2365"]`, `reteiva`→`["2367"]`); variables según la clasificación a grupos de 2 dígitos (`gasto`→`["51","52","53"]`). El grupo vive en el componente —no en el rol— porque un rol agrupa varios `tipoComponente` que caen en grupos distintos. La **contrapartida** es la excepción: se genera por el motor y carece de `tipoComponente`, por lo que su `grupoPucEsperado` se declara a nivel del rol (`["2205","2335"]` en `causacion_gasto`). `grupoPucEsperado` **no reemplaza la cadena de resolución**: el mapeo fino (tipoComponente × clasificacion × empresa → cuenta exacta) lo siguen haciendo el Nivel A (reglas) y el Nivel C (aprendizaje); el grupo solo orienta el Nivel B. Es obligatorio en todos los roles. Alternativa descartada: grupo por (rol × clasificación) — se rechazó porque la clasificación no vive en la plantilla (llega en cada línea, catálogo abierto) y duplicaría la función de la cadena de resolución. | [D6] [DD2] [R47] |
+| D12 | **Grupo del PUC esperado para acotar la inferencia.** Cada componente que alimenta un rol de la plantilla (`ComponenteDelRol`) declara `grupoPucEsperado`: una lista de uno o más prefijos del código PUC, de **longitud variable** (clase = 1 dígito, grupo = 2, cuenta = 4). El **Nivel B** (inferencia) solo considera cuentas auxiliares cuyo código inicia por alguno de los prefijos. La profundidad refleja qué tan determinístico es el componente: estables a 4 dígitos (`iva`→`["2408"]`, `retefuente`→`["2365"]`, `reteiva`→`["2367"]`); variables según la clasificación a grupos de 2 dígitos (`gasto`→`["51","52","53"]`). El grupo vive en el componente —no en el rol— porque un rol agrupa varios `tipoComponente` que caen en grupos distintos. Desde [D15] la contrapartida dejó de ser excepción: viaja como línea con `tipoComponente = contrapartida` y su `ComponenteDelRol` declara el grupo como cualquier otro (`["2205","2335"]` en `causacion_gasto`; originalmente se declaraba a nivel del rol porque el motor la generaba sin `tipoComponente`). `grupoPucEsperado` **no reemplaza la cadena de resolución**: el mapeo fino a la cuenta exacta lo siguen haciendo el Nivel A (reglas) y el Nivel C (aprendizaje) mediante el emparejamiento por similitud de la clasificación [D15]; el grupo solo orienta el Nivel B. Es obligatorio en todos los roles. Alternativa descartada: grupo por (rol × clasificación) — se rechazó porque la clasificación no vive en la plantilla (llega en cada línea como texto semántico) y duplicaría la función de la cadena de resolución. | [D6] [DD2] [R47] [D15] |
 | D13 | **Narración del borrador: descripción general + descripción de concepto por partida.** El borrador admite dos textos de narración, ambos **enviados por el consumidor** (no compuestos por el motor en esta fase): (1) `BorradorContable.descripcion` — descripción general del hecho económico, a nivel de encabezado; opcional, si el consumidor no la envía queda vacía. (2) `PartidaBorrador.descripcionConcepto` — narración del movimiento individual, que el motor asigna **solo** a las partidas cuyo `ComponenteDelRol` tiene `llevaDescripcionConcepto = true`. Este flag se declara en la plantilla y es `true` únicamente en los componentes que portan concepto de negocio (`gasto`, `concepto_devuelto`, `anticipo`) y `false` en impuestos y retenciones, cuya cuenta ya es autodescriptiva — evita repetir el mismo texto donde no aporta. La asignación ocurre en el paso 4b del ServicioDeTraduccion. Alternativa diferida (no en esta fase): que el motor **componga** la `descripcion` general a partir de las descripciones de concepto cuando el consumidor no la envíe. | [R48] |
 | D14 | **La partida del borrador hereda el `rol` de la plantilla y lo propaga a la entrega.** Cada `PartidaBorrador` registra el `rol` (código de conjunto cerrado: GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA) del `RolPartida` de la plantilla que la originó, asignado en el paso 5 del ServicioDeTraduccion. Antes, la partida solo heredaba `esContrapartida` (booleano), perdiendo la distinción entre impuesto, retención y gasto; como las cuentas se resuelven dinámicamente, el `rol` es la marca confiable del tipo de partida. El `rol` se propaga en el payload de `EntregaContable` para que el sistema contable de destino (caso **SincoA&F**) identifique las partidas tributarias y les dé tratamiento fiscal. El `rol` es un **código** (no texto descriptivo); por consistencia, el atributo del rol en `RolPartida` se renombró de `nombre` a `rol`, y `esContrapartida` se conserva como atajo equivalente a `rol == CONTRAPARTIDA`. El requisito específico de SincoA&F sobre los impuestos se confirma al implementar su adaptador [PD1]. No se propaga a N2 en esta fase (F2). | [R49] [PD1] |
+| D15 | **Clasificación como texto semántico de emparejamiento, contrapartida como línea y resolución por espejo del hecho relacionado (issue #104).** Cierra la zona gris sobre el contenido de `clasificacion` en el contrato de la línea de traducción. **(1) Clasificación = texto semántico, no código ni llave:** cada consumidor la compone **mecánicamente** por componente a partir de datos de sus catálogos (OXP: p. ej. `gasto` = descripción del concepto + concepto de pago + clasificación tributaria; las recetas por componente viven en el modelo del emisor). No la digita un usuario. Es **obligatoria en toda línea** [I34]: el grupo del PUC admite muchas cuentas válidas y sin texto no hay resolución confiable. Los Niveles A y C la emparejan **por similitud** dentro de la partición exacta de dimensiones estables (tipoTransaccion, tipoComponente, empresa) [SI8]; el Nivel B la compara contra las descripciones de las cuentas del PUC [D6]. El control del repetido de reglas y aprendizajes se ancla en las dimensiones estables + el texto [I9] [I14]. Alternativa descartada: código de catálogo normalizado — inútil para comparar contra la descripción de la cuenta contable y rompería la simetría entre las tres capas, que resuelven sobre el mismo dato recibido. **(2) La contrapartida viaja como línea** (`tipoComponente = contrapartida`, canónico): trae tercero propio y clasificación compuesta por el consumidor (p. ej. medio de pago + observación general), sin valor ni unidad organizacional — el motor calcula el valor como balance de débitos/créditos y rinde la unidad según [I33]. Obligatoria cuando la plantilla tiene el rol [I35]. Así Contabilidad no conoce los campos internos de cada consumidor y cada consumidor incorpora los atributos que maneje para componer su clasificación. `terceroPrincipal` (issue #28) se **conserva como informativo** del hecho económico — deja de ser la fuente del tercero de la contrapartida. **(3) Resolución por espejo del hecho relacionado:** los componentes que representan la contraparte contable de un hecho anterior (`cruce_obligacion`, `partida_aclarada`, `amortizacion_anticipo`, `reversa_anticipo` y todos los componentes de `nota_credito_gasto`) deben aterrizar en la **misma cuenta** que usó ese hecho para que el cruce salde. Su `ComponenteDelRol` declara `resolucionPorEspejo` (rol a espejar) y la línea trae `referenciaHechoRelacionado`; el motor copia la cuenta de la partida del rol espejado en su propio borrador del hecho relacionado. El espejo precede a la cadena, no alimenta el aprendizaje y ante ausencia o ambigüedad del hecho relacionado deja la partida sin cuenta (borrador PENDIENTE) — nunca adivina por similitud. | [I34] [I35] [SI8] [D6] [D12] [I33] Sección 3.13 |
 
 ---
 
@@ -1852,3 +1887,4 @@ Cada bounded context declara los recursos que protege y las acciones que expone 
 | 1.9 | Junio 2026 | Validación de datos maestros contra copia local — replanteamiento #45, issue #47. Precisada la invariante **`I7b`**: el estado de terceros y unidades organizacionales se valida contra la **copia local** de la señal que cada sub-dominio dueño publica por suscripción (Terceros: señal global; Estructura Organizacional: eventos de ciclo de vida de unidades), **sin consulta en caliente**. Antes decía "se valida contra sub-dominios externos", lenguaje que sugería consulta al maestro — desactualizado frente al patrón de copia local; de paso cierra el cabo que el #37 dejó al actualizar R07 en el alcance pero no esta invariante. Sin cambios de conteo (13 agregados, 59 eventos, 33 invariantes, 14 decisiones). Acompaña `definicion-alcance.md` v1.9 (actor y dependencia de Estructura Organizacional redefinidos; R07 ampliada a unidades + nota de reestructuración). |
 | 1.10 | Julio 2026 | Ciclo contable de la partida en disputa del extracto — ajuste cruzado con OXP (issue #90). Cambios en el catálogo precargado `datos-precargados/plantillas-de-asiento.{md,json}` (v1.7): dos roles nuevos en `causacion_gasto` (`PARTIDA_POR_ACLARAR` Db / `PARTIDA_ACLARADA` Cr, transitoria de partidas por aclarar, tentativo `["1360","1380"]`) y **nueva plantilla `reclasificacion_partida`** (Db `CRUCE_OBLIGACION` · Cr `PARTIDA_ACLARADA`, **sin contrapartida del motor** — sus dos líneas viajan explícitas desde OXP con tercero propio). Nuevo **Ejemplo 5** en el anexo (v1.4) con los tres momentos del ciclo. El conjunto cerrado de roles (`[D14]`) incorpora los dos códigos nuevos. Cobertura del catálogo: 5 → 6 plantillas (corregida de paso la mención "4 plantillas" de la Sección de inventario, desactualizada desde v1.6 del catálogo). Sin cambios en agregados (13), eventos (59), invariantes (33) ni decisiones (14) — la mecánica del motor no cambia; la plantilla sin rol CONTRAPARTIDA ya está admitida por el modelo (la contrapartida es un rol opcional de la plantilla, no un paso obligatorio del ServicioDeTraduccion). Alinea con `modelo-dominio.md` de OXP v4.6 (`[D37]`). |
 | 1.11 | Julio 2026 | Rol `IMPUESTO_ASUMIDO` en la plantilla `causacion_gasto` del catálogo precargado (v1.8) por ajuste cruzado con OXP — issue #94. Retención asumida cuando el pago ya salió completo (medio de pago tarjeta, `[D38]` de OXP): la retención viaja idéntica (Cr, certificable) y la línea Db espejo `retencion_asumida` (tentativo `["5315"]`) la registra como gasto propio; la contrapartida queda por el total. Sin cambios en el modelo (agregados, eventos, invariantes, decisiones) — la mecánica del motor no cambia. |
+| 1.12 | Julio 2026 | **Clasificación semántica, contrapartida como línea y resolución por espejo — issue #104.** Cierra la confusión del equipo de desarrollo sobre el campo `clasificacion` de la línea de traducción (¿texto abierto o código normalizado?). **Nueva decisión [D15]** con tres piezas: **(1) Clasificación = texto semántico de emparejamiento** — el consumidor la compone mecánicamente por componente desde sus catálogos (recetas por `tipoComponente` en el modelo de OXP v4.8); obligatoria en toda línea (**[I34]** nueva); los Niveles A y C pasan de llave exacta a **partición estable exacta (tipoTransaccion, tipoComponente, empresa) + emparejamiento por similitud** (**[SI8]** nueva: umbral, coincidencia exacta = similitud máxima, desempate por recencia, índice por empresa y partición); el Nivel B la compara contra las descripciones de las cuentas del PUC. Glosario ("Combinación de dimensiones" redefinida + término "Clasificación"), `Regla` (ahora con `textoAncla`), `ResolucionAprendida`, `resolver()`, payloads de `ReglaAgregada`/`ResolucionAprendida`/`AprendizajePromovidoARegla`, e invariantes [I9]/[I14] reescritas en esos términos. `PartidaBorrador` gana `clasificacion` (payloads de `BorradorCreado`/`BorradorReemplazado`). **(2) La contrapartida viaja como línea** (`tipoComponente = contrapartida`): tercero y clasificación los envía el consumidor; el motor solo calcula el valor (balance) y rinde la unidad organizacional según [I33]; obligatoria cuando la plantilla tiene el rol (**[I35]** nueva + motivo `LINEA_CONTRAPARTIDA_FALTANTE`; línea sin texto → `LINEA_SIN_CLASIFICACION`); `RolPartida` pierde el `grupoPucEsperado` a nivel de rol (la excepción de [D12] se disuelve); **`terceroPrincipal` se conserva como informativo** (deja de ser la fuente del tercero de la contrapartida — ajuste sobre el #28). **(3) Resolución por espejo del hecho relacionado:** `ComponenteDelRol` gana `resolucionPorEspejo`; `cruce_obligacion`, `partida_aclarada`, `amortizacion_anticipo`, `reversa_anticipo` y todos los componentes de `nota_credito_gasto` copian la cuenta de la partida del rol espejado en el borrador del hecho relacionado (vía `referenciaHechoRelacionado`) — garantiza que el cruce contable salde en la misma cuenta; precede a la cadena, no alimenta el aprendizaje, y ante ausencia/ambigüedad deja el borrador PENDIENTE. Pasos 2, 3 y 4 del `ServicioDeTraduccion` reescritos; `nivelResolucion` admite `espejo`. Conteos: invariantes 33 → **35** ([I34], [I35]); decisiones 14 → **15** ([D15]); sugerencias 7 → **8** ([SI8]); sin cambios en agregados (13) ni eventos (59). **Coordinación cruzada:** alcance v1.11, anexo de ejemplos v1.5, catálogo de plantillas v1.9, modelo de OXP v4.8 (recetas de composición + línea `contrapartida`, catálogo canónico 17 → 18). |
