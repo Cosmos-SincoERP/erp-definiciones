@@ -643,7 +643,7 @@ La línea de contrapartida resuelve el problema que originó este ejemplo (issue
 
 ## 8. Ejemplo 5 — Ciclo de la partida en disputa (cuenta transitoria de partidas por aclarar)
 
-> Añadido en el issue #90; conceptualmente extiende el Ejemplo 4. Ilustra los roles `PARTIDA_POR_ACLARAR`/`PARTIDA_ACLARADA` de `causacion_gasto` y la plantilla `reclasificacion_partida` (`[D37]` de OXP). Cuentas ilustrativas — grupos ⚠️ `porValidar` (ítems 11 y 12 de la revisión pendiente del catálogo).
+> Añadido en el issue #90; conceptualmente extiende el Ejemplo 4. Ilustra los roles `PARTIDA_POR_ACLARAR`/`PARTIDA_ACLARADA` de `causacion_gasto` y la plantilla `reclasificacion_partida` (`[D36]` de OXP). Cuentas ilustrativas — grupos ⚠️ `porValidar` (ítems 11 y 12 de la revisión pendiente del catálogo).
 
 Caso: el extracto de **enero** de la tarjeta de **Bancolombia (890.903.938)** trae tres partidas: dos compras ya causadas —proveedor **A (901.090.486)** por 600.000 y proveedor **B (860.533.413)** por 400.000— y una partida de **500.000 que nadie reconoce** (posible fraude). El usuario la marca **en disputa** (`PartidaEnDisputaMarcada`), lo que permite conciliar al 100% (`R06` de OXP) sin generar anticipos. El banco cobrará el total: **1.500.000**.
 
