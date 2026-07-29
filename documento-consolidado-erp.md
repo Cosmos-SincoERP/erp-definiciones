@@ -134,7 +134,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Replanteamiento (#31, #39):** el alta del `PerfilTributario` ya no depende de un registro centralizado de terceros — el comando `AsegurarPerfilTributario` crea-o-reutiliza por identificación × país (`[D16]`), validando la identidad con la pieza del paquete `IdentificacionLegal`; los eventos del perfil se publican hacia la bodega de Terceros (Impuestos es fuente, no consumidor).
 
-**Estado:** Alcance v1.5, modelo v2.0.5 (junio 2026). Modelo completo + catálogos F1 entregados — refinamiento por consultores fiscales en curso (es el sub-dominio más avanzado en el hito de refinamiento).
+**Estado:** Alcance v1.5, modelo v2.0.6 (julio 2026). Modelo completo + catálogos F1 entregados — refinamiento por consultores fiscales en curso (es el sub-dominio más avanzado en el hito de refinamiento).
 
 > Detalle: [`dominio/impuestos/modelo-dominio.md`](dominio/impuestos/modelo-dominio.md), [`dominio/impuestos/datos-precargados/`](dominio/impuestos/datos-precargados/)
 
@@ -424,7 +424,7 @@ Datos de Referencia ──► Nuggets ──► (terceros y unidades
 | Nuggets | Todos (validación empaquetada) | Datos de Referencia | **8 nuggets aceptados (borrador)** |
 | Terceros (bodega) | Consolida roles; publica señal global | Nuggets (clave natural) | **v2.0.2 — cerrado para desarrollo F1** |
 | Estructura Org | OXP, Contabilidad (copia local de unidades) | Datos de Referencia | **v2.5 — listo para desarrollo F1** |
-| Impuestos | OXP (cálculo tributario) | Nuggets, Datos de Referencia | **v2.0.5 — modelo completo + catálogos F1** |
+| Impuestos | OXP (cálculo tributario) | Nuggets, Datos de Referencia | **v2.0.6 — modelo completo + catálogos F1** |
 | Contabilidad | OXP (confirmación de asiento) | Terceros, Estructura Org (copia local) | **v1.12 — N1 listo para desarrollo F1** |
 | OXP | Terceros (rol Proveedor) | Impuestos, Contabilidad, Estructura Org (copia local) | **v4.10 — Fase 2 (refinamiento continuo)** |
 
@@ -433,7 +433,7 @@ Datos de Referencia ──► Nuggets ──► (terceros y unidades
 - ✅ **Datos de Referencia** — v2.0 listo (producción de catálogos + tasas de cambio).
 - 🟡 **Nuggets** — 8 nuggets aceptados en borrador (gobernanza + catálogo).
 - ✅ **Terceros** — v2.0.2 cerrado para desarrollo F1 (bodega consolidadora, 2 auditorías).
-- ✅ **Impuestos** — modelo v2.0.5 completo + catálogos F1 (LatAm CO/DO/PA, apertura US/CA F2).
+- ✅ **Impuestos** — modelo v2.0.6 completo + catálogos F1 (LatAm CO/DO/PA, apertura US/CA F2).
 - ✅ **Estructura Organizacional** — modelo v2.5 listo F1 (copia local + diferir; lote #85-#89 aplicado: varios grupos de primer nivel, `TipoUnidad` agregado propio, código de texto libre).
 - ✅ **Contabilidad** — v1.12, N1 listo F1 (MarcoContable + arquitectura PUC + grupo PUC esperado + copia local de datos maestros; catálogo de plantillas v1.9 con 6 plantillas).
 - 🔄 **OXP** — v4.10, Fase 2. Integración con Contabilidad **cerrada** y con Estructura Organizacional documentada; refinamiento continuo (últimos: registro de productos financieros #106 y medio de pago canónico #96).
@@ -811,7 +811,7 @@ El porcentaje de avance combina cinco hitos. Cada hito tiene un peso fijo y se e
 ### Detalle de los parciales
 
 **Impuestos — 85%**
-- ✅ Alcance v1.5, Modelo v2.0.5, Auditoría aplicada (2 rondas). Catálogo tributario CO v1.1.
+- ✅ Alcance v1.5, Modelo v2.0.6, Auditoría aplicada (2 rondas). Catálogo tributario CO v1.1.
 - 🟡 Refinamiento en progreso (~85%) — catálogos fiscales F1 entregados (962 entradas CO/DO/PA); #39 (perfil sin registro centralizado) y #93 (ICA solo ingreso, validado con la consultoría fiscal) aplicados; resta el refinamiento por consultores sobre las secciones "Revisión pendiente" (abierto: #97, cuantía mínima como política de empresa).
 - ⬜ Listo F1 — depende del cierre del refinamiento.
 - **Cálculo:** 20 + 25 + 15 + (30 × 0.85) + 0 = 85.5 ≈ **85%**.

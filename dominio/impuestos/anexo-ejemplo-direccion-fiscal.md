@@ -20,7 +20,7 @@ La `direccionFiscal` (gasto/ingreso) es un campo **obligatorio** del contrato de
 
 **Decisión de diseño clave (`[D2]` refinada):** la dirección fiscal se materializa **explícitamente** en el modelo mediante dos mecanismos complementarios:
 
-1. **`Tributo.direccionFiscalAplicable`** declara las direcciones donde el tributo existe normativamente (invariante del agregado). Ejemplos: AUTO_RETEFUENTE solo en `ingreso`; AUTO_RIVA solo en `gasto` (reverseCharge). La mayoría de tributos directos (IVA, RETEFUENTE, RIVA, RICA) tienen `direccionFiscalAplicable: ambas`; ICA es `ingreso` — el sujeto pasivo es quien genera el ingreso (issue #93).
+1. **`Tributo.direccionFiscalAplicable`** declara las direcciones donde el tributo existe normativamente (invariante del agregado). Ejemplos: AUTO_RETEFUENTE solo en `ingreso`; AUTO_RIVA solo en `gasto` (reverseCharge). La mayoría de tributos directos (IVA, RETEFUENTE, RIVA, RICA) tienen `direccionFiscalAplicable: ambas`; ICA es `ingreso` — el sujeto pasivo es quien genera el ingreso.
 2. **`Condicion.direccionFiscalAplicable`** declara las direcciones donde la condición se evalúa. Permite modelar reglas con perspectiva fiscal específica (ej: "si el proveedor es exento de retefuente no le retengo" solo aplica en `gasto` evaluando `contraparte`; la regla simétrica en `ingreso` evalúa `emisora`).
 
 Los roles `emisora`/`contraparte` se mantienen como **roles posicionales fiscales** (lenguaje del dominio, alineado con SAP Legal Entity, Oracle First/Third Party). El motor filtra tributos y condiciones por `direccionFiscalAplicable` antes de evaluar — la dirección entra explícitamente a la lógica del motor, no implícitamente.
@@ -109,7 +109,7 @@ conceptos[0]: {
 `PerfilTributario.perfilCompletoA(2026-05-04)` para Sinco y ConsultorPro.
 
 **Paso 2 — Determinar tributos candidatos y filtrar por direccionFiscalAplicable:**
-`CatalogoTributario.tributosAplicablesA(GRAV_19)` → `[IVA, RETEFUENTE, RIVA, ICA, RICA]`. **ICA se descarta por dirección** (`direccionFiscalAplicable: ingreso` no incluye `gasto` — el comprador no autoliquida ICA; solo practicaría la retención RICA, issue #93); IVA, RETEFUENTE, RIVA y RICA tienen `ambas` y siguen. Las autorretenciones no están en la matriz para GRAV_19.
+`CatalogoTributario.tributosAplicablesA(GRAV_19)` → `[IVA, RETEFUENTE, RIVA, ICA, RICA]`. **ICA se descarta por dirección** (`direccionFiscalAplicable: ingreso` no incluye `gasto` — el comprador no autoliquida ICA; solo practicaría la retención RICA); IVA, RETEFUENTE, RIVA y RICA tienen `ambas` y siguen. Las autorretenciones no están en la matriz para GRAV_19.
 
 **Paso 3 — Filtrar condiciones por direccionFiscalAplicable contra `gasto`:**
 Solo se evalúan las condiciones con `direccionFiscalAplicable ∈ {gasto, ambas}`. Las que tienen `direccionFiscalAplicable: ingreso` se descartan (no se evalúan en este caso).
@@ -293,7 +293,7 @@ Las autorretenciones, el reverseCharge y el ICA tienen **direccionalidad inheren
 | AUTO_RETEFUENTE | `ingreso` | Autoretención sobre ingresos propios |
 | AUTO_RICA | `ingreso` | Autoretención de ICA |
 | AUTO_RENTA | `ingreso` | Autoretención de renta |
-| ICA | `ingreso` | Impuesto del ingreso: el sujeto pasivo es quien lo genera — en gasto el comprador solo practica RICA (issue #93) |
+| ICA | `ingreso` | Impuesto del ingreso: el sujeto pasivo es quien lo genera — en gasto el comprador solo practica RICA |
 
 Ejemplo del caso reverseCharge (condición RIVA-3):
 

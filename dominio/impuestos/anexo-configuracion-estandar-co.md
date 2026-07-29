@@ -87,7 +87,7 @@ En esta sección queda únicamente el **contexto de diseño**:
 
 ### INC, ICA — sin condiciones por perfil
 
-INC e ICA no evalúan calidades tributarias del emisor ni del adquiriente. Su aplicación depende únicamente de la clasificación tributaria (INC) y de la ciudad + actividad económica (ICA). El ICA tiene además **direccionalidad inherente** (`direccionFiscalAplicable: ingreso`, issue #93): solo se liquida cuando la empresa genera el ingreso — en las compras el comprador practica la retención (RICA), no autoliquida ICA.
+INC e ICA no evalúan calidades tributarias del emisor ni del adquiriente. Su aplicación depende únicamente de la clasificación tributaria (INC) y de la ciudad + actividad económica (ICA). El ICA tiene además **direccionalidad inherente** (`direccionFiscalAplicable: ingreso`): solo se liquida cuando la empresa genera el ingreso — en las compras el comprador practica la retención (RICA), no autoliquida ICA.
 
 ---
 
