@@ -61,7 +61,7 @@ Este catálogo precarga la configuración estándar del agregado `CatalogoTribut
 | `RICA` | Retención sobre el ICA | sustractivo | anticipado | municipal | `actividadEconomica` | ambas | — |
 | `SOBRETASA_BOMBERIL` | Sobretasa Bomberil | sustractivo | definitivo | municipal | `porcentajeDePadre` | ambas | `RICA` |
 
-> **Nota (issue #93, v1.1):** `ICA` pasó de `ambas` a `ingreso` — el sujeto pasivo del ICA es **quien genera el ingreso**; en dirección gasto el comprador solo practica la retención (`RICA`), no autoliquida ICA (coherente con `R61` del alcance). `RICA` permanece en `ambas` (retención: en gasto la empresa retiene al proveedor; en ingreso el cliente le retiene a la empresa). Alineado con la implementación ya verificada (`Cosmos.Impuestos#116`).
+> **Nota:** `ICA` aplica solo en `ingreso` — el sujeto pasivo del ICA es **quien genera el ingreso**; en dirección gasto el comprador solo practica la retención (`RICA`), no autoliquida ICA (coherente con `R61` del alcance). `RICA` permanece en `ambas` (retención: en gasto la empresa retiene al proveedor; en ingreso el cliente le retiene a la empresa).
 
 ### 4.2. Tributos de provisión / autorretenciones (4)
 

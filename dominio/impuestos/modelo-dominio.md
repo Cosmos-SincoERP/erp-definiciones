@@ -209,7 +209,7 @@ El bounded context de Impuestos agrupa capacidades con distinto nivel de central
 Algunos tributos solo existen normativamente en una dirección fiscal. El atributo `direccionFiscalAplicable` declara esta invariante a nivel del agregado, permitiendo que el motor filtre el tributo antes de evaluar sus condiciones:
 
 - **`ambas`** (default): el tributo aplica en gasto e ingreso. La mayoría de los tributos directos (IVA, RETEFUENTE, RIVA, RICA) tienen direccionalidad bidireccional — su comportamiento específico se modela vía condiciones.
-- **`ingreso`**: el tributo solo existe cuando la emisora es facturadora. Aplica a autorretenciones que el sujeto pasivo practica sobre sus propios ingresos (AUTO_RETEFUENTE, AUTO_RICA, AUTO_RENTA), y a impuestos cuyo sujeto pasivo es quien genera el ingreso: ICA (issue #93) — en gasto el comprador no autoliquida ICA, solo practica la retención RICA.
+- **`ingreso`**: el tributo solo existe cuando la emisora es facturadora. Aplica a autorretenciones que el sujeto pasivo practica sobre sus propios ingresos (AUTO_RETEFUENTE, AUTO_RICA, AUTO_RENTA), y a impuestos cuyo sujeto pasivo es quien genera el ingreso: ICA — en gasto el comprador no autoliquida ICA, solo practica la retención RICA.
 - **`gasto`**: el tributo solo existe cuando la emisora es adquiriente. Aplica a tributos autoliquidados por reverseCharge (AUTO_RIVA en importación de servicios).
 
 Esta declaración es una **invariante normativa del agregado**: AUTO_RETEFUENTE no existe en gasto, sin importar las condiciones que se configuren. El motor descarta el tributo entero antes de evaluar sus condiciones cuando la dirección fiscal de la transacción no coincide.
