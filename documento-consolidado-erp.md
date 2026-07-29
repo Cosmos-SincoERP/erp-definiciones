@@ -63,7 +63,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 | Agregados | Eventos | Domain Services | Invariantes | Decisiones | Premisas | Pendientes | Sugerencias |
 |:---------:|:-------:|:---------------:|:-----------:|:----------:|:--------:|:----------:|:-----------:|
-| 6 (+2 config) | 57 | 3 | 27 | 39 (D1-D39) | 3 | 4 | 10 |
+| 6 (+2 config) | 58 | 3 | 28 | 40 (D1-D40) | 3 | 4 | 10 |
 
 **Componentes:**
 
@@ -86,9 +86,9 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Integración con Contabilidad (cerrada):** causación del Anticipo (D25), generalización terminológica hacia "sistema contable" (D26), mapeo `tipoTransaccion` evento → plantilla de asiento (D27), canonización de `tipoComponente` con código fiscal específico (`iva`/`inc`/`retefuente`/`reteiva`/`reteica`) 1:1 con el catálogo de Contabilidad, y manejo de rechazos del sistema contable vía outbox del consumidor (D28). De jul-2026: ciclo contable de la **partida en disputa** vía cuenta transitoria de partidas por aclarar (`[D36]`, #90), **retenciones asumidas** por pago con tarjeta (`[D37]`, #94 — la retención se practica siempre, doctrina de concurrencia; con tarjeta no se descuenta del pagable, la asume la empresa) y **clasificación semántica del contrato de traducción** (`[D38]`, #104 — la clasificación de cada línea es texto compuesto mecánicamente desde los catálogos de OXP; la contrapartida viaja como línea; los componentes que saldan un hecho anterior se resuelven por espejo con `referenciaHechoRelacionado`). El mapeo canónico quedó en **18 `tipoComponente` y 6 plantillas**.
 
-**Replanteamiento (#31/#45) y refinamientos recientes:** `Proveedor` como rol del tercero hacia la bodega de Terceros (#38); la **unidad organizacional se consume como copia local** por eventos de Estructura Organizacional —no agregado— y la causación **se difiere** cuando la unidad no existe (`[D34]`, `[SI8]`, #48); control de doble pago vía constancia humana (`[R38]`, `[D33]`, #30); **registro de productos financieros** — el emisor del extracto proviene del registro de tarjetas definido por el usuario, con atribución y bandeja de pendientes; conciliación por tarjeta, extracto consolidado diferido como evolución (`[D39]`, #106 — reemplaza la inferencia por histórico del #57); **asignación de la unidad por cadena de niveles** (Nivel A reglas configurables + Nivel B aprendizaje, `[D35]`, #51).
+**Replanteamiento (#31/#45) y refinamientos recientes:** `Proveedor` como rol del tercero hacia la bodega de Terceros (#38); la **unidad organizacional se consume como copia local** por eventos de Estructura Organizacional —no agregado— y la causación **se difiere** cuando la unidad no existe (`[D34]`, `[SI8]`, #48); control de doble pago vía constancia humana (`[R38]`, `[D33]`, #30); **registro de productos financieros** — el emisor del extracto proviene del registro de tarjetas definido por el usuario, con atribución y bandeja de pendientes; conciliación por tarjeta, extracto consolidado diferido como evolución (`[D39]`, #106 — reemplaza la inferencia por histórico del #57); **asignación de la unidad por cadena de niveles** (Nivel A reglas configurables + Nivel B aprendizaje, `[D35]`, #51); **medio de pago canónico** — cadena de resolución con origen rastreado (la tarjeta referenciada al registro de productos financieros), retención en la confirmación de las resoluciones débiles y alerta de coherencia con el extracto (`[D40]`, #96).
 
-**Estado:** Alcance v1.18, modelo v4.9 (julio 2026). En refinamiento continuo (Fase 2). Integración OXP ↔ Contabilidad **cerrada**; integración con Estructura Organizacional documentada (**copia local + diferir por consistencia eventual** — la señal de demanda se retiró en el #72: la copia es para validación, la UI lee a EO en vivo).
+**Estado:** Alcance v1.19, modelo v4.10 (julio 2026). En refinamiento continuo (Fase 2). Integración OXP ↔ Contabilidad **cerrada**; integración con Estructura Organizacional documentada (**copia local + diferir por consistencia eventual** — la señal de demanda se retiró en el #72: la copia es para validación, la UI lee a EO en vivo).
 
 > Detalle: [`dominio/obligaciones-por-pagar/modelo-dominio.md`](dominio/obligaciones-por-pagar/modelo-dominio.md)
 
@@ -426,7 +426,7 @@ Datos de Referencia ──► Nuggets ──► (terceros y unidades
 | Estructura Org | OXP, Contabilidad (copia local de unidades) | Datos de Referencia | **v2.5 — listo para desarrollo F1** |
 | Impuestos | OXP (cálculo tributario) | Nuggets, Datos de Referencia | **v2.0.5 — modelo completo + catálogos F1** |
 | Contabilidad | OXP (confirmación de asiento) | Terceros, Estructura Org (copia local) | **v1.12 — N1 listo para desarrollo F1** |
-| OXP | Terceros (rol Proveedor) | Impuestos, Contabilidad, Estructura Org (copia local) | **v4.9 — Fase 2 (refinamiento continuo)** |
+| OXP | Terceros (rol Proveedor) | Impuestos, Contabilidad, Estructura Org (copia local) | **v4.10 — Fase 2 (refinamiento continuo)** |
 
 ### Estado actual de construcción
 
@@ -436,7 +436,7 @@ Datos de Referencia ──► Nuggets ──► (terceros y unidades
 - ✅ **Impuestos** — modelo v2.0.5 completo + catálogos F1 (LatAm CO/DO/PA, apertura US/CA F2).
 - ✅ **Estructura Organizacional** — modelo v2.5 listo F1 (copia local + diferir; lote #85-#89 aplicado: varios grupos de primer nivel, `TipoUnidad` agregado propio, código de texto libre).
 - ✅ **Contabilidad** — v1.12, N1 listo F1 (MarcoContable + arquitectura PUC + grupo PUC esperado + copia local de datos maestros; catálogo de plantillas v1.9 con 6 plantillas).
-- 🔄 **OXP** — v4.9, Fase 2. Integración con Contabilidad **cerrada** y con Estructura Organizacional documentada; refinamiento continuo (último: registro de productos financieros #106).
+- 🔄 **OXP** — v4.10, Fase 2. Integración con Contabilidad **cerrada** y con Estructura Organizacional documentada; refinamiento continuo (últimos: registro de productos financieros #106 y medio de pago canónico #96).
 
 ### Siguiente paso
 
@@ -803,7 +803,7 @@ El porcentaje de avance combina cinco hitos. Cada hito tiene un peso fijo y se e
 
 **Lectura del cuadro:**
 - **Impuestos lidera** con 85% — refinamiento por consultores fiscales más avanzado (activo: #93 resuelto con la consultoría), catálogos F1 entregados.
-- **OXP y Contabilidad (82%)** tienen refinamiento del equipo de desarrollo activo (últimos: partida en disputa #90, retenciones asumidas #94 y clasificación semántica del contrato de traducción #104 y registro de productos financieros #106); OXP está en Fase 2 (refinamiento continuo) con el modelo maduro (v4.9) y la integración con Contabilidad y Estructura Organizacional cerrada.
+- **OXP y Contabilidad (82%)** tienen refinamiento del equipo de desarrollo activo (últimos: partida en disputa #90, retenciones asumidas #94 y clasificación semántica del contrato de traducción #104, registro de productos financieros #106 y medio de pago canónico #96); OXP está en Fase 2 (refinamiento continuo) con el modelo maduro (v4.10) y la integración con Contabilidad y Estructura Organizacional cerrada.
 - **Estructura Organizacional (81%)** cerró el lote #85-#89 (varios grupos de primer nivel, `TipoUnidad` agregado propio, retiro del descarte automático, código de texto libre, numeración continua) sobre los replanteamientos #31/#45/#72; resta la validación final con el equipo de desarrollo.
 - **Terceros (75%)** absorbió el replanteamiento #31 (bodega consolidadora) además de sus auditorías; resta la validación final con el equipo de desarrollo.
 - **Datos de Referencia (78%)** completó alcance v2.0 y publicó los catálogos de dirección (#77); **Nuggets (47%)** tiene gobernanza y catálogo, con `DireccionFisica` v0.3 ya consultada por el equipo de desarrollo (#100) y las demás especificaciones en borrador.
