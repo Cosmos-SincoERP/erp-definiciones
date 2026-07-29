@@ -2083,7 +2083,9 @@ Nace `Activo` (vía `RegistrarProductoFinanciero` — registro deliberado, previ
 | **Estado resultante** | (sin cambio de estado — la alerta no bloquea el cruce). |
 | **Precondiciones** | Vinculación aplicada con medio de pago no-tarjeta o con discordancia de tarjeta/dígitos. |
 | **Información capturada** | Referencia a la OXP y a la partida vinculada, medio de pago resuelto (tipo + origen), producto financiero del extracto, motivo (`no_tarjeta` \| `tarjeta_discordante`). |
-| **Efectos** | Si la OXP **no ha causado**: corregir el medio de pago y **recalcular el tratamiento de las retenciones** (`[D37]`). Si **ya causó**: resolución operativa — camino de corrección (análogo a la resolución de `AlertaDoblePagoPotencial`). |
+| **Efectos** | La atiende el **usuario de la conciliación** (o quien reciba la bandeja de alertas) — intervención **explícita**, nunca corrección silenciosa. Si la OXP **no ha causado**: el usuario corrige el medio de pago en la OXP (editable antes de causar, `[R44]` — el origen pasa a `capturado`) y se **recalcula el tratamiento de las retenciones** (`[D37]`); la causación saldrá correcta. Si **ya causó**: resolución operativa — camino de corrección contable (análogo a la resolución de `AlertaDoblePagoPotencial`; el asiento salió con las retenciones descontadas mientras la partida pagó el total — la diferencia se hace visible en el propio cruce). |
+
+> El barrido de conciliación **no filtra candidatas por medio de pago** (cruza por descripción `[R09]`, tercero y valor `[R10]`) — si filtrara "solo tarjeta", la compra mal resuelta jamás aparecería como candidata, la partida quedaría sin cruce (anticipo o disputa falsos) y el error nunca saldría a la luz. Esta alerta es el **complemento de I28**: la invariante atrapa "nadie decidió" (resolución débil, retenida en la confirmación); la alerta atrapa "decidieron mal" (resolución fuerte pero equivocada — visible cuando la compra aparece en el extracto, que es la evidencia definitiva).
 
 ### 5.4. Confirmación y Causación
 
