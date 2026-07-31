@@ -2,8 +2,8 @@
 
 **País:** Colombia (`CO`)
 **Catálogo del modelo:** `CatalogoDeAtributosFiscales` (Sección 3.5 de `modelo-dominio.md`)
-**Versión:** 1.0
-**Fecha de actualización:** 2026-05-26
+**Versión:** 1.1
+**Fecha de actualización:** 2026-07-31
 **Archivo de datos:** [`co-catalogo-de-atributos-fiscales.json`](co-catalogo-de-atributos-fiscales.json)
 
 ---
@@ -33,11 +33,11 @@ Cierra el contrato entre:
 
 | Categoría | Cantidad |
 |---|---|
-| Atributos booleanos (calificaciones DIAN/municipales) | 9 |
+| Atributos booleanos (calificaciones DIAN/municipales y domicilio fiscal) | 10 |
 | Atributos enum simples | 2 (`regimenTributario`, `tipoPersona`) |
 | Atributos enum con `catalogoReferencia` | 3 (zona franca, monopolio, puerto libre empresarial) |
 | Atributos string libres | 0 |
-| **Total** | **15** atributos en la precarga F1 |
+| **Total** | **16** atributos en la precarga F1 |
 
 ---
 
@@ -50,6 +50,7 @@ Cierra el contrato entre:
 | `esGranContribuyente` | boolean | Sí | — | 2017-01-01 |
 | `esAutorretenedora` | boolean | Sí | — | 2017-01-01 |
 | `esAgenteRetenedorIVA` | boolean | Sí | — | 2017-01-01 |
+| `tieneDomicilioFiscalEnElPais` | boolean | Sí | — | 2017-01-01 |
 | `esExentoRetefuente` | boolean | Sí | — | 2017-01-01 |
 | `perteneceRegimenSimple` | boolean | Sí | — | 2019-01-01 |
 | `esAutorretenedorRenta` | boolean | Sí | — | 2017-01-01 |
@@ -67,7 +68,11 @@ Cierra el contrato entre:
 
 ### 5.1. `requerido: true` significa que el PerfilTributario debe declararlo
 
-Los 8 atributos requeridos (`regimenTributario`, `perteneceRegimenIVA`, `esGranContribuyente`, `esAutorretenedora`, `esAgenteRetenedorIVA`, `esExentoRetefuente`, `perteneceRegimenSimple`, `esAutorretenedorRenta`, `tipoPersona`) deben estar presentes en el `PerfilTributario` de cualquier entidad colombiana. Los 7 opcionales solo aplican cuando son relevantes para la entidad.
+Los 10 atributos requeridos (`regimenTributario`, `perteneceRegimenIVA`, `esGranContribuyente`, `esAutorretenedora`, `esAgenteRetenedorIVA`, `tieneDomicilioFiscalEnElPais`, `esExentoRetefuente`, `perteneceRegimenSimple`, `esAutorretenedorRenta`, `tipoPersona`) deben estar presentes en el `PerfilTributario` de cualquier entidad colombiana. Los 6 opcionales solo aplican cuando son relevantes para la entidad. El perfil mínimo exigible a una contraparte **sin domicilio fiscal en el país** (proveedor del exterior) está en definición con los consultores fiscales — ver la pregunta 8 de la revisión pendiente del catálogo tributario.
+
+### 5.4. `tieneDomicilioFiscalEnElPais` y la autoliquidación del IVA
+
+Declara si la entidad tiene residencia o domicilio fiscal en el país (art. 437-2 numeral 3 del Estatuto Tributario). Es el disparador de `IVA_IMPORTACION_SERVICIOS`: cuando la contraparte de una compra de servicios no lo tiene, no factura IVA y la empresa lo autoliquida (se descarta RIVA). **No se deriva del país de la identificación:** una entidad con identificación extranjera puede tener domicilio fiscal en el país, y viceversa — por eso es un atributo declarado del perfil, no un dato calculado.
 
 ### 5.2. Diferencia entre `valoresValidos` y `catalogoReferencia`
 
@@ -93,6 +98,7 @@ La vigencia desde corresponde a la entrada en vigor de la norma que crea o regul
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1.0 | 2026-05-26 | Carga inicial F1: 15 atributos (9 booleanos + 2 enum simples + 3 enum con catálogo referenciado + 1 enum tipo persona). |
+| 1.1 | 2026-07-31 | Nuevo atributo requerido **`tieneDomicilioFiscalEnElPais`** (boolean, art. 437-2 num. 3 ET) — disparador de la autoliquidación del IVA en importación de servicios (issue #110): reemplaza el criterio legado `esAgenteRetenedorIVA` en las condiciones de `IVA_IMPORTACION_SERVICIOS` (antes `AUTO_RIVA`). Se corrige la descripción de `esAgenteRetenedorIVA` (ya no menciona la activación del autoliquidado). Total 15 → 16 atributos. |
 
 ---
 

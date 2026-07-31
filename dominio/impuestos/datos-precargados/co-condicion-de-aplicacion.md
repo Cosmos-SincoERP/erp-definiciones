@@ -2,8 +2,8 @@
 
 **País:** Colombia (`CO`)
 **Catálogo del modelo:** `CondicionDeAplicacion` (Sección 3.4 de `modelo-dominio.md`)
-**Versión:** 1.0
-**Fecha de actualización:** 2026-05-26
+**Versión:** 1.1
+**Fecha de actualización:** 2026-07-31
 **Archivo de datos:** [`co-condicion-de-aplicacion.json`](co-condicion-de-aplicacion.json)
 
 ---
@@ -28,7 +28,7 @@ Las condiciones se evalúan después de que el motor resuelve qué tributos apli
 - **RIVA — reglas de agente retenedor IVA:** Estatuto Tributario art. 437-2.
 - **RICA — calidades ICA municipal:** Estatutos tributarios municipales + Ley 14/1983.
 - **Régimen Simple:** Ley 1943/2018 modificada por Ley 2010/2019.
-- **AUTO_RIVA — reverse charge:** Estatuto Tributario art. 437-2 numeral 3 (importación de servicios).
+- **IVA_IMPORTACION_SERVICIOS — autoliquidación del IVA:** Estatuto Tributario art. 437-2 numeral 3 (contratación de servicios gravados con proveedores sin residencia ni domicilio en el país) + art. 437-1 (retención del 100%).
 - **Régimen Puerto Libre — IVA territorial:** Constitución art. 310 + Ley 47/1993 art. 22.
 
 ---
@@ -40,11 +40,11 @@ Las condiciones se evalúan después de que el motor resuelve qué tributos apli
 | Tributo | Condiciones | Notas |
 |---|:---:|---|
 | RETEFUENTE | 15 | 14 condiciones específicas + 1 default. Patrón asimétrico: cada caso real se desdobla en perspectivas `gasto` (sub-código `a`) e `ingreso` (sub-código `b`). |
-| RIVA | 5 | Casos de agente retenedor IVA + reverse charge para AUTO_RIVA. |
+| RIVA | 5 | Casos de agente retenedor IVA + sustitución por IVA_IMPORTACION_SERVICIOS cuando el proveedor no tiene domicilio fiscal en el país. |
 | RICA | 5 | Casos por calidades ICA + gran contribuyente Bogotá. |
 | IVA | 3 | 2 casos de pertenencia régimen IVA + 1 caso territorial Puerto Libre. |
 | AUTO_RETEFUENTE | 1 | Activación por autorretenedora. |
-| AUTO_RIVA | 1 | Activación por reverse charge. |
+| IVA_IMPORTACION_SERVICIOS | 1 | Activación por proveedor sin domicilio fiscal en el país. |
 | AUTO_RICA | 1 | Activación por autorretenedora ICA. |
 | AUTO_RENTA | 1 | Activación por autorretenedora de renta. |
 
@@ -104,7 +104,7 @@ Combinan calidades de Gran Contribuyente (`esGranContribuyente`) y Autorretenedo
 | `RIVA-01b` | Proveedor régimen IVA + empresa agente retenedor | `contraparte.perteneceRegimenIVA = true ∧ emisora.esAgenteRetenedorIVA = true` | `aplicar` | gasto |
 | `RIVA-02a` | Cliente no agente retenedor | `contraparte.esAgenteRetenedorIVA = false` | `noAplicar` | ingreso |
 | `RIVA-02b` | Empresa no agente retenedor | `emisora.esAgenteRetenedorIVA = false` | `noAplicar` | gasto |
-| `RIVA-03` | Reverse charge en gasto | `emisora.esAgenteRetenedorIVA = true` → activa AUTO_RIVA | `reverseCharge` | gasto |
+| `RIVA-03` | Proveedor del exterior | `contraparte.tieneDomicilioFiscalEnElPais = false` → activa IVA_IMPORTACION_SERVICIOS | `reverseCharge` | gasto |
 
 ---
 
@@ -141,7 +141,7 @@ Cada autorretención tiene una condición de activación cuando la empresa vende
 | Código | Atributo | Tributo |
 |---|---|---|
 | `AUTO-RTF-01` | `esAutorretenedora = true` | AUTO_RETEFUENTE |
-| `AUTO-RIVA-01` | `esAgenteRetenedorIVA = true` (gasto, reverse charge) | AUTO_RIVA |
+| `IVA-IMPORTACION-SERVICIOS-01` | `contraparte.tieneDomicilioFiscalEnElPais = false` (gasto) | IVA_IMPORTACION_SERVICIOS |
 | `AUTO-RICA-01` | `esAutorretenedorICA = true` (requiere ciudad) | AUTO_RICA |
 | `AUTO-RENTA-01` | `esAutorretenedorRenta = true` | AUTO_RENTA |
 
@@ -174,7 +174,7 @@ La condición `RTF-08` tiene efecto `aplicar-default`. Es la condición catch-al
 
 ### 10.5. `efecto: reverseCharge`
 
-La condición `RIVA-03` tiene efecto `reverseCharge`: RIVA no aplica, pero AUTO_RIVA sí. Esto se modela con el campo `tributoSubstituto: "AUTO_RIVA"` que indica al motor que active el tributo sustituto en lugar del original.
+La condición `RIVA-03` tiene efecto `reverseCharge`: cuando el proveedor no tiene residencia ni domicilio fiscal en el país, RIVA no aplica (no hay a quién retenerle un IVA que no facturó), pero IVA_IMPORTACION_SERVICIOS sí — la empresa asume el impuesto. Esto se modela con el campo `tributoSubstituto: "IVA_IMPORTACION_SERVICIOS"` que indica al motor que active el tributo sustituto en lugar del original. El proveedor recibe el total de la factura: el IVA teórico y su retención del 100% se anulan entre sí sobre el valor a pagar, y quedan las dos líneas para el reconocimiento contable.
 
 ### 10.6. Cuantía mínima no es condición
 
@@ -187,6 +187,7 @@ La validación "Base mínima superada" NO es una `CondicionDeAplicacion`. Es atr
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1.0 | 2026-05-26 | Carga inicial F1: 32 condiciones (15 RETEFUENTE + 5 RIVA + 5 RICA + 3 IVA + 4 autorretenciones). Patrón asimétrico aplicado. |
+| 1.1 | 2026-07-31 | **Disparador de la autoliquidación del IVA corregido (issue #110, resolución con consultoría fiscal):** `RIVA-03` y `AUTO-RIVA-01` (ahora `IVA-IMPORTACION-SERVICIOS-01`) evaluaban `emisora.esAgenteRetenedorIVA = true` — residuo de la definición legada del sistema de facturación, que disparaba el autoliquidado en cualquier compra doméstica de una empresa agente retenedora y chocaba con `RIVA-01b`. Ambas pasan a evaluar `contraparte.tieneDomicilioFiscalEnElPais = false` (art. 437-2 num. 3: proveedor sin residencia ni domicilio en el país), usando el atributo nuevo del catálogo de atributos v1.1. Renombre `AUTO_RIVA` → `IVA_IMPORTACION_SERVICIOS` aplicado en códigos y descripciones. |
 
 ---
 

@@ -1,8 +1,8 @@
 {
   "pais": "CO",
   "catalogo": "CatalogoDeAtributosFiscales",
-  "version": "1.0",
-  "fechaActualizacion": "2026-05-26",
+  "version": "1.1",
+  "fechaActualizacion": "2026-07-31",
   "fuente": "Estatuto Tributario Nacional + Régimen Simple de Tributación (Ley 1943/2018 modificada por Ley 2010/2019) + Ley 1816/2016 (monopolios) + Ley 47/1993 (Puerto Libre San Andrés) + clasificación DIAN de contribuyentes.",
   "entradas": [
     {
@@ -47,7 +47,17 @@
     },
     {
       "nombre": "esAgenteRetenedorIVA",
-      "descripcion": "Indica si la entidad actúa como agente retenedor de IVA. Activa RIVA o AUTO_RIVA según el rol.",
+      "descripcion": "Indica si la entidad actúa como agente retenedor de IVA (art. 437-2 del Estatuto Tributario). Activa RIVA según el rol: en gasto la empresa agente retiene al proveedor; en ingreso el cliente agente le retiene a la empresa.",
+      "tipo": "boolean",
+      "valoresValidos": null,
+      "catalogoReferencia": null,
+      "requerido": true,
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "tieneDomicilioFiscalEnElPais",
+      "descripcion": "Indica si la entidad tiene residencia o domicilio fiscal en el país (art. 437-2 numeral 3 del Estatuto Tributario). Cuando la contraparte de una compra de servicios NO lo tiene, no factura IVA y la empresa lo autoliquida (activa IVA_IMPORTACION_SERVICIOS y descarta RIVA).",
       "tipo": "boolean",
       "valoresValidos": null,
       "catalogoReferencia": null,

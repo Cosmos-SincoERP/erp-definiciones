@@ -69,7 +69,7 @@ en adelante cada cambio se maneja como issue para que quede trazable y justifica
 | Sub-dominio | Alcance | Modelo | Estado |
 |-------------|---------|--------|--------|
 | [Obligaciones por Pagar](dominio/obligaciones-por-pagar/) | ✅ v1.15 | ✅ v4.3 | 🟡 En refinamiento (Fase 2) |
-| [Impuestos](dominio/impuestos/) | ✅ v1.5 | ✅ v2.0.6 | 🟢 Completo — listo para desarrollo (F1) |
+| [Impuestos](dominio/impuestos/) | ✅ v1.5 | ✅ v2.0.7 | 🟢 Completo — listo para desarrollo (F1) |
 | [Contabilidad](dominio/contabilidad/) | ✅ v1.10 | ✅ v1.9 | 🟢 N1 listo para desarrollo (F1); N2 (F2) |
 | [Terceros](dominio/terceros/) | ✅ v2.0 | ✅ v2.0.2 | 🟢 Bodega consolidadora (replanteamiento #31) — listo para desarrollo (F1) |
 | [Estructura Organizacional](dominio/estructura-organizacional/) | ✅ v1.4 | ✅ v1.6 | 🟢 Replanteamiento #45 (copia local + diferir + señal) — listo para desarrollo (F1) |

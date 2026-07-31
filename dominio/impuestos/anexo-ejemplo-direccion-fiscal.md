@@ -20,7 +20,7 @@ La `direccionFiscal` (gasto/ingreso) es un campo **obligatorio** del contrato de
 
 **Decisión de diseño clave (`[D2]` refinada):** la dirección fiscal se materializa **explícitamente** en el modelo mediante dos mecanismos complementarios:
 
-1. **`Tributo.direccionFiscalAplicable`** declara las direcciones donde el tributo existe normativamente (invariante del agregado). Ejemplos: AUTO_RETEFUENTE solo en `ingreso`; AUTO_RIVA solo en `gasto` (reverseCharge). La mayoría de tributos directos (IVA, RETEFUENTE, RIVA, RICA) tienen `direccionFiscalAplicable: ambas`; ICA es `ingreso` — el sujeto pasivo es quien genera el ingreso.
+1. **`Tributo.direccionFiscalAplicable`** declara las direcciones donde el tributo existe normativamente (invariante del agregado). Ejemplos: AUTO_RETEFUENTE solo en `ingreso`; IVA_IMPORTACION_SERVICIOS solo en `gasto` (autoliquidación — el adquiriente asume el IVA del proveedor del exterior). La mayoría de tributos directos (IVA, RETEFUENTE, RIVA, RICA) tienen `direccionFiscalAplicable: ambas`; ICA es `ingreso` — el sujeto pasivo es quien genera el ingreso.
 2. **`Condicion.direccionFiscalAplicable`** declara las direcciones donde la condición se evalúa. Permite modelar reglas con perspectiva fiscal específica (ej: "si el proveedor es exento de retefuente no le retengo" solo aplica en `gasto` evaluando `contraparte`; la regla simétrica en `ingreso` evalúa `emisora`).
 
 Los roles `emisora`/`contraparte` se mantienen como **roles posicionales fiscales** (lenguaje del dominio, alineado con SAP Legal Entity, Oracle First/Third Party). El motor filtra tributos y condiciones por `direccionFiscalAplicable` antes de evaluar — la dirección entra explícitamente a la lógica del motor, no implícitamente.
@@ -70,11 +70,11 @@ Se modela la **misma transacción** vista desde las dos direcciones:
 | RIVA-1b | RIVA | contraparte + emisora | `perteneceRegimenIVA` (C) + `esAgenteRetenedorIVA` (E) | `true` + `true` | `aplicar` | `gasto` |
 | RIVA-2a | RIVA | contraparte | `esAgenteRetenedorIVA` | `false` | `noAplicar` | `ingreso` |
 | RIVA-2b | RIVA | emisora | `esAgenteRetenedorIVA` | `false` | `noAplicar` | `gasto` |
-| RIVA-3 | RIVA | emisora | `esAgenteRetenedorIVA` | `true` | `reverseCharge` (activa AUTO_RIVA) | `gasto` |
+| RIVA-3 | RIVA | contraparte | `tieneDomicilioFiscalEnElPais` | `false` | `reverseCharge` (activa IVA_IMPORTACION_SERVICIOS) | `gasto` |
 
 **Tributos con direccionalidad inherente** (`Tributo.direccionFiscalAplicable`):
 - ICA, AUTO_RETEFUENTE, AUTO_RICA, AUTO_RENTA → `ingreso`
-- AUTO_RIVA → `gasto` (reverseCharge)
+- IVA_IMPORTACION_SERVICIOS → `gasto` (autoliquidación)
 - IVA, INC, RETEFUENTE, RIVA, RICA, SOBRETASA_BOMBERIL → `ambas`
 
 **Tarifas vigentes a 2026-05-04** (de `TarifaTributaria`):
@@ -289,7 +289,7 @@ Las autorretenciones, el reverseCharge y el ICA tienen **direccionalidad inheren
 
 | Tributo | `direccionFiscalAplicable` | Caso de uso |
 |---|---|---|
-| AUTO_RIVA | `gasto` | Reverse charge — importación de servicios |
+| IVA_IMPORTACION_SERVICIOS | `gasto` | Autoliquidación del IVA — importación de servicios (proveedor sin domicilio fiscal en el país) |
 | AUTO_RETEFUENTE | `ingreso` | Autoretención sobre ingresos propios |
 | AUTO_RICA | `ingreso` | Autoretención de ICA |
 | AUTO_RENTA | `ingreso` | Autoretención de renta |
@@ -299,16 +299,16 @@ Ejemplo del caso reverseCharge (condición RIVA-3):
 
 ```
 Tributo:                    RIVA  (Tributo.direccionFiscalAplicable: ambas)
-AmbitoEvaluado:             emisora
-Atributo:                   esAgenteRetenedorIVA
-ValorEsperado:              true
-Efecto:                     reverseCharge → activa AUTO_RIVA
+AmbitoEvaluado:             contraparte
+Atributo:                   tieneDomicilioFiscalEnElPais
+ValorEsperado:              false
+Efecto:                     reverseCharge → activa IVA_IMPORTACION_SERVICIOS
 direccionFiscalAplicable:   gasto
 ```
 
-Si en el Caso A el perfil de Sinco fuera `esAgenteRetenedorIVA=true`, el motor descartaría `RIVA` y activaría `AUTO_RIVA` (caso típico: importación de servicios). **AUTO_RIVA tiene `direccionFiscalAplicable: gasto`** — por su invariante del agregado, no se calcula en ingreso, incluso si la condición RIVA-3 intentara dispararla.
+Si en el Caso A el proveedor (ConsultorPro) no tuviera residencia ni domicilio fiscal en Colombia (`tieneDomicilioFiscalEnElPais=false`), no facturaría IVA y no habría rete-IVA que practicarle: el motor descartaría `RIVA` y activaría `IVA_IMPORTACION_SERVICIOS` — Sinco autoliquida el IVA teórico y asume su retención del 100% (art. 437-2 num. 3). **IVA_IMPORTACION_SERVICIOS tiene `direccionFiscalAplicable: gasto`** — por su invariante del agregado, no se calcula en ingreso, incluso si la condición RIVA-3 intentara dispararla.
 
-**Semántica condicional de reverseCharge:** si el tributo alternativo (`AUTO_RIVA`) no es aplicable en la dirección actual (filtrado por su `direccionFiscalAplicable`), el tributo original (`RIVA`) continúa su evaluación normal. Esto garantiza coherencia: la condición RIVA-3 solo se evalúa en gasto, y el reemplazo `RIVA → AUTO_RIVA` ocurre solo cuando ambos son aplicables.
+**Semántica condicional de reverseCharge:** si el tributo alternativo (`IVA_IMPORTACION_SERVICIOS`) no es aplicable en la dirección actual (filtrado por su `direccionFiscalAplicable`), el tributo original (`RIVA`) continúa su evaluación normal. Esto garantiza coherencia: la condición RIVA-3 solo se evalúa en gasto, y el reemplazo `RIVA → IVA_IMPORTACION_SERVICIOS` ocurre solo cuando ambos son aplicables.
 
 ### 6.6. Persistencia obligatoria en el RegistroTributario
 

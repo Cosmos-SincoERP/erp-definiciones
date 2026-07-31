@@ -22,7 +22,7 @@ El contenido se organiza siguiendo la estructura de los agregados del modelo de 
 
 ## 1. Tributos — CatalogoTributario
 
-Los datos del catálogo `catalogo-tributario-PA` se migraron a [`datos-precargados/pa-catalogo-tributario.json`](datos-precargados/pa-catalogo-tributario.json) (v1.0, 2026-05-26). Allí viven las 20 entidades F1 (4 tributos + 5 clasificaciones + 7 tratamientos + 4 reglas de localización). Narrativo: [`datos-precargados/pa-catalogo-tributario.md`](datos-precargados/pa-catalogo-tributario.md).
+Los datos del catálogo `catalogo-tributario-PA` se migraron a [`datos-precargados/pa-catalogo-tributario.json`](datos-precargados/pa-catalogo-tributario.json) (v1.1, 2026-07-31). Allí viven las 21 entidades F1 (4 tributos + 5 clasificaciones + 8 tratamientos + 4 reglas de localización). Narrativo: [`datos-precargados/pa-catalogo-tributario.md`](datos-precargados/pa-catalogo-tributario.md).
 
 **Contexto de diseño:**
 - **4 tributos:** ITBMS (tarifa progresiva 7/10/15%), RITBMS (50% del ITBMS), ISC (varía por producto), ISR (retenciones por concepto).

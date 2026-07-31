@@ -2,7 +2,7 @@
 
 **País:** Colombia (`CO`)
 **Catálogo del modelo:** `TarifaTributaria` (Sección 3.3 de `modelo-dominio.md`) — agregado con múltiples streams (uno por jurisdicción × tributo).
-**Versión:** 1.0
+**Versión:** 1.1
 **Fecha de actualización:** 2026-05-26
 **Archivo de datos:** [`co-tarifa-tributaria.json`](co-tarifa-tributaria.json)
 
@@ -15,7 +15,7 @@ Precarga todas las **tarifas tributarias** de Colombia organizadas por stream de
 - IVA, INC: factor = clasificación (`GRAV_19`, `GRAV_5`, `EXENTO`).
 - RETEFUENTE, AUTO_RETEFUENTE: factor = concepto de pago (`COMPRAS_GENERALES_DECLARANTES`, `HONORARIOS_DECLARANTES`, etc.).
 - ICA, RICA, AUTO_RICA: factor = código CIIU de actividad económica (`4711`, `6201`, etc.).
-- RIVA, AUTO_RIVA, SOBRETASA_BOMBERIL: porcentaje sobre el tributo padre (sin factor).
+- RIVA, IVA_IMPORTACION_SERVICIOS, SOBRETASA_BOMBERIL: porcentaje sobre el tributo padre (sin factor).
 - AUTO_RENTA: tarifa fija sin factor.
 
 ---
@@ -26,7 +26,8 @@ Precarga todas las **tarifas tributarias** de Colombia organizadas por stream de
 - **RETEFUENTE:** Decreto Único Reglamentario 1625 de 2016 (compilación) + actualizaciones DIAN sectoriales anuales.
 - **RIVA:** Estatuto Tributario art. 437-1 + Decreto 522 de 2003 y modificatorios.
 - **AUTO_RENTA:** Decreto 2201 de 2016 (tarifas sectoriales 0.40%–1.60%).
-- **AUTO_RETEFUENTE, AUTO_RIVA:** Aplican tarifas equivalentes a RETEFUENTE/RIVA cuando la empresa es autorretenedora.
+- **AUTO_RETEFUENTE:** Aplica tarifas equivalentes a RETEFUENTE cuando la empresa es autorretenedora.
+- **IVA_IMPORTACION_SERVICIOS:** Retención del 100% del IVA teórico autoliquidado (art. 437-2 num. 3 + art. 437-1 del Estatuto Tributario).
 - **ICA, RICA, SOBRETASA_BOMBERIL, AUTO_RICA:** Estatutos tributarios municipales de cada ciudad (acuerdos del Concejo Municipal/Distrital).
 
 ---
@@ -35,7 +36,7 @@ Precarga todas las **tarifas tributarias** de Colombia organizadas por stream de
 
 | Categoría | Streams | Total tarifas |
 |---|:---:|:---:|
-| Nacionales (IVA, INC, RETEFUENTE, RIVA, AUTO_RENTA, AUTO_RETEFUENTE, AUTO_RIVA) | 7 | 59 |
+| Nacionales (IVA, INC, RETEFUENTE, RIVA, AUTO_RENTA, AUTO_RETEFUENTE, IVA_IMPORTACION_SERVICIOS) | 7 | 59 |
 | Municipales ICA (12 ciudades principales) | 12 | 64 |
 | SOBRETASA_BOMBERIL (Bogotá ejemplo) | 1 | 1 |
 | RICA y AUTO_RICA (placeholder, replican ICA municipal) | 2 | 0 |
@@ -89,7 +90,7 @@ Las tarifas van desde 0.1% (combustibles) hasta 33% (pagos al exterior por softw
 |---|---|---|
 | `tarifa-CO-AUTO_RENTA` | 0.55% fija | Tarifa base — existen tarifas sectoriales distintas (0.40%, 1.60%) que pueden requerir agregar entradas. |
 | `tarifa-CO-AUTO_RETEFUENTE` | Replica tarifas RETEFUENTE | Solo 3 entradas precargadas como muestra (compras grales, servicios grales, honorarios). |
-| `tarifa-CO-AUTO_RIVA` | 100% del IVA | Reverse charge — autoliquidación completa del IVA por importación de servicios. |
+| `tarifa-CO-IVA_IMPORTACION_SERVICIOS` | 100% del IVA | Autoliquidación completa del IVA por importación de servicios (proveedor sin domicilio fiscal en el país). |
 
 ---
 
@@ -178,6 +179,7 @@ Los stream keys usan códigos DIVIPOLA de las jurisdicciones (`tarifa-CO-11001-I
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1.0 | 2026-05-26 | Carga inicial F1: 22 streams (7 nacionales + 12 ICA municipales + 1 SOBRETASA Bogotá + 2 placeholders RICA/AUTO_RICA) con 124 entradas de tarifa. 49 conceptos RETEFUENTE precargados. |
+| 1.1 | 2026-07-31 | Renombre `AUTO_RIVA` → `IVA_IMPORTACION_SERVICIOS` (issue #110): stream `tarifa-CO-IVA_IMPORTACION_SERVICIOS`, entrada `iva-importacion-servicios-general`. Se corrige la fuente normativa §2, que describía el tributo como autorretención ("cuando la empresa es autorretenedora" — residuo de la definición legada): la tarifa del 100% corresponde a la autoliquidación del art. 437-2 num. 3 + art. 437-1. Se cierra la antigua pregunta 8 (¿siempre 100%?): el art. 437-1 fija la retención en el 100% del impuesto para este caso. |
 
 ---
 
@@ -192,5 +194,4 @@ Preguntas para validación del **equipo de consultores fiscales**:
 5. **AUTO_RENTA — tarifas sectoriales:** ¿Cuáles sectores deben precargarse en F1 (industria 0.40%, comercio 0.80%, energía 1.60%) y cómo se identifica el sector aplicable?
 6. **SOBRETASA_BOMBERIL:** Solo Bogotá precargado (8%). ¿Qué municipios aplican sobretasa y con qué porcentaje? Lista pendiente.
 7. **Cuantías mínimas:** ¿Las cuantías mínimas en UVT precargadas son las vigentes 2024–2025? Caso típico: arrendamiento inmuebles 27 UVT, servicios generales 4 UVT.
-8. **AUTO_RIVA = 100% IVA:** ¿Es siempre 100% en reverse charge, o puede ser parcial en algunos casos?
-9. **Stream `tarifa-CO-AUTO_RETEFUENTE` incompleto:** ¿Replicamos todos los 49 conceptos como AUTO_RETEFUENTE o solo los aplicables a autorretenedoras?
+8. **Stream `tarifa-CO-AUTO_RETEFUENTE` incompleto:** ¿Replicamos todos los 49 conceptos como AUTO_RETEFUENTE o solo los aplicables a autorretenedoras?

@@ -22,12 +22,12 @@ El contenido se organiza siguiendo la estructura de los agregados del modelo de 
 
 ## 1. Tributos — CatalogoTributario
 
-Los datos del catálogo `catalogo-tributario-CO` (tributos, clasificaciones, tratamientos y reglas de localización) se migraron a [`datos-precargados/co-catalogo-tributario.json`](datos-precargados/co-catalogo-tributario.json) (v1.0, 2026-05-26). Allí viven las 46 entidades iniciales F1 (11 tributos + 6 clasificaciones + 18 tratamientos + 11 reglas de localización). El narrativo de revisión para consultores está en [`datos-precargados/co-catalogo-tributario.md`](datos-precargados/co-catalogo-tributario.md).
+Los datos del catálogo `catalogo-tributario-CO` (tributos, clasificaciones, tratamientos y reglas de localización) se migraron a [`datos-precargados/co-catalogo-tributario.json`](datos-precargados/co-catalogo-tributario.json) (v1.2, 2026-07-31). Allí viven las 50 entidades F1 (11 tributos + 6 clasificaciones + 22 tratamientos + 11 reglas de localización). El narrativo de revisión para consultores está en [`datos-precargados/co-catalogo-tributario.md`](datos-precargados/co-catalogo-tributario.md).
 
 En esta sección queda únicamente el **contexto de diseño**:
 
-- **Tributos directos:** 7 (IVA, INC, ICA, RETEFUENTE, RIVA, RICA, SOBRETASA_BOMBERIL). IVA, INC, ICA son `aditivo`; los demás `sustractivo`. Cuatro niveles de dependencia padre-hijo: RIVA → IVA, RICA → (independiente), SOBRETASA_BOMBERIL → RICA, AUTO_RIVA → IVA.
-- **Tributos de provisión (autorretenciones):** 4 (AUTO_RENTA, AUTO_RETEFUENTE, AUTO_RIVA, AUTO_RICA). Aplican cuando la empresa es autorretenedora — atributo del `PerfilTributario`. Direccionalidad: `ingreso` (la empresa autorretiene sobre sus propias ventas) salvo AUTO_RIVA que es `gasto` (reverse charge).
+- **Tributos directos:** 7 (IVA, INC, ICA, RETEFUENTE, RIVA, RICA, SOBRETASA_BOMBERIL). IVA, INC, ICA son `aditivo`; los demás `sustractivo`. Cuatro niveles de dependencia padre-hijo: RIVA → IVA, RICA → (independiente), SOBRETASA_BOMBERIL → RICA, IVA_IMPORTACION_SERVICIOS → IVA.
+- **Tributos de provisión:** 4 — tres autorretenciones (AUTO_RENTA, AUTO_RETEFUENTE, AUTO_RICA), que aplican cuando la empresa es autorretenedora (atributo del `PerfilTributario`) con direccionalidad `ingreso` (la empresa se retiene sobre sus propias ventas); y un autoliquidado (IVA_IMPORTACION_SERVICIOS) con direccionalidad `gasto` — el adquiriente asume el IVA cuando el proveedor de servicios no tiene residencia ni domicilio fiscal en el país (art. 437-2 num. 3).
 - **`codigo` semántico inmutable:** Los códigos de Tributo y Clasificación son inmutables por referencias históricas desde `RegistroTributario` (`[I26]`). Política de modificabilidad de otros atributos diferida a `[PD12]`.
 - **Clasificaciones:** 6 categorías que agrupan bienes y servicios por tratamiento (GRAV_19, GRAV_5, EXCLUIDO, EXENTO, INC_8, NO_GRAVADO). Las tarifas específicas viven en `TarifaTributaria` — el catálogo solo define qué clasificaciones existen.
 
@@ -47,7 +47,7 @@ En esta sección queda únicamente el **contexto de diseño** de la configuraci�
 
 Las 11 reglas de localización se migraron junto con el catálogo tributario a [`datos-precargados/co-catalogo-tributario.json`](datos-precargados/co-catalogo-tributario.json) (sección `reglasLocalizacion`).
 
-**Patrón de diseño:** Tributos nacionales (IVA, INC, RETEFUENTE, RIVA, AUTO_RENTA, AUTO_RETEFUENTE, AUTO_RIVA) resuelven por `sedeEmisora` sin fallback — la sede de la empresa determina el país. Tributos municipales (ICA, RICA, SOBRETASA_BOMBERIL, AUTO_RICA) resuelven por `lugarEjecucion` con fallback a `sedeEmisora` — donde se presta el servicio o entrega el bien, y si no hay dato del lugar de ejecución, se usa la sede.
+**Patrón de diseño:** Tributos nacionales (IVA, INC, RETEFUENTE, RIVA, AUTO_RENTA, AUTO_RETEFUENTE, IVA_IMPORTACION_SERVICIOS) resuelven por `sedeEmisora` sin fallback — la sede de la empresa determina el país. Tributos municipales (ICA, RICA, SOBRETASA_BOMBERIL, AUTO_RICA) resuelven por `lugarEjecucion` con fallback a `sedeEmisora` — donde se presta el servicio o entrega el bien, y si no hay dato del lugar de ejecución, se usa la sede.
 
 ---
 
@@ -62,7 +62,7 @@ En esta sección queda únicamente el **contexto de diseño**:
 - **RIVA:** 15% del IVA generado (porcentajeDePadre).
 - **AUTO_RENTA:** Tarifa base 0.55%. Tarifas sectoriales (0.40% industria, 0.80% comercio, 1.60% otros) pendientes de validación.
 - **AUTO_RETEFUENTE:** Replica tarifas RETEFUENTE; precarga inicial de 3 conceptos.
-- **AUTO_RIVA:** 100% del IVA (reverse charge en importación de servicios).
+- **IVA_IMPORTACION_SERVICIOS:** 100% del IVA teórico (autoliquidación en importación de servicios, art. 437-2 num. 3 + art. 437-1).
 - **ICA municipal:** Streams por código DIVIPOLA — `tarifa-CO-11001-ICA` (Bogotá), `tarifa-CO-05001-ICA` (Medellín), etc. Cobertura F1 en 12 ciudades principales. Bogotá tiene 13 entradas con tarifas oficiales del Acuerdo 65/2002; las otras 11 ciudades tienen 3–8 entradas con valores razonables pendientes de validación.
 - **RICA y AUTO_RICA:** Replican la tarifa ICA del municipio correspondiente.
 - **SOBRETASA_BOMBERIL:** Solo Bogotá precargada (8% del RICA). Otros municipios pendientes.
@@ -83,7 +83,7 @@ En esta sección queda únicamente el **contexto de diseño**:
 - **Frontera con `Tratamiento`:** El `Tratamiento` (en `CatalogoTributario`) declara qué tributos aplican por clasificación; la `CondicionDeAplicacion` ajusta por perfil tributario del sujeto. El motor primero filtra por tratamiento y luego evalúa condiciones.
 - **Condición territorial:** `IVA-02-territorial` evalúa `lugarEjecucion.jurisdiccion.tipoRegimen = "puerto-libre"` — opera sobre la jurisdicción resuelta, no sobre atributos del perfil. Materializa la decisión `[D12]` y la invariante `[I15]`. Si en el futuro se incorporan más jurisdicciones con `tipoRegimen: puerto-libre`, esta condición las cubre automáticamente.
 - **Cuantía mínima:** NO es condición. Es atributo de `EntradaDeTarifa` (`cuantiaMinima`). El motor la evalúa después de resolver la tarifa.
-- **Autorretenciones:** Su `direccionFiscalAplicable` declarada en el `Tributo` (ingreso para AUTO_RENTA/RETEFUENTE/RICA; gasto para AUTO_RIVA) actúa como prefiltro estructural. Las condiciones aquí solo activan el tributo cuando la empresa tiene la calidad correspondiente.
+- **Provisiones:** Su `direccionFiscalAplicable` declarada en el `Tributo` (ingreso para las autorretenciones AUTO_RENTA/RETEFUENTE/RICA; gasto para el autoliquidado IVA_IMPORTACION_SERVICIOS) actúa como prefiltro estructural. Las condiciones activan las autorretenciones cuando la empresa tiene la calidad correspondiente, y el autoliquidado cuando la contraparte no tiene domicilio fiscal en el país (`tieneDomicilioFiscalEnElPais = false`).
 
 ### INC, ICA — sin condiciones por perfil
 
@@ -135,4 +135,5 @@ Los formatos fiscales se migraron a [`datos-precargados/co-formato-fiscal.json`]
 |---------|-------|-------------|
 | 1.0 | Marzo 2026 | Versión inicial: 11 tributos, 6 clasificaciones, condiciones de aplicación completas, 13 atributos fiscales, formatos DIAN y municipales. |
 | 1.1 | Mayo 2026 | Cambio 3 — Sub-cambio 3.4: nueva Sección 5 con regímenes empresariales precargados (zonas francas, monopolios departamentales, Puerto Libre empresarial). 3 atributos fiscales nuevos en Sección 4 (`inscripcionZonaFranca`, `inscripcionMonopolio`, `inscripcionPuertoLibre`) con `catalogoReferencia`. Renumeración de Sección 5 (Formatos) a Sección 6. `[D13]` `[I16]`. |
+| 1.3 | Julio 2026 | **Renombre `AUTO_RIVA` → `IVA_IMPORTACION_SERVICIOS` y corrección del disparador (issue #110, resolución con consultoría fiscal).** La "autorretención de IVA" no existe como figura normativa: el tributo queda definido como la autoliquidación del IVA en importación de servicios (art. 437-2 num. 3), con disparador `contraparte.tieneDomicilioFiscalEnElPais = false` (atributo nuevo del catálogo v1.1) en lugar del residuo legado `emisora.esAgenteRetenedorIVA`. Prosa de provisiones reescrita distinguiendo autorretenciones (ingreso, por calidad propia) del autoliquidado (gasto, por contraparte del exterior). Conteos alineados al catálogo v1.2 (22 tratamientos, 50 entidades — issue #111). |
 | 1.2 | Julio 2026 | **ICA con direccionalidad inherente `ingreso` (issue #93).** El catálogo declaraba `ICA: ambas`, lo que en dirección gasto hacía liquidar un ICA aditivo del que el comprador no es sujeto pasivo (además de la RICA, con misma base y tarifa) — contradiciendo `R61`. `ICA.direccionFiscalAplicable` pasa a `ingreso` (patrón de `AUTO_RICA`); `RICA` permanece en `ambas` (es retención). Sección "INC, ICA — sin condiciones por perfil" anotada. Alinea la definición fuente con la implementación ya verificada (`Cosmos.Impuestos#116`): catálogo `co-catalogo-tributario.{md,json}` v1.1 y `anexo-ejemplo-direccion-fiscal.md` (el paso de filtro por dirección del Caso A ahora sí descarta un tributo — ICA). |
