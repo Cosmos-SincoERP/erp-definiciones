@@ -2,7 +2,7 @@
 
 **País:** Panamá (`PA`)
 **Catálogo del modelo:** `CatalogoTributario` (Sección 3.2)
-**Versión:** 1.0
+**Versión:** 1.1
 **Fecha de actualización:** 2026-05-26
 **Archivo de datos:** [`pa-catalogo-tributario.json`](pa-catalogo-tributario.json)
 
@@ -30,9 +30,9 @@ Catálogo de tributos vigentes en Panamá administrados por la DGI (Dirección G
 |---|:---:|
 | Tributos | 4 (ITBMS, RITBMS, ISC, ISR) |
 | Clasificaciones | 5 |
-| Tratamientos `aplica: true` | 7 |
+| Tratamientos `aplica: true` | 8 |
 | Reglas de localización | 4 |
-| **Total** | **20 entidades** |
+| **Total** | **21 entidades** |
 
 ---
 
@@ -60,10 +60,10 @@ Catálogo de tributos vigentes en Panamá administrados por la DGI (Dirección G
 | `GRAV_ITBMS_7` | Gravados ITBMS 7% | ITBMS, RITBMS |
 | `GRAV_ITBMS_10` | Gravados ITBMS 10% (alcohol, hospedaje) | ITBMS, RITBMS |
 | `GRAV_ITBMS_15` | Gravados ITBMS 15% (cigarrillos) | ITBMS, RITBMS |
-| `EXENTO_ITBMS` | Exentos de ITBMS | — |
+| `EXENTO_ITBMS` | Exentos de ITBMS | ISR |
 | `ISC_APLICABLE` | Sujeto a ISC | ISC |
 
-ISR no tiene clasificación — su factor es `conceptoPago` (honorarios, dividendos, intereses, alquileres, etc.).
+La tarifa del ISR no depende de la clasificación — su factor es `conceptoPago` (honorarios, dividendos, intereses, alquileres, etc.). Sí participa de la matriz de tratamientos: `ISR` × `EXENTO_ITBMS` declara que la retención de renta puede aplicar a un concepto exento de ITBMS (son tributos independientes: la exención del ITBMS no exime la retención de renta). Coherente con la configuración estándar de la implementación; confirmación con consultores pendiente (pregunta 6).
 
 ---
 
@@ -109,6 +109,7 @@ Panamá sigue el **principio territorial de renta**: solo se grava la renta de f
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1.0 | 2026-05-26 | Carga inicial F1: 4 tributos + 5 clasificaciones + 7 tratamientos + 4 reglas de localización. |
+| 1.1 | 2026-07-31 | Nuevo tratamiento `ISR` × `EXENTO_ITBMS` (`aplica: true`) — issue #111: la matriz va atrás de la configuración estándar de la implementación; la retención de renta puede aplicar a conceptos exentos de ITBMS (tributos independientes). Confirmación con consultores pendiente (pregunta 6). Tratamientos 7 → 8, total 20 → 21 entidades. |
 
 ---
 
@@ -124,3 +125,4 @@ Preguntas para validación del **equipo de consultores fiscales PA**:
 3. **ISR — tarifas específicas:** ¿Cuáles conceptos de retención debemos precargar en F1? Los más comunes: honorarios profesionales, dividendos, intereses, alquileres, pagos al exterior.
 4. **Tarifa ISC específica:** ¿Cuáles productos tienen ISC y a qué tarifa? Casos conocidos: vehículos, alcohol, tabaco, joyas, telecomunicaciones móviles.
 5. **Clasificaciones ITBMS exentas con sub-categorías:** ¿Conviene distinguir `EXENTO_ITBMS_CANASTA_BASICA`, `EXENTO_ITBMS_MEDICAMENTOS`, etc., o mantener una única `EXENTO_ITBMS`?
+6. **Tratamiento `ISR` × `EXENTO_ITBMS`:** ¿Se confirma que la retención de renta aplica a conceptos exentos de ITBMS? Es coherente (son tributos independientes) y así corre en la configuración estándar, pero conviene la ratificación normativa.

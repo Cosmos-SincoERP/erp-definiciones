@@ -1,8 +1,8 @@
 {
   "pais": "CO",
   "catalogo": "TarifaTributaria",
-  "version": "1.0",
-  "fechaActualizacion": "2026-05-26",
+  "version": "1.1",
+  "fechaActualizacion": "2026-07-31",
   "fuente": "Decreto Único Reglamentario 1625 de 2016 (DIAN — RETEFUENTE) + Estatuto Tributario Nacional (IVA, INC, RIVA) + Decreto 2201 de 2016 (AUTO_RENTA) + estatutos tributarios municipales (ICA, RICA, SOBRETASA_BOMBERIL, AUTO_RICA).",
   "estructura": {
     "totalStreams": 22,
@@ -128,11 +128,11 @@
     },
 
     {
-      "streamKey": "tarifa-CO-AUTO_RIVA",
-      "tributo": "AUTO_RIVA",
+      "streamKey": "tarifa-CO-IVA_IMPORTACION_SERVICIOS",
+      "tributo": "IVA_IMPORTACION_SERVICIOS",
       "jurisdiccion": null,
       "tarifas": [
-        { "entradaId": "auto-riva-general", "factor": null, "descripcion": "Autorretención de IVA en reverse charge (importación de servicios) — 100% del IVA autoliquidado", "tarifa": 100, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
+        { "entradaId": "iva-importacion-servicios-general", "factor": null, "descripcion": "IVA por importación de servicios — retención del 100% del IVA teórico autoliquidado por el adquiriente (art. 437-2 num. 3 + art. 437-1 del Estatuto Tributario)", "tarifa": 100, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
       ]
     },
 

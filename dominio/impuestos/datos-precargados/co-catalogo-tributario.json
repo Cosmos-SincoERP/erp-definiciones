@@ -1,8 +1,8 @@
 {
   "pais": "CO",
   "catalogo": "CatalogoTributario",
-  "version": "1.1",
-  "fechaActualizacion": "2026-07-10",
+  "version": "1.2",
+  "fechaActualizacion": "2026-07-31",
   "fuente": "Estatuto Tributario Nacional (Decreto 624 de 1989) + Decreto Único Reglamentario 1625 de 2016 (DIAN) + Ley 14 de 1983 (ICA) + Ley 1430 de 2010 (autorretenciones) + estatutos tributarios municipales.",
 
   "tributos": [
@@ -115,8 +115,8 @@
       "definicion": "Autorretención en la fuente que la empresa practica sobre sus propios ingresos cuando es responsable como autorretenedora."
     },
     {
-      "codigo": "AUTO_RIVA",
-      "nombre": "Autorretención de IVA",
+      "codigo": "IVA_IMPORTACION_SERVICIOS",
+      "nombre": "IVA por importación de servicios",
       "naturaleza": "sustractivo",
       "caracterRetencion": "anticipado",
       "nivelJurisdiccional": "nacional",
@@ -124,7 +124,7 @@
       "direccionFiscalAplicable": "gasto",
       "tributoPadre": "IVA",
       "origen": "estandar",
-      "definicion": "Autorretención de IVA por reverse charge (importación de servicios). El comprador autoliquida el IVA cuando el vendedor no está obligado."
+      "definicion": "IVA autoliquidado por el adquiriente al contratar servicios gravados con proveedores sin residencia ni domicilio fiscal en el país (Estatuto Tributario art. 437-2 numeral 3). El proveedor no factura IVA y recibe el total de la factura; la empresa asume el impuesto (retención del 100% del IVA teórico), lo declara y lo paga a la DIAN."
     },
     {
       "codigo": "AUTO_RICA",
@@ -152,22 +152,26 @@
   "tratamientos": [
     { "clasificacion": "GRAV_19", "tributo": "IVA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "GRAV_19", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_19", "tributo": "AUTO_RETEFUENTE", "aplica": true, "origen": "estandar" },
     { "clasificacion": "GRAV_19", "tributo": "RIVA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "GRAV_19", "tributo": "ICA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "GRAV_19", "tributo": "RICA", "aplica": true, "origen": "estandar" },
 
     { "clasificacion": "GRAV_5", "tributo": "IVA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "GRAV_5", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "GRAV_5", "tributo": "AUTO_RETEFUENTE", "aplica": true, "origen": "estandar" },
     { "clasificacion": "GRAV_5", "tributo": "RIVA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "GRAV_5", "tributo": "ICA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "GRAV_5", "tributo": "RICA", "aplica": true, "origen": "estandar" },
 
     { "clasificacion": "EXCLUIDO", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "EXCLUIDO", "tributo": "AUTO_RETEFUENTE", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXCLUIDO", "tributo": "ICA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXCLUIDO", "tributo": "RICA", "aplica": true, "origen": "estandar" },
 
     { "clasificacion": "EXENTO", "tributo": "IVA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXENTO", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "EXENTO", "tributo": "AUTO_RETEFUENTE", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXENTO", "tributo": "ICA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXENTO", "tributo": "RICA", "aplica": true, "origen": "estandar" },
 
@@ -184,7 +188,7 @@
     { "tributo": "SOBRETASA_BOMBERIL", "clasificacion": "*", "rolQueManda": "lugarEjecucion", "rolFallback": "sedeEmisora", "origen": "estandar" },
     { "tributo": "AUTO_RENTA", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
     { "tributo": "AUTO_RETEFUENTE", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
-    { "tributo": "AUTO_RIVA", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "IVA_IMPORTACION_SERVICIOS", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
     { "tributo": "AUTO_RICA", "clasificacion": "*", "rolQueManda": "lugarEjecucion", "rolFallback": "sedeEmisora", "origen": "estandar" }
   ]
 }

@@ -1,8 +1,8 @@
 {
   "pais": "PA",
   "catalogo": "CatalogoTributario",
-  "version": "1.0",
-  "fechaActualizacion": "2026-05-26",
+  "version": "1.1",
+  "fechaActualizacion": "2026-07-31",
   "fuente": "Código Fiscal de Panamá (Ley 8 de 1956 y modificatorias) + Ley 8 de 2010 (reforma fiscal, ITBMS) + Decretos Ejecutivos reglamentarios DGI.",
 
   "tributos": [
@@ -71,7 +71,8 @@
     { "clasificacion": "GRAV_ITBMS_10", "tributo": "RITBMS", "aplica": true, "origen": "estandar" },
     { "clasificacion": "GRAV_ITBMS_15", "tributo": "ITBMS", "aplica": true, "origen": "estandar" },
     { "clasificacion": "GRAV_ITBMS_15", "tributo": "RITBMS", "aplica": true, "origen": "estandar" },
-    { "clasificacion": "ISC_APLICABLE", "tributo": "ISC", "aplica": true, "origen": "estandar" }
+    { "clasificacion": "ISC_APLICABLE", "tributo": "ISC", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "EXENTO_ITBMS", "tributo": "ISR", "aplica": true, "origen": "estandar" }
   ],
 
   "reglasLocalizacion": [

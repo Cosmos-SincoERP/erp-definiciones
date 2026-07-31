@@ -1,8 +1,8 @@
 {
   "pais": "CO",
   "catalogo": "CondicionDeAplicacion",
-  "version": "1.0",
-  "fechaActualizacion": "2026-05-26",
+  "version": "1.1",
+  "fechaActualizacion": "2026-07-31",
   "fuente": "Estatuto Tributario Nacional + Decreto Único Reglamentario 1625 de 2016 (DIAN — RETEFUENTE/RIVA) + estatutos tributarios municipales (RICA) + Ley 1943/2018 y Ley 2010/2019 (Régimen Simple) + Constitución art. 310 + Ley 47/1993 (Puerto Libre).",
   "estructura": {
     "totalCondiciones": 32,
@@ -12,7 +12,7 @@
       "RICA": 5,
       "IVA": 3,
       "AUTO_RETEFUENTE": 1,
-      "AUTO_RIVA": 1,
+      "IVA_IMPORTACION_SERVICIOS": 1,
       "AUTO_RICA": 1,
       "AUTO_RENTA": 1
     },
@@ -283,14 +283,14 @@
     {
       "codigo": "RIVA-03",
       "tributo": "RIVA",
-      "entidadEvaluada": "emisora",
+      "entidadEvaluada": "contraparte",
       "criterios": [
-        { "atributo": "esAgenteRetenedorIVA", "operador": "igual", "valor": true }
+        { "atributo": "tieneDomicilioFiscalEnElPais", "operador": "igual", "valor": false }
       ],
       "efecto": "reverseCharge",
-      "tributoSubstituto": "AUTO_RIVA",
+      "tributoSubstituto": "IVA_IMPORTACION_SERVICIOS",
       "direccionFiscalAplicable": "gasto",
-      "descripcion": "Empresa adquiriente agente retenedor de IVA en importación de servicios → autoliquida IVA (AUTO_RIVA). Activa AUTO_RIVA por su propia direccionFiscalAplicable: gasto.",
+      "descripcion": "Proveedor sin residencia ni domicilio fiscal en el país (art. 437-2 num. 3) → no se le retiene RIVA; la empresa autoliquida el IVA (sustituto IVA_IMPORTACION_SERVICIOS, activado por su propia direccionFiscalAplicable: gasto).",
       "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
       "origen": "estandar"
     },
@@ -417,15 +417,15 @@
       "origen": "estandar"
     },
     {
-      "codigo": "AUTO-RIVA-01",
-      "tributo": "AUTO_RIVA",
-      "entidadEvaluada": "emisora",
+      "codigo": "IVA-IMPORTACION-SERVICIOS-01",
+      "tributo": "IVA_IMPORTACION_SERVICIOS",
+      "entidadEvaluada": "contraparte",
       "criterios": [
-        { "atributo": "esAgenteRetenedorIVA", "operador": "igual", "valor": true }
+        { "atributo": "tieneDomicilioFiscalEnElPais", "operador": "igual", "valor": false }
       ],
       "efecto": "aplicar",
       "direccionFiscalAplicable": "gasto",
-      "descripcion": "AUTO_RIVA activa en lugar de RIVA cuando la empresa adquiriente es agente retenedor de IVA (reverse charge en importación de servicios).",
+      "descripcion": "IVA_IMPORTACION_SERVICIOS activa en lugar de RIVA cuando el proveedor no tiene residencia ni domicilio fiscal en el país: no factura IVA y la empresa lo autoliquida (art. 437-2 num. 3 — retención del 100% del IVA teórico).",
       "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
       "origen": "estandar"
     },
