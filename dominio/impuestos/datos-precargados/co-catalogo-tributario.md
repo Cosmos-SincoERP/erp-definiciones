@@ -2,7 +2,7 @@
 
 **País:** Colombia (`CO`)
 **Catálogo del modelo:** `CatalogoTributario` (Sección 3.2 de `modelo-dominio.md`)
-**Versión:** 1.2
+**Versión:** 1.3
 **Fecha de actualización:** 2026-07-31
 **Archivo de datos:** [`co-catalogo-tributario.json`](co-catalogo-tributario.json)
 
@@ -60,7 +60,7 @@ Este catálogo precarga la configuración estándar del agregado `CatalogoTribut
 | `RETEFUENTE` | Retención en la Fuente | sustractivo | anticipado | nacional | `conceptoPago` | ambas | — |
 | `RIVA` | Retención sobre el IVA | sustractivo | anticipado | nacional | `porcentajeDePadre` | ambas | `IVA` |
 | `RICA` | Retención sobre el ICA | sustractivo | anticipado | municipal | `actividadEconomica` | ambas | — |
-| `SOBRETASA_BOMBERIL` | Sobretasa Bomberil | sustractivo | definitivo | municipal | `porcentajeDePadre` | ambas | `RICA` |
+| `SOBRETASA_BOMBERIL` | Sobretasa Bomberil | sustractivo | anticipado | municipal | `porcentajeDePadre` | ambas | `RICA` |
 
 > **Nota:** `ICA` aplica solo en `ingreso` — el sujeto pasivo del ICA es **quien genera el ingreso**; en dirección gasto el comprador solo practica la retención (`RICA`), no autoliquida ICA (coherente con `R61` del alcance). `RICA` permanece en `ambas` (retención: en gasto la empresa retiene al proveedor; en ingreso el cliente le retiene a la empresa).
 
@@ -103,7 +103,7 @@ Cada entrada declara que el tributo aplica cuando un concepto es clasificado con
 - INC_8: 1 tributo (INC).
 - NO_GRAVADO: ninguno.
 
-`AUTO_RETEFUENTE` **sí participa de la matriz** (las cuatro clasificaciones principales): la matriz declara su candidatura por clasificación, y su activación sigue dependiendo de la calidad de autorretenedora vía `CondicionDeAplicacion` — igual que en la configuración estándar de la implementación. `AUTO_RENTA` y `AUTO_RICA` NO se modelan como tratamientos por clasificación — su aplicación depende solo de atributos del `PerfilTributario` y de la dirección fiscal. La matriz de `IVA_IMPORTACION_SERVICIOS` está **pendiente de definición** con los consultores fiscales (pregunta 6 de la revisión pendiente).
+`AUTO_RETEFUENTE` **sí participa de la matriz** (las cuatro clasificaciones principales): la matriz declara su candidatura por clasificación, y su activación sigue dependiendo de la calidad de autorretenedora vía `CondicionDeAplicacion` — igual que en la configuración estándar de la implementación. `AUTO_RENTA` y `AUTO_RICA` NO se modelan como tratamientos por clasificación — su aplicación depende solo de atributos del `PerfilTributario` y de la dirección fiscal. La matriz de `IVA_IMPORTACION_SERVICIOS` está **pendiente de definición** con los consultores fiscales (pregunta 5 de la revisión pendiente).
 
 ---
 
@@ -137,9 +137,11 @@ Cada regla declara qué rol de ubicación de la transacción determina la jurisd
 
 ### 8.2. `caracterRetencion` y compensación
 
-- **anticipado:** el tributo retenido se compensa con la declaración tributaria correspondiente (renta, IVA, ICA).
-- **definitivo:** el tributo no se compensa, va directo al fondo destinado (caso SOBRETASA_BOMBERIL).
+- **anticipado:** la retención se compensa en la declaración del tributo correspondiente del retenido — es un abono a su propio impuesto (renta, IVA, ICA, o la sobretasa bomberil contra la sobretasa liquidada). Contablemente el retenido la registra como saldo a favor (activo, grupo 17/13), no como gasto.
+- **definitivo:** la retención no es compensable en ninguna declaración del retenido — es su pago final del tributo (caso típico: retenciones a beneficiarios que no declaran en el país). El destino del recaudo (un fondo específico, por ejemplo) **no** determina el carácter: lo determina si el retenido puede descontarla. Ningún tributo precargado de Colombia usa este valor hoy.
 - **null:** aplica a tributos aditivos que no son retenciones (IVA, INC, ICA).
+
+> **Nota (validado con consultoría fiscal, jul-2026):** la retención de `SOBRETASA_BOMBERIL` es **anticipado** — se descuenta de la sobretasa liquidada en la declaración del retenido (que acompaña la del ICA en los municipios que la adoptaron, ej. Cali e Ibagué; no se descuenta del ICA, contra el que solo aplica `RICA`). Salvedad: la sobretasa es normativa municipal, no nacional — si algún municipio la definiera como cobro no compensable, ese caso se manejaría como excepción (hoy no se ha evidenciado ninguno).
 
 ### 8.3. Tributos sin clasificación específica
 
@@ -165,6 +167,7 @@ Este catálogo declara **qué tributos existen y a qué clasificaciones aplican 
 |---|---|---|
 | 1.0 | 2026-05-26 | Carga inicial F1: 11 tributos (7 directos + 4 autorretenciones), 6 clasificaciones, 18 tratamientos, 11 reglas de localización. Fuente Estatuto Tributario + Decretos DIAN + leyes municipales. |
 | 1.1 | 2026-07-10 | `ICA.direccionFiscalAplicable` pasa de `ambas` a `ingreso` (issue #93): el sujeto pasivo del ICA es quien genera el ingreso; en gasto el comprador solo practica RICA. Alineado con la implementación (`Cosmos.Impuestos#116`). |
+| 1.3 | 2026-07-31 | **Carácter de la retención de la sobretasa bomberil: `definitivo` → `anticipado`** (issue #108, validado con las dos consultoras fiscales jul-31): la retención se descuenta de la **sobretasa liquidada** en la declaración del retenido — no del ICA, contra el que solo aplica RICA — y el retenido la registra como saldo a favor (grupo 17). El valor `definitivo` de la carga inicial se justificaba por el destino del recaudo ("va directo al fondo bomberil"), que no determina el carácter: lo determina si el retenido puede descontarla. Nota 8.2 reescrita con las definiciones correctas de cada carácter + salvedad municipal (la sobretasa es norma de cada municipio — ej. Cali e Ibagué la tienen, Bogotá no la maneja en la declaración de ICA; un municipio podría definirla no compensable y se manejaría como excepción). Se cierra la antigua pregunta 2 y se renumeran las restantes (3-8 → 2-7). ⚠️ La implementación (`ConfiguracionEstandarCo`) ya decía `anticipado` — ahora validado, deja de ser default sospechoso. |
 | 1.2 | 2026-07-31 | **Renombre `AUTO_RIVA` → `IVA_IMPORTACION_SERVICIOS`** (issue #110, resolución con consultoría fiscal jul-2026): la "autorretención de IVA en ventas" del sistema legado no tiene sustento normativo y se remueve como concepto; el tributo queda definido como la autoliquidación del IVA en importación de servicios (art. 437-2 num. 3 ET). Nombre legible "IVA por importación de servicios"; el disparador pasa de `esAgenteRetenedorIVA` (residuo legado, chocaba con `RIVA-01b`) al nuevo atributo `tieneDomicilioFiscalEnElPais` de la contraparte — ver catálogo de atributos v1.1 y condiciones v1.1. Se cierra la antigua pregunta 4 (dirección `gasto` confirmada) y entran las preguntas 6-8. **Tratamientos 18 → 22** (issue #111): `AUTO_RETEFUENTE` × GRAV_19/GRAV_5/EXCLUIDO/EXENTO (`aplica: true`), alineando la matriz con la configuración estándar de la implementación. Total entidades 46 → 50. |
 
 ---
@@ -174,10 +177,9 @@ Este catálogo declara **qué tributos existen y a qué clasificaciones aplican 
 Preguntas para validación del **equipo de consultores fiscales**:
 
 1. **`caracterRetencion` para tributos aditivos:** ¿Es correcto dejarlo `null` para IVA, INC, ICA, o conviene usar un valor explícito (ej: `no-aplica`)?
-2. **SOBRETASA_BOMBERIL como `definitivo`:** ¿La sobretasa va directamente al fondo bomberil sin compensación, o tiene algún mecanismo de descuento que la haga `anticipado`?
-3. **¿Faltan tributos en F1?** Casos conocidos no incluidos por simplicidad inicial: GMF (4×1000), Impuesto al Patrimonio, Impuesto al Consumo de Licores y Cervezas departamental, Estampillas municipales/departamentales. ¿Cuáles deben entrar en F1?
-4. **Tratamientos para INC:** ¿Existen clasificaciones adicionales de INC (`INC_4`, `INC_16`)? Si sí, ¿cómo se diferencian (sectores)?
-5. **Tratamientos para clasificaciones GRAV_*:** ¿Faltan tarifas intermedias (GRAV_8, GRAV_12, etc.)?
-6. **Matriz de tratamientos de `IVA_IMPORTACION_SERVICIOS`:** el art. 437-2 num. 3 no alcanza todos los conceptos — ¿qué clasificaciones (o servicios) quedan cubiertos por la autoliquidación? Hoy el tributo no tiene tratamientos declarados; definir la matriz con los consultores.
-7. **¿La autoliquidación se restringe a emisoras responsables de IVA** (`perteneceRegimenIVA = true`), o aplica a cualquier contratante de servicios del exterior?
-8. **Perfil tributario mínimo del proveedor del exterior:** ¿qué datos se exigen para operar con una contraparte sin domicilio fiscal en el país? (El motor rechaza la transacción si la contraparte no tiene perfil.)
+2. **¿Faltan tributos en F1?** Casos conocidos no incluidos por simplicidad inicial: GMF (4×1000), Impuesto al Patrimonio, Impuesto al Consumo de Licores y Cervezas departamental, Estampillas municipales/departamentales. ¿Cuáles deben entrar en F1?
+3. **Tratamientos para INC:** ¿Existen clasificaciones adicionales de INC (`INC_4`, `INC_16`)? Si sí, ¿cómo se diferencian (sectores)?
+4. **Tratamientos para clasificaciones GRAV_*:** ¿Faltan tarifas intermedias (GRAV_8, GRAV_12, etc.)?
+5. **Matriz de tratamientos de `IVA_IMPORTACION_SERVICIOS`:** el art. 437-2 num. 3 no alcanza todos los conceptos — ¿qué clasificaciones (o servicios) quedan cubiertos por la autoliquidación? Hoy el tributo no tiene tratamientos declarados; definir la matriz con los consultores.
+6. **¿La autoliquidación se restringe a emisoras responsables de IVA** (`perteneceRegimenIVA = true`), o aplica a cualquier contratante de servicios del exterior?
+7. **Perfil tributario mínimo del proveedor del exterior:** ¿qué datos se exigen para operar con una contraparte sin domicilio fiscal en el país? (El motor rechaza la transacción si la contraparte no tiene perfil.)

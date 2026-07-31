@@ -1,7 +1,7 @@
 {
   "pais": "CO",
   "catalogo": "CatalogoTributario",
-  "version": "1.2",
+  "version": "1.3",
   "fechaActualizacion": "2026-07-31",
   "fuente": "Estatuto Tributario Nacional (Decreto 624 de 1989) + Decreto Único Reglamentario 1625 de 2016 (DIAN) + Ley 14 de 1983 (ICA) + Ley 1430 de 2010 (autorretenciones) + estatutos tributarios municipales.",
 
@@ -82,13 +82,13 @@
       "codigo": "SOBRETASA_BOMBERIL",
       "nombre": "Sobretasa Bomberil",
       "naturaleza": "sustractivo",
-      "caracterRetencion": "definitivo",
+      "caracterRetencion": "anticipado",
       "nivelJurisdiccional": "municipal",
       "factorDeTarifa": "porcentajeDePadre",
       "direccionFiscalAplicable": "ambas",
       "tributoPadre": "RICA",
       "origen": "estandar",
-      "definicion": "Sobretasa municipal con destinación al cuerpo de bomberos. Aplica sobre el valor de RICA. Requisito: el tercero debe ser responsable de ICA. Ley 1575 de 2012."
+      "definicion": "Sobretasa municipal con destinación al cuerpo de bomberos (Ley 1575 de 2012), adoptada por acuerdo de cada municipio (ej.: Cali, Ibagué). Aplica sobre el valor de RICA. Requisito: el tercero debe ser responsable de ICA. La retención practicada se descuenta de la sobretasa liquidada en la declaración del retenido (no del ICA) — anticipo de su propio tributo, validado con consultoría fiscal jul-2026."
     },
     {
       "codigo": "AUTO_RENTA",

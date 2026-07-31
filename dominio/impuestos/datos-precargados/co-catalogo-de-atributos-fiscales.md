@@ -68,7 +68,7 @@ Cierra el contrato entre:
 
 ### 5.1. `requerido: true` significa que el PerfilTributario debe declararlo
 
-Los 10 atributos requeridos (`regimenTributario`, `perteneceRegimenIVA`, `esGranContribuyente`, `esAutorretenedora`, `esAgenteRetenedorIVA`, `tieneDomicilioFiscalEnElPais`, `esExentoRetefuente`, `perteneceRegimenSimple`, `esAutorretenedorRenta`, `tipoPersona`) deben estar presentes en el `PerfilTributario` de cualquier entidad colombiana. Los 6 opcionales solo aplican cuando son relevantes para la entidad. El perfil mínimo exigible a una contraparte **sin domicilio fiscal en el país** (proveedor del exterior) está en definición con los consultores fiscales — ver la pregunta 8 de la revisión pendiente del catálogo tributario.
+Los 10 atributos requeridos (`regimenTributario`, `perteneceRegimenIVA`, `esGranContribuyente`, `esAutorretenedora`, `esAgenteRetenedorIVA`, `tieneDomicilioFiscalEnElPais`, `esExentoRetefuente`, `perteneceRegimenSimple`, `esAutorretenedorRenta`, `tipoPersona`) deben estar presentes en el `PerfilTributario` de cualquier entidad colombiana. Los 6 opcionales solo aplican cuando son relevantes para la entidad. El perfil mínimo exigible a una contraparte **sin domicilio fiscal en el país** (proveedor del exterior) está en definición con los consultores fiscales — ver la pregunta 7 de la revisión pendiente del catálogo tributario.
 
 ### 5.4. `tieneDomicilioFiscalEnElPais` y la autoliquidación del IVA
 
