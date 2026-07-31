@@ -130,11 +130,11 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 - **F1 — LatAm completo:** CO/DO/PA con regímenes territoriales y empresariales precargados.
 - **F2 — Apertura US/CA:** activación de tipos `distrito-fiscal-especial` y `soberania-tributaria`, resolución de jurisdicción por dirección/geocoding, decisión arquitectónica proveedor fiscal externo vs catálogo propio (ver `[PD11]`).
 
-**Catálogos fiscales precargados (F1):** 27 pares de archivos (`.md` + `.json`), 967 entradas que cubren los 3 países F1 (CO: 498, DO: 260, PA: 209). Son **parte del producto** (`origen: estándar`) — pendiente refinamiento por consultores fiscales (cada `.md` lleva sección "Revisión pendiente"). Catálogo tributario CO **v1.3**: `ICA` solo en dirección `ingreso` (#93, validado con la consultoría fiscal), renombre `AUTO_RIVA` → `IVA_IMPORTACION_SERVICIOS` (#110 — la autorretención de IVA no existe como figura; el tributo es la autoliquidación en importación de servicios, con disparador por contraparte sin domicilio fiscal en el país) y retención de la sobretasa bomberil como `anticipado` (#108 — se descuenta de la sobretasa liquidada, no del ICA; validado con las dos consultoras).
+**Catálogos fiscales precargados (F1):** 27 pares de archivos (`.md` + `.json`), 983 entradas que cubren los 3 países F1 (CO: 514, DO: 260, PA: 209). Son **parte del producto** (`origen: estándar`) — pendiente refinamiento por consultores fiscales (cada `.md` lleva sección "Revisión pendiente"). Catálogo tributario CO **v1.4**: `ICA` solo en dirección `ingreso` (#93, validado con la consultoría fiscal), renombre `AUTO_RIVA` → `IVA_IMPORTACION_SERVICIOS` (#110 — la autorretención de IVA no existe como figura; el tributo es la autoliquidación en importación de servicios, con disparador por contraparte sin domicilio fiscal en el país) y retención de la sobretasa bomberil como `anticipado` (#108 — se descuenta de la sobretasa liquidada, no del ICA; validado con las dos consultoras).
 
 **Replanteamiento (#31, #39):** el alta del `PerfilTributario` ya no depende de un registro centralizado de terceros — el comando `AsegurarPerfilTributario` crea-o-reutiliza por identificación × país (`[D16]`), validando la identidad con la pieza del paquete `IdentificacionLegal`; los eventos del perfil se publican hacia la bodega de Terceros (Impuestos es fuente, no consumidor).
 
-**Estado:** Alcance v1.5, modelo v2.0.7 (julio 2026). Modelo completo + catálogos F1 entregados — refinamiento por consultores fiscales en curso (es el sub-dominio más avanzado en el hito de refinamiento).
+**Estado:** Alcance v1.5, modelo v2.0.8 (julio 2026). Modelo completo + catálogos F1 entregados — refinamiento por consultores fiscales en curso (es el sub-dominio más avanzado en el hito de refinamiento).
 
 > Detalle: [`dominio/impuestos/modelo-dominio.md`](dominio/impuestos/modelo-dominio.md), [`dominio/impuestos/datos-precargados/`](dominio/impuestos/datos-precargados/)
 
@@ -424,7 +424,7 @@ Datos de Referencia ──► Nuggets ──► (terceros y unidades
 | Nuggets | Todos (validación empaquetada) | Datos de Referencia | **8 nuggets aceptados (borrador)** |
 | Terceros (bodega) | Consolida roles; publica señal global | Nuggets (clave natural) | **v2.0.2 — cerrado para desarrollo F1** |
 | Estructura Org | OXP, Contabilidad (copia local de unidades) | Datos de Referencia | **v2.5 — listo para desarrollo F1** |
-| Impuestos | OXP (cálculo tributario) | Nuggets, Datos de Referencia | **v2.0.7 — modelo completo + catálogos F1** |
+| Impuestos | OXP (cálculo tributario) | Nuggets, Datos de Referencia | **v2.0.8 — modelo completo + catálogos F1** |
 | Contabilidad | OXP (confirmación de asiento) | Terceros, Estructura Org (copia local) | **v1.12 — N1 listo para desarrollo F1** |
 | OXP | Terceros (rol Proveedor) | Impuestos, Contabilidad, Estructura Org (copia local) | **v4.10 — Fase 2 (refinamiento continuo)** |
 
@@ -433,7 +433,7 @@ Datos de Referencia ──► Nuggets ──► (terceros y unidades
 - ✅ **Datos de Referencia** — v2.0 listo (producción de catálogos + tasas de cambio).
 - 🟡 **Nuggets** — 8 nuggets aceptados en borrador (gobernanza + catálogo).
 - ✅ **Terceros** — v2.0.2 cerrado para desarrollo F1 (bodega consolidadora, 2 auditorías).
-- ✅ **Impuestos** — modelo v2.0.7 completo + catálogos F1 (LatAm CO/DO/PA, apertura US/CA F2).
+- ✅ **Impuestos** — modelo v2.0.8 completo + catálogos F1 (LatAm CO/DO/PA, apertura US/CA F2).
 - ✅ **Estructura Organizacional** — modelo v2.5 listo F1 (copia local + diferir; lote #85-#89 aplicado: varios grupos de primer nivel, `TipoUnidad` agregado propio, código de texto libre).
 - ✅ **Contabilidad** — v1.12, N1 listo F1 (MarcoContable + arquitectura PUC + grupo PUC esperado + copia local de datos maestros; catálogo de plantillas v1.9 con 6 plantillas).
 - 🔄 **OXP** — v4.10, Fase 2. Integración con Contabilidad **cerrada** y con Estructura Organizacional documentada; refinamiento continuo (últimos: registro de productos financieros #106 y medio de pago canónico #96).
@@ -811,8 +811,8 @@ El porcentaje de avance combina cinco hitos. Cada hito tiene un peso fijo y se e
 ### Detalle de los parciales
 
 **Impuestos — 85%**
-- ✅ Alcance v1.5, Modelo v2.0.7, Auditoría aplicada (2 rondas). Catálogo tributario CO v1.3.
-- 🟡 Refinamiento en progreso (~85%) — catálogos fiscales F1 entregados (967 entradas CO/DO/PA); #39 (perfil sin registro centralizado), #93 (ICA solo ingreso), #110 (IVA_IMPORTACION_SERVICIOS, resolución con la consultoría fiscal), #111 (matriz de tratamientos alineada a la implementación), #108 (sobretasa bomberil `anticipado`, validado con las dos consultoras) y #109 (RITBMS de Panamá como `porcentajeDePadre` — hereda el ciclo de vida del ITBMS) aplicados; resta el refinamiento por consultores sobre las secciones "Revisión pendiente" (abierto: #97 cuantía mínima como política).
+- ✅ Alcance v1.5, Modelo v2.0.8, Auditoría aplicada (2 rondas). Catálogo tributario CO v1.4.
+- 🟡 Refinamiento en progreso (~85%) — catálogos fiscales F1 entregados (983 entradas CO/DO/PA); #39 (perfil sin registro centralizado), #93 (ICA solo ingreso), #110 (IVA_IMPORTACION_SERVICIOS, resolución con la consultoría fiscal), #111 (matriz de tratamientos alineada a la implementación), #108 (sobretasa bomberil `anticipado`, validado con las dos consultoras), #109 (RITBMS de Panamá como `porcentajeDePadre` — hereda el ciclo de vida del ITBMS) y #117/#118 (autoliquidado autónomo de naturaleza `provision` + clasificaciones de servicios) aplicados; resta el refinamiento por consultores sobre las secciones "Revisión pendiente" (abierto: #97 cuantía mínima como política).
 - ⬜ Listo F1 — depende del cierre del refinamiento.
 - **Cálculo:** 20 + 25 + 15 + (30 × 0.85) + 0 = 85.5 ≈ **85%**.
 

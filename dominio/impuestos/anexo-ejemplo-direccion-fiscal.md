@@ -70,7 +70,7 @@ Se modela la **misma transacción** vista desde las dos direcciones:
 | RIVA-1b | RIVA | contraparte + emisora | `perteneceRegimenIVA` (C) + `esAgenteRetenedorIVA` (E) | `true` + `true` | `aplicar` | `gasto` |
 | RIVA-2a | RIVA | contraparte | `esAgenteRetenedorIVA` | `false` | `noAplicar` | `ingreso` |
 | RIVA-2b | RIVA | emisora | `esAgenteRetenedorIVA` | `false` | `noAplicar` | `gasto` |
-| RIVA-3 | RIVA | contraparte | `tieneDomicilioFiscalEnElPais` | `false` | `reverseCharge` (activa IVA_IMPORTACION_SERVICIOS) | `gasto` |
+| IVA-IMP-SERV-1 | IVA_IMPORTACION_SERVICIOS | contraparte | `tieneDomicilioFiscalEnElPais` | `false` | `aplicar` | `gasto` |
 
 **Tributos con direccionalidad inherente** (`Tributo.direccionFiscalAplicable`):
 - ICA, AUTO_RETEFUENTE, AUTO_RICA, AUTO_RENTA → `ingreso`
@@ -129,7 +129,7 @@ Solo se evalúan las condiciones con `direccionFiscalAplicable ∈ {gasto, ambas
 | **RIVA** | RIVA-1b: `contraparte.regimenIVA && emisora.esAgenteRetenedorIVA` (gasto) | ConsultorPro=true, Sinco=false ✗ | sigue |
 | | RIVA-2b: `emisora.esAgenteRetenedorIVA == false` (gasto) | Sinco=false ✓ | **`noAplicar`** |
 
-Nota: las condiciones IVA-1a, RTF-2a, RTF-3a, RTF-4b, RIVA-1a, RIVA-2a, RIVA-3 tienen `direccionFiscalAplicable: ingreso` y por tanto **no se evalúan** en este caso (gasto).
+Nota: las condiciones IVA-1a, RTF-2a, RTF-3a, RTF-4b, RIVA-1a, RIVA-2a tienen `direccionFiscalAplicable: ingreso` y por tanto **no se evalúan** en este caso (gasto).
 
 **Paso 5 — Calcular base × tarifa:**
 
@@ -199,7 +199,7 @@ Solo se evalúan las condiciones con `direccionFiscalAplicable ∈ {ingreso, amb
 | | (default) | | **aplica** |
 | **RIVA** | RIVA-1a: `emisora.regimenIVA && contraparte.esAgenteRetenedorIVA` (ingreso) | Sinco=true ✓, MegaCorp=true ✓ | **aplica** |
 
-Nota: las condiciones IVA-1b, RTF-2b, RTF-3b, RTF-4a, RIVA-1b, RIVA-2b, RIVA-3 tienen `direccionFiscalAplicable: gasto` y por tanto **no se evalúan** en este caso (ingreso). Esto demuestra que el motor evalúa **conjuntos diferentes de condiciones según la dirección**.
+Nota: las condiciones IVA-1b, RTF-2b, RTF-3b, RTF-4a, RIVA-1b, RIVA-2b e IVA-IMP-SERV-1 tienen `direccionFiscalAplicable: gasto` y por tanto **no se evalúan** en este caso (ingreso). Esto demuestra que el motor evalúa **conjuntos diferentes de condiciones según la dirección**.
 
 **Paso 5 — Calcular:**
 
@@ -285,7 +285,7 @@ Las reglas con semántica genuinamente bilateral (ej: régimen simple — RTF-1a
 
 ### 6.5. ReverseCharge y direccionalidad inherente del tributo
 
-Las autorretenciones, el reverseCharge y el ICA tienen **direccionalidad inherente** declarada explícitamente como invariante del agregado en `Tributo.direccionFiscalAplicable`:
+Las autorretenciones, el autoliquidado y el ICA tienen **direccionalidad inherente** declarada explícitamente como invariante del agregado en `Tributo.direccionFiscalAplicable`:
 
 | Tributo | `direccionFiscalAplicable` | Caso de uso |
 |---|---|---|
@@ -295,20 +295,19 @@ Las autorretenciones, el reverseCharge y el ICA tienen **direccionalidad inheren
 | AUTO_RENTA | `ingreso` | Autoretención de renta |
 | ICA | `ingreso` | Impuesto del ingreso: el sujeto pasivo es quien lo genera — en gasto el comprador solo practica RICA |
 
-Ejemplo del caso reverseCharge (condición RIVA-3):
+Ejemplo del caso autoliquidado (condición IVA-IMP-SERV-1 — activación autónoma):
 
 ```
-Tributo:                    RIVA  (Tributo.direccionFiscalAplicable: ambas)
+Tributo:                    IVA_IMPORTACION_SERVICIOS
+                            (autónomo · naturaleza provision · gasto)
 AmbitoEvaluado:             contraparte
 Atributo:                   tieneDomicilioFiscalEnElPais
 ValorEsperado:              false
-Efecto:                     reverseCharge → activa IVA_IMPORTACION_SERVICIOS
+Efecto:                     aplicar
 direccionFiscalAplicable:   gasto
 ```
 
-Si en el Caso A el proveedor (ConsultorPro) no tuviera residencia ni domicilio fiscal en Colombia (`tieneDomicilioFiscalEnElPais=false`), no facturaría IVA y no habría rete-IVA que practicarle: el motor descartaría `RIVA` y activaría `IVA_IMPORTACION_SERVICIOS` — Sinco autoliquida el IVA teórico y asume su retención del 100% (art. 437-2 num. 3). **IVA_IMPORTACION_SERVICIOS tiene `direccionFiscalAplicable: gasto`** — por su invariante del agregado, no se calcula en ingreso, incluso si la condición RIVA-3 intentara dispararla.
-
-**Semántica condicional de reverseCharge:** si el tributo alternativo (`IVA_IMPORTACION_SERVICIOS`) no es aplicable en la dirección actual (filtrado por su `direccionFiscalAplicable`), el tributo original (`RIVA`) continúa su evaluación normal. Esto garantiza coherencia: la condición RIVA-3 solo se evalúa en gasto, y el reemplazo `RIVA → IVA_IMPORTACION_SERVICIOS` ocurre solo cuando ambos son aplicables.
+Si en el Caso A el concepto fuera un servicio (clasificación `SERVICIOS_GRAV_19`) y el proveedor (ConsultorPro) no tuviera residencia ni domicilio fiscal en Colombia (`tieneDomicilioFiscalEnElPais=false`): el IVA no aplica (el proveedor no pertenece al régimen y no lo factura), RIVA no aplica (no hay IVA facturado que retener), y `IVA_IMPORTACION_SERVICIOS` aplica por su propia condición — Sinco reconoce el IVA asumido con tarifa espejo sobre la base (19% × base), sin afectar el valor a pagar al proveedor, que recibe el total de la factura (arts. 420 par. 3 y 437-2 num. 3). **No hay sustitución entre tributos:** cada uno se activa o descarta por sus propias condiciones; el autoliquidado además solo es candidato en clasificaciones de servicios (matriz de tratamientos) — un bien importado nunca lo activa (su IVA lo recauda la aduana).
 
 ### 6.6. Persistencia obligatoria en el RegistroTributario
 
@@ -333,7 +332,7 @@ El `RegistroTributario` debe conservar `direccionFiscal` dentro de su `ContextoT
 | Persistencia de `direccionFiscal` en el registro | `RegistroTributario.ContextoTransaccional`, Sección 3.11, R24 |
 | Comportamiento del tributo según dirección | R11, P2 (alcance) |
 | Semántica condicional de `reverseCharge` | VO `Efecto` en `CondicionDeAplicacion`, Sección 3.4 |
-| `reverseCharge` y autorretenciones | RIVA-3 + autorretenciones, `anexo-configuracion-estandar-co.md` |
+| Autoliquidado y autorretenciones (provisiones) | IVA-IMP-SERV-1 + autorretenciones, `anexo-configuracion-estandar-co.md` |
 
 ---
 

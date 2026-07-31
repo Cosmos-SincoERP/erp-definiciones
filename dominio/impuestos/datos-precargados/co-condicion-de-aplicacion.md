@@ -2,7 +2,7 @@
 
 **País:** Colombia (`CO`)
 **Catálogo del modelo:** `CondicionDeAplicacion` (Sección 3.4 de `modelo-dominio.md`)
-**Versión:** 1.1
+**Versión:** 1.2
 **Fecha de actualización:** 2026-07-31
 **Archivo de datos:** [`co-condicion-de-aplicacion.json`](co-condicion-de-aplicacion.json)
 
@@ -35,12 +35,12 @@ Las condiciones se evalúan después de que el motor resuelve qué tributos apli
 
 ## 3. Cobertura del catálogo
 
-**Total: 32 condiciones.** Distribución por tributo:
+**Total: 31 condiciones.** Distribución por tributo:
 
 | Tributo | Condiciones | Notas |
 |---|:---:|---|
 | RETEFUENTE | 15 | 14 condiciones específicas + 1 default. Patrón asimétrico: cada caso real se desdobla en perspectivas `gasto` (sub-código `a`) e `ingreso` (sub-código `b`). |
-| RIVA | 5 | Casos de agente retenedor IVA + sustitución por IVA_IMPORTACION_SERVICIOS cuando el proveedor no tiene domicilio fiscal en el país. |
+| RIVA | 4 | Casos de agente retenedor IVA. Con proveedor del exterior RIVA simplemente no aplica (el proveedor no pertenece al régimen ni factura IVA) — no requiere condición propia. |
 | RICA | 5 | Casos por calidades ICA + gran contribuyente Bogotá. |
 | IVA | 3 | 2 casos de pertenencia régimen IVA + 1 caso territorial Puerto Libre. |
 | AUTO_RETEFUENTE | 1 | Activación por autorretenedora. |
@@ -104,7 +104,6 @@ Combinan calidades de Gran Contribuyente (`esGranContribuyente`) y Autorretenedo
 | `RIVA-01b` | Proveedor régimen IVA + empresa agente retenedor | `contraparte.perteneceRegimenIVA = true ∧ emisora.esAgenteRetenedorIVA = true` | `aplicar` | gasto |
 | `RIVA-02a` | Cliente no agente retenedor | `contraparte.esAgenteRetenedorIVA = false` | `noAplicar` | ingreso |
 | `RIVA-02b` | Empresa no agente retenedor | `emisora.esAgenteRetenedorIVA = false` | `noAplicar` | gasto |
-| `RIVA-03` | Proveedor del exterior | `contraparte.tieneDomicilioFiscalEnElPais = false` → activa IVA_IMPORTACION_SERVICIOS | `reverseCharge` | gasto |
 
 ---
 
@@ -172,9 +171,9 @@ El motor primero aplica `tributosAplicablesA(clasificacion)` y luego evalúa las
 
 La condición `RTF-08` tiene efecto `aplicar-default`. Es la condición catch-all: si **ninguna otra condición** del tributo se cumple, RETEFUENTE aplica con su tarifa estándar. El motor evalúa las condiciones específicas en orden y solo cae al default si ninguna las excluye o las activa explícitamente.
 
-### 10.5. `efecto: reverseCharge`
+### 10.5. Activación autónoma del autoliquidado (sin sustitución)
 
-La condición `RIVA-03` tiene efecto `reverseCharge`: cuando el proveedor no tiene residencia ni domicilio fiscal en el país, RIVA no aplica (no hay a quién retenerle un IVA que no facturó), pero IVA_IMPORTACION_SERVICIOS sí — la empresa asume el impuesto. Esto se modela con el campo `tributoSubstituto: "IVA_IMPORTACION_SERVICIOS"` que indica al motor que active el tributo sustituto en lugar del original. El proveedor recibe el total de la factura: el IVA teórico y su retención del 100% se anulan entre sí sobre el valor a pagar, y quedan las dos líneas para el reconocimiento contable.
+`IVA_IMPORTACION_SERVICIOS` se activa por su **propia** condición (`IVA-IMPORTACION-SERVICIOS-01`: contraparte sin domicilio fiscal, dirección gasto), no por sustitución de RIVA: es un tributo autónomo de naturaleza `provision`, con tarifa propia sobre la base. RIVA no necesita condición de exclusión para el caso — con proveedor del exterior sus propias condiciones no disparan (el proveedor no pertenece al régimen de IVA ni hay IVA facturado que retener). El efecto `reverseCharge` del modelo permanece disponible como mecanismo, pero la precarga de Colombia ya no lo usa.
 
 ### 10.6. Cuantía mínima no es condición
 
@@ -187,6 +186,7 @@ La validación "Base mínima superada" NO es una `CondicionDeAplicacion`. Es atr
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1.0 | 2026-05-26 | Carga inicial F1: 32 condiciones (15 RETEFUENTE + 5 RIVA + 5 RICA + 3 IVA + 4 autorretenciones). Patrón asimétrico aplicado. |
+| 1.2 | 2026-07-31 | **Se retira `RIVA-03` — el autoliquidado se activa solo (issues #117/#118).** La sustitución `reverseCharge` era innecesaria y sostenía el modelado padre-hijo que descartaba al autoliquidado por `[R14]`: como tributo autónomo, `IVA_IMPORTACION_SERVICIOS` se activa por su propia condición (`IVA-IMPORTACION-SERVICIOS-01`, sin cambios) y RIVA no dispara con proveedor del exterior por sus propias condiciones. §10.5 reescrita. Total 32 → 31 condiciones (RIVA 5 → 4). |
 | 1.1 | 2026-07-31 | **Disparador de la autoliquidación del IVA corregido (issue #110, resolución con consultoría fiscal):** `RIVA-03` y `AUTO-RIVA-01` (ahora `IVA-IMPORTACION-SERVICIOS-01`) evaluaban `emisora.esAgenteRetenedorIVA = true` — residuo de la definición legada del sistema de facturación, que disparaba el autoliquidado en cualquier compra doméstica de una empresa agente retenedora y chocaba con `RIVA-01b`. Ambas pasan a evaluar `contraparte.tieneDomicilioFiscalEnElPais = false` (art. 437-2 num. 3: proveedor sin residencia ni domicilio en el país), usando el atributo nuevo del catálogo de atributos v1.1. Renombre `AUTO_RIVA` → `IVA_IMPORTACION_SERVICIOS` aplicado en códigos y descripciones. |
 
 ---
@@ -203,6 +203,6 @@ Preguntas para validación del **equipo de consultores fiscales**:
    - Pagos a no contribuyentes (universidades, gobierno, ESALES)
    - Servicios prestados desde el exterior
    - Operaciones con régimen ZESE (Zonas Económicas y Sociales Especiales)?
-6. **`RIVA-03` reverse charge solo importación de servicios:** ¿Hay otros casos de reverse charge (ej: ventas a no responsables especiales)?
+6. **Otros casos de autoliquidación:** además de la importación de servicios (`IVA_IMPORTACION_SERVICIOS`), ¿existen otros casos normativos donde la empresa deba asumir un impuesto que la contraparte no factura? Si aparecen, siguen el mismo patrón: tributo autónomo de provisión con condición de activación propia.
 7. **AUTO_RENTA — tarifas sectoriales en condiciones:** ¿Deberían modelarse condiciones que activen distintas tarifas según el sector de la empresa autorretenedora?
 8. **Régimen Simple vs Régimen Ordinario:** ¿Las condiciones `RTF-01a/b` cubren todos los casos de exclusión por régimen simple, o hay matices (servicios calificados que sí retienen, etc.)?

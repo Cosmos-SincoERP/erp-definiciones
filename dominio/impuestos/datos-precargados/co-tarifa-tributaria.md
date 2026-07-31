@@ -2,7 +2,7 @@
 
 **País:** Colombia (`CO`)
 **Catálogo del modelo:** `TarifaTributaria` (Sección 3.3 de `modelo-dominio.md`) — agregado con múltiples streams (uno por jurisdicción × tributo).
-**Versión:** 1.1
+**Versión:** 1.2
 **Fecha de actualización:** 2026-05-26
 **Archivo de datos:** [`co-tarifa-tributaria.json`](co-tarifa-tributaria.json)
 
@@ -15,7 +15,8 @@ Precarga todas las **tarifas tributarias** de Colombia organizadas por stream de
 - IVA, INC: factor = clasificación (`GRAV_19`, `GRAV_5`, `EXENTO`).
 - RETEFUENTE, AUTO_RETEFUENTE: factor = concepto de pago (`COMPRAS_GENERALES_DECLARANTES`, `HONORARIOS_DECLARANTES`, etc.).
 - ICA, RICA, AUTO_RICA: factor = código CIIU de actividad económica (`4711`, `6201`, etc.).
-- RIVA, IVA_IMPORTACION_SERVICIOS, SOBRETASA_BOMBERIL: porcentaje sobre el tributo padre (sin factor).
+- RIVA, SOBRETASA_BOMBERIL: porcentaje sobre el tributo padre (sin factor).
+- IVA_IMPORTACION_SERVICIOS: factor = clasificación de servicios (`SERVICIOS_GRAV_19`, `SERVICIOS_GRAV_5`) — tarifa propia sobre la base, espejo de la tarifa de IVA del servicio.
 - AUTO_RENTA: tarifa fija sin factor.
 
 ---
@@ -27,7 +28,7 @@ Precarga todas las **tarifas tributarias** de Colombia organizadas por stream de
 - **RIVA:** Estatuto Tributario art. 437-1 + Decreto 522 de 2003 y modificatorios.
 - **AUTO_RENTA:** Decreto 2201 de 2016 (tarifas sectoriales 0.40%–1.60%).
 - **AUTO_RETEFUENTE:** Aplica tarifas equivalentes a RETEFUENTE cuando la empresa es autorretenedora.
-- **IVA_IMPORTACION_SERVICIOS:** Retención del 100% del IVA teórico autoliquidado (art. 437-2 num. 3 + art. 437-1 del Estatuto Tributario).
+- **IVA_IMPORTACION_SERVICIOS:** IVA asumido por el adquiriente con tarifa espejo de la del IVA del servicio, sobre la base (arts. 420 par. 3 y 437-2 num. 3 del Estatuto Tributario). El efecto económico equivale al 100% del IVA que el proveedor no facturó.
 - **ICA, RICA, SOBRETASA_BOMBERIL, AUTO_RICA:** Estatutos tributarios municipales de cada ciudad (acuerdos del Concejo Municipal/Distrital).
 
 ---
@@ -36,11 +37,11 @@ Precarga todas las **tarifas tributarias** de Colombia organizadas por stream de
 
 | Categoría | Streams | Total tarifas |
 |---|:---:|:---:|
-| Nacionales (IVA, INC, RETEFUENTE, RIVA, AUTO_RENTA, AUTO_RETEFUENTE, IVA_IMPORTACION_SERVICIOS) | 7 | 59 |
+| Nacionales (IVA, INC, RETEFUENTE, RIVA, AUTO_RENTA, AUTO_RETEFUENTE, IVA_IMPORTACION_SERVICIOS) | 7 | 60 |
 | Municipales ICA (12 ciudades principales) | 12 | 64 |
 | SOBRETASA_BOMBERIL (Bogotá ejemplo) | 1 | 1 |
 | RICA y AUTO_RICA (placeholder, replican ICA municipal) | 2 | 0 |
-| **Total** | **22** | **124** |
+| **Total** | **22** | **125** |
 
 **Ciudades cubiertas en ICA (12):** Bogotá D.C. (`11001`), Medellín (`05001`), Cali (`76001`), Barranquilla (`08001`), Bucaramanga (`68001`), Cartagena (`13001`), Pereira (`66001`), Manizales (`17001`), Cúcuta (`54001`), Ibagué (`73001`), Santa Marta (`47001`), Villavicencio (`50001`).
 
@@ -90,7 +91,7 @@ Las tarifas van desde 0.1% (combustibles) hasta 33% (pagos al exterior por softw
 |---|---|---|
 | `tarifa-CO-AUTO_RENTA` | 0.55% fija | Tarifa base — existen tarifas sectoriales distintas (0.40%, 1.60%) que pueden requerir agregar entradas. |
 | `tarifa-CO-AUTO_RETEFUENTE` | Replica tarifas RETEFUENTE | Solo 3 entradas precargadas como muestra (compras grales, servicios grales, honorarios). |
-| `tarifa-CO-IVA_IMPORTACION_SERVICIOS` | 100% del IVA | Autoliquidación completa del IVA por importación de servicios (proveedor sin domicilio fiscal en el país). |
+| `tarifa-CO-IVA_IMPORTACION_SERVICIOS` | 19% / 5% sobre la base | IVA asumido en importación de servicios (proveedor sin domicilio fiscal en el país) — espejo de la tarifa de IVA por clasificación de servicio. |
 
 ---
 
@@ -179,6 +180,7 @@ Los stream keys usan códigos DIVIPOLA de las jurisdicciones (`tarifa-CO-11001-I
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1.0 | 2026-05-26 | Carga inicial F1: 22 streams (7 nacionales + 12 ICA municipales + 1 SOBRETASA Bogotá + 2 placeholders RICA/AUTO_RICA) con 124 entradas de tarifa. 49 conceptos RETEFUENTE precargados. |
+| 1.2 | 2026-07-31 | **Tarifa propia del autoliquidado (issues #117/#118):** el stream `tarifa-CO-IVA_IMPORTACION_SERVICIOS` pasa de una entrada "100% del padre" a **dos entradas espejo de la tarifa de IVA sobre la base** (`SERVICIOS_GRAV_19` → 19%, `SERVICIOS_GRAV_5` → 5%, `tipoTarifa: porcentaje`): el modelado padre-hijo descartaba el tributo cuando el proveedor no facturaba IVA (`[R14]`), y el adjetivo "teórico" no tenía contraparte en el vocabulario del modelo. 124 → 125 entradas. |
 | 1.1 | 2026-07-31 | Renombre `AUTO_RIVA` → `IVA_IMPORTACION_SERVICIOS` (issue #110): stream `tarifa-CO-IVA_IMPORTACION_SERVICIOS`, entrada `iva-importacion-servicios-general`. Se corrige la fuente normativa §2, que describía el tributo como autorretención ("cuando la empresa es autorretenedora" — residuo de la definición legada): la tarifa del 100% corresponde a la autoliquidación del art. 437-2 num. 3 + art. 437-1. Se cierra la antigua pregunta 8 (¿siempre 100%?): el art. 437-1 fija la retención en el 100% del impuesto para este caso. |
 
 ---

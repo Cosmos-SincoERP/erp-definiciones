@@ -2,7 +2,7 @@
 
 **País:** Colombia (`CO`)
 **Catálogo del modelo:** `CatalogoDeAtributosFiscales` (Sección 3.5 de `modelo-dominio.md`)
-**Versión:** 1.1
+**Versión:** 1.2
 **Fecha de actualización:** 2026-07-31
 **Archivo de datos:** [`co-catalogo-de-atributos-fiscales.json`](co-catalogo-de-atributos-fiscales.json)
 
@@ -72,7 +72,7 @@ Los 10 atributos requeridos (`regimenTributario`, `perteneceRegimenIVA`, `esGran
 
 ### 5.4. `tieneDomicilioFiscalEnElPais` y la autoliquidación del IVA
 
-Declara si la entidad tiene residencia o domicilio fiscal en el país (art. 437-2 numeral 3 del Estatuto Tributario). Es el disparador de `IVA_IMPORTACION_SERVICIOS`: cuando la contraparte de una compra de servicios no lo tiene, no factura IVA y la empresa lo autoliquida (se descarta RIVA). **No se deriva del país de la identificación:** una entidad con identificación extranjera puede tener domicilio fiscal en el país, y viceversa — por eso es un atributo declarado del perfil, no un dato calculado.
+Declara si la entidad tiene residencia, domicilio fiscal **o registro ante la autoridad fiscal del país** (art. 437-2 numeral 3 del Estatuto Tributario). Es el disparador de `IVA_IMPORTACION_SERVICIOS`: cuando la contraparte de una compra de servicios no lo tiene, no factura IVA y la empresa lo asume. **No se deriva del país de la identificación:** una entidad con identificación extranjera puede tener domicilio fiscal en el país, y viceversa — por eso es un atributo declarado del perfil, no un dato calculado. **El prestador del exterior registrado ante la DIAN para el IVA** (caso de los servicios digitales) cuenta como con domicilio fiscal para estos efectos: factura su propio IVA y el autoliquidado no aplica.
 
 ### 5.2. Diferencia entre `valoresValidos` y `catalogoReferencia`
 
@@ -98,6 +98,7 @@ La vigencia desde corresponde a la entrada en vigor de la norma que crea o regul
 | Versión | Fecha | Cambio |
 |---|---|---|
 | 1.0 | 2026-05-26 | Carga inicial F1: 15 atributos (9 booleanos + 2 enum simples + 3 enum con catálogo referenciado + 1 enum tipo persona). |
+| 1.2 | 2026-07-31 | Semántica de `tieneDomicilioFiscalEnElPais` precisada (issues #117/#118): incluye el **registro ante la autoridad fiscal del país** — el prestador del exterior registrado ante la DIAN factura su propio IVA y el autoliquidado no aplica. |
 | 1.1 | 2026-07-31 | Nuevo atributo requerido **`tieneDomicilioFiscalEnElPais`** (boolean, art. 437-2 num. 3 ET) — disparador de la autoliquidación del IVA en importación de servicios (issue #110): reemplaza el criterio legado `esAgenteRetenedorIVA` en las condiciones de `IVA_IMPORTACION_SERVICIOS` (antes `AUTO_RIVA`). Se corrige la descripción de `esAgenteRetenedorIVA` (ya no menciona la activación del autoliquidado). Total 15 → 16 atributos. |
 
 ---
