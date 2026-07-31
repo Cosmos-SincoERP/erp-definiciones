@@ -1,15 +1,15 @@
 {
   "pais": "PA",
   "catalogo": "TarifaTributaria",
-  "version": "1.0",
-  "fechaActualizacion": "2026-05-26",
+  "version": "1.1",
+  "fechaActualizacion": "2026-07-31",
   "fuente": "Código Fiscal de Panamá (Ley 8 de 1956) + Ley 8 de 2010 (reforma ITBMS) + Decretos Ejecutivos DGI vigentes.",
   "estructura": {
     "totalStreams": 4,
     "streamsNacionales": 4,
     "streamsMunicipales": 0,
-    "totalEntradas": 13,
-    "notaCobertura": "PA opera con tributos nacionales. ITBMS (7/10/15%), RITBMS (50%), ISC (varía), ISR (retenciones según concepto)."
+    "totalEntradas": 12,
+    "notaCobertura": "PA opera con tributos nacionales. ITBMS (7/10/15%), RITBMS (50% del ITBMS causado), ISC (varía), ISR (retenciones según concepto)."
   },
 
   "streams": [
@@ -29,8 +29,7 @@
       "tributo": "RITBMS",
       "jurisdiccion": null,
       "tarifas": [
-        { "entradaId": "ritbms-general", "factor": "GRAV_ITBMS_7", "descripcion": "Retención del 50% del ITBMS facturado (norma general). Aplica sobre ITBMS al 7%.", "tarifa": 50, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2011-01-01", "fechaHasta": null }, "origen": "estandar" },
-        { "entradaId": "ritbms-grav10", "factor": "GRAV_ITBMS_10", "descripcion": "Retención del 50% sobre ITBMS al 10%.", "tarifa": 50, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2011-01-01", "fechaHasta": null }, "origen": "estandar" }
+        { "entradaId": "ritbms-general", "factor": null, "descripcion": "Retención del 50% del ITBMS causado (norma general, Decreto Ejecutivo 470 de 2015). Aplica sobre cualquier tarifa de ITBMS. Variantes del 100% (servicios profesionales al Estado, pagos a no residentes) pendientes de modelar.", "tarifa": 50, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2011-01-01", "fechaHasta": null }, "origen": "estandar" }
       ]
     },
     {
