@@ -22,7 +22,7 @@ El contenido se organiza siguiendo la estructura de los agregados del modelo de 
 
 ## 1. Tributos — CatalogoTributario
 
-Los datos del catálogo `catalogo-tributario-PA` se migraron a [`datos-precargados/pa-catalogo-tributario.json`](datos-precargados/pa-catalogo-tributario.json) (v1.1, 2026-07-31). Allí viven las 21 entidades F1 (4 tributos + 5 clasificaciones + 8 tratamientos + 4 reglas de localización). Narrativo: [`datos-precargados/pa-catalogo-tributario.md`](datos-precargados/pa-catalogo-tributario.md).
+Los datos del catálogo `catalogo-tributario-PA` se migraron a [`datos-precargados/pa-catalogo-tributario.json`](datos-precargados/pa-catalogo-tributario.json) (v1.2, 2026-07-31). Allí viven las 21 entidades F1 (4 tributos + 5 clasificaciones + 8 tratamientos + 4 reglas de localización). Narrativo: [`datos-precargados/pa-catalogo-tributario.md`](datos-precargados/pa-catalogo-tributario.md).
 
 **Contexto de diseño:**
 - **4 tributos:** ITBMS (tarifa progresiva 7/10/15%), RITBMS (50% del ITBMS), ISC (varía por producto), ISR (retenciones por concepto).
@@ -39,11 +39,11 @@ Las 25 jurisdicciones PA (1 nacional + 10 provincias + 3 comarcas + 11 distritos
 
 ## 2. Tarifas — TarifaTributaria
 
-Las tarifas se migraron a [`datos-precargados/pa-tarifa-tributaria.json`](datos-precargados/pa-tarifa-tributaria.json) (4 streams nacionales con 13 entradas).
+Las tarifas se migraron a [`datos-precargados/pa-tarifa-tributaria.json`](datos-precargados/pa-tarifa-tributaria.json) (v1.1, 2026-07-31 — 4 streams nacionales con 12 entradas).
 
 **Contexto de diseño:**
 - **ITBMS:** 3 tarifas progresivas (7% general, 10% alcohol/hospedaje, 15% tabaco) + 0% exento.
-- **RITBMS:** 50% sobre ITBMS facturado.
+- **RITBMS:** 50% del ITBMS causado (norma general, Decreto Ejecutivo 470 de 2015); `porcentajeDePadre` con padre ITBMS — hereda su ciclo de vida. Variantes del 100% (Estado-servicios, no residentes) pendientes de modelar.
 - **ISC:** Tarifas por categoría (telecomunicaciones móvil 5%, joyas/armas 5%) — otras categorías ISC (vehículos, alcohol, combustibles) pendientes.
 - **ISR:** 5 conceptos precargados (honorarios 15%, dividendos 10%, intereses 5%, alquileres 12.5%, pagos exterior 12.5%).
 
@@ -98,3 +98,4 @@ Propuesta inicial migrada a [`datos-precargados/pa-formato-fiscal.json`](datos-p
 |---------|-------|-------------|
 | 1.0 | Marzo 2026 | Versión inicial: 4 tributos, 5 clasificaciones, condiciones simples, 2 atributos fiscales. Formatos DGI pendientes. |
 | 1.1 | Mayo 2026 | Cambio 3 — Sub-cambio 3.4: nueva Sección 5 con regímenes empresariales precargados (Zona Libre de Colón, AEEPP Panamá-Pacífico, Ciudad del Saber). 3 atributos fiscales nuevos en Sección 4 (`inscripcionZonaLibreColon`, `inscripcionAEEPP`, `inscripcionCiudadDelSaber`) con `catalogoReferencia`. Renumeración de Sección 5 (Formatos) a Sección 6. `[D13]` `[I16]`. |
+| 1.2 | Julio 2026 | Contexto de RITBMS alineado a la resolución del issue #109: 50% del **ITBMS causado** (Decreto Ejecutivo 470 de 2015), `porcentajeDePadre` con padre ITBMS — hereda su ciclo de vida; variantes del 100% (Estado-servicios, no residentes) anotadas como pendientes. Referencias a catálogo PA v1.2 y tarifas v1.1 (12 entradas tras consolidar el stream RITBMS). |

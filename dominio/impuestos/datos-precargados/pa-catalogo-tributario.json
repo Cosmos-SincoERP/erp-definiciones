@@ -1,7 +1,7 @@
 {
   "pais": "PA",
   "catalogo": "CatalogoTributario",
-  "version": "1.1",
+  "version": "1.2",
   "fechaActualizacion": "2026-07-31",
   "fuente": "Código Fiscal de Panamá (Ley 8 de 1956 y modificatorias) + Ley 8 de 2010 (reforma fiscal, ITBMS) + Decretos Ejecutivos reglamentarios DGI.",
 
@@ -24,11 +24,11 @@
       "naturaleza": "sustractivo",
       "caracterRetencion": "anticipado",
       "nivelJurisdiccional": "nacional",
-      "factorDeTarifa": "clasificacion",
+      "factorDeTarifa": "porcentajeDePadre",
       "direccionFiscalAplicable": "ambas",
       "tributoPadre": "ITBMS",
       "origen": "estandar",
-      "definicion": "Retención del ITBMS aplicada por agentes de retención designados por DGI."
+      "definicion": "Retención del ITBMS practicada por los agentes designados por la DGI (Decreto Ejecutivo 470 de 2015): siempre un porcentaje del ITBMS causado — 50% norma general; existen casos del 100% (servicios profesionales al Estado, pagos a no residentes) pendientes de modelar como variantes. Sigue el ciclo de vida del ITBMS: si el impuesto no se causa en la transacción, no hay retención."
     },
     {
       "codigo": "ISC",
