@@ -1,7 +1,7 @@
 {
   "pais": "CO",
   "catalogo": "TarifaTributaria",
-  "version": "1.1",
+  "version": "1.2",
   "fechaActualizacion": "2026-07-31",
   "fuente": "Decreto Único Reglamentario 1625 de 2016 (DIAN — RETEFUENTE) + Estatuto Tributario Nacional (IVA, INC, RIVA) + Decreto 2201 de 2016 (AUTO_RENTA) + estatutos tributarios municipales (ICA, RICA, SOBRETASA_BOMBERIL, AUTO_RICA).",
   "estructura": {
@@ -132,7 +132,8 @@
       "tributo": "IVA_IMPORTACION_SERVICIOS",
       "jurisdiccion": null,
       "tarifas": [
-        { "entradaId": "iva-importacion-servicios-general", "factor": null, "descripcion": "IVA por importación de servicios — retención del 100% del IVA teórico autoliquidado por el adquiriente (art. 437-2 num. 3 + art. 437-1 del Estatuto Tributario)", "tarifa": 100, "tipoTarifa": "porcentajeDePadre", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
+        { "entradaId": "iva-import-serv-19", "factor": "SERVICIOS_GRAV_19", "descripcion": "IVA asumido por importación de servicios gravados a la tarifa general — espejo de la tarifa de IVA, sobre la base (arts. 420 par. 3 y 437-2 num. 3 del Estatuto Tributario)", "tarifa": 19, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+        { "entradaId": "iva-import-serv-5", "factor": "SERVICIOS_GRAV_5", "descripcion": "IVA asumido por importación de servicios gravados a la tarifa reducida — espejo de la tarifa de IVA, sobre la base", "tarifa": 5, "tipoTarifa": "porcentaje", "cuantiaMinima": null, "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" }
       ]
     },
 

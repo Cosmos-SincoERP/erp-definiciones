@@ -1,14 +1,14 @@
 {
   "pais": "CO",
   "catalogo": "CondicionDeAplicacion",
-  "version": "1.1",
+  "version": "1.2",
   "fechaActualizacion": "2026-07-31",
   "fuente": "Estatuto Tributario Nacional + Decreto Único Reglamentario 1625 de 2016 (DIAN — RETEFUENTE/RIVA) + estatutos tributarios municipales (RICA) + Ley 1943/2018 y Ley 2010/2019 (Régimen Simple) + Constitución art. 310 + Ley 47/1993 (Puerto Libre).",
   "estructura": {
-    "totalCondiciones": 32,
+    "totalCondiciones": 31,
     "porTributo": {
       "RETEFUENTE": 15,
-      "RIVA": 5,
+      "RIVA": 4,
       "RICA": 5,
       "IVA": 3,
       "AUTO_RETEFUENTE": 1,
@@ -280,20 +280,6 @@
       "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
       "origen": "estandar"
     },
-    {
-      "codigo": "RIVA-03",
-      "tributo": "RIVA",
-      "entidadEvaluada": "contraparte",
-      "criterios": [
-        { "atributo": "tieneDomicilioFiscalEnElPais", "operador": "igual", "valor": false }
-      ],
-      "efecto": "reverseCharge",
-      "tributoSubstituto": "IVA_IMPORTACION_SERVICIOS",
-      "direccionFiscalAplicable": "gasto",
-      "descripcion": "Proveedor sin residencia ni domicilio fiscal en el país (art. 437-2 num. 3) → no se le retiene RIVA; la empresa autoliquida el IVA (sustituto IVA_IMPORTACION_SERVICIOS, activado por su propia direccionFiscalAplicable: gasto).",
-      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
-      "origen": "estandar"
-    },
 
     {
       "codigo": "RICA-01a",
@@ -425,7 +411,7 @@
       ],
       "efecto": "aplicar",
       "direccionFiscalAplicable": "gasto",
-      "descripcion": "IVA_IMPORTACION_SERVICIOS activa en lugar de RIVA cuando el proveedor no tiene residencia ni domicilio fiscal en el país: no factura IVA y la empresa lo autoliquida (art. 437-2 num. 3 — retención del 100% del IVA teórico).",
+      "descripcion": "Activa IVA_IMPORTACION_SERVICIOS cuando el proveedor no tiene residencia ni domicilio fiscal en el país: no factura IVA y la empresa lo asume con tarifa espejo sobre la base, sin afectar el valor a pagar (arts. 420 par. 3 y 437-2 num. 3). Tributo autónomo: no sustituye a RIVA — RIVA no dispara con proveedor del exterior por sus propias condiciones.",
       "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
       "origen": "estandar"
     },

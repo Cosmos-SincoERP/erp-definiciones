@@ -1,7 +1,7 @@
 {
   "pais": "CO",
   "catalogo": "CatalogoTributario",
-  "version": "1.3",
+  "version": "1.4",
   "fechaActualizacion": "2026-07-31",
   "fuente": "Estatuto Tributario Nacional (Decreto 624 de 1989) + Decreto Único Reglamentario 1625 de 2016 (DIAN) + Ley 14 de 1983 (ICA) + Ley 1430 de 2010 (autorretenciones) + estatutos tributarios municipales.",
 
@@ -93,7 +93,7 @@
     {
       "codigo": "AUTO_RENTA",
       "nombre": "Autorretención de Renta",
-      "naturaleza": "sustractivo",
+      "naturaleza": "provision",
       "caracterRetencion": "anticipado",
       "nivelJurisdiccional": "nacional",
       "factorDeTarifa": "fija",
@@ -105,7 +105,7 @@
     {
       "codigo": "AUTO_RETEFUENTE",
       "nombre": "Autorretención en la Fuente",
-      "naturaleza": "sustractivo",
+      "naturaleza": "provision",
       "caracterRetencion": "anticipado",
       "nivelJurisdiccional": "nacional",
       "factorDeTarifa": "conceptoPago",
@@ -117,19 +117,19 @@
     {
       "codigo": "IVA_IMPORTACION_SERVICIOS",
       "nombre": "IVA por importación de servicios",
-      "naturaleza": "sustractivo",
+      "naturaleza": "provision",
       "caracterRetencion": "anticipado",
       "nivelJurisdiccional": "nacional",
-      "factorDeTarifa": "porcentajeDePadre",
+      "factorDeTarifa": "clasificacion",
       "direccionFiscalAplicable": "gasto",
-      "tributoPadre": "IVA",
+      "tributoPadre": null,
       "origen": "estandar",
-      "definicion": "IVA autoliquidado por el adquiriente al contratar servicios gravados con proveedores sin residencia ni domicilio fiscal en el país (Estatuto Tributario art. 437-2 numeral 3). El proveedor no factura IVA y recibe el total de la factura; la empresa asume el impuesto (retención del 100% del IVA teórico), lo declara y lo paga a la DIAN."
+      "definicion": "Tributo autónomo de provisión: IVA que el adquiriente asume al contratar servicios gravados con proveedores sin residencia ni domicilio fiscal en el país (Estatuto Tributario arts. 420 parágrafo 3 y 437-2 numeral 3). El proveedor no factura IVA y recibe el total de la factura; la empresa reconoce el impuesto con tarifa propia sobre la base (espejo de la tarifa de IVA de la clasificación del servicio), lo declara y lo paga a la DIAN, sin afectar el valor a pagar. Sin tributo padre ni hijos: sus reglas no se mezclan con las del IVA facturado."
     },
     {
       "codigo": "AUTO_RICA",
       "nombre": "Autorretención de ICA",
-      "naturaleza": "sustractivo",
+      "naturaleza": "provision",
       "caracterRetencion": "anticipado",
       "nivelJurisdiccional": "municipal",
       "factorDeTarifa": "actividadEconomica",
@@ -143,6 +143,8 @@
   "clasificaciones": [
     { "codigo": "GRAV_19", "nombre": "Gravados 19%", "descripcion": "Tarifa general de IVA — bienes y servicios gravados al 19%.", "origen": "estandar" },
     { "codigo": "GRAV_5", "nombre": "Gravados 5%", "descripcion": "Tarifa reducida de IVA — bienes y servicios de la canasta básica y otros con tarifa especial.", "origen": "estandar" },
+    { "codigo": "SERVICIOS_GRAV_19", "nombre": "Servicios gravados 19%", "descripcion": "Servicios gravados a la tarifa general de IVA. Distingue la naturaleza de servicio del concepto — los tributos autoliquidados solo alcanzan servicios (los bienes importados liquidan su IVA en aduana). El consumidor clasifica por lo que es el concepto, sin importar el domicilio del proveedor.", "origen": "estandar" },
+    { "codigo": "SERVICIOS_GRAV_5", "nombre": "Servicios gravados 5%", "descripcion": "Servicios gravados a la tarifa reducida de IVA. Misma lógica de naturaleza de servicio que SERVICIOS_GRAV_19.", "origen": "estandar" },
     { "codigo": "EXCLUIDO", "nombre": "Excluidos de IVA", "descripcion": "Bienes y servicios que no generan IVA. Pueden tener retenciones e ICA.", "origen": "estandar" },
     { "codigo": "EXENTO", "nombre": "Exentos de IVA", "descripcion": "Bienes y servicios con IVA tarifa 0%. Otorgan derecho a descontar el IVA pagado.", "origen": "estandar" },
     { "codigo": "INC_8", "nombre": "Gravados INC 8%", "descripcion": "Bienes y servicios sujetos a Impuesto Nacional al Consumo tarifa 8%.", "origen": "estandar" },
@@ -174,6 +176,21 @@
     { "clasificacion": "EXENTO", "tributo": "AUTO_RETEFUENTE", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXENTO", "tributo": "ICA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXENTO", "tributo": "RICA", "aplica": true, "origen": "estandar" },
+
+    { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "IVA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "AUTO_RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "RIVA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "ICA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "RICA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "IVA_IMPORTACION_SERVICIOS", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "IVA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "AUTO_RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "RIVA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "ICA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "RICA", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "IVA_IMPORTACION_SERVICIOS", "aplica": true, "origen": "estandar" },
 
     { "clasificacion": "INC_8", "tributo": "INC", "aplica": true, "origen": "estandar" }
   ],
