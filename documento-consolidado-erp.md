@@ -88,7 +88,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Replanteamiento (#31/#45) y refinamientos recientes:** `Proveedor` como rol del tercero hacia la bodega de Terceros (#38); la **unidad organizacional se consume como copia local** por eventos de Estructura Organizacional —no agregado— y la causación **se difiere** cuando la unidad no existe (`[D34]`, `[SI8]`, #48); control de doble pago vía constancia humana (`[R38]`, `[D33]`, #30); **registro de productos financieros** — el emisor del extracto proviene del registro de tarjetas definido por el usuario, con atribución y bandeja de pendientes; conciliación por tarjeta, extracto consolidado diferido como evolución (`[D39]`, #106 — reemplaza la inferencia por histórico del #57); **asignación de la unidad por cadena de niveles** (Nivel A reglas configurables + Nivel B aprendizaje, `[D35]`, #51); **medio de pago canónico** — cadena de resolución con origen rastreado (la tarjeta referenciada al registro de productos financieros), retención en la confirmación de las resoluciones débiles y coherencia con el extracto garantizada por el control de saldos y la diferencia visible en el cruce — sin evento ni regla propios (`[D40]`, #96); **lote del equipo de desarrollo #126/#127** — el extracto no lleva medio de pago (se identifica por su producto financiero y copia el tipo de tarjeta) y la **cuenta consolidadora como dato agrupable** (diagnóstico de la salvaguarda de consolidado + advertencia al registrar un número que coincide con una cuenta anotada).
 
-**Estado:** Alcance v1.20, modelo v4.12 (agosto 2026). En refinamiento continuo (Fase 2). Integración OXP ↔ Contabilidad **cerrada**; integración con Estructura Organizacional documentada (**copia local + diferir por consistencia eventual** — la señal de demanda se retiró en el #72: la copia es para validación, la UI lee a EO en vivo).
+**Estado:** Alcance v1.20, modelo v4.13 (agosto 2026). En refinamiento continuo (Fase 2). Integración OXP ↔ Contabilidad **cerrada**; integración con Estructura Organizacional documentada (**copia local + diferir por consistencia eventual** — la señal de demanda se retiró en el #72: la copia es para validación, la UI lee a EO en vivo).
 
 > Detalle: [`dominio/obligaciones-por-pagar/modelo-dominio.md`](dominio/obligaciones-por-pagar/modelo-dominio.md)
 
@@ -183,11 +183,11 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **17 permisos atómicos** definidos con convención `accion_recurso`.
 
-**Refinamientos aplicados (integración con OXP):** grupo del PUC esperado por componente para acotar la inferencia Nivel B (D12), narración del borrador — descripción general + descripción de concepto por partida (D13), herencia del `rol` de la partida desde la plantilla y propagación a la entrega (D14), rol `CRUCE_OBLIGACION` en `causacion_gasto` (#18), plantilla `nota_credito_gasto` completada (#20), `terceroPrincipal` como fuente del tercero de la contrapartida (#28 — desde #104 es informativo: el tercero viaja en la línea `contrapartida`). De jul-2026: roles `PARTIDA_POR_ACLARAR`/`PARTIDA_ACLARADA` y plantilla `reclasificacion_partida` para el ciclo de la partida en disputa (#90), rol `IMPUESTO_ASUMIDO` para las retenciones asumidas por pago con tarjeta (#94) — cuentas `porValidar` por consultor contable —, y **clasificación semántica + contrapartida como línea + resolución por espejo** (#104: `[D15]`, `[R52]`-`[R54]`, `resolucionPorEspejo` en el catálogo de plantillas v1.9).
+**Refinamientos aplicados (integración con OXP):** grupo del PUC esperado por componente para acotar la inferencia Nivel B (D12), narración del borrador — descripción general + descripción de concepto por partida (D13), herencia del `rol` de la partida desde la plantilla y propagación a la entrega (D14), rol `CRUCE_OBLIGACION` en `causacion_gasto` (#18), plantilla `nota_credito_gasto` completada (#20), `terceroPrincipal` como fuente del tercero de la contrapartida (#28 — desde #104 es informativo: el tercero viaja en la línea `contrapartida`). De jul-2026: roles `PARTIDA_POR_ACLARAR`/`PARTIDA_ACLARADA` y plantilla `reclasificacion_partida` para el ciclo de la partida en disputa (#90), rol `IMPUESTO_ASUMIDO` para las retenciones asumidas por pago con tarjeta (#94) — cuentas `porValidar` por consultor contable —, y **clasificación semántica + contrapartida como línea + resolución por espejo** (#104: `[D15]`, `[R52]`-`[R54]`, `resolucionPorEspejo` en el catálogo de plantillas v1.9). De ago-2026: roles `IMPUESTO_AUTOLIQUIDADO`/`AUTOLIQUIDADO_POR_PAGAR` para los tributos de provisión — el par de líneas del autoliquidado (#128, `[D41]` de OXP; catálogo v1.10).
 
 **Replanteamiento (#45, #47):** Estructura Organizacional deja de ser "fuente de verdad que se consulta" — N1 valida terceros y unidades contra **copia local por suscripción**, sin consulta en caliente (`R07`, `I7b`); la reestructuración de unidades es un hecho de negocio que la capa de reportería aplica al leer (no regla nueva). Contabilidad también realiza transacciones propias de ajuste (N2): no todo proviene de dominios externos.
 
-**Estado:** Alcance v1.11, modelo v1.12 (julio 2026); catálogo de plantillas v1.9, anexo de ejemplos v1.5 (5 ejemplos). N1 listo para desarrollo F1 (N2 en F2) — refinamiento con el equipo de desarrollo en curso.
+**Estado:** Alcance v1.11, modelo v1.12 (julio 2026); catálogo de plantillas v1.10, anexo de ejemplos v1.5 (5 ejemplos). N1 listo para desarrollo F1 (N2 en F2) — refinamiento con el equipo de desarrollo en curso.
 
 > Detalle: [`dominio/contabilidad/modelo-dominio.md`](dominio/contabilidad/modelo-dominio.md), [`dominio/contabilidad/anexo-marco-contable-y-arquitectura-puc.md`](dominio/contabilidad/anexo-marco-contable-y-arquitectura-puc.md)
 
@@ -426,7 +426,7 @@ Datos de Referencia ──► Nuggets ──► (terceros y unidades
 | Estructura Org | OXP, Contabilidad (copia local de unidades) | Datos de Referencia | **v2.5 — listo para desarrollo F1** |
 | Impuestos | OXP (cálculo tributario) | Nuggets, Datos de Referencia | **v2.0.8 — modelo completo + catálogos F1** |
 | Contabilidad | OXP (confirmación de asiento) | Terceros, Estructura Org (copia local) | **v1.12 — N1 listo para desarrollo F1** |
-| OXP | Terceros (rol Proveedor) | Impuestos, Contabilidad, Estructura Org (copia local) | **v4.12 — Fase 2 (refinamiento continuo)** |
+| OXP | Terceros (rol Proveedor) | Impuestos, Contabilidad, Estructura Org (copia local) | **v4.13 — Fase 2 (refinamiento continuo)** |
 
 ### Estado actual de construcción
 
@@ -435,8 +435,8 @@ Datos de Referencia ──► Nuggets ──► (terceros y unidades
 - ✅ **Terceros** — v2.0.2 cerrado para desarrollo F1 (bodega consolidadora, 2 auditorías).
 - ✅ **Impuestos** — modelo v2.0.8 completo + catálogos F1 (LatAm CO/DO/PA, apertura US/CA F2).
 - ✅ **Estructura Organizacional** — modelo v2.5 listo F1 (copia local + diferir; lote #85-#89 aplicado: varios grupos de primer nivel, `TipoUnidad` agregado propio, código de texto libre).
-- ✅ **Contabilidad** — v1.12, N1 listo F1 (MarcoContable + arquitectura PUC + grupo PUC esperado + copia local de datos maestros; catálogo de plantillas v1.9 con 6 plantillas).
-- 🔄 **OXP** — v4.12, Fase 2. Integración con Contabilidad **cerrada** y con Estructura Organizacional documentada; refinamiento continuo (últimos: medio de pago canónico #96 y lote del equipo de desarrollo #126/#127 — extracto sin medio de pago, cuenta consolidadora agrupable).
+- ✅ **Contabilidad** — v1.12, N1 listo F1 (MarcoContable + arquitectura PUC + grupo PUC esperado + copia local de datos maestros; catálogo de plantillas v1.10 con 6 plantillas).
+- 🔄 **OXP** — v4.13, Fase 2. Integración con Contabilidad **cerrada** y con Estructura Organizacional documentada; refinamiento continuo (últimos del equipo de desarrollo: #126/#127 — extracto sin medio de pago, cuenta consolidadora agrupable — y #128 — par de líneas del tributo de provisión, `[D41]`).
 
 ### Siguiente paso
 
@@ -803,7 +803,7 @@ El porcentaje de avance combina cinco hitos. Cada hito tiene un peso fijo y se e
 
 **Lectura del cuadro:**
 - **Impuestos lidera** con 85% — refinamiento por consultores fiscales más avanzado (activo: #93 resuelto con la consultoría), catálogos F1 entregados.
-- **OXP y Contabilidad (82%)** tienen refinamiento del equipo de desarrollo activo (últimos: partida en disputa #90, retenciones asumidas #94 y clasificación semántica del contrato de traducción #104, registro de productos financieros #106 y medio de pago canónico #96); OXP está en Fase 2 (refinamiento continuo) con el modelo maduro (v4.12) y la integración con Contabilidad y Estructura Organizacional cerrada.
+- **OXP y Contabilidad (82%)** tienen refinamiento del equipo de desarrollo activo (últimos: partida en disputa #90, retenciones asumidas #94 y clasificación semántica del contrato de traducción #104, registro de productos financieros #106 y medio de pago canónico #96); OXP está en Fase 2 (refinamiento continuo) con el modelo maduro (v4.13) y la integración con Contabilidad y Estructura Organizacional cerrada.
 - **Estructura Organizacional (81%)** cerró el lote #85-#89 (varios grupos de primer nivel, `TipoUnidad` agregado propio, retiro del descarte automático, código de texto libre, numeración continua) sobre los replanteamientos #31/#45/#72; resta la validación final con el equipo de desarrollo.
 - **Terceros (75%)** absorbió el replanteamiento #31 (bodega consolidadora) además de sus auditorías; resta la validación final con el equipo de desarrollo.
 - **Datos de Referencia (78%)** completó alcance v2.0 y publicó los catálogos de dirección (#77); **Nuggets (47%)** tiene gobernanza y catálogo, con `DireccionFisica` v0.3 ya consultada por el equipo de desarrollo (#100) y las demás especificaciones en borrador.
@@ -823,7 +823,7 @@ El porcentaje de avance combina cinco hitos. Cada hito tiene un peso fijo y se e
 - **Cálculo:** 20 + 25 + 15 + (30 × 0.75) + 0 = 82.5 ≈ **82%**.
 
 **Contabilidad — 82%**
-- ✅ Alcance v1.11, Modelo v1.12, Auditoría aplicada. Catálogo de plantillas v1.9 (6 plantillas), anexo de ejemplos v1.5.
+- ✅ Alcance v1.11, Modelo v1.12, Auditoría aplicada. Catálogo de plantillas v1.10 (6 plantillas), anexo de ejemplos v1.5.
 - 🟡 Refinamiento en progreso (~75%) — #7/#8/#9 (grupo PUC, narración, herencia del rol), #17 (unidad de la contrapartida), #18 (rol CRUCE_OBLIGACION), #20 (nota_credito_gasto), #28 (terceroPrincipal), #47 (copia local de datos maestros), #90 (partida en disputa), #94 (retenciones asumidas) y #104 (clasificación semántica, contrapartida como línea y espejo) aplicados (abierto: #98, IVA descontable vs mayor valor).
 - ⬜ Listo F1 — depende del cierre del refinamiento.
 - **Cálculo:** 20 + 25 + 15 + (30 × 0.75) + 0 = 82.5 ≈ **82%**.
