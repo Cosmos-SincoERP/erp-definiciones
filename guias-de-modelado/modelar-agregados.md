@@ -156,7 +156,7 @@ Ningún evento es emitido por dos agregados. Ninguna transición es compartida.
 
 ```
 InformacionTercero   { nit, razonSocial }              → 4 agregados
-MedioDePago          { tipo, origen, tarjeta? }         → 2 agregados (OxpComercio, Anticipo)
+MedioDePago          { tipo, numero }                   → 2 agregados (OxpComercio, Anticipo; +origen y tarjeta ref. en OxpComercio)
 ValorMonetario       { monto, moneda, trm, funcional }  → 4 agregados
 SoporteDocumental    { tipo, referencia, datos }        → 4 agregados
 DestinoDeNegocio     { unidadOrganizacional, % }        → 4 agregados (vía InstruccionDistribucion)
