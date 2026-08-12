@@ -1,7 +1,7 @@
 {
   "catalogo": "PlantillaDeAsiento",
-  "version": "1.9",
-  "fechaActualizacion": "2026-07-17",
+  "version": "1.10",
+  "fechaActualizacion": "2026-08-12",
   "alcance": "Sub-dominio emisor OXP (Obligaciones por Pagar). 6 plantillas de las 42 del inventario (anexo-ejemplo-plantilla-de-asiento.md, Seccion 5.2).",
   "fuente": "Mapeo canonico de eventos OXP -> tipoTransaccion contable (dominio/obligaciones-por-pagar/modelo-dominio.md, tabla de la seccion 'Integracion con sub-dominio Contabilidad') + estructura del agregado PlantillaDeAsiento (dominio/contabilidad/modelo-dominio.md, Seccion 3.7, [D12], [D13]).",
   "nota": "grupoPucEsperado acota solo el Nivel B (inferencia) de la cadena de resolucion [D12]/[R47]. llevaDescripcionConcepto indica si la partida del componente recibe la descripcionConcepto que envia el consumidor [D13]/[R48] (true en componentes de concepto de negocio; false en impuestos y retenciones). La contrapartida viaja como linea del consumidor (tipoComponente 'contrapartida', con tercero y clasificacion, sin valor ni unidad organizacional — el motor balancea) [D15]/[R54]. resolucionPorEspejo (opcional) indica que la cuenta del componente se copia de la partida del rol indicado en el borrador del hecho relacionado (referenciaHechoRelacionado de la linea) — no pasa por la cadena ni alimenta el aprendizaje [D15]/[R53]. La clasificacion de cada linea es texto semantico obligatorio compuesto por el emisor (recetas por componente en el modelo de OXP) [R52]. El atributo 'rol' de cada RolPartida es un codigo de conjunto cerrado (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA) que la partida del borrador hereda y se propaga a la entrega [D14]/[R49]. Codigos PUC referidos al Decreto 2650 (Colombia). Los items marcados porValidar:true requieren confirmacion de consultor contable y/o canonizacion en OXP (issue #10).",
@@ -96,6 +96,39 @@
               "llevaDescripcionConcepto": false,
               "porValidar": true,
               "notaValidacion": "Retencion asumida por la empresa cuando el pago del documento ya salio completo (medio de pago tarjeta, [D38] de OXP): la linea de la retencion viaja identica al caso normal (Cr, misma cuenta, tercero proveedor, certificable) y esta linea Db espejo la asume como gasto propio — la contrapartida queda por el total. Aplica a todas las retenciones sustractivas (una linea espejo por cada una). Grupo tentativo 5315 (gastos - impuestos asumidos), por validar con consultor contable. Doctrina de concurrencia validada con consultoria fiscal jul-2026."
+            }
+          ]
+        },
+        {
+          "rol": "IMPUESTO_AUTOLIQUIDADO",
+          "naturaleza": "debito",
+          "esContrapartida": false,
+          "componentes": [
+            {
+              "tipoComponente": "iva_importacion_servicios",
+              "grupoPucEsperado": [
+                "2408"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Reconocimiento del tributo autoliquidado ([D41] de OXP, issue #128). Grupo tentativo 2408 (descontable); el destino real depende del derecho al descuento (cruza con el item 1 y el issue #98). Definir con consultor contable (item 14)."
+            }
+          ]
+        },
+        {
+          "rol": "AUTOLIQUIDADO_POR_PAGAR",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            {
+              "tipoComponente": "iva_importacion_servicios_por_pagar",
+              "grupoPucEsperado": [
+                "2367",
+                "2408"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Provision por pagar del autoliquidado ([D41] de OXP, issue #128). La practica del 437-2 num. 3 lo declara como reteIVA (2367); confirmar cuenta con consultor contable (item 15)."
             }
           ]
         },
@@ -362,6 +395,41 @@
               "porValidar": true,
               "notaValidacion": "Inverso del reteica en causacion_gasto. Confirmar si OXP emite reteica como tipoComponente (issue #10).",
               "resolucionPorEspejo": "RETENCION"
+            }
+          ]
+        },
+        {
+          "rol": "IMPUESTO_AUTOLIQUIDADO",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            {
+              "tipoComponente": "iva_importacion_servicios",
+              "grupoPucEsperado": [
+                "2408"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Inverso del reconocimiento del autoliquidado — resuelve por espejo del rol homologo de la causacion devuelta ([D41] de OXP, issue #128).",
+              "resolucionPorEspejo": "IMPUESTO_AUTOLIQUIDADO"
+            }
+          ]
+        },
+        {
+          "rol": "AUTOLIQUIDADO_POR_PAGAR",
+          "naturaleza": "debito",
+          "esContrapartida": false,
+          "componentes": [
+            {
+              "tipoComponente": "iva_importacion_servicios_por_pagar",
+              "grupoPucEsperado": [
+                "2367",
+                "2408"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Inverso de la provision por pagar — resuelve por espejo del rol homologo de la causacion devuelta ([D41] de OXP, issue #128).",
+              "resolucionPorEspejo": "AUTOLIQUIDADO_POR_PAGAR"
             }
           ]
         },
