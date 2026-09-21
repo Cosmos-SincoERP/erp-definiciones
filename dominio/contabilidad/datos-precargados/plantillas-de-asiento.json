@@ -1,7 +1,7 @@
 {
   "catalogo": "PlantillaDeAsiento",
-  "version": "1.10",
-  "fechaActualizacion": "2026-08-12",
+  "version": "1.11",
+  "fechaActualizacion": "2026-09-21",
   "alcance": "Sub-dominio emisor OXP (Obligaciones por Pagar). 6 plantillas de las 42 del inventario (anexo-ejemplo-plantilla-de-asiento.md, Seccion 5.2).",
   "fuente": "Mapeo canonico de eventos OXP -> tipoTransaccion contable (dominio/obligaciones-por-pagar/modelo-dominio.md, tabla de la seccion 'Integracion con sub-dominio Contabilidad') + estructura del agregado PlantillaDeAsiento (dominio/contabilidad/modelo-dominio.md, Seccion 3.7, [D12], [D13]).",
   "nota": "grupoPucEsperado acota solo el Nivel B (inferencia) de la cadena de resolucion [D12]/[R47]. llevaDescripcionConcepto indica si la partida del componente recibe la descripcionConcepto que envia el consumidor [D13]/[R48] (true en componentes de concepto de negocio; false en impuestos y retenciones). La contrapartida viaja como linea del consumidor (tipoComponente 'contrapartida', con tercero y clasificacion, sin valor ni unidad organizacional — el motor balancea) [D15]/[R54]. resolucionPorEspejo (opcional) indica que la cuenta del componente se copia de la partida del rol indicado en el borrador del hecho relacionado (referenciaHechoRelacionado de la linea) — no pasa por la cadena ni alimenta el aprendizaje [D15]/[R53]. La clasificacion de cada linea es texto semantico obligatorio compuesto por el emisor (recetas por componente en el modelo de OXP) [R52]. El atributo 'rol' de cada RolPartida es un codigo de conjunto cerrado (GASTO/IMPUESTO/RETENCION/CONTRAPARTIDA) que la partida del borrador hereda y se propaga a la entrega [D14]/[R49]. Codigos PUC referidos al Decreto 2650 (Colombia). Los items marcados porValidar:true requieren confirmacion de consultor contable y/o canonizacion en OXP (issue #10).",
@@ -149,19 +149,34 @@
           ]
         },
         {
-          "rol": "DIFERENCIA_EN_CAMBIO",
-          "naturaleza": "debito_credito",
+          "rol": "DIFERENCIA_EN_CAMBIO_PERDIDA",
+          "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
             {
-              "tipoComponente": "diferencia_en_cambio",
+              "tipoComponente": "diferencia_en_cambio_perdida",
               "grupoPucEsperado": [
-                "5305",
-                "4215"
+                "5305"
               ],
               "llevaDescripcionConcepto": false,
               "porValidar": true,
-              "notaValidacion": "Perdida -> gasto financiero (5305); ganancia -> ingreso financiero (4215). Nombre de tipoComponente sin canonizar en OXP (issue #10)."
+              "notaValidacion": "Perdida por diferencia en cambio al cruzar una compra en moneda extranjera con el extracto (TRM subio, [R10b] de OXP). El signo lo decide OXP al conciliar (AjustePorDiferenciaCambio.clasificacion, [D42] de OXP) y emite solo este componente; tercero = proveedor de la compra cruzada. Grupo tentativo 5305 Financieros (530525 Diferencia en cambio), por validar con consultor contable (item 4). Issue #132."
+            }
+          ]
+        },
+        {
+          "rol": "DIFERENCIA_EN_CAMBIO_GANANCIA",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            {
+              "tipoComponente": "diferencia_en_cambio_ganancia",
+              "grupoPucEsperado": [
+                "4210"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Ganancia por diferencia en cambio al cruzar una compra en moneda extranjera con el extracto (TRM bajo, [R10b] de OXP). El signo lo decide OXP al conciliar ([D42] de OXP) y emite solo este componente; tercero = proveedor de la compra cruzada. Grupo tentativo 4210 Financieros (421020 Diferencia en cambio) — corrige el 4215 anterior (Dividendos y participaciones). Por validar con consultor contable (item 4). Issue #132."
             }
           ]
         },
@@ -183,19 +198,34 @@
           ]
         },
         {
-          "rol": "AJUSTE_TOLERANCIA",
-          "naturaleza": "debito_credito",
+          "rol": "AJUSTE_TOLERANCIA_PERDIDA",
+          "naturaleza": "debito",
           "esContrapartida": false,
           "componentes": [
             {
-              "tipoComponente": "ajuste_tolerancia",
+              "tipoComponente": "ajuste_tolerancia_perdida",
               "grupoPucEsperado": [
-                "5305",
+                "5305"
+              ],
+              "llevaDescripcionConcepto": false,
+              "porValidar": true,
+              "notaValidacion": "Ajuste por diferencia dentro de tolerancia al conciliar, extracto mayor que la compra ([R10] de OXP). El signo lo decide OXP (AjustePorTolerancia.direccion, [D42] de OXP) y emite solo este componente; tercero = proveedor de la compra cruzada. Grupo tentativo 5305 Financieros (530505 Gastos bancarios), por validar con consultor contable (item 10). Issue #132."
+            }
+          ]
+        },
+        {
+          "rol": "AJUSTE_TOLERANCIA_GANANCIA",
+          "naturaleza": "credito",
+          "esContrapartida": false,
+          "componentes": [
+            {
+              "tipoComponente": "ajuste_tolerancia_ganancia",
+              "grupoPucEsperado": [
                 "4210"
               ],
               "llevaDescripcionConcepto": false,
               "porValidar": true,
-              "notaValidacion": "Ajuste por diferencia dentro de tolerancia al conciliar (OxpExtracto). Pequena perdida/ganancia. Grupo tentativo: gasto financiero (5305) / ingreso financiero (4210). Por validar con consultor contable."
+              "notaValidacion": "Ajuste por diferencia dentro de tolerancia al conciliar, extracto menor que la compra ([R10] de OXP). El signo lo decide OXP (AjustePorTolerancia.direccion, [D42] de OXP) y emite solo este componente; tercero = proveedor de la compra cruzada. Grupo tentativo 4210 Financieros; alternativa 4295 Diversos (429581 Aprovechamientos), nombre que usa la regla de OXP. Por validar con consultor contable (item 10). Issue #132."
             }
           ]
         },
