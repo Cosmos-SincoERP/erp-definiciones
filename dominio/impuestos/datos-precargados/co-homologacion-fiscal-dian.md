@@ -3,8 +3,8 @@
 **País:** Colombia (`CO`)
 **Autoridad:** DIAN (Dirección de Impuestos y Aduanas Nacionales)
 **Catálogo del modelo:** `HomologacionFiscal` (Sección 3.10 — fase F2)
-**Versión:** 1.0
-**Fecha de actualización:** 2026-05-26
+**Versión:** 1.1
+**Fecha de actualización:** 2026-09-21
 **Archivo de datos:** [`co-homologacion-fiscal-dian.json`](co-homologacion-fiscal-dian.json)
 
 ---
@@ -42,14 +42,14 @@ Cada `Equivalencia` es un mapeo `(valorInterno, tributo) → codigoAutoridad` co
 
 ## 4. Códigos de conceptos RETEFUENTE (bloque 5XXX)
 
-Los códigos `5XXX` son los conceptos oficiales DIAN para el formato F-1001 (Pagos y retenciones). Cubren las 18 categorías principales de RETEFUENTE precargadas en `co-tarifa-tributaria.json`. Ejemplos:
+Los códigos `5XXX` son los conceptos oficiales DIAN para el formato F-1001 (Pagos y retenciones). Cubren 18 de los 53 conceptos de RETEFUENTE precargados en `co-tarifa-tributaria.json` (v1.3); los 35 restantes no tienen equivalencia todavía (pregunta 1 de §10). Ejemplos:
 
 | Código DIAN | Valor interno | Concepto |
 |---|---|---|
 | `5001` | `COMPRAS_GENERALES_DECLARANTES` | Compras generales — declarantes |
 | `5002` | `COMPRAS_GENERALES_NO_DECLARANTES` | Compras generales — no declarantes |
 | `5010` | `SERVICIOS_GENERALES_DECLARANTES` | Servicios generales — declarantes |
-| `5020` | `HONORARIOS_DECLARANTES` | Honorarios y comisiones — declarantes |
+| `5020` | `HONORARIOS_PERSONA_JURIDICA` | Honorarios y comisiones — persona jurídica |
 | `5031` | `ARRENDAMIENTO_INMUEBLES` | Arrendamiento de bienes inmuebles |
 | `5050` | `EXTERIOR_SERVICIOS_TECNICOS` | Pagos al exterior — servicios técnicos |
 
@@ -127,14 +127,16 @@ La mayoría de equivalencias tienen `fechaDesde: 2017-01-01` porque corresponden
 
 | Versión | Fecha | Cambio |
 |---|---|---|
+| 1.1 | 2026-09-21 | **Alineación con el catálogo de tarifas v1.3 (issue #133):** `valorInterno` de `5013` → `SERVICIOS_TRANSPORTE_TERRESTRE_PASAJEROS`, `5020` → `HONORARIOS_PERSONA_JURIDICA`, `5021` → `HONORARIOS_PERSONA_NATURAL` (nombres de autoridad ajustados). Sin equivalencias nuevas para los 6 conceptos agregados en tarifas — no se inventan códigos; quedan en la pregunta 1 de §10, junto con la pregunta 6 nueva sobre la correspondencia de los códigos 5XXX con el anexo técnico del F-1001. 35 equivalencias (sin cambio). |
 | 1.0 | 2026-05-26 | Carga inicial F1: 35 equivalencias (18 RETEFUENTE + 7 IVA + 1 INC + 4 ICA + 5 rentas laborales). |
 
 ---
 
 ## 10. Revisión pendiente
 
-1. **Códigos 5XXX completos:** Los 18 conceptos RETEFUENTE precargados son los más comunes. ¿Existen otros conceptos DIAN del bloque 5XXX que debamos incluir? (DIAN tiene ~50 conceptos en total).
+1. **Códigos 5XXX completos:** Los 18 conceptos RETEFUENTE con equivalencia son los más comunes; 35 de los 53 factores del catálogo de tarifas v1.3 no tienen código, entre ellos los agregados en v1.3 (`SERVICIOS_SOFTWARE_DESARROLLO_NO_DECLARANTES`, `SERVICIOS_SOFTWARE_LICENCIAMIENTO_DECLARANTES`, `SERVICIOS_SOFTWARE_LICENCIAMIENTO_NO_DECLARANTES`, `SERVICIOS_CONSULTORIA_OBRA_CIVIL_NO_DECLARANTES`, `SERVICIOS_TRANSPORTE_AEREO_MARITIMO_PASAJEROS`, `COMPRAS_ACTIVOS_FIJOS_PERSONA_NATURAL`). ¿Qué conceptos DIAN del bloque 5XXX les corresponden? (DIAN tiene ~50 conceptos en total).
 2. **Códigos por formato:** ¿Necesitamos campo adicional `formatoAplica` para identificar en qué formato usa cada código? (Ej: `5001` se usa en F-1001 y F-1003, pero no en F-2276).
 3. **Códigos por año gravable:** ¿Algunos códigos han cambiado entre años gravables y requieren modelado de vigencia más fino?
 4. **Códigos para activos digitales (F-2856):** ¿Cuáles son los códigos específicos para criptomonedas, NFTs, otros activos digitales?
 5. **Códigos para sectores especializados:** ¿Existen códigos específicos para sectores como salud, educación, ESALES?
+6. **Correspondencia con el anexo técnico del F-1001:** los códigos precargados asignan `5001` a compras generales declarantes y `5010` a servicios generales, pero en el anexo técnico del Formato 1001 los conceptos `5001`-`5008` parecen corresponder a salarios, honorarios, comisiones, servicios, arrendamientos, intereses y compras. ¿Los códigos precargados son los del anexo vigente o hay que rehacer la tabla?
