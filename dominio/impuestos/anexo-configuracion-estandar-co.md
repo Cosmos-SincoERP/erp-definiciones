@@ -53,12 +53,12 @@ Las 11 reglas de localización se migraron junto con el catálogo tributario a [
 
 ## 2. Tarifas — TarifaTributaria
 
-Las tarifas tributarias se migraron a [`datos-precargados/co-tarifa-tributaria.json`](datos-precargados/co-tarifa-tributaria.json) (v1.0, 2026-05-26). Allí viven 22 streams con 124 entradas de tarifa (7 streams nacionales + 12 streams ICA municipales + sobretasa Bogotá + placeholders RICA/AUTO_RICA). El narrativo de revisión está en [`datos-precargados/co-tarifa-tributaria.md`](datos-precargados/co-tarifa-tributaria.md).
+Las tarifas tributarias se migraron a [`datos-precargados/co-tarifa-tributaria.json`](datos-precargados/co-tarifa-tributaria.json) (v1.3, 2026-09-21). Allí viven 22 streams con 147 entradas de tarifa (7 streams nacionales + 12 streams ICA municipales + sobretasa Bogotá + placeholders RICA/AUTO_RICA). El narrativo de revisión está en [`datos-precargados/co-tarifa-tributaria.md`](datos-precargados/co-tarifa-tributaria.md).
 
 En esta sección queda únicamente el **contexto de diseño**:
 
 - **IVA, INC:** 3 + 1 = 4 entradas nacionales por clasificación tributaria.
-- **RETEFUENTE:** 49 conceptos certificados DIAN (Decreto Único 1625/2016) — compras, servicios, honorarios, arrendamientos, pagos al exterior, etc. Tarifas de 0.1% a 33%.
+- **RETEFUENTE:** 53 conceptos de pago en 71 entradas (Decreto Único 1625/2016 + Decreto 572/2025; 6 conceptos con 4 tramos de cuantía mínima) — compras, servicios, honorarios (persona jurídica 11% / persona natural 10%), arrendamientos, pagos al exterior, etc. Tarifas de 0.1% a 33%. La elección entre pares `_DECLARANTES`/`_NO_DECLARANTES` la hace el consumidor al escoger el concepto de pago.
 - **RIVA:** 15% del IVA generado (porcentajeDePadre).
 - **AUTO_RENTA:** Tarifa base 0.55%. Tarifas sectoriales (0.40% industria, 0.80% comercio, 1.60% otros) pendientes de validación.
 - **AUTO_RETEFUENTE:** Replica tarifas RETEFUENTE; precarga inicial de 3 conceptos.
