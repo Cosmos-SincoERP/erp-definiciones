@@ -1,13 +1,14 @@
 {
   "pais": "CO",
   "catalogo": "CondicionDeAplicacion",
-  "version": "1.2",
-  "fechaActualizacion": "2026-07-31",
-  "fuente": "Estatuto Tributario Nacional + Decreto Único Reglamentario 1625 de 2016 (DIAN — RETEFUENTE/RIVA) + estatutos tributarios municipales (RICA) + Ley 1943/2018 y Ley 2010/2019 (Régimen Simple) + Constitución art. 310 + Ley 47/1993 (Puerto Libre).",
+  "version": "1.3",
+  "fechaActualizacion": "2026-09-22",
+  "fuente": "Estatuto Tributario Nacional + Decreto Único Reglamentario 1625 de 2016 (DIAN — RETEFUENTE/RIVA) + estatutos tributarios municipales (RICA) + Ley 1943/2018 y Ley 2010/2019 (Régimen Simple) + Constitución art. 310 + Ley 47/1993 (Puerto Libre) + Estatuto Tributario arts. 406 a 408 (retención a beneficiarios del exterior) y convenios para evitar la doble imposición vigentes.",
   "estructura": {
-    "totalCondiciones": 31,
+    "totalCondiciones": 34,
     "porTributo": {
-      "RETEFUENTE": 15,
+      "RETEFUENTE": 16,
+      "RETEFUENTE_EXTERIOR": 2,
       "RIVA": 4,
       "RICA": 5,
       "IVA": 3,
@@ -227,6 +228,19 @@
     },
 
     {
+      "codigo": "RTF-09",
+      "tributo": "RETEFUENTE",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "tieneDomicilioFiscalEnElPais", "operador": "igual", "valor": false }
+      ],
+      "efecto": "noAplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Beneficiario del exterior — la retención doméstica no aplica: al proveedor sin residencia ni domicilio fiscal en el país se le practica la retención a beneficiarios del exterior (RETEFUENTE_EXTERIOR, arts. 406 a 408 ET). Exclusión explícita con fundamento propio, independiente de RTF-04a.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
       "codigo": "RIVA-01a",
       "tributo": "RIVA",
       "entidadEvaluada": "emisora-y-contraparte",
@@ -438,6 +452,33 @@
       "efecto": "aplicar",
       "direccionFiscalAplicable": "ingreso",
       "descripcion": "AUTO_RENTA aplica cuando la empresa vendedora es autorretenedora de renta. Tarifa fija sectorial.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-EXT-01",
+      "tributo": "RETEFUENTE_EXTERIOR",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "tieneDomicilioFiscalEnElPais", "operador": "igual", "valor": false }
+      ],
+      "efecto": "aplicar",
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Activa RETEFUENTE_EXTERIOR cuando el proveedor no tiene residencia ni domicilio fiscal en el país (arts. 406 a 408 ET). Tarifa general del 20 % por concepto de pago; los conceptos sin entrada de tarifa (compras de bienes) se descartan por tarifa no configurada.",
+      "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "codigo": "RTF-EXT-02",
+      "tributo": "RETEFUENTE_EXTERIOR",
+      "entidadEvaluada": "contraparte",
+      "criterios": [
+        { "atributo": "paisDeResidenciaFiscal", "operador": "con-convenio-vigente" }
+      ],
+      "efecto": "cambiarTarifa",
+      "tarifaAlternativa": { "tipo": "convenio" },
+      "direccionFiscalAplicable": "gasto",
+      "descripcion": "Convenio para evitar la doble imposición vigente entre Colombia y el país de residencia fiscal del beneficiario: la tarifa se toma del convenio (tarifa convenida para el concepto de pago; si no existe, la tarifa general del convenio). Una tarifa convenida de cero excluye el tributo (el convenio reserva la potestad de gravar al otro país). Lista de convenios en co-convenio-de-doble-imposicion.",
       "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null },
       "origen": "estandar"
     }

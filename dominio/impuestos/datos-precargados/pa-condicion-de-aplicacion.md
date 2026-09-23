@@ -2,8 +2,8 @@
 
 **País:** Panamá (`PA`)
 **Catálogo del modelo:** `CondicionDeAplicacion` (Sección 3.4)
-**Versión:** 1.0
-**Fecha de actualización:** 2026-05-26
+**Versión:** 1.1
+**Fecha de actualización:** 2026-09-22
 **Archivo de datos:** [`pa-condicion-de-aplicacion.json`](pa-condicion-de-aplicacion.json)
 
 ---
@@ -23,7 +23,7 @@ Reglas declarativas para ajustar el tratamiento tributario en PA según el perfi
 | ITBMS | 4 (2 régimen + 2 exoneraciones por área especial) |
 | RITBMS | 3 (1 activación agente + 2 exclusiones) |
 | ISC | 1 (default) |
-| ISR | 3 (1 activación + 1 territorial + 1 CDIs) |
+| ISR | 3 (1 activación + 1 territorial + 1 convenio de doble imposición) |
 
 ---
 
@@ -41,11 +41,11 @@ La condición `ISR-02-territorial` materializa el **principio territorial de ren
 
 **Criterio `fuente = extranjera`:** el motor debe poder determinar si el pago es de fuente panameña o extranjera. Esto se evalúa caso por caso considerando el lugar de prestación del servicio y la residencia del beneficiario. La determinación es **subjetiva** y suele requerir intervención manual o reglas configurables por concepto.
 
-### 3.3. ISR — Convenios para Evitar Doble Imposición (CDIs)
+### 3.3. ISR — Convenios para evitar la doble imposición
 
-La condición `ISR-03-cdi` reconoce que los CDIs vigentes reducen la tarifa de retención. Panamá tiene CDIs con países como España, México, Italia, Holanda, Singapur, entre otros. El motor consulta una **tabla de CDIs** (pendiente de modelar) para resolver tarifa aplicable.
+La condición `ISR-03-cdi` aplica la tarifa reducida de un convenio para evitar la doble imposición cuando el país de residencia fiscal del beneficiario tiene convenio vigente con Panamá. Desde la v1.1 está expresada con el mecanismo del modelo: evalúa a la **contraparte** con el criterio `paisDeResidenciaFiscal` + operador `con-convenio-vigente`, efecto `cambiarTarifa` con `tarifaAlternativa: { tipo: convenio }`. El motor toma la tarifa del catálogo `pa-convenio-de-doble-imposicion` (agregado `ConvenioDeDobleImposicion`): la convenida para el concepto de pago y, si no existe, la general del convenio; si el convenio no define ninguna, rige la tarifa de `TarifaTributaria`. Una tarifa convenida de cero excluye el tributo.
 
-**Propuesta:** modelar una `TablaCDI` con tarifas reducidas por (país, concepto). No está en el catálogo F1 actual — pendiente con consultores.
+**Estado de la precarga:** el catálogo de convenios de Panamá trae los 17 países con convenio vigente según la DGI, **sin tarifas convenidas**: la condición queda declarada y sembrable, pero no modifica tarifas hasta que la consultoría fiscal valide país, vigencia y tarifa por concepto. Requiere el atributo `paisDeResidenciaFiscal` del perfil (catálogo de atributos v1.1).
 
 ---
 
@@ -74,6 +74,7 @@ Estas reglas requieren refinamiento con consultores.
 
 | Versión | Fecha | Cambio |
 |---|---|---|
+| 1.1 | 2026-09-22 | **`ISR-03-cdi` migrada al mecanismo común de convenios (issue #143; cierra el #138):** `entidadEvaluada: contraparte`, criterio `paisDeResidenciaFiscal` con operador `con-convenio-vigente` (reemplaza `paisContraparte` + `tiene-cdi-vigente` + `valor: "PA"`, redundante con la raíz por país), efecto `cambiarTarifa` con `tarifaAlternativa: { tipo: convenio }` (reemplaza `aplicar-con-tarifa-cdi`). Lista de convenios en el catálogo nuevo `pa-convenio-de-doble-imposicion` v1.0 (17 países, tarifas por validar). Pregunta 5 resuelta. |
 | 1.0 | 2026-05-26 | Carga inicial F1: 11 condiciones (4 ITBMS + 3 RITBMS + 1 ISC + 3 ISR). |
 
 ---
@@ -84,5 +85,5 @@ Estas reglas requieren refinamiento con consultores.
 2. **ITBMS — ZLC ventas locales:** ¿Cómo se distinguen las ventas al exterior (exentas) de las ventas locales (gravadas) dentro de la ZLC?
 3. **ITBMS — AEEPP por tipo de operación:** ¿Cuáles son las sub-condiciones según tipo de actividad certificada?
 4. **ISR — Determinación de fuente:** ¿Hay reglas determinísticas que el motor pueda aplicar para determinar fuente panameña vs extranjera, o siempre requiere análisis manual?
-5. **ISR — Tabla CDIs:** ¿Modelamos como nuevo agregado (`TablaCDI`) o como sub-catálogo dentro de `TarifaTributaria`?
+5. **ISR — Tabla de convenios — resuelto (v1.1):** agregado propio `ConvenioDeDobleImposicion` por país, con tarifas convenidas por concepto de pago (modelo de Impuestos v2.1.0). Pendiente con los consultores: las tarifas convenidas por país y concepto de los 17 convenios vigentes de Panamá.
 6. **¿Falta condición específica para SEM** (Sede de Empresas Multinacionales)? Ley 41/2007 tiene tratamiento ISR distinto.

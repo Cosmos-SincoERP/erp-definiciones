@@ -88,7 +88,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Replanteamiento (#31/#45) y refinamientos recientes:** `Proveedor` como rol del tercero hacia la bodega de Terceros (#38); la **unidad organizacional se consume como copia local** por eventos de Estructura Organizacional —no agregado— y la causación **se difiere** cuando la unidad no existe (`[D34]`, `[SI8]`, #48); control de doble pago vía constancia humana (`[R38]`, `[D33]`, #30); **registro de productos financieros** — el emisor del extracto proviene del registro de tarjetas definido por el usuario, con atribución y bandeja de pendientes; conciliación por tarjeta, extracto consolidado diferido como evolución (`[D39]`, #106 — reemplaza la inferencia por histórico del #57); **asignación de la unidad por cadena de niveles** (Nivel A reglas configurables + Nivel B aprendizaje, `[D35]`, #51); **medio de pago canónico** — cadena de resolución con origen rastreado (la tarjeta referenciada al registro de productos financieros), retención en la confirmación de las resoluciones débiles y coherencia con el extracto garantizada por el control de saldos y la diferencia visible en el cruce — sin evento ni regla propios (`[D40]`, #96); **lote del equipo de desarrollo #126/#127** — el extracto no lleva medio de pago (se identifica por su producto financiero y copia el tipo de tarjeta) y la **cuenta consolidadora como dato agrupable** (diagnóstico de la salvaguarda de consolidado + advertencia al registrar un número que coincide con una cuenta anotada).
 
-**Estado:** Alcance v1.22, modelo v4.15 (septiembre 2026). En refinamiento continuo (Fase 2). Integración OXP ↔ Contabilidad **cerrada**; integración con Estructura Organizacional documentada (**copia local + diferir por consistencia eventual** — la señal de demanda se retiró en el #72: la copia es para validación, la UI lee a EO en vivo).
+**Estado:** Alcance v1.23, modelo v4.16 (septiembre 2026). En refinamiento continuo (Fase 2). Integración OXP ↔ Contabilidad **cerrada**; integración con Estructura Organizacional documentada (**copia local + diferir por consistencia eventual** — la señal de demanda se retiró en el #72: la copia es para validación, la UI lee a EO en vivo).
 
 > Detalle: [`dominio/obligaciones-por-pagar/modelo-dominio.md`](dominio/obligaciones-por-pagar/modelo-dominio.md)
 
@@ -122,7 +122,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 | CertificadoTributario | F2 | Generación y entrega de certificados de retención. |
 
 **Tres responsabilidades:**
-1. **Configuración fiscal** — Catálogo de tributos, tarifas, reglas, jurisdicciones y regímenes especiales. Preconfigurado para CO (11 tributos), DO (5), PA (4).
+1. **Configuración fiscal** — Catálogo de tributos, tarifas, reglas, jurisdicciones y regímenes especiales. Preconfigurado para CO (12 tributos), DO (5), PA (4).
 2. **Motor de cálculo** — Stateless. Recibe contexto transaccional, resuelve tributos aplicables. Retorna desglose propuesto + tributos descartados con motivo. Paso 2.c evalúa regímenes empresariales; paso 2.d resuelve CIIU según rol del sujeto pasivo + dirección fiscal.
 3. **Cumplimiento fiscal** — Reportes (exógena, DGII, municipales), certificados tributarios. Consume registros propios.
 
@@ -130,11 +130,11 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 - **F1 — LatAm completo:** CO/DO/PA con regímenes territoriales y empresariales precargados.
 - **F2 — Apertura US/CA:** activación de tipos `distrito-fiscal-especial` y `soberania-tributaria`, resolución de jurisdicción por dirección/geocoding, decisión arquitectónica proveedor fiscal externo vs catálogo propio (ver `[PD11]`).
 
-**Catálogos fiscales precargados (F1):** 27 pares de archivos (`.md` + `.json`), 983 entradas que cubren los 3 países F1 (CO: 514, DO: 260, PA: 209). Son **parte del producto** (`origen: estándar`) — pendiente refinamiento por consultores fiscales (cada `.md` lleva sección "Revisión pendiente"). Catálogo tributario CO **v1.4**: `ICA` solo en dirección `ingreso` (#93, validado con la consultoría fiscal), renombre `AUTO_RIVA` → `IVA_IMPORTACION_SERVICIOS` (#110 — la autorretención de IVA no existe como figura; el tributo es la autoliquidación en importación de servicios, con disparador por contraparte sin domicilio fiscal en el país) y retención de la sobretasa bomberil como `anticipado` (#108 — se descuenta de la sobretasa liquidada, no del ICA; validado con las dos consultoras).
+**Catálogos fiscales precargados (F1):** 29 pares de archivos (`.md` + `.json`), ~1.030 entradas que cubren los 3 países F1 (CO: ~543, DO: 260, PA: ~227) — incluye los catálogos nuevos de convenios para evitar la doble imposición de CO y PA (#143). Son **parte del producto** (`origen: estándar`) — pendiente refinamiento por consultores fiscales (cada `.md` lleva sección "Revisión pendiente"). Catálogo tributario CO **v1.5**: retención a beneficiarios del exterior como tributo propio `RETEFUENTE_EXTERIOR` (#143 — 20 % general, tarifa de convenio, exclusión de la retención doméstica), `ICA` solo en dirección `ingreso` (#93, validado con la consultoría fiscal), renombre `AUTO_RIVA` → `IVA_IMPORTACION_SERVICIOS` (#110 — la autorretención de IVA no existe como figura; el tributo es la autoliquidación en importación de servicios, con disparador por contraparte sin domicilio fiscal en el país) y retención de la sobretasa bomberil como `anticipado` (#108 — se descuenta de la sobretasa liquidada, no del ICA; validado con las dos consultoras).
 
 **Replanteamiento (#31, #39):** el alta del `PerfilTributario` ya no depende de un registro centralizado de terceros — el comando `AsegurarPerfilTributario` crea-o-reutiliza por identificación × país (`[D16]`), validando la identidad con la pieza del paquete `IdentificacionLegal`; los eventos del perfil se publican hacia la bodega de Terceros (Impuestos es fuente, no consumidor).
 
-**Estado:** Alcance v1.5, modelo v2.0.8 (julio 2026). Modelo completo + catálogos F1 entregados — refinamiento por consultores fiscales en curso (es el sub-dominio más avanzado en el hito de refinamiento).
+**Estado:** Alcance v1.6, modelo v2.1.0 (septiembre 2026). Modelo completo + catálogos F1 entregados — refinamiento por consultores fiscales en curso (es el sub-dominio más avanzado en el hito de refinamiento).
 
 > Detalle: [`dominio/impuestos/modelo-dominio.md`](dominio/impuestos/modelo-dominio.md), [`dominio/impuestos/datos-precargados/`](dominio/impuestos/datos-precargados/)
 
@@ -187,7 +187,7 @@ Un ERP multi-país (Colombia, República Dominicana, Panamá) diseñado como un 
 
 **Replanteamiento (#45, #47):** Estructura Organizacional deja de ser "fuente de verdad que se consulta" — N1 valida terceros y unidades contra **copia local por suscripción**, sin consulta en caliente (`R07`, `I7b`); la reestructuración de unidades es un hecho de negocio que la capa de reportería aplica al leer (no regla nueva). Contabilidad también realiza transacciones propias de ajuste (N2): no todo proviene de dominios externos.
 
-**Estado:** Alcance v1.11, modelo v1.12 (julio 2026); catálogo de plantillas v1.11, anexo de ejemplos v1.5 (5 ejemplos). N1 listo para desarrollo F1 (N2 en F2) — refinamiento con el equipo de desarrollo en curso.
+**Estado:** Alcance v1.11, modelo v1.12 (julio 2026); catálogo de plantillas v1.12, anexo de ejemplos v1.5 (5 ejemplos). N1 listo para desarrollo F1 (N2 en F2) — refinamiento con el equipo de desarrollo en curso.
 
 > Detalle: [`dominio/contabilidad/modelo-dominio.md`](dominio/contabilidad/modelo-dominio.md), [`dominio/contabilidad/anexo-marco-contable-y-arquitectura-puc.md`](dominio/contabilidad/anexo-marco-contable-y-arquitectura-puc.md)
 
@@ -424,19 +424,19 @@ Datos de Referencia ──► Nuggets ──► (terceros y unidades
 | Nuggets | Todos (validación empaquetada) | Datos de Referencia | **8 nuggets aceptados (borrador)** |
 | Terceros (bodega) | Consolida roles; publica señal global | Nuggets (clave natural) | **v2.0.2 — cerrado para desarrollo F1** |
 | Estructura Org | OXP, Contabilidad (copia local de unidades) | Datos de Referencia | **v2.5 — listo para desarrollo F1** |
-| Impuestos | OXP (cálculo tributario) | Nuggets, Datos de Referencia | **v2.0.8 — modelo completo + catálogos F1** |
+| Impuestos | OXP (cálculo tributario) | Nuggets, Datos de Referencia | **v2.1.0 — modelo completo + catálogos F1** |
 | Contabilidad | OXP (confirmación de asiento) | Terceros, Estructura Org (copia local) | **v1.12 — N1 listo para desarrollo F1** |
-| OXP | Terceros (rol Proveedor) | Impuestos, Contabilidad, Estructura Org (copia local) | **v4.15 — Fase 2 (refinamiento continuo)** |
+| OXP | Terceros (rol Proveedor) | Impuestos, Contabilidad, Estructura Org (copia local) | **v4.16 — Fase 2 (refinamiento continuo)** |
 
 ### Estado actual de construcción
 
 - ✅ **Datos de Referencia** — v2.0 listo (producción de catálogos + tasas de cambio).
 - 🟡 **Nuggets** — 8 nuggets aceptados en borrador (gobernanza + catálogo).
 - ✅ **Terceros** — v2.0.2 cerrado para desarrollo F1 (bodega consolidadora, 2 auditorías).
-- ✅ **Impuestos** — modelo v2.0.8 completo + catálogos F1 (LatAm CO/DO/PA, apertura US/CA F2).
+- ✅ **Impuestos** — modelo v2.1.0 completo + catálogos F1 (LatAm CO/DO/PA, apertura US/CA F2); retención a beneficiarios del exterior y convenios de doble imposición (#143).
 - ✅ **Estructura Organizacional** — modelo v2.5 listo F1 (copia local + diferir; lote #85-#89 aplicado: varios grupos de primer nivel, `TipoUnidad` agregado propio, código de texto libre).
-- ✅ **Contabilidad** — v1.12, N1 listo F1 (MarcoContable + arquitectura PUC + grupo PUC esperado + copia local de datos maestros; catálogo de plantillas v1.11 con 6 plantillas).
-- 🔄 **OXP** — v4.13, Fase 2. Integración con Contabilidad **cerrada** y con Estructura Organizacional documentada; refinamiento continuo (últimos del equipo de desarrollo: #126/#127 — extracto sin medio de pago, cuenta consolidadora agrupable — y #128 — par de líneas del tributo de provisión, `[D41]`; en curso el lote Anticipo #122-#125 — I29 distingue el pendiente de asignación, que se exige al confirmar, del de propagación, que difiere la causación).
+- ✅ **Contabilidad** — v1.12, N1 listo F1 (MarcoContable + arquitectura PUC + grupo PUC esperado + copia local de datos maestros; catálogo de plantillas v1.12 con 6 plantillas).
+- 🔄 **OXP** — v4.16, Fase 2. Integración con Contabilidad **cerrada** y con Estructura Organizacional documentada; refinamiento continuo (últimos del equipo de desarrollo: #126/#127 — extracto sin medio de pago, cuenta consolidadora agrupable — y #128 — par de líneas del tributo de provisión, `[D41]`; en curso el lote Anticipo #122-#125 — I29 distingue el pendiente de asignación, que se exige al confirmar, del de propagación, que difiere la causación).
 
 ### Siguiente paso
 
@@ -811,19 +811,19 @@ El porcentaje de avance combina cinco hitos. Cada hito tiene un peso fijo y se e
 ### Detalle de los parciales
 
 **Impuestos — 85%**
-- ✅ Alcance v1.5, Modelo v2.0.8, Auditoría aplicada (2 rondas). Catálogo tributario CO v1.4.
-- 🟡 Refinamiento en progreso (~85%) — catálogos fiscales F1 entregados (983 entradas CO/DO/PA); #39 (perfil sin registro centralizado), #93 (ICA solo ingreso), #110 (IVA_IMPORTACION_SERVICIOS, resolución con la consultoría fiscal), #111 (matriz de tratamientos alineada a la implementación), #108 (sobretasa bomberil `anticipado`, validado con las dos consultoras), #109 (RITBMS de Panamá como `porcentajeDePadre` — hereda el ciclo de vida del ITBMS) y #117/#118 (autoliquidado autónomo de naturaleza `provision` + clasificaciones de servicios) aplicados; resta el refinamiento por consultores sobre las secciones "Revisión pendiente" (abierto: #97 cuantía mínima como política).
+- ✅ Alcance v1.6, Modelo v2.1.0, Auditoría aplicada (2 rondas). Catálogo tributario CO v1.5; catálogos de convenios de doble imposición CO/PA v1.0.
+- 🟡 Refinamiento en progreso (~85%) — catálogos fiscales F1 entregados (983 entradas CO/DO/PA); #39 (perfil sin registro centralizado), #93 (ICA solo ingreso), #110 (IVA_IMPORTACION_SERVICIOS, resolución con la consultoría fiscal), #111 (matriz de tratamientos alineada a la implementación), #108 (sobretasa bomberil `anticipado`, validado con las dos consultoras), #109 (RITBMS de Panamá como `porcentajeDePadre` — hereda el ciclo de vida del ITBMS) #117/#118 (autoliquidado autónomo de naturaleza `provision` + clasificaciones de servicios), #133 (conceptos RETEFUENTE contra la tabla 2026) y #143 (retención a beneficiarios del exterior como tributo propio + agregado de convenios de doble imposición CO/PA; cierra el #138) aplicados; resta el refinamiento por consultores sobre las secciones "Revisión pendiente" (abierto: #97 cuantía mínima como política).
 - ⬜ Listo F1 — depende del cierre del refinamiento.
 - **Cálculo:** 20 + 25 + 15 + (30 × 0.85) + 0 = 85.5 ≈ **85%**.
 
 **OXP — 82%**
-- ✅ Alcance v1.17, Modelo v4.8, Auditoría: 3 rondas aplicadas. Modelo maduro: integración con Contabilidad y con Estructura Organizacional **cerradas**; ubicaciones hacia Impuestos resueltas (`lugarEjecucion`).
+- ✅ Alcance v1.23, Modelo v4.16, Auditoría: 3 rondas aplicadas. Modelo maduro: integración con Contabilidad y con Estructura Organizacional **cerradas**; ubicaciones hacia Impuestos resueltas (`lugarEjecucion`).
 - 🟡 Refinamiento en progreso (~75%, Fase 2 continuo) — #18/#25/#26/#28/#30/#38/#48/#51/#57/#72/#90/#94 aplicados (abierto: #96, canonización del medio de pago).
 - ⬜ Listo F1 — depende del cierre del refinamiento.
 - **Cálculo:** 20 + 25 + 15 + (30 × 0.75) + 0 = 82.5 ≈ **82%**.
 
 **Contabilidad — 82%**
-- ✅ Alcance v1.11, Modelo v1.12, Auditoría aplicada. Catálogo de plantillas v1.11 (6 plantillas), anexo de ejemplos v1.5.
+- ✅ Alcance v1.11, Modelo v1.12, Auditoría aplicada. Catálogo de plantillas v1.12 (6 plantillas), anexo de ejemplos v1.5.
 - 🟡 Refinamiento en progreso (~75%) — #7/#8/#9 (grupo PUC, narración, herencia del rol), #17 (unidad de la contrapartida), #18 (rol CRUCE_OBLIGACION), #20 (nota_credito_gasto), #28 (terceroPrincipal), #47 (copia local de datos maestros), #90 (partida en disputa), #94 (retenciones asumidas) y #104 (clasificación semántica, contrapartida como línea y espejo) aplicados (abierto: #98, IVA descontable vs mayor valor).
 - ⬜ Listo F1 — depende del cierre del refinamiento.
 - **Cálculo:** 20 + 25 + 15 + (30 × 0.75) + 0 = 82.5 ≈ **82%**.

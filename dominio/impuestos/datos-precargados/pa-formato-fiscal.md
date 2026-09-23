@@ -1,7 +1,7 @@
 # Catálogo Formatos Fiscales — Panamá
 
 **País:** Panamá (`PA`)
-**Catálogo del modelo:** `FormatoFiscal` (Sección 3.11 — fase F2)
+**Catálogo del modelo:** `FormatoFiscal` (Sección 3.12 — fase F2)
 **Versión:** 0.1-placeholder
 **Fecha de actualización:** 2026-05-26
 **Archivo de datos:** [`pa-formato-fiscal.json`](pa-formato-fiscal.json)

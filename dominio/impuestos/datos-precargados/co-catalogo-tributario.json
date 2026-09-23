@@ -1,8 +1,8 @@
 {
   "pais": "CO",
   "catalogo": "CatalogoTributario",
-  "version": "1.4",
-  "fechaActualizacion": "2026-07-31",
+  "version": "1.5",
+  "fechaActualizacion": "2026-09-22",
   "fuente": "Estatuto Tributario Nacional (Decreto 624 de 1989) + Decreto Único Reglamentario 1625 de 2016 (DIAN) + Ley 14 de 1983 (ICA) + Ley 1430 de 2010 (autorretenciones) + estatutos tributarios municipales.",
 
   "tributos": [
@@ -53,6 +53,18 @@
       "tributoPadre": null,
       "origen": "estandar",
       "definicion": "Mecanismo anticipado de recaudación del impuesto a la renta y complementarios. Se compensa con la declaración anual de renta."
+    },
+    {
+      "codigo": "RETEFUENTE_EXTERIOR",
+      "nombre": "Retención en la fuente a beneficiarios del exterior",
+      "naturaleza": "sustractivo",
+      "caracterRetencion": "definitivo",
+      "nivelJurisdiccional": "nacional",
+      "factorDeTarifa": "conceptoPago",
+      "direccionFiscalAplicable": "gasto",
+      "tributoPadre": null,
+      "origen": "estandar",
+      "definicion": "Retención en la fuente sobre pagos o abonos en cuenta a beneficiarios sin residencia ni domicilio fiscal en el país por rentas de fuente nacional (Estatuto Tributario arts. 406 a 408 y 592 numeral 2). Tributo autónomo: sustituye a la retención doméstica cuando la contraparte no tiene domicilio fiscal en el país (condición propia), con tarifa general del 20 % por concepto de pago y tarifa reducida cuando el país de residencia fiscal del beneficiario tiene un convenio para evitar la doble imposición vigente. Es el impuesto definitivo del beneficiario. Comparte los códigos de concepto de pago con RETEFUENTE. La retención la liquida Impuestos; si la empresa la asume o la descuenta al beneficiario lo decide el sub-dominio consumidor."
     },
     {
       "codigo": "RIVA",
@@ -167,18 +179,21 @@
     { "clasificacion": "GRAV_5", "tributo": "RICA", "aplica": true, "origen": "estandar" },
 
     { "clasificacion": "EXCLUIDO", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "EXCLUIDO", "tributo": "RETEFUENTE_EXTERIOR", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXCLUIDO", "tributo": "AUTO_RETEFUENTE", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXCLUIDO", "tributo": "ICA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXCLUIDO", "tributo": "RICA", "aplica": true, "origen": "estandar" },
 
     { "clasificacion": "EXENTO", "tributo": "IVA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXENTO", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "EXENTO", "tributo": "RETEFUENTE_EXTERIOR", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXENTO", "tributo": "AUTO_RETEFUENTE", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXENTO", "tributo": "ICA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "EXENTO", "tributo": "RICA", "aplica": true, "origen": "estandar" },
 
     { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "IVA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "RETEFUENTE_EXTERIOR", "aplica": true, "origen": "estandar" },
     { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "AUTO_RETEFUENTE", "aplica": true, "origen": "estandar" },
     { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "RIVA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "ICA", "aplica": true, "origen": "estandar" },
@@ -186,6 +201,7 @@
     { "clasificacion": "SERVICIOS_GRAV_19", "tributo": "IVA_IMPORTACION_SERVICIOS", "aplica": true, "origen": "estandar" },
     { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "IVA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "RETEFUENTE", "aplica": true, "origen": "estandar" },
+    { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "RETEFUENTE_EXTERIOR", "aplica": true, "origen": "estandar" },
     { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "AUTO_RETEFUENTE", "aplica": true, "origen": "estandar" },
     { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "RIVA", "aplica": true, "origen": "estandar" },
     { "clasificacion": "SERVICIOS_GRAV_5", "tributo": "ICA", "aplica": true, "origen": "estandar" },
@@ -199,6 +215,7 @@
     { "tributo": "IVA", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
     { "tributo": "INC", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
     { "tributo": "RETEFUENTE", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
+    { "tributo": "RETEFUENTE_EXTERIOR", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
     { "tributo": "ICA", "clasificacion": "*", "rolQueManda": "lugarEjecucion", "rolFallback": "sedeEmisora", "origen": "estandar" },
     { "tributo": "RIVA", "clasificacion": "*", "rolQueManda": "sedeEmisora", "rolFallback": null, "origen": "estandar" },
     { "tributo": "RICA", "clasificacion": "*", "rolQueManda": "lugarEjecucion", "rolFallback": "sedeEmisora", "origen": "estandar" },

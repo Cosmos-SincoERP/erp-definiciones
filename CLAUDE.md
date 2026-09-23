@@ -8,9 +8,9 @@ Definición de los sub-dominios de un ERP mediante documentos de diseño convers
 
 | Carpeta | Sub-dominio | Estado |
 |---------|-------------|--------|
-| `dominio/obligaciones-por-pagar/` | Obligaciones por Pagar (OXP) | Alcance v1.15, Modelo v4.3 — Fase 2 (refinamiento continuo) |
-| `dominio/impuestos/` | Impuestos | Alcance v1.5, Modelo v2.0.8 — Listo para desarrollo (F1); multi-país CO/DO/PA + catálogos precargados |
-| `dominio/contabilidad/` | Contabilidad (Nivel 1: Motor de Traducción + Nivel 2: Sistema contable) | Alcance v1.10, Modelo v1.9 — N1 listo para desarrollo (F1); N2 (F2) |
+| `dominio/obligaciones-por-pagar/` | Obligaciones por Pagar (OXP) | Alcance v1.23, Modelo v4.16 — Fase 2 (refinamiento continuo) |
+| `dominio/impuestos/` | Impuestos | Alcance v1.6, Modelo v2.1.0 — Listo para desarrollo (F1); multi-país CO/DO/PA + catálogos precargados |
+| `dominio/contabilidad/` | Contabilidad (Nivel 1: Motor de Traducción + Nivel 2: Sistema contable) | Alcance v1.11, Modelo v1.12 — N1 listo para desarrollo (F1); N2 (F2) |
 | `dominio/terceros/` | Terceros (bodega consolidadora — replanteamiento #31) | Alcance v2.0, Modelo v2.0.2 — listo para desarrollo (F1) |
 | `dominio/estructura-organizacional/` | Estructura Organizacional | Alcance v1.4, Modelo v1.6 — replanteamiento #45 (copia local + diferir + señal), listo para desarrollo (F1) |
 | `compartido/datos-referencia/` | Datos de Referencia (catálogos base del ERP) | Alcance v2.0 — replanteamiento jun-2026 (catálogos como Nuggets + tasas de cambio) |

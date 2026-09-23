@@ -2,8 +2,8 @@
 
 **País:** Colombia (`CO`)
 **Catálogo del modelo:** `CatalogoTributario` (Sección 3.2 de `modelo-dominio.md`)
-**Versión:** 1.4
-**Fecha de actualización:** 2026-07-31
+**Versión:** 1.5
+**Fecha de actualización:** 2026-09-22
 **Archivo de datos:** [`co-catalogo-tributario.json`](co-catalogo-tributario.json)
 
 ---
@@ -29,6 +29,7 @@ Este catálogo precarga la configuración estándar del agregado `CatalogoTribut
   - AUTO_RENTA: Decreto 2201 de 2016.
   - AUTO_RETEFUENTE: Estatuto Tributario art. 9 y normas relacionadas.
   - AUTO_RICA: Acuerdos municipales que designen autorretenedores.
+- **Retención a beneficiarios del exterior:** Estatuto Tributario arts. 406 a 408 (tarifa general del 20 % sobre rentas de fuente nacional pagadas a no residentes) y 592 numeral 2 (retención como impuesto definitivo del beneficiario); convenios para evitar la doble imposición vigentes (tarifas reducidas, ver `co-convenio-de-doble-imposicion`).
 - **IVA por importación de servicios:** Art. 437-2 numeral 3 del Estatuto Tributario — el adquiriente autoliquida el IVA al contratar servicios gravados con proveedores sin residencia ni domicilio en el país; la retención es del 100% del impuesto (art. 437-1).
 - **Sobretasa bomberil:** Ley 1575 de 2012 (Ley General de Bomberos).
 
@@ -38,19 +39,19 @@ Este catálogo precarga la configuración estándar del agregado `CatalogoTribut
 
 | Categoría | Cantidad |
 |---|---|
-| Tributos directos | 7 |
+| Tributos directos | 8 |
 | Autorretenciones | 3 |
 | Tributos autoliquidados | 1 |
 | Clasificaciones tributarias | 8 |
-| Tratamientos explícitos `aplica: true` | 36 |
-| Reglas de localización | 11 |
-| **Total entidades** | **66** |
+| Tratamientos explícitos `aplica: true` | 40 |
+| Reglas de localización | 12 |
+| **Total entidades** | **72** |
 
 ---
 
 ## 4. Tributos
 
-### 4.1. Tributos directos (7)
+### 4.1. Tributos directos (8)
 
 | Código | Nombre | Naturaleza | Carácter retención | Nivel | Factor de tarifa | Dirección fiscal | Tributo padre |
 |---|---|:---:|:---:|:---:|---|:---:|:---:|
@@ -58,11 +59,14 @@ Este catálogo precarga la configuración estándar del agregado `CatalogoTribut
 | `INC` | Impuesto Nacional al Consumo | aditivo | — | nacional | `clasificacion` | ambas | — |
 | `ICA` | Impuesto de Industria y Comercio | aditivo | — | municipal | `actividadEconomica` | ingreso | — |
 | `RETEFUENTE` | Retención en la Fuente | sustractivo | anticipado | nacional | `conceptoPago` | ambas | — |
+| `RETEFUENTE_EXTERIOR` | Retención en la fuente a beneficiarios del exterior | sustractivo | definitivo | nacional | `conceptoPago` | gasto | — |
 | `RIVA` | Retención sobre el IVA | sustractivo | anticipado | nacional | `porcentajeDePadre` | ambas | `IVA` |
 | `RICA` | Retención sobre el ICA | sustractivo | anticipado | municipal | `actividadEconomica` | ambas | — |
 | `SOBRETASA_BOMBERIL` | Sobretasa Bomberil | sustractivo | anticipado | municipal | `porcentajeDePadre` | ambas | `RICA` |
 
 > **Nota:** `ICA` aplica solo en `ingreso` — el sujeto pasivo del ICA es **quien genera el ingreso**; en dirección gasto el comprador solo practica la retención (`RICA`), no autoliquida ICA (coherente con `R61` del alcance). `RICA` permanece en `ambas` (retención: en gasto la empresa retiene al proveedor; en ingreso el cliente le retiene a la empresa).
+
+> **Nota — `RETEFUENTE_EXTERIOR`:** es la retención que la empresa practica a un proveedor **sin residencia ni domicilio fiscal en el país** (arts. 406 a 408 ET). Es un **tributo autónomo**, no un concepto de RETEFUENTE: se activa por condición propia (`RTF-EXT-01`) y en ese mismo caso la retención doméstica se excluye (`RTF-09`) — nunca concurren. Comparte los **códigos de concepto de pago** con RETEFUENTE, de modo que los consumidores no cambian la asignación de sus conceptos: el mismo concepto "honorarios" cae en la tarifa doméstica con un proveedor nacional y en la del exterior (20 %) con un proveedor extranjero. Solo existe en dirección `gasto` (la empresa es la residente). Su carácter es **definitivo**: el beneficiario no declara en el país y la retención es su impuesto (art. 592 num. 2). La tarifa se reduce cuando el país de residencia fiscal del beneficiario tiene un convenio para evitar la doble imposición vigente (`RTF-EXT-02`, catálogo `co-convenio-de-doble-imposicion`). Si la empresa **asume** la retención (el proveedor recibe el total) o se la **descuenta** no lo decide este catálogo: lo decide el sub-dominio consumidor (OXP), que conoce el acuerdo con el proveedor.
 
 ### 4.2. Tributos de provisión (4): autorretenciones y autoliquidados
 
@@ -83,10 +87,10 @@ Este catálogo precarga la configuración estándar del agregado `CatalogoTribut
 |---|---|---|
 | `GRAV_19` | Gravados 19% | IVA, RETEFUENTE, AUTO_RETEFUENTE, RIVA, ICA, RICA |
 | `GRAV_5` | Gravados 5% | IVA, RETEFUENTE, AUTO_RETEFUENTE, RIVA, ICA, RICA |
-| `SERVICIOS_GRAV_19` | Servicios gravados 19% | IVA, RETEFUENTE, AUTO_RETEFUENTE, RIVA, ICA, RICA, IVA_IMPORTACION_SERVICIOS |
-| `SERVICIOS_GRAV_5` | Servicios gravados 5% | IVA, RETEFUENTE, AUTO_RETEFUENTE, RIVA, ICA, RICA, IVA_IMPORTACION_SERVICIOS |
-| `EXCLUIDO` | Excluidos de IVA | RETEFUENTE, AUTO_RETEFUENTE, ICA, RICA |
-| `EXENTO` | Exentos de IVA (tarifa 0%) | IVA, RETEFUENTE, AUTO_RETEFUENTE, ICA, RICA |
+| `SERVICIOS_GRAV_19` | Servicios gravados 19% | IVA, RETEFUENTE, RETEFUENTE_EXTERIOR, AUTO_RETEFUENTE, RIVA, ICA, RICA, IVA_IMPORTACION_SERVICIOS |
+| `SERVICIOS_GRAV_5` | Servicios gravados 5% | IVA, RETEFUENTE, RETEFUENTE_EXTERIOR, AUTO_RETEFUENTE, RIVA, ICA, RICA, IVA_IMPORTACION_SERVICIOS |
+| `EXCLUIDO` | Excluidos de IVA | RETEFUENTE, RETEFUENTE_EXTERIOR, AUTO_RETEFUENTE, ICA, RICA |
+| `EXENTO` | Exentos de IVA (tarifa 0%) | IVA, RETEFUENTE, RETEFUENTE_EXTERIOR, AUTO_RETEFUENTE, ICA, RICA |
 | `INC_8` | Gravados INC 8% | INC |
 | `NO_GRAVADO` | No sujeto a impuestos | — |
 
@@ -98,14 +102,16 @@ Este catálogo precarga la configuración estándar del agregado `CatalogoTribut
 
 Cada entrada declara que el tributo aplica cuando un concepto es clasificado con esa clasificación. Los tratamientos NO listados implican que el tributo no aplica por default; pueden agregarse excepciones vía `origen: personalizado`.
 
-**Total: 36 tratamientos `aplica: true`.** Distribución:
+**Total: 40 tratamientos `aplica: true`.** Distribución:
 
 - GRAV_19: 6 tributos (IVA, RETEFUENTE, AUTO_RETEFUENTE, RIVA, ICA, RICA).
 - GRAV_5: 6 tributos (mismos que GRAV_19, distintas tarifas en `TarifaTributaria`).
-- SERVICIOS_GRAV_19: 7 tributos (los 6 de GRAV_19 + IVA_IMPORTACION_SERVICIOS).
-- SERVICIOS_GRAV_5: 7 tributos (los 6 de GRAV_5 + IVA_IMPORTACION_SERVICIOS).
-- EXCLUIDO: 4 tributos (RETEFUENTE, AUTO_RETEFUENTE, ICA, RICA).
-- EXENTO: 5 tributos (IVA con tarifa 0%, RETEFUENTE, AUTO_RETEFUENTE, ICA, RICA).
+- SERVICIOS_GRAV_19: 8 tributos (los 6 de GRAV_19 + RETEFUENTE_EXTERIOR + IVA_IMPORTACION_SERVICIOS).
+- SERVICIOS_GRAV_5: 8 tributos (los 6 de GRAV_5 + RETEFUENTE_EXTERIOR + IVA_IMPORTACION_SERVICIOS).
+- EXCLUIDO: 5 tributos (RETEFUENTE, RETEFUENTE_EXTERIOR, AUTO_RETEFUENTE, ICA, RICA).
+- EXENTO: 6 tributos (IVA con tarifa 0%, RETEFUENTE, RETEFUENTE_EXTERIOR, AUTO_RETEFUENTE, ICA, RICA).
+
+`RETEFUENTE_EXTERIOR` participa **solo** de las clasificaciones de servicios y de las excluidas/exentas, **no** de `GRAV_19`/`GRAV_5` (bienes gravados): la compra de bienes a un proveedor del exterior es una importación y no está sometida a esta retención. Es el filtro estructural que evita que el tributo llegue a evaluarse sobre mercancías; para los conceptos de bienes que caigan en `EXCLUIDO`/`EXENTO`, el tributo se descarta porque su stream de tarifas no tiene entrada para esos conceptos (motivo `tarifa_no_configurada`).
 - INC_8: 1 tributo (INC).
 - NO_GRAVADO: ninguno.
 
@@ -122,6 +128,7 @@ Cada regla declara qué rol de ubicación de la transacción determina la jurisd
 | `IVA` | sedeEmisora | — |
 | `INC` | sedeEmisora | — |
 | `RETEFUENTE` | sedeEmisora | — |
+| `RETEFUENTE_EXTERIOR` | sedeEmisora | — |
 | `ICA` | lugarEjecucion | sedeEmisora |
 | `RIVA` | sedeEmisora | — |
 | `RICA` | lugarEjecucion | sedeEmisora |
@@ -144,7 +151,7 @@ Cada regla declara qué rol de ubicación de la transacción determina la jurisd
 ### 8.2. `caracterRetencion` y compensación
 
 - **anticipado:** la retención se compensa en la declaración del tributo correspondiente del retenido — es un abono a su propio impuesto (renta, IVA, ICA, o la sobretasa bomberil contra la sobretasa liquidada). Contablemente el retenido la registra como saldo a favor (activo, grupo 17/13), no como gasto.
-- **definitivo:** la retención no es compensable en ninguna declaración del retenido — es su pago final del tributo (caso típico: retenciones a beneficiarios que no declaran en el país). El destino del recaudo (un fondo específico, por ejemplo) **no** determina el carácter: lo determina si el retenido puede descontarla. Ningún tributo precargado de Colombia usa este valor hoy.
+- **definitivo:** la retención no es compensable en ninguna declaración del retenido — es su pago final del tributo (caso típico: retenciones a beneficiarios que no declaran en el país). El destino del recaudo (un fondo específico, por ejemplo) **no** determina el carácter: lo determina si el retenido puede descontarla. En Colombia lo usa `RETEFUENTE_EXTERIOR`: el beneficiario del exterior sin establecimiento permanente no declara renta en el país (art. 592 num. 2) y la retención es su impuesto. Salvedad: el no residente con establecimiento permanente o que opta por declarar sí la acredita — ese caso se gestiona con el perfil del proveedor, no cambia el carácter del tributo.
 - **null:** aplica a tributos aditivos que no son retenciones (IVA, INC, ICA).
 
 > **Nota (validado con consultoría fiscal, jul-2026):** la retención de `SOBRETASA_BOMBERIL` es **anticipado** — se descuenta de la sobretasa liquidada en la declaración del retenido (que acompaña la del ICA en los municipios que la adoptaron, ej. Cali e Ibagué; no se descuenta del ICA, contra el que solo aplica `RICA`). Salvedad: la sobretasa es normativa municipal, no nacional — si algún municipio la definiera como cobro no compensable, ese caso se manejaría como excepción (hoy no se ha evidenciado ninguno).
@@ -170,6 +177,7 @@ Este catálogo declara **qué tributos existen y a qué clasificaciones aplican 
 
 | Versión | Fecha | Cambio |
 |---|---|---|
+| 1.5 | 2026-09-22 | **Retención a beneficiarios del exterior como tributo autónomo `RETEFUENTE_EXTERIOR`** (issue #143; revisión con el contador de la empresa y las consultoras fiscales). Nuevo tributo directo: sustractivo, carácter **definitivo** (primer uso de este valor en CO), nacional, factor `conceptoPago` compartido con RETEFUENTE, dirección `gasto`, sin padre. Tratamientos +4 (`SERVICIOS_GRAV_19`, `SERVICIOS_GRAV_5`, `EXCLUIDO`, `EXENTO`; no en bienes gravados) → 40; regla de localización `sedeEmisora` → 12; total de entidades 66 → 72. La exclusión mutua con RETEFUENTE y la tarifa por convenio viven en `co-condicion-de-aplicacion` v1.3 (`RTF-09`, `RTF-EXT-01/02`); las tarifas en `co-tarifa-tributaria` v1.4 (stream propio, conceptos `EXTERIOR_*` retirados de RETEFUENTE); la lista de convenios en el catálogo nuevo `co-convenio-de-doble-imposicion` v1.0. Nota 8.2 actualizada. Pregunta 7 de la revisión pendiente resuelta (perfil mínimo del exterior); preguntas 8-10 nuevas. |
 | 1.0 | 2026-05-26 | Carga inicial F1: 11 tributos (7 directos + 4 autorretenciones), 6 clasificaciones, 18 tratamientos, 11 reglas de localización. Fuente Estatuto Tributario + Decretos DIAN + leyes municipales. |
 | 1.1 | 2026-07-10 | `ICA.direccionFiscalAplicable` pasa de `ambas` a `ingreso` (issue #93): el sujeto pasivo del ICA es quien genera el ingreso; en gasto el comprador solo practica RICA. Alineado con la implementación (`Cosmos.Impuestos#116`). |
 | 1.4 | 2026-07-31 | **Autoliquidado autónomo + naturaleza `provision` (issues #117/#118, sobre la resolución del #110).** `IVA_IMPORTACION_SERVICIOS` deja de ser hijo del IVA: `factorDeTarifa` pasa de `porcentajeDePadre` a `clasificacion`, `tributoPadre` a vacío, y su tarifa es propia sobre la base (espejo de la del IVA del servicio) — el modelado padre-hijo lo descartaba por `[R14]` justo cuando el proveedor no factura IVA (el único escenario que lo justifica), y además mezclaba las reglas e hijos del IVA real con las del asumido. **Naturaleza `provision`** (modelo v2.0.8) para los 4 tributos de provisión — las autorretenciones pasan de `sustractivo` a `provision`: se reconocen sin afectar el valor a pagar/cobrar. **Clasificaciones nuevas `SERVICIOS_GRAV_19` y `SERVICIOS_GRAV_5`** (el eje de naturaleza del concepto que la norma exige: el autoliquidado solo alcanza servicios; los bienes importados liquidan su IVA en aduana) con matriz completa (22 → 36 tratamientos; 50 → 66 entidades). Pregunta 5 reencuadrada a las exclusiones del art. 476. |
@@ -188,4 +196,7 @@ Preguntas para validación del **equipo de consultores fiscales**:
 4. **Tratamientos para clasificaciones GRAV_*:** ¿Faltan tarifas intermedias (GRAV_8, GRAV_12, etc.)?
 5. **Exclusiones del autoliquidado (art. 476):** la matriz ya declara `IVA_IMPORTACION_SERVICIOS` sobre las clasificaciones de servicios (`SERVICIOS_GRAV_19`/`SERVICIOS_GRAV_5`) — la regla del art. 420 parágrafo 3 es de destino (todo servicio del exterior con usuario en el país está gravado, salvo los excluidos del art. 476). ¿Los servicios excluidos quedan suficientemente cubiertos clasificándolos como `EXCLUIDO`, o hay casos del 476 que requieran clasificación o tratamiento propio?
 6. **¿La autoliquidación se restringe a emisoras responsables de IVA** (`perteneceRegimenIVA = true`), o aplica a cualquier contratante de servicios del exterior?
-7. **Perfil tributario mínimo del proveedor del exterior:** ¿qué datos se exigen para operar con una contraparte sin domicilio fiscal en el país? (El motor rechaza la transacción si la contraparte no tiene perfil.)
+7. **Perfil tributario mínimo del proveedor del exterior — resuelto (v1.5):** tipo de persona, `tieneDomicilioFiscalEnElPais = false` y `paisDeResidenciaFiscal` (obligatorio en ese caso, ver `co-catalogo-de-atributos-fiscales` v1.3). Los demás atributos requeridos se declaran con su valor por defecto (no responsable, no gran contribuyente, etc.). Queda por confirmar con los consultores si el certificado de residencia fiscal debe exigirse como soporte para aplicar la tarifa de convenio.
+8. **`RETEFUENTE_EXTERIOR` — conceptos con tarifa distinta del 20 %:** el stream precarga la tarifa general del art. 408 ET para todos los conceptos aplicables. ¿Qué conceptos tienen tarifa especial (intereses de créditos a más de un año, arrendamiento financiero, transporte internacional, software) y cuál es su base? ¿Aplica el 35 % a beneficiarios en jurisdicciones no cooperantes o de baja imposición (art. 408 parágrafo)? Si sí, requeriría una segunda lista de países y una condición propia.
+9. **`RETEFUENTE_EXTERIOR` — retención asumida:** cuando la empresa asume la retención (el proveedor recibe el total), ¿la base se reajusta tratando la retención asumida como mayor valor del pago (100 pagados → base 125, retención 25) y el gasto de la retención asumida es no deducible? Hoy el motor liquida sobre la base facturada; la asunción la decide OXP.
+10. **Concurrencia con `IVA_IMPORTACION_SERVICIOS`:** confirmar que sobre un mismo servicio del exterior aplican a la vez la retención a beneficiarios del exterior (sustractiva) y el IVA autoliquidado (provisión).

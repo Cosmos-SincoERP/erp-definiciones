@@ -2,7 +2,7 @@
 
 **País:** Panamá (`PA`)
 **Autoridad:** DGI (Dirección General de Ingresos)
-**Catálogo del modelo:** `HomologacionFiscal` (Sección 3.10 — fase F2)
+**Catálogo del modelo:** `HomologacionFiscal` (Sección 3.11 — fase F2)
 **Versión:** 0.1-placeholder
 **Fecha de actualización:** 2026-05-26
 **Archivo de datos:** [`pa-homologacion-fiscal-dgi.json`](pa-homologacion-fiscal-dgi.json)

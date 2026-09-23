@@ -3,7 +3,7 @@
 > **Propósito:** Ilustrar con un caso simétrico cómo el `MotorDeCalculo` evalúa las `CondicionDeAplicacion` ante las dos direcciones fiscales (`gasto` e `ingreso`), evidenciando cómo la dirección fiscal se materializa **explícitamente** en el modelo mediante `direccionFiscalAplicable` en Tributo y Condicion, manteniendo el lenguaje fiscal del dominio (`emisora`/`contraparte` como roles posicionales).
 >
 > **Aplica a:** Modelo de dominio `dominio/impuestos/modelo-dominio.md` v1.3 (con el refinamiento del Cambio 1 — direccionFiscalAplicable explícito).
-> **Referencias:** R02, R09, R11, R30, P2, [D2] refinada, [D9], MotorDeCalculo (Sección 3.12), CondicionDeAplicacion (Sección 3.4), `anexo-configuracion-estandar-co.md`.
+> **Referencias:** R02, R09, R11, R30, P2, [D2] refinada, [D9], MotorDeCalculo (Sección 3.15), CondicionDeAplicacion (Sección 3.4), `anexo-configuracion-estandar-co.md`.
 >
 > **Audiencia:** Equipo de desarrollo, integradores de OXP/CXC, administradores fiscales.
 
@@ -76,6 +76,7 @@ Se modela la **misma transacción** vista desde las dos direcciones:
 - ICA, AUTO_RETEFUENTE, AUTO_RICA, AUTO_RENTA → `ingreso`
 - IVA_IMPORTACION_SERVICIOS → `gasto` (autoliquidación)
 - IVA, INC, RETEFUENTE, RIVA, RICA, SOBRETASA_BOMBERIL → `ambas`
+- RETEFUENTE_EXTERIOR → `gasto` (retención a beneficiarios del exterior: solo cuando la empresa residente es la adquiriente; sustituye a RETEFUENTE cuando la contraparte no tiene domicilio fiscal en el país — `RTF-09` / `RTF-EXT-01`)
 
 **Tarifas vigentes a 2026-05-04** (de `TarifaTributaria`):
 
@@ -311,7 +312,7 @@ Si en el Caso A el concepto fuera un servicio (clasificación `SERVICIOS_GRAV_19
 
 ### 6.6. Persistencia obligatoria en el RegistroTributario
 
-El `RegistroTributario` debe conservar `direccionFiscal` dentro de su `ContextoTransaccional` (Sección 3.11 del modelo). Sin ese dato, los reportes de exógena, los certificados de retención y la clasificación contable de IVA (descontable vs generado) son irreproducibles.
+El `RegistroTributario` debe conservar `direccionFiscal` dentro de su `ContextoTransaccional` (Sección 3.10 del modelo). Sin ese dato, los reportes de exógena, los certificados de retención y la clasificación contable de IVA (descontable vs generado) son irreproducibles.
 
 ---
 
@@ -319,17 +320,17 @@ El `RegistroTributario` debe conservar `direccionFiscal` dentro de su `ContextoT
 
 | Concepto del ejemplo | Referencia en el modelo |
 |---|---|
-| Contrato de entrada del motor | `MotorDeCalculo`, contrato `[D9]`, Sección 3.12 |
+| Contrato de entrada del motor | `MotorDeCalculo`, contrato `[D9]`, Sección 3.15 |
 | `direccionFiscal` campo obligatorio | R30 (alcance) |
 | Dirección fiscal explícita en Tributo y Condicion | `[D2]` refinada, Sección "Decisiones de diseño" |
 | `Tributo.direccionFiscalAplicable` (invariante del agregado) | `CatalogoTributario`, Sección 3.2 — entidad `Tributo` |
 | `Condicion.direccionFiscalAplicable` (direccionalidad de la regla) | `CondicionDeAplicacion`, Sección 3.4 — entidad `Condicion` |
-| Filtrado de tributos por dirección antes de evaluar | Paso 2.a del Motor, Sección 3.12 |
-| Filtrado de condiciones por dirección antes de evaluar | Paso 2.c del Motor, Sección 3.12 |
+| Filtrado de tributos por dirección antes de evaluar | Paso 2.a del Motor, Sección 3.15 |
+| Filtrado de condiciones por dirección antes de evaluar | Paso 2.c del Motor, Sección 3.15 |
 | `tributosAplicablesA(clasificacion)` | `CatalogoTributario`, Sección 3.2 |
 | `tarifaVigenteA(factor, fecha)` | `TarifaTributaria`, Sección 3.3 |
 | `perfilCompletoA(fecha)` | `PerfilTributario`, Sección 3.6 |
-| Persistencia de `direccionFiscal` en el registro | `RegistroTributario.ContextoTransaccional`, Sección 3.11, R24 |
+| Persistencia de `direccionFiscal` en el registro | `RegistroTributario.ContextoTransaccional`, Sección 3.10, R24 |
 | Comportamiento del tributo según dirección | R11, P2 (alcance) |
 | Semántica condicional de `reverseCharge` | VO `Efecto` en `CondicionDeAplicacion`, Sección 3.4 |
 | Autoliquidado y autorretenciones (provisiones) | IVA-IMP-SERV-1 + autorretenciones, `anexo-configuracion-estandar-co.md` |

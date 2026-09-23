@@ -2,9 +2,9 @@
 
 **País:** Colombia (`CO`)
 **Autoridad:** DIAN (Dirección de Impuestos y Aduanas Nacionales)
-**Catálogo del modelo:** `HomologacionFiscal` (Sección 3.10 — fase F2)
-**Versión:** 1.1
-**Fecha de actualización:** 2026-09-21
+**Catálogo del modelo:** `HomologacionFiscal` (Sección 3.11 — fase F2)
+**Versión:** 1.2
+**Fecha de actualización:** 2026-09-22
 **Archivo de datos:** [`co-homologacion-fiscal-dian.json`](co-homologacion-fiscal-dian.json)
 
 ---
@@ -32,7 +32,8 @@ Cada `Equivalencia` es un mapeo `(valorInterno, tributo) → codigoAutoridad` co
 
 | Tributo | Equivalencias |
 |---|:---:|
-| RETEFUENTE | 18 (conceptos de pago — bloque 5XXX) |
+| RETEFUENTE | 16 (conceptos de pago — bloque 5XXX) |
+| RETEFUENTE_EXTERIOR | 2 (pagos al exterior — `5050`, `5051`) |
 | IVA | 7 (clasificaciones IVA + RIVA + bienes/servicios) |
 | INC | 1 |
 | ICA / RICA / AUTO_RICA / SOBRETASA_BOMBERIL | 4 (códigos ICA-0X para reportes ICA municipales) |
@@ -51,7 +52,8 @@ Los códigos `5XXX` son los conceptos oficiales DIAN para el formato F-1001 (Pag
 | `5010` | `SERVICIOS_GENERALES_DECLARANTES` | Servicios generales — declarantes |
 | `5020` | `HONORARIOS_PERSONA_JURIDICA` | Honorarios y comisiones — persona jurídica |
 | `5031` | `ARRENDAMIENTO_INMUEBLES` | Arrendamiento de bienes inmuebles |
-| `5050` | `EXTERIOR_SERVICIOS_TECNICOS` | Pagos al exterior — servicios técnicos |
+| `5050` | `SERVICIOS_TECNICOS` (tributo `RETEFUENTE_EXTERIOR`) | Pagos al exterior — servicios técnicos |
+| `5051` | `REGALIAS` (tributo `RETEFUENTE_EXTERIOR`) | Pagos al exterior — regalías |
 
 ---
 
@@ -127,6 +129,7 @@ La mayoría de equivalencias tienen `fechaDesde: 2017-01-01` porque corresponden
 
 | Versión | Fecha | Cambio |
 |---|---|---|
+| 1.2 | 2026-09-22 | Las dos equivalencias de pagos al exterior (`5050`, `5051`) pasan del tributo RETEFUENTE al tributo **`RETEFUENTE_EXTERIOR`** con los conceptos `SERVICIOS_TECNICOS` y `REGALIAS` (issue #143): los factores `EXTERIOR_*` se retiraron del catálogo de tarifas v1.4. RETEFUENTE 18 → 16. Pregunta 7 nueva. |
 | 1.1 | 2026-09-21 | **Alineación con el catálogo de tarifas v1.3 (issue #133):** `valorInterno` de `5013` → `SERVICIOS_TRANSPORTE_TERRESTRE_PASAJEROS`, `5020` → `HONORARIOS_PERSONA_JURIDICA`, `5021` → `HONORARIOS_PERSONA_NATURAL` (nombres de autoridad ajustados). Sin equivalencias nuevas para los 6 conceptos agregados en tarifas — no se inventan códigos; quedan en la pregunta 1 de §10, junto con la pregunta 6 nueva sobre la correspondencia de los códigos 5XXX con el anexo técnico del F-1001. 35 equivalencias (sin cambio). |
 | 1.0 | 2026-05-26 | Carga inicial F1: 35 equivalencias (18 RETEFUENTE + 7 IVA + 1 INC + 4 ICA + 5 rentas laborales). |
 
@@ -140,3 +143,4 @@ La mayoría de equivalencias tienen `fechaDesde: 2017-01-01` porque corresponden
 4. **Códigos para activos digitales (F-2856):** ¿Cuáles son los códigos específicos para criptomonedas, NFTs, otros activos digitales?
 5. **Códigos para sectores especializados:** ¿Existen códigos específicos para sectores como salud, educación, ESALES?
 6. **Correspondencia con el anexo técnico del F-1001:** los códigos precargados asignan `5001` a compras generales declarantes y `5010` a servicios generales, pero en el anexo técnico del Formato 1001 los conceptos `5001`-`5008` parecen corresponder a salarios, honorarios, comisiones, servicios, arrendamientos, intereses y compras. ¿Los códigos precargados son los del anexo vigente o hay que rehacer la tabla?
+7. **Códigos DIAN de los demás conceptos de `RETEFUENTE_EXTERIOR`:** solo `5050` (servicios técnicos) y `5051` (regalías) tienen equivalencia. ¿Qué códigos usa la exógena para honorarios, consultoría, asistencia técnica, intereses, software y arrendamientos pagados al exterior, y cambian según haya o no convenio de doble imposición?
