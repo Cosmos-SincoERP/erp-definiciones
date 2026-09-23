@@ -22,11 +22,11 @@ El contenido se organiza siguiendo la estructura de los agregados del modelo de 
 
 ## 1. Tributos — CatalogoTributario
 
-Los datos del catálogo `catalogo-tributario-CO` (tributos, clasificaciones, tratamientos y reglas de localización) se migraron a [`datos-precargados/co-catalogo-tributario.json`](datos-precargados/co-catalogo-tributario.json) (v1.4, 2026-07-31). Allí viven las 66 entidades F1 (11 tributos + 8 clasificaciones + 36 tratamientos + 11 reglas de localización). El narrativo de revisión para consultores está en [`datos-precargados/co-catalogo-tributario.md`](datos-precargados/co-catalogo-tributario.md).
+Los datos del catálogo `catalogo-tributario-CO` (tributos, clasificaciones, tratamientos y reglas de localización) se migraron a [`datos-precargados/co-catalogo-tributario.json`](datos-precargados/co-catalogo-tributario.json) (v1.5, 2026-09-22). Allí viven las 72 entidades F1 (12 tributos + 8 clasificaciones + 40 tratamientos + 12 reglas de localización). El narrativo de revisión para consultores está en [`datos-precargados/co-catalogo-tributario.md`](datos-precargados/co-catalogo-tributario.md).
 
 En esta sección queda únicamente el **contexto de diseño**:
 
-- **Tributos directos:** 7 (IVA, INC, ICA, RETEFUENTE, RIVA, RICA, SOBRETASA_BOMBERIL). IVA, INC, ICA son `aditivo`; los demás `sustractivo`. Dependencias padre-hijo: RIVA → IVA, SOBRETASA_BOMBERIL → RICA (RICA es independiente).
+- **Tributos directos:** 8 (IVA, INC, ICA, RETEFUENTE, RETEFUENTE_EXTERIOR, RIVA, RICA, SOBRETASA_BOMBERIL). IVA, INC, ICA son `aditivo`; los demás `sustractivo`. Dependencias padre-hijo: RIVA → IVA, SOBRETASA_BOMBERIL → RICA (RICA es independiente). **RETEFUENTE_EXTERIOR** (`[D17]`) es la retención a beneficiarios sin domicilio fiscal en el país (arts. 406 a 408 ET): tributo autónomo, carácter `definitivo`, dirección `gasto`, factor `conceptoPago` compartido con RETEFUENTE; sustituye a la retención doméstica por condición (`RTF-09` / `RTF-EXT-01`) y toma la tarifa del convenio de doble imposición cuando aplica (`RTF-EXT-02`). Participa solo de las clasificaciones de servicios y de las excluidas/exentas — no de bienes gravados.
 - **Tributos de provisión:** 4, todos con naturaleza **`provision`** (se reconocen sin afectar el valor a pagar/cobrar ni los saldos) — tres autorretenciones (AUTO_RENTA, AUTO_RETEFUENTE, AUTO_RICA), que aplican cuando la empresa es autorretenedora (atributo del `PerfilTributario`) con direccionalidad `ingreso`; y un autoliquidado **autónomo** (IVA_IMPORTACION_SERVICIOS, sin padre ni hijos, tarifa propia sobre la base) con direccionalidad `gasto` — el adquiriente asume el IVA cuando el proveedor de servicios no tiene residencia ni domicilio fiscal en el país (art. 437-2 num. 3).
 - **`codigo` semántico inmutable:** Los códigos de Tributo y Clasificación son inmutables por referencias históricas desde `RegistroTributario` (`[I26]`). Política de modificabilidad de otros atributos diferida a `[PD12]`.
 - **Clasificaciones:** 8 categorías que agrupan bienes y servicios por tratamiento (GRAV_19, GRAV_5, SERVICIOS_GRAV_19, SERVICIOS_GRAV_5, EXCLUIDO, EXENTO, INC_8, NO_GRAVADO). Las `SERVICIOS_*` distinguen la naturaleza de servicio del concepto — el eje que el autoliquidado necesita (solo alcanza servicios; los bienes importados liquidan su IVA en aduana). Las tarifas específicas viven en `TarifaTributaria` — el catálogo solo define qué clasificaciones existen.
@@ -45,9 +45,9 @@ En esta sección queda únicamente el **contexto de diseño** de la configuraci�
 
 ### Reglas de localización
 
-Las 11 reglas de localización se migraron junto con el catálogo tributario a [`datos-precargados/co-catalogo-tributario.json`](datos-precargados/co-catalogo-tributario.json) (sección `reglasLocalizacion`).
+Las 12 reglas de localización se migraron junto con el catálogo tributario a [`datos-precargados/co-catalogo-tributario.json`](datos-precargados/co-catalogo-tributario.json) (sección `reglasLocalizacion`).
 
-**Patrón de diseño:** Tributos nacionales (IVA, INC, RETEFUENTE, RIVA, AUTO_RENTA, AUTO_RETEFUENTE, IVA_IMPORTACION_SERVICIOS) resuelven por `sedeEmisora` sin fallback — la sede de la empresa determina el país. Tributos municipales (ICA, RICA, SOBRETASA_BOMBERIL, AUTO_RICA) resuelven por `lugarEjecucion` con fallback a `sedeEmisora` — donde se presta el servicio o entrega el bien, y si no hay dato del lugar de ejecución, se usa la sede.
+**Patrón de diseño:** Tributos nacionales (IVA, INC, RETEFUENTE, RETEFUENTE_EXTERIOR, RIVA, AUTO_RENTA, AUTO_RETEFUENTE, IVA_IMPORTACION_SERVICIOS) resuelven por `sedeEmisora` sin fallback — la sede de la empresa determina el país. Tributos municipales (ICA, RICA, SOBRETASA_BOMBERIL, AUTO_RICA) resuelven por `lugarEjecucion` con fallback a `sedeEmisora` — donde se presta el servicio o entrega el bien, y si no hay dato del lugar de ejecución, se usa la sede.
 
 ---
 
@@ -58,7 +58,8 @@ Las tarifas tributarias se migraron a [`datos-precargados/co-tarifa-tributaria.j
 En esta sección queda únicamente el **contexto de diseño**:
 
 - **IVA, INC:** 3 + 1 = 4 entradas nacionales por clasificación tributaria.
-- **RETEFUENTE:** 53 conceptos de pago en 71 entradas (Decreto Único 1625/2016 + Decreto 572/2025; 6 conceptos con 4 tramos de cuantía mínima) — compras, servicios, honorarios (persona jurídica 11% / persona natural 10%), arrendamientos, pagos al exterior, etc. Tarifas de 0.1% a 33%. La elección entre pares `_DECLARANTES`/`_NO_DECLARANTES` la hace el consumidor al escoger el concepto de pago.
+- **RETEFUENTE:** 45 conceptos de pago en 63 entradas (Decreto Único 1625/2016 + Decreto 572/2025; 6 conceptos con 4 tramos de cuantía mínima) — compras, servicios, honorarios (persona jurídica 11% / persona natural 10%), arrendamientos, etc. Tarifas de 0.1% a 20%. Los pagos al exterior salieron de este stream en v1.4.
+- **RETEFUENTE_EXTERIOR:** 12 conceptos al 20 % (art. 408 ET) en el stream propio `tarifa-CO-RETEFUENTE_EXTERIOR`, con los mismos códigos de concepto de RETEFUENTE más `SERVICIOS_TECNICOS`, `ASISTENCIA_TECNICA` y `REGALIAS`; sin entradas para compras de bienes (descarte `tarifa_no_configurada`). Tarifa reducida por convenio de doble imposición: catálogo `co-convenio-de-doble-imposicion` (10 % general, por validar). La elección entre pares `_DECLARANTES`/`_NO_DECLARANTES` la hace el consumidor al escoger el concepto de pago.
 - **RIVA:** 15% del IVA generado (porcentajeDePadre).
 - **AUTO_RENTA:** Tarifa base 0.55%. Tarifas sectoriales (0.40% industria, 0.80% comercio, 1.60% otros) pendientes de validación.
 - **AUTO_RETEFUENTE:** Replica tarifas RETEFUENTE; precarga inicial de 3 conceptos.
@@ -73,13 +74,14 @@ Los stream keys usan códigos DIVIPOLA del catálogo `JurisdiccionFiscal` (`tari
 
 ## 3. Condiciones de aplicación — CondicionDeAplicacion
 
-Las condiciones de aplicación se migraron a [`datos-precargados/co-condicion-de-aplicacion.json`](datos-precargados/co-condicion-de-aplicacion.json) (v1.0, 2026-05-26). Allí viven las 32 condiciones precargadas (15 RETEFUENTE + 5 RIVA + 5 RICA + 3 IVA + 4 autorretenciones). El narrativo de revisión está en [`datos-precargados/co-condicion-de-aplicacion.md`](datos-precargados/co-condicion-de-aplicacion.md).
+Las condiciones de aplicación se migraron a [`datos-precargados/co-condicion-de-aplicacion.json`](datos-precargados/co-condicion-de-aplicacion.json) (v1.3, 2026-09-22). Allí viven las 34 condiciones precargadas (16 RETEFUENTE + 2 RETEFUENTE_EXTERIOR + 4 RIVA + 5 RICA + 3 IVA + 4 autorretenciones y autoliquidado). El narrativo de revisión está en [`datos-precargados/co-condicion-de-aplicacion.md`](datos-precargados/co-condicion-de-aplicacion.md).
 
 En esta sección queda únicamente el **contexto de diseño**:
 
 - **Patrón asimétrico:** Las reglas con perspectiva asimétrica (que solo tienen sentido normativo en una dirección) se modelan como dos condiciones independientes — una evaluando `emisora` con dirección fija, otra evaluando `contraparte` con la dirección opuesta. Las reglas bilaterales (Régimen Simple) se mantienen como una sola condición con `direccionFiscalAplicable: ambas`.
 - **Lenguaje fiscal del dominio:** `emisora` y `contraparte` como roles posicionales — no `vendedor`/`comprador` (esos roles se proyectan según dirección).
-- **Distribución por tributo:** RETEFUENTE 15 (8 exclusiones + 6 casos granC compuestos + 1 default), RIVA 5, RICA 5, IVA 3 (2 régimen IVA + 1 territorial Puerto Libre), autorretenciones 4 (una por tributo).
+- **Distribución por tributo:** RETEFUENTE 16 (9 exclusiones — incluida `RTF-09` al proveedor sin domicilio fiscal — + 6 casos granC compuestos + 1 default), RETEFUENTE_EXTERIOR 2 (`RTF-EXT-01` activación por proveedor sin domicilio fiscal; `RTF-EXT-02` tarifa por convenio con el operador `con-convenio-vigente` sobre `paisDeResidenciaFiscal`), RIVA 4, RICA 5, IVA 3 (2 régimen IVA + 1 territorial Puerto Libre), autorretenciones y autoliquidado 4 (una por tributo).
+- **Exclusión mutua doméstica/exterior:** el mismo criterio (`contraparte.tieneDomicilioFiscalEnElPais = false`) excluye RETEFUENTE y activa RETEFUENTE_EXTERIOR — un proveedor recibe una de las dos retenciones, nunca ambas (`[D17]`).
 - **Frontera con `Tratamiento`:** El `Tratamiento` (en `CatalogoTributario`) declara qué tributos aplican por clasificación; la `CondicionDeAplicacion` ajusta por perfil tributario del sujeto. El motor primero filtra por tratamiento y luego evalúa condiciones.
 - **Condición territorial:** `IVA-02-territorial` evalúa `lugarEjecucion.jurisdiccion.tipoRegimen = "puerto-libre"` — opera sobre la jurisdicción resuelta, no sobre atributos del perfil. Materializa la decisión `[D12]` y la invariante `[I15]`. Si en el futuro se incorporan más jurisdicciones con `tipoRegimen: puerto-libre`, esta condición las cubre automáticamente.
 - **Cuantía mínima:** NO es condición. Es atributo de `EntradaDeTarifa` (`cuantiaMinima`). El motor la evalúa después de resolver la tarifa.
@@ -93,11 +95,12 @@ INC e ICA no evalúan calidades tributarias del emisor ni del adquiriente. Su ap
 
 ## 4. Atributos fiscales — CatalogoDeAtributosFiscales
 
-Las 15 definiciones de atributos fiscales se migraron a [`datos-precargados/co-catalogo-de-atributos-fiscales.json`](datos-precargados/co-catalogo-de-atributos-fiscales.json) (v1.0, 2026-05-26). Allí viven los atributos requeridos/opcionales con sus tipos, valoresValidos o catalogoReferencia, vigencias y normas asociadas. El narrativo de revisión está en [`datos-precargados/co-catalogo-de-atributos-fiscales.md`](datos-precargados/co-catalogo-de-atributos-fiscales.md).
+Las 17 definiciones de atributos fiscales se migraron a [`datos-precargados/co-catalogo-de-atributos-fiscales.json`](datos-precargados/co-catalogo-de-atributos-fiscales.json) (v1.3, 2026-09-22). Allí viven los atributos requeridos/opcionales con sus tipos, valoresValidos o catalogoReferencia, vigencias y normas asociadas. El narrativo de revisión está en [`datos-precargados/co-catalogo-de-atributos-fiscales.md`](datos-precargados/co-catalogo-de-atributos-fiscales.md).
 
 En esta sección queda únicamente el **contexto de diseño**:
 
-- **8 atributos requeridos** clasifican el régimen tributario y las calificaciones DIAN principales (gran contribuyente, autorretenedora, agente retenedor IVA, exento retefuente, régimen simple, autorretenedor renta, perteneceRegimenIVA, tipoPersona, regimenTributario).
+- **10 atributos requeridos** clasifican el régimen tributario y las calificaciones DIAN principales (gran contribuyente, autorretenedora, agente retenedor IVA, exento retefuente, régimen simple, autorretenedor renta, perteneceRegimenIVA, tieneDomicilioFiscalEnElPais, tipoPersona, regimenTributario).
+- **`paisDeResidenciaFiscal`** (enum contra el catálogo de países de Datos de Referencia): declarado, obligatorio cuando la contraparte no tiene domicilio fiscal en el país (`[I29]`). Con `tipoPersona` y `tieneDomicilioFiscalEnElPais = false` conforma el perfil mínimo del proveedor del exterior. Lo evalúa `RTF-EXT-02` para la tarifa por convenio.
 - **3 atributos opcionales municipales** (`esAgenteRetenedorICA`, `esAutorretenedorICA`, `esGranContribuyenteICA`) cubren calificaciones por jurisdicción municipal. Su contextualización por municipio (una empresa puede ser autorretenedora de ICA en Bogotá pero no en Medellín) es pendiente de refinamiento por consultores.
 - **3 atributos opcionales con `catalogoReferencia`** (`inscripcionZonaFranca`, `inscripcionMonopolio`, `inscripcionPuertoLibre`) referencian al `CatalogoDeRegimenesEspeciales` filtrado por `tipo`. Soportan el patrón D13 (regímenes empresariales por inscripción).
 - **Retirado:** `actividadEconomica` ya no es atributo del catálogo. Tras `[D14]`, se modela como entidad `ActividadEconomicaRegistrada` dentro del `PerfilTributario`, con multiplicidad por jurisdicción/clasificación. La precarga de códigos CIIU vive en `co-ciiu.json`.
@@ -117,6 +120,14 @@ En esta sección queda únicamente el **contexto de diseño**:
 
 ---
 
+## 5 bis. Convenios para evitar la doble imposición — ConvenioDeDobleImposicion
+
+Los convenios vigentes de Colombia se precargan en [`datos-precargados/co-convenio-de-doble-imposicion.json`](datos-precargados/co-convenio-de-doble-imposicion.json) (v1.0, 2026-09-22): 15 convenios (España, Chile, Suiza, Canadá, México, Corea del Sur, India, Portugal, República Checa, Reino Unido, Italia, Francia, Japón, Emiratos Árabes Unidos, Uruguay) con tarifa general del 10 % por regla de negocio acordada con la consultoría fiscal — todos `porValidar` (lista, fechas y tarifas por concepto). El narrativo está en [`datos-precargados/co-convenio-de-doble-imposicion.md`](datos-precargados/co-convenio-de-doble-imposicion.md).
+
+**Contexto de diseño:** agregado propio por país (`[D17]`, Sección 3.9 del modelo), consultado por el motor cuando la condición `RTF-EXT-02` evalúa `paisDeResidenciaFiscal` con `con-convenio-vigente` y resuelve la `TarifaAlternativa` de forma convenio (tarifa convenida por concepto → general → sin cambio; cero exime). No se precargan convenios firmados sin entrada en vigor confirmada; la Decisión 578 de la Comunidad Andina queda pendiente con la consultoría (`[PD13]`).
+
+---
+
 ## 6. Formatos fiscales — FormatoFiscal
 
 Los formatos fiscales se migraron a [`datos-precargados/co-formato-fiscal.json`](datos-precargados/co-formato-fiscal.json) (10 formatos: 8 DIAN + 1 municipal + 1 certificado). La homologación oficial DIAN se migra a [`datos-precargados/co-homologacion-fiscal-dian.json`](datos-precargados/co-homologacion-fiscal-dian.json) (35 equivalencias).
@@ -133,6 +144,7 @@ Los formatos fiscales se migraron a [`datos-precargados/co-formato-fiscal.json`]
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
+| 1.5 | Septiembre 2026 | **Retención a beneficiarios del exterior y convenios de doble imposición (issue #143, `[D17]`).** Nuevo tributo directo `RETEFUENTE_EXTERIOR` (12 tributos, 40 tratamientos, 12 reglas — catálogo v1.5); stream propio de 12 conceptos al 20 % y retiro de los `EXTERIOR_*` de RETEFUENTE (tarifas v1.4); condiciones `RTF-09`, `RTF-EXT-01/02` (34 condiciones — v1.3); atributo `paisDeResidenciaFiscal` (17 atributos — v1.3); nueva Sección 5 bis con el catálogo de convenios (v1.0). Cifras de secciones 1, 3 y 4 actualizadas (traían conteos de mayo). |
 | 1.0 | Marzo 2026 | Versión inicial: 11 tributos, 6 clasificaciones, condiciones de aplicación completas, 13 atributos fiscales, formatos DIAN y municipales. |
 | 1.1 | Mayo 2026 | Cambio 3 — Sub-cambio 3.4: nueva Sección 5 con regímenes empresariales precargados (zonas francas, monopolios departamentales, Puerto Libre empresarial). 3 atributos fiscales nuevos en Sección 4 (`inscripcionZonaFranca`, `inscripcionMonopolio`, `inscripcionPuertoLibre`) con `catalogoReferencia`. Renumeración de Sección 5 (Formatos) a Sección 6. `[D13]` `[I16]`. |
 | 1.4 | Julio 2026 | **Autoliquidado autónomo + naturaleza `provision` (issues #117/#118).** IVA_IMPORTACION_SERVICIOS deja de ser hijo del IVA (el modelado padre-hijo lo descartaba por `[R14]` cuando el proveedor no facturaba IVA): tributo autónomo con tarifa propia sobre la base (espejo 19%/5%). Los 4 tributos de provisión pasan a naturaleza `provision` (modelo v2.0.8). Clasificaciones nuevas `SERVICIOS_GRAV_19`/`SERVICIOS_GRAV_5` con matriz completa (22 → 36 tratamientos, 66 entidades). `RIVA-03` (sustitución) retirada de condiciones — cada tributo se activa por sus propias condiciones. |

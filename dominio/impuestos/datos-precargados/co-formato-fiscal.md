@@ -1,7 +1,7 @@
 # Catálogo Formatos Fiscales — Colombia
 
 **País:** Colombia (`CO`)
-**Catálogo del modelo:** `FormatoFiscal` (Sección 3.11 — fase F2)
+**Catálogo del modelo:** `FormatoFiscal` (Sección 3.12 — fase F2)
 **Versión:** 1.0
 **Fecha de actualización:** 2026-05-26
 **Archivo de datos:** [`co-formato-fiscal.json`](co-formato-fiscal.json)

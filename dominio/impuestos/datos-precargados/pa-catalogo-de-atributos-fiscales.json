@@ -1,8 +1,8 @@
 {
   "pais": "PA",
   "catalogo": "CatalogoDeAtributosFiscales",
-  "version": "1.0",
-  "fechaActualizacion": "2026-05-26",
+  "version": "1.1",
+  "fechaActualizacion": "2026-09-22",
   "fuente": "Código Fiscal Panamá + DGI (registro RUC, designaciones de retención) + Decreto Ley 18 de 1948 (Zona Libre de Colón) + Ley 41 de 2004 (AEEPP Panamá-Pacífico) + Decreto Ley 6 de 1998 (Ciudad del Saber).",
   "entradas": [
     {
@@ -95,6 +95,19 @@
       },
       "requerido": false,
       "vigencia": { "fechaDesde": "1998-02-10", "fechaHasta": null },
+      "origen": "estandar"
+    },
+    {
+      "nombre": "paisDeResidenciaFiscal",
+      "descripcion": "País de residencia fiscal de la entidad (código ISO 3166-1 alfa-2 del catálogo de países de Datos de Referencia). Es un dato DECLARADO, no se deriva del país de la identificación. Determina si aplica un convenio para evitar la doble imposición (condición ISR-03-cdi con operador con-convenio-vigente) y la tarifa reducida del ISR sobre pagos al exterior. El certificado de residencia fiscal que respalda el dato se registra como fuente de autoridad del atributo.",
+      "tipo": "enum",
+      "valoresValidos": null,
+      "catalogoReferencia": {
+        "agregado": "Pais",
+        "filtroTipo": null
+      },
+      "requerido": false,
+      "vigencia": { "fechaDesde": "2011-01-01", "fechaHasta": null },
       "origen": "estandar"
     }
   ]

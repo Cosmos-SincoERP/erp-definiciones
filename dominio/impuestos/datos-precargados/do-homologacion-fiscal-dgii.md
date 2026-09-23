@@ -2,7 +2,7 @@
 
 **País:** República Dominicana (`DO`)
 **Autoridad:** DGII (Dirección General de Impuestos Internos)
-**Catálogo del modelo:** `HomologacionFiscal` (Sección 3.10 — fase F2)
+**Catálogo del modelo:** `HomologacionFiscal` (Sección 3.11 — fase F2)
 **Versión:** 1.0
 **Fecha de actualización:** 2026-05-26
 **Archivo de datos:** [`do-homologacion-fiscal-dgii.json`](do-homologacion-fiscal-dgii.json)

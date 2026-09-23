@@ -2,8 +2,8 @@
 
 **País:** Panamá (`PA`)
 **Catálogo del modelo:** `CatalogoDeAtributosFiscales` (Sección 3.5)
-**Versión:** 1.0
-**Fecha de actualización:** 2026-05-26
+**Versión:** 1.1
+**Fecha de actualización:** 2026-09-22
 **Archivo de datos:** [`pa-catalogo-de-atributos-fiscales.json`](pa-catalogo-de-atributos-fiscales.json)
 
 ---
@@ -16,7 +16,7 @@ Atributos del `PerfilTributario` que el motor evalúa para resolver tratamiento 
 
 ## 2. Cobertura
 
-**8 atributos precargados.**
+**9 atributos precargados.**
 
 | Nombre | Tipo | Requerido | Notas |
 |---|:---:|:---:|---|
@@ -28,6 +28,7 @@ Atributos del `PerfilTributario` que el motor evalúa para resolver tratamiento 
 | `inscripcionZonaLibreColon` | enum + catalogoReferencia | No | Filtro `zona-economica-especial` + subtipo `zona-libre-colon` |
 | `inscripcionAEEPP` | enum + catalogoReferencia | No | Filtro `zona-economica-especial` + subtipo `panama-pacifico` |
 | `inscripcionCiudadDelSaber` | enum + catalogoReferencia | No | Filtro `zona-economica-especial` + subtipo `ciudad-del-saber` |
+| `paisDeResidenciaFiscal` | enum + catalogoReferencia | No | Catálogo de países de Datos de Referencia (ISO 3166-1 alfa-2). Declarado; lo evalúa `ISR-03-cdi` con `con-convenio-vigente` |
 
 ---
 
@@ -47,7 +48,11 @@ A diferencia de CO o DR, en PA no todas las empresas están automáticamente reg
 
 Igual que en CO/DR, el RUC vive en el sub-dominio Terceros como `IdentificacionFiscal`. Aquí lo proyectamos para que el motor pueda consultarlo en condiciones (validar formato, verificar contra listas DGI).
 
-### 3.4. Atributos NO incluidos (vs CO)
+### 3.4. `paisDeResidenciaFiscal`
+
+País de residencia fiscal de la entidad, declarado (no se deriva del país de la identificación). Es el dato que la condición `ISR-03-cdi` evalúa con el operador `con-convenio-vigente` contra el catálogo `pa-convenio-de-doble-imposicion` para aplicar la tarifa reducida del ISR a beneficiarios del exterior. Panamá no tiene el atributo `tieneDomicilioFiscalEnElPais` de Colombia: la territorialidad del ISR se resuelve por la condición `ISR-02-territorial` (fuente de la renta), no por el domicilio del beneficiario, así que aquí el país de residencia no es condicionalmente obligatorio; se declara cuando se quiera aplicar un convenio. El certificado de residencia fiscal se registra como fuente de autoridad del atributo.
+
+### 3.5. Atributos NO incluidos (vs CO)
 
 - `perteneceRegimenSimple` — PA no tiene equivalente directo.
 - `esGranContribuyente` — la designación de Gran Contribuyente DGI no afecta tarifas transaccionales (solo plazos de pago y declaraciones).
@@ -58,6 +63,7 @@ Igual que en CO/DR, el RUC vive en el sub-dominio Terceros como `IdentificacionF
 
 | Versión | Fecha | Cambio |
 |---|---|---|
+| 1.1 | 2026-09-22 | Nuevo atributo **`paisDeResidenciaFiscal`** (enum contra el catálogo de países de Datos de Referencia) para la tarifa por convenio de doble imposición de `ISR-03-cdi` (issue #143; cierra el #138). 8 → 9 atributos. Nota 3.4 nueva; 3.4 anterior → 3.5. |
 | 1.0 | 2026-05-26 | Carga inicial F1: 8 atributos (3 requeridos + 5 opcionales, 3 de los cuales con `catalogoReferencia`). |
 
 ---

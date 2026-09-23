@@ -2,13 +2,14 @@
   "pais": "CO",
   "catalogo": "HomologacionFiscal",
   "autoridad": "DIAN",
-  "version": "1.1",
-  "fechaActualizacion": "2026-09-21",
+  "version": "1.2",
+  "fechaActualizacion": "2026-09-22",
   "fuente": "DIAN — Anexos técnicos de las Resoluciones de información exógena (Res. 162/2023, Res. 000233/2026). Códigos de conceptos, tributos, tarifas y tipos de operación según especificaciones DIAN.",
   "estructura": {
     "totalEquivalencias": 35,
     "porTributo": {
-      "RETEFUENTE": 18,
+      "RETEFUENTE": 16,
+      "RETEFUENTE_EXTERIOR": 2,
       "IVA": 8,
       "ICA": 4,
       "RENTA_LABORAL": 5
@@ -31,8 +32,8 @@
     { "valorInterno": "ARRENDAMIENTO_MUEBLES", "tributo": "RETEFUENTE", "codigoAutoridad": "5030", "nombreAutoridad": "Arrendamiento de bienes muebles", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
     { "valorInterno": "ARRENDAMIENTO_INMUEBLES", "tributo": "RETEFUENTE", "codigoAutoridad": "5031", "nombreAutoridad": "Arrendamiento de bienes inmuebles", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
     { "valorInterno": "RENDIMIENTOS_FINANCIEROS", "tributo": "RETEFUENTE", "codigoAutoridad": "5040", "nombreAutoridad": "Rendimientos financieros", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
-    { "valorInterno": "EXTERIOR_SERVICIOS_TECNICOS", "tributo": "RETEFUENTE", "codigoAutoridad": "5050", "nombreAutoridad": "Pagos al exterior — servicios técnicos", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
-    { "valorInterno": "EXTERIOR_REGALIAS", "tributo": "RETEFUENTE", "codigoAutoridad": "5051", "nombreAutoridad": "Pagos al exterior — regalías", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "SERVICIOS_TECNICOS", "tributo": "RETEFUENTE_EXTERIOR", "codigoAutoridad": "5050", "nombreAutoridad": "Pagos al exterior — servicios técnicos", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
+    { "valorInterno": "REGALIAS", "tributo": "RETEFUENTE_EXTERIOR", "codigoAutoridad": "5051", "nombreAutoridad": "Pagos al exterior — regalías", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
 
     { "valorInterno": "GRAV_19", "tributo": "IVA", "codigoAutoridad": "01", "nombreAutoridad": "IVA al 19%", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },
     { "valorInterno": "GRAV_5", "tributo": "IVA", "codigoAutoridad": "02", "nombreAutoridad": "IVA al 5%", "vigencia": { "fechaDesde": "2017-01-01", "fechaHasta": null }, "origen": "estandar" },

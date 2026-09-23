@@ -55,7 +55,7 @@ Las 11 condiciones PA se migraron a [`datos-precargados/pa-condicion-de-aplicaci
 
 **Contexto de diseño:**
 - **Régimen territorial de renta:** condición `ISR-02-territorial` materializa que pagos al exterior por servicios prestados desde el extranjero NO están sujetos a ISR (principio territorial panameño).
-- **CDIs:** condición `ISR-03-cdi` reconoce tarifas reducidas por Convenios para Evitar Doble Imposición. Tabla CDI pendiente de modelar.
+- **Convenios para evitar la doble imposición:** la condición `ISR-03-cdi` (condiciones v1.1) aplica la tarifa reducida cuando `contraparte.paisDeResidenciaFiscal` tiene convenio vigente (operador `con-convenio-vigente`, efecto `cambiarTarifa` con `tarifaAlternativa` de forma convenio). La lista vive en [`datos-precargados/pa-convenio-de-doble-imposicion.json`](datos-precargados/pa-convenio-de-doble-imposicion.json) (v1.0: 17 convenios según la DGI, **sin tarifas convenidas** — la condición no modifica tarifas hasta que la consultoría las valide). Agregado `ConvenioDeDobleImposicion` (`[D17]`, Sección 3.9 del modelo). Requiere el atributo `paisDeResidenciaFiscal` (atributos v1.1, 9 atributos).
 - **Exoneraciones por áreas económicas:** condiciones `ITBMS-02-zlc` (ZLC) y `ITBMS-03-aeepp` (AEEPP) — alcance específico pendiente de refinamiento con consultores.
 
 ---
@@ -96,6 +96,7 @@ Propuesta inicial migrada a [`datos-precargados/pa-formato-fiscal.json`](datos-p
 
 | Versión | Fecha | Descripción |
 |---------|-------|-------------|
+| 1.3 | Septiembre 2026 | **`ISR-03-cdi` migrada al mecanismo común de convenios (issue #143; cierra el #138):** operador `con-convenio-vigente` sobre `paisDeResidenciaFiscal`, efecto `cambiarTarifa` por convenio; catálogo nuevo `pa-convenio-de-doble-imposicion` v1.0 (17 países, tarifas por validar); atributo `paisDeResidenciaFiscal` (atributos v1.1). Sección 3 actualizada. |
 | 1.0 | Marzo 2026 | Versión inicial: 4 tributos, 5 clasificaciones, condiciones simples, 2 atributos fiscales. Formatos DGI pendientes. |
 | 1.1 | Mayo 2026 | Cambio 3 — Sub-cambio 3.4: nueva Sección 5 con regímenes empresariales precargados (Zona Libre de Colón, AEEPP Panamá-Pacífico, Ciudad del Saber). 3 atributos fiscales nuevos en Sección 4 (`inscripcionZonaLibreColon`, `inscripcionAEEPP`, `inscripcionCiudadDelSaber`) con `catalogoReferencia`. Renumeración de Sección 5 (Formatos) a Sección 6. `[D13]` `[I16]`. |
 | 1.2 | Julio 2026 | Contexto de RITBMS alineado a la resolución del issue #109: 50% del **ITBMS causado** (Decreto Ejecutivo 470 de 2015), `porcentajeDePadre` con padre ITBMS — hereda su ciclo de vida; variantes del 100% (Estado-servicios, no residentes) anotadas como pendientes. Referencias a catálogo PA v1.2 y tarifas v1.1 (12 entradas tras consolidar el stream RITBMS). |

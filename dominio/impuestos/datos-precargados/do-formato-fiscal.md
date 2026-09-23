@@ -1,7 +1,7 @@
 # Catálogo Formatos Fiscales — República Dominicana
 
 **País:** República Dominicana (`DO`)
-**Catálogo del modelo:** `FormatoFiscal` (Sección 3.11 — fase F2)
+**Catálogo del modelo:** `FormatoFiscal` (Sección 3.12 — fase F2)
 **Versión:** 1.0
 **Fecha de actualización:** 2026-05-26
 **Archivo de datos:** [`do-formato-fiscal.json`](do-formato-fiscal.json)

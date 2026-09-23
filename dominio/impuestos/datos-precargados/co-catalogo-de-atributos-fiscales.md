@@ -2,8 +2,8 @@
 
 **País:** Colombia (`CO`)
 **Catálogo del modelo:** `CatalogoDeAtributosFiscales` (Sección 3.5 de `modelo-dominio.md`)
-**Versión:** 1.2
-**Fecha de actualización:** 2026-07-31
+**Versión:** 1.3
+**Fecha de actualización:** 2026-09-22
 **Archivo de datos:** [`co-catalogo-de-atributos-fiscales.json`](co-catalogo-de-atributos-fiscales.json)
 
 ---
@@ -16,6 +16,7 @@ Cierra el contrato entre:
 - `PerfilTributario` (consumidor: instancia atributos con valores).
 - `CondicionDeAplicacion` (consumidor: evalúa expresiones contra atributos).
 - `CatalogoDeRegimenesEspeciales` (referenciado: cuando un atributo tiene `catalogoReferencia`).
+- Catálogo de países de Datos de Referencia (referenciado por `paisDeResidenciaFiscal`; es la única referencia a un catálogo fuera del sub-dominio).
 
 ---
 
@@ -35,9 +36,9 @@ Cierra el contrato entre:
 |---|---|
 | Atributos booleanos (calificaciones DIAN/municipales y domicilio fiscal) | 10 |
 | Atributos enum simples | 2 (`regimenTributario`, `tipoPersona`) |
-| Atributos enum con `catalogoReferencia` | 3 (zona franca, monopolio, puerto libre empresarial) |
+| Atributos enum con `catalogoReferencia` | 4 (zona franca, monopolio, puerto libre empresarial, país de residencia fiscal) |
 | Atributos string libres | 0 |
-| **Total** | **16** atributos en la precarga F1 |
+| **Total** | **17** atributos en la precarga F1 |
 
 ---
 
@@ -51,6 +52,7 @@ Cierra el contrato entre:
 | `esAutorretenedora` | boolean | Sí | — | 2017-01-01 |
 | `esAgenteRetenedorIVA` | boolean | Sí | — | 2017-01-01 |
 | `tieneDomicilioFiscalEnElPais` | boolean | Sí | — | 2017-01-01 |
+| `paisDeResidenciaFiscal` | enum | Condicional | Catálogo de países de Datos de Referencia (ISO 3166-1 alfa-2) | 2017-01-01 |
 | `esExentoRetefuente` | boolean | Sí | — | 2017-01-01 |
 | `perteneceRegimenSimple` | boolean | Sí | — | 2019-01-01 |
 | `esAutorretenedorRenta` | boolean | Sí | — | 2017-01-01 |
@@ -70,26 +72,30 @@ Cierra el contrato entre:
 
 Los 10 atributos requeridos (`regimenTributario`, `perteneceRegimenIVA`, `esGranContribuyente`, `esAutorretenedora`, `esAgenteRetenedorIVA`, `tieneDomicilioFiscalEnElPais`, `esExentoRetefuente`, `perteneceRegimenSimple`, `esAutorretenedorRenta`, `tipoPersona`) deben estar presentes en el `PerfilTributario` de cualquier entidad colombiana. Los 6 opcionales solo aplican cuando son relevantes para la entidad. El perfil mínimo exigible a una contraparte **sin domicilio fiscal en el país** (proveedor del exterior) está en definición con los consultores fiscales — ver la pregunta 7 de la revisión pendiente del catálogo tributario.
 
-### 5.4. `tieneDomicilioFiscalEnElPais` y la autoliquidación del IVA
+### 5.2. `tieneDomicilioFiscalEnElPais` y la autoliquidación del IVA
 
 Declara si la entidad tiene residencia, domicilio fiscal **o registro ante la autoridad fiscal del país** (art. 437-2 numeral 3 del Estatuto Tributario). Es el disparador de `IVA_IMPORTACION_SERVICIOS`: cuando la contraparte de una compra de servicios no lo tiene, no factura IVA y la empresa lo asume. **No se deriva del país de la identificación:** una entidad con identificación extranjera puede tener domicilio fiscal en el país, y viceversa — por eso es un atributo declarado del perfil, no un dato calculado. **El prestador del exterior registrado ante la DIAN para el IVA** (caso de los servicios digitales) cuenta como con domicilio fiscal para estos efectos: factura su propio IVA y el autoliquidado no aplica.
 
-### 5.2. Diferencia entre `valoresValidos` y `catalogoReferencia`
+### 5.3. Diferencia entre `valoresValidos` y `catalogoReferencia`
 
 - **`valoresValidos`** (enum corto): lista cerrada de valores embebida en la definición. Útil para enums pequeños y estables (`Ordinario`, `Simple`, etc.).
 - **`catalogoReferencia`** (enum largo): el valor del atributo se valida contra otro agregado (típicamente `CatalogoDeRegimenesEspeciales`) filtrado por una categoría (`tipo`). Útil cuando los valores válidos son muchos y cambian (121 zonas francas, 33 monopolios, etc.).
 
-### 5.3. `actividadEconomica` retirada como atributo
+### 5.4. `actividadEconomica` retirada como atributo
 
 En versiones anteriores del modelo, la actividad económica era un atributo simple. Tras la decisión `[D14]`, pasa a modelarse como **entidad propia** `ActividadEconomicaRegistrada` dentro del `PerfilTributario`, con multiplicidad por jurisdicción y/o clasificación tributaria. NO se lista aquí porque ya no es un atributo del catálogo.
 
-### 5.4. Atributos municipales (ICA)
+### 5.5. Atributos municipales (ICA)
 
 Los tres atributos opcionales `esAgenteRetenedorICA`, `esAutorretenedorICA`, `esGranContribuyenteICA` se evalúan contextualmente. Una empresa puede ser autorretenedora de ICA en Bogotá pero no en Medellín. El modelo actual los declara como atributos simples del perfil — su contextualización por jurisdicción podría requerir refinamiento futuro (sugerencia: matriz `(municipio, atributo) → valor`).
 
-### 5.5. Vigencia desde
+### 5.6. Vigencia desde
 
 La vigencia desde corresponde a la entrada en vigor de la norma que crea o regula el atributo. Algunos atributos coinciden con la entrada de IVA moderno (2017-01-01); otros tienen fechas específicas por marco normativo.
+
+### 5.7. `paisDeResidenciaFiscal`: declarado y obligatorio para el proveedor sin domicilio fiscal
+
+País de residencia fiscal de la entidad, como código del catálogo de países de Datos de Referencia (ISO 3166-1 alfa-2). Es un dato **declarado**: no se deriva del país de la identificación (una sucursal extranjera con NIT colombiano reside fiscalmente en Colombia; una sociedad con identificación tributaria local puede residir en el exterior). En el catálogo lleva `requerido: false`, pero el `PerfilTributario` lo exige cuando `tieneDomicilioFiscalEnElPais = false` (invariante `[I29]` del modelo): es el **perfil mínimo del proveedor del exterior** — tipo de persona, sin domicilio fiscal en el país y país de residencia fiscal. Lo usa la condición `RTF-EXT-02` con el operador `con-convenio-vigente` para aplicar la tarifa de convenio de doble imposición a la retención a beneficiarios del exterior. El certificado de residencia fiscal que respalda el dato se registra como fuente de autoridad del atributo.
 
 ---
 
@@ -97,6 +103,7 @@ La vigencia desde corresponde a la entrada en vigor de la norma que crea o regul
 
 | Versión | Fecha | Cambio |
 |---|---|---|
+| 1.3 | 2026-09-22 | Nuevo atributo **`paisDeResidenciaFiscal`** (enum contra el catálogo de países de Datos de Referencia; `requerido: false` con obligatoriedad condicional cuando `tieneDomicilioFiscalEnElPais = false`, invariante `[I29]`) para la tarifa por convenio de doble imposición de la retención a beneficiarios del exterior (issue #143). 16 → 17 atributos. Notas 5.x renumeradas (había dos "5.4"); nota 5.7 nueva. Pregunta 6 nueva. |
 | 1.0 | 2026-05-26 | Carga inicial F1: 15 atributos (9 booleanos + 2 enum simples + 3 enum con catálogo referenciado + 1 enum tipo persona). |
 | 1.2 | 2026-07-31 | Semántica de `tieneDomicilioFiscalEnElPais` precisada (issues #117/#118): incluye el **registro ante la autoridad fiscal del país** — el prestador del exterior registrado ante la DIAN factura su propio IVA y el autoliquidado no aplica. |
 | 1.1 | 2026-07-31 | Nuevo atributo requerido **`tieneDomicilioFiscalEnElPais`** (boolean, art. 437-2 num. 3 ET) — disparador de la autoliquidación del IVA en importación de servicios (issue #110): reemplaza el criterio legado `esAgenteRetenedorIVA` en las condiciones de `IVA_IMPORTACION_SERVICIOS` (antes `AUTO_RIVA`). Se corrige la descripción de `esAgenteRetenedorIVA` (ya no menciona la activación del autoliquidado). Total 15 → 16 atributos. |
@@ -112,3 +119,4 @@ Preguntas para validación del **equipo de consultores fiscales**:
 3. **`regimenTributario` con valor `NoResponsable`:** ¿Es correcto este enum, o conviene `NoObligado` u otra denominación más alineada con DIAN?
 4. **Vigencia desde 2017-01-01 para tantos atributos:** ¿Es la fecha correcta, o conviene rastrear el marco normativo específico de cada uno?
 5. **¿`tipoPersona` debería ser atributo de Terceros (sub-dominio) en vez de atributo fiscal?** El sub-dominio Terceros ya modela tipo de persona. Aquí lo declaramos para que el motor lo pueda evaluar; podría leerse de Terceros vía integración.
+6. **Certificado de residencia fiscal:** ¿la tarifa reducida por convenio exige que el proveedor aporte certificado de residencia fiscal vigente? Si sí, ¿basta registrarlo como fuente de autoridad de `paisDeResidenciaFiscal`, o la condición debe exigir la evidencia para aplicar el convenio?

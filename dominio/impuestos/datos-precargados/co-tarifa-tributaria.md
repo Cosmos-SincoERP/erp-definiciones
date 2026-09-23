@@ -2,8 +2,8 @@
 
 **País:** Colombia (`CO`)
 **Catálogo del modelo:** `TarifaTributaria` (Sección 3.3 de `modelo-dominio.md`) — agregado con múltiples streams (uno por jurisdicción × tributo).
-**Versión:** 1.3
-**Fecha de actualización:** 2026-09-21
+**Versión:** 1.4
+**Fecha de actualización:** 2026-09-22
 **Archivo de datos:** [`co-tarifa-tributaria.json`](co-tarifa-tributaria.json)
 
 ---
@@ -13,7 +13,7 @@
 Precarga todas las **tarifas tributarias** de Colombia organizadas por stream del agregado `TarifaTributaria`. Cada stream identifica una tabla de tarifas de un tributo específico en una jurisdicción específica. El motor de cálculo busca la tarifa aplicable usando el `factorDeTarifa` declarado en el `CatalogoTributario`:
 
 - IVA, INC: factor = clasificación (`GRAV_19`, `GRAV_5`, `EXENTO`).
-- RETEFUENTE, AUTO_RETEFUENTE: factor = concepto de pago (`COMPRAS_GENERALES_DECLARANTES`, `HONORARIOS_PERSONA_JURIDICA`, etc.).
+- RETEFUENTE, RETEFUENTE_EXTERIOR, AUTO_RETEFUENTE: factor = concepto de pago (`COMPRAS_GENERALES_DECLARANTES`, `HONORARIOS_PERSONA_JURIDICA`, etc.). Los tres comparten los códigos de concepto: el tributo que aplica lo deciden las condiciones (proveedor nacional → RETEFUENTE; proveedor sin domicilio fiscal en el país → RETEFUENTE_EXTERIOR), no el concepto.
 - ICA, RICA, AUTO_RICA: factor = código CIIU de actividad económica (`4711`, `6201`, etc.).
 - RIVA, SOBRETASA_BOMBERIL: porcentaje sobre el tributo padre (sin factor).
 - IVA_IMPORTACION_SERVICIOS: factor = clasificación de servicios (`SERVICIOS_GRAV_19`, `SERVICIOS_GRAV_5`) — tarifa propia sobre la base, espejo de la tarifa de IVA del servicio.
@@ -25,6 +25,7 @@ Precarga todas las **tarifas tributarias** de Colombia organizadas por stream de
 
 - **IVA, INC:** Estatuto Tributario Nacional (Libro Tercero, arts. 420 a 513) + Reformas Tributarias 2016, 2018, 2022.
 - **RETEFUENTE:** Decreto Único Reglamentario 1625 de 2016 (compilación): art. 1.2.4.3.1 (honorarios y comisiones — Decreto 260/2001 art. 1; software — Decreto 2521/2011 para licenciamiento y Decreto 2499/2012 para desarrollo, diseño web y consultoría informática), art. 1.2.4.4.1 (cuantía mínima de servicios), art. 1.2.4.4.6 (transporte aéreo y marítimo de pasajeros — Decreto 399/1987), art. 1.2.4.4.12 (servicios integrales de salud por IPS — Decreto 2271/2009), art. 1.2.4.9.1 (cuantía mínima de compras y construcción — Decreto 1512/1985), art. 1.2.4.10.3 (consultoría en ingeniería — Decreto 1141/2010); Estatuto Tributario arts. 392, 398 y 399. **Cuantías mínimas:** Decreto 572 de 2025 (arts. 2-8) rige desde 2025-06-01; suspendido provisionalmente por el Consejo de Estado con efectos del 2026-05-08 al 2026-06-30 (volvieron las cuantías previas); reactivado desde 2026-07-01 — ver §6.3. Fuente secundaria de contraste: tabla de retención en la fuente 2026 de Actualícese (`fuentes/VA26-Tabla-en-Excel-de-retencion-en-la-fuente-2026 (1).xlsm`, hoja "Retenciones y normatividad", 2026-07-14).
+- **RETEFUENTE_EXTERIOR:** Estatuto Tributario arts. 406 a 408 (tarifa general del 20 % sobre pagos a beneficiarios sin residencia ni domicilio fiscal en el país, Ley 2010 de 2019) y 592 num. 2; convenios para evitar la doble imposición vigentes para la tarifa reducida (`co-convenio-de-doble-imposicion`).
 - **RIVA:** Estatuto Tributario art. 437-1 + Decreto 522 de 2003 y modificatorios.
 - **AUTO_RENTA:** Decreto 2201 de 2016 (tarifas sectoriales 0.40%–1.60%).
 - **AUTO_RETEFUENTE:** Aplica tarifas equivalentes a RETEFUENTE cuando la empresa es autorretenedora.
@@ -37,11 +38,11 @@ Precarga todas las **tarifas tributarias** de Colombia organizadas por stream de
 
 | Categoría | Streams | Total tarifas |
 |---|:---:|:---:|
-| Nacionales (IVA, INC, RETEFUENTE, RIVA, AUTO_RENTA, AUTO_RETEFUENTE, IVA_IMPORTACION_SERVICIOS) | 7 | 82 |
+| Nacionales (IVA, INC, RETEFUENTE, RETEFUENTE_EXTERIOR, RIVA, AUTO_RENTA, AUTO_RETEFUENTE, IVA_IMPORTACION_SERVICIOS) | 8 | 86 |
 | Municipales ICA (12 ciudades principales) | 12 | 64 |
 | SOBRETASA_BOMBERIL (Bogotá ejemplo) | 1 | 1 |
 | RICA y AUTO_RICA (placeholder, replican ICA municipal) | 2 | 0 |
-| **Total** | **22** | **147** |
+| **Total** | **23** | **151** |
 
 **Ciudades cubiertas en ICA (12):** Bogotá D.C. (`11001`), Medellín (`05001`), Cali (`76001`), Barranquilla (`08001`), Bucaramanga (`68001`), Cartagena (`13001`), Pereira (`66001`), Manizales (`17001`), Cúcuta (`54001`), Ibagué (`73001`), Santa Marta (`47001`), Villavicencio (`50001`).
 
@@ -65,7 +66,7 @@ Precarga todas las **tarifas tributarias** de Colombia organizadas por stream de
 
 ### 4.3. RETEFUENTE — `tarifa-CO-RETEFUENTE`
 
-**Total: 53 conceptos (factores) precargados en 71 entradas** — 6 conceptos llevan 4 tramos de vigencia por la cuantía mínima (§6.3); los otros 47 tienen una sola entrada.
+**Total: 45 conceptos (factores) precargados en 63 entradas** — 6 conceptos llevan 4 tramos de vigencia por la cuantía mínima (§6.3); los otros 39 tienen una sola entrada. Los pagos a beneficiarios del exterior ya no son conceptos de este stream: tienen tributo y stream propios (§4.4).
 
 Categorías cubiertas:
 
@@ -74,18 +75,42 @@ Categorías cubiertas:
 - **Honorarios y comisiones (4 conceptos):** honorarios a persona jurídica (11%) y a persona natural (10%), comisiones de intermediación, comisiones del sector financiero.
 - **Arrendamientos (2 conceptos):** muebles, inmuebles.
 - **Rendimientos y premios (3 conceptos):** rendimientos financieros, loterías/rifas, premios.
-- **Pagos al exterior (8 conceptos):** servicios técnicos, asistencia técnica, regalías, software, intereses, dividendos, consultoría, comisiones extranjeras.
 - **Otros (6 conceptos):** otros ingresos (decl/no decl), indemnizaciones laborales, comercialización animales vivos, seguros (primas), honorarios de personal de servicios temporales.
 
-Las tarifas van desde 0.1% (combustibles) hasta 33% (pagos al exterior por software/comisiones extranjeras).
+Las tarifas van desde 0.1% (combustibles) hasta 20% (loterías, premios e indemnizaciones laborales).
 
-### 4.4. RIVA — `tarifa-CO-RIVA`
+### 4.4. RETEFUENTE_EXTERIOR — `tarifa-CO-RETEFUENTE_EXTERIOR`
+
+**Total: 12 conceptos en 12 entradas, todos al 20 %** — tarifa general del art. 408 ET para pagos o abonos en cuenta a beneficiarios sin residencia ni domicilio fiscal en el país. Sin cuantía mínima.
+
+| Concepto (factor) | Tarifa | Nota |
+|---|:---:|---|
+| `SERVICIOS_GENERALES_DECLARANTES` | 20% | Servicios en general prestados por beneficiarios del exterior. |
+| `SERVICIOS_TECNICOS` | 20% | Concepto propio del exterior (sin gemelo doméstico). |
+| `ASISTENCIA_TECNICA` | 20% | Concepto propio del exterior. |
+| `SERVICIOS_CONSULTORIA_OBRA_CIVIL_DECLARANTES` | 20% | Consultoría. |
+| `HONORARIOS_PERSONA_JURIDICA` | 20% | Honorarios y comisiones — persona jurídica. |
+| `HONORARIOS_PERSONA_NATURAL` | 20% | Honorarios y comisiones — persona natural. |
+| `COMISIONES_INTERMEDIACION` | 20% | Comisiones. |
+| `REGALIAS` | 20% | Regalías y explotación de intangibles. Concepto propio del exterior. |
+| `SERVICIOS_SOFTWARE_LICENCIAMIENTO_DECLARANTES` | 20% | Licenciamiento de software — base por validar (§8). |
+| `SERVICIOS_SOFTWARE_DESARROLLO_DECLARANTES` | 20% | Desarrollo de software y consultoría informática. |
+| `ARRENDAMIENTO_MUEBLES` | 20% | Arrendamiento de bienes muebles — tarifa especial de leasing por validar. |
+| `RENDIMIENTOS_FINANCIEROS` | 20% | Intereses — tarifa reducida de créditos a más de un año por validar. |
+
+**Cómo se usa:** el stream comparte los códigos de concepto de pago con RETEFUENTE. Un consumidor que envía `HONORARIOS_PERSONA_JURIDICA` con un proveedor nacional cae en el 11 % de RETEFUENTE; con un proveedor sin domicilio fiscal en el país, la condición `RTF-09` excluye RETEFUENTE y `RTF-EXT-01` activa este tributo, que resuelve el 20 % con el mismo código. Los tres conceptos propios del exterior (`SERVICIOS_TECNICOS`, `ASISTENCIA_TECNICA`, `REGALIAS`) los asigna el consumidor cuando el gasto corresponde a esas figuras.
+
+**Qué no tiene entrada:** compras de bienes (`COMPRAS_*`), transporte, servicios públicos y demás conceptos que no constituyen renta de fuente nacional del beneficiario del exterior. Para esos conceptos el tributo se descarta con motivo `tarifa_no_configurada`. Reemplaza los 8 conceptos `EXTERIOR_*` (15 %/33 %, norma anterior a la Ley 2010 de 2019) que hasta la v1.3 vivían dentro de RETEFUENTE sin disparador.
+
+**Tarifa por convenio:** cuando el país de residencia fiscal del beneficiario tiene un convenio para evitar la doble imposición vigente, la condición `RTF-EXT-02` reemplaza la tarifa de este stream por la tarifa convenida (catálogo `co-convenio-de-doble-imposicion`; 10 % general en la precarga, por validar).
+
+### 4.5. RIVA — `tarifa-CO-RIVA`
 
 | Tarifa | Tipo |
 |---|---|
 | 15% del IVA generado | `porcentajeDePadre` |
 
-### 4.5. Autorretenciones
+### 4.6. Autorretenciones y autoliquidados
 
 | Stream | Tarifa | Notas |
 |---|---|---|
@@ -201,6 +226,7 @@ Los stream keys usan códigos DIVIPOLA de las jurisdicciones (`tarifa-CO-11001-I
 
 | Versión | Fecha | Cambio |
 |---|---|---|
+| 1.4 | 2026-09-22 | **Retención a beneficiarios del exterior con stream propio (issue #143).** Nuevo stream `tarifa-CO-RETEFUENTE_EXTERIOR` (12 entradas al 20 %, art. 408 ET) indexado por los mismos códigos de concepto de pago de RETEFUENTE más tres conceptos propios del exterior (`SERVICIOS_TECNICOS`, `ASISTENCIA_TECNICA`, `REGALIAS`). Se **retiran** de `tarifa-CO-RETEFUENTE` los 8 conceptos `EXTERIOR_*` (15 %/33 %, desactualizados y sin disparador): 53 → 45 conceptos, 71 → 63 entradas. Streams 22 → 23 (nacionales 8), entradas 147 → 151. Sección 4.4 nueva; 4.4-4.5 anteriores → 4.5-4.6. Preguntas 16-17 nuevas. |
 | 1.3 | 2026-09-21 | **Conceptos RETEFUENTE contrastados con la tabla de retención 2026 de Actualícese (issue #133):** (a) **Honorarios** por tipo de persona, no por declarante: `HONORARIOS_DECLARANTES` (10%) → `HONORARIOS_PERSONA_JURIDICA` **11%** y `HONORARIOS_NO_DECLARANTES` (11%) → `HONORARIOS_PERSONA_NATURAL` **10%** (11% si contrato/pagos > 3.300 UVT o ≥ 2 trabajadores — documentado, no automatizado); `auto-rtf-honorarios` y equivalencias DIAN 5020/5021 alineadas. (b) **Software:** `SERVICIOS_SOFTWARE_DESARROLLO` (4%, 4 UVT, tratado como servicio general) → `SERVICIOS_SOFTWARE_DESARROLLO_DECLARANTES` **3,5% sin cuantía** (Decreto 2499/2012) + gemelo `_NO_DECLARANTES` 10%; nuevo par `SERVICIOS_SOFTWARE_LICENCIAMIENTO_DECLARANTES` 3,5% / `_NO_DECLARANTES` 10% (Decreto 2521/2011). (c) **Consultoría en ingeniería:** `SERVICIOS_CONSULTORIA_OBRA_CIVIL` (6%, 27 UVT) → `_DECLARANTES` 6% **sin cuantía** + gemelo `_NO_DECLARANTES` 10% (Decreto 1141/2010). (d) **Transporte de pasajeros:** `SERVICIOS_TRANSPORTE_PASAJEROS` → `SERVICIOS_TRANSPORTE_TERRESTRE_PASAJEROS` (3,5%); nuevo `SERVICIOS_TRANSPORTE_AEREO_MARITIMO_PASAJEROS` 1% (Decreto 399/1987). (e) Nuevo `COMPRAS_ACTIVOS_FIJOS_PERSONA_NATURAL` 1% (arts. 398-399 ET). (f) **Retirados** `SERVICIOS_SALUD_NO_DECLARANTES` (3%, sin sustento) y `SERVICIOS_OBRA_CIVIL` (duplicaba `SERVICIOS_CONSTRUCCION`); `SERVICIOS_SALUD_DECLARANTES` → `SERVICIOS_SALUD_IPS` (servicios integrales de salud por IPS, Decreto 2271/2009). (g) **Cuantías por tramos de vigencia** del Decreto 572/2025 (vigente 2025-06-01, suspendido 2026-05-08 a 2026-06-30, reactivado 2026-07-01) **solo en los 6 conceptos tocados**: hoteles/restaurantes, salud IPS y transporte aéreo/marítimo 4 → 2 UVT; transporte terrestre, construcción y activos fijos PN 27 → 10 UVT; convención `entradaId-{fechaDesde}` (§6.3). El resto del stream conserva cuantías previas (actualización masiva en issue posterior). (h) §6.4 corregido: la elección entre pares la hace el consumidor al escoger el concepto de pago — el motor no consulta `regimenTributario`. (i) Conteos: 49 → **53** conceptos, 49 → **71** entradas RETEFUENTE, 125 → **147** entradas totales (la cabecera del JSON decía 124 desde v1.0; los conteos por categoría de §4.3 se recalcularon desde el JSON). Preguntas 9-15 nuevas en §8. Homologación DIAN v1.1 y anexo de configuración estándar alineados. |
 | 1.0 | 2026-05-26 | Carga inicial F1: 22 streams (7 nacionales + 12 ICA municipales + 1 SOBRETASA Bogotá + 2 placeholders RICA/AUTO_RICA) con 124 entradas de tarifa. 49 conceptos RETEFUENTE precargados. |
 | 1.2 | 2026-07-31 | **Tarifa propia del autoliquidado (issues #117/#118):** el stream `tarifa-CO-IVA_IMPORTACION_SERVICIOS` pasa de una entrada "100% del padre" a **dos entradas espejo de la tarifa de IVA sobre la base** (`SERVICIOS_GRAV_19` → 19%, `SERVICIOS_GRAV_5` → 5%, `tipoTarifa: porcentaje`): el modelado padre-hijo descartaba el tributo cuando el proveedor no facturaba IVA (`[R14]`), y el adjetivo "teórico" no tenía contraparte en el vocabulario del modelo. 124 → 125 entradas. |
@@ -227,3 +253,5 @@ Preguntas para validación del **equipo de consultores fiscales**:
 13. **Atributo de declarante de renta en el perfil tributario:** hoy no existe y el motor no lo necesita porque el consumidor escoge el concepto (§6.4). ¿Conviene tenerlo para validar o sugerir el concepto? De ser así, requiere issue propio sobre el catálogo de atributos fiscales y una regla de poblado en la migración de terceros.
 14. **Conceptos sin respaldo en la tabla 2026:** `SERVICIOS_EDUCACION` (2%), `SERVICIOS_IMPRESION_PUBLICIDAD` (4%), `SERVICIOS_FINANCIEROS` (4%), `SERVICIOS_TRANSPORTE_INTERNACIONAL` (3%), `INDEMNIZACIONES_LABORALES` (20%), `COMERCIALIZACION_ANIMALES_VIVOS` (1,5%), `SEGUROS_PRIMAS` (2,5%), `COMISIONES_INTERMEDIACION` (11%), `HONORARIOS_SERVICIOS_TEMPORALES` (1%). ¿Se sostienen con norma propia, se reconducen a servicios generales u honorarios, o se retiran? Impresión/publicidad y financieros son en la práctica servicios generales al 4%.
 15. **Conceptos de la tabla 2026 deliberadamente no precargados** por estar fuera del gasto o requerir mecanismos distintos de una tarifa: compras con tarjeta débito/crédito (1,5%, la practica la entidad financiera al comercio), exportaciones de hidrocarburos/carbón y minerales (autorretención), rentas de trabajo con la tabla del art. 383 ET (incluye personas naturales con honorarios que declaran bajo juramento no usar costos), dividendos (tablas por tipo de socio), rendimientos de títulos de renta fija/CDAT (4%), oro de comercializadoras internacionales, comisiones en bolsa (3%), sísmica de hidrocarburos, emolumentos eclesiásticos, colocación de juegos de azar, artistas extranjeros (8%). ¿Alguno debe entrar en F1?
+16. **`RETEFUENTE_EXTERIOR` — conceptos con tarifa especial:** el stream precarga la tarifa general del 20 % (art. 408 ET) para 12 conceptos. ¿Qué conceptos tienen tarifa distinta y con qué base: intereses de créditos a más de un año (15 %), arrendamiento financiero de equipos (leasing), transporte internacional, explotación de software, dividendos a no residentes? ¿Cuáles de los conceptos precargados no constituyen renta de fuente nacional y deberían retirarse?
+17. **`RETEFUENTE_EXTERIOR` — jurisdicciones no cooperantes y retención asumida:** ¿aplica la tarifa general de renta (35 %) a beneficiarios en jurisdicciones no cooperantes o de baja imposición (art. 408 parágrafo)? Requeriría una segunda lista de países y una condición propia. Y cuando la empresa asume la retención (el proveedor recibe el total), ¿la base se reajusta como mayor valor del pago (100 pagados → base 125) y el gasto de la retención asumida es no deducible? Hoy el motor liquida sobre la base facturada.

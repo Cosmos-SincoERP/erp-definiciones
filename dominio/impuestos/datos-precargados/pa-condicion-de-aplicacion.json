@@ -1,8 +1,8 @@
 {
   "pais": "PA",
   "catalogo": "CondicionDeAplicacion",
-  "version": "1.0",
-  "fechaActualizacion": "2026-05-26",
+  "version": "1.1",
+  "fechaActualizacion": "2026-09-22",
   "fuente": "Código Fiscal de Panamá + Decretos Ejecutivos DGI + leyes orgánicas de áreas económicas especiales (ZLC, AEEPP, Ciudad del Saber).",
   "estructura": {
     "totalCondiciones": 11,
@@ -149,13 +149,14 @@
     {
       "codigo": "ISR-03-cdi",
       "tributo": "ISR",
-      "entidadEvaluada": null,
+      "entidadEvaluada": "contraparte",
       "criterios": [
-        { "atributo": "paisContraparte", "operador": "tiene-cdi-vigente", "valor": "PA" }
+        { "atributo": "paisDeResidenciaFiscal", "operador": "con-convenio-vigente" }
       ],
-      "efecto": "aplicar-con-tarifa-cdi",
+      "efecto": "cambiarTarifa",
+      "tarifaAlternativa": { "tipo": "convenio" },
       "direccionFiscalAplicable": "gasto",
-      "descripcion": "Convenios para Evitar la Doble Imposición (CDIs) vigentes reducen la tarifa de retención al exterior. El motor consulta la tabla de CDIs para resolver tarifa aplicable (pendiente modelado de tabla CDIs).",
+      "descripcion": "Convenio para evitar la doble imposición vigente entre Panamá y el país de residencia fiscal del beneficiario: la tarifa del ISR se toma del convenio (tarifa convenida para el concepto de pago; si no existe, la tarifa general del convenio; si el convenio no define tarifa, rige la de TarifaTributaria). Una tarifa convenida de cero excluye el tributo. Lista de convenios en pa-convenio-de-doble-imposicion (tarifas por validar con consultoría).",
       "vigencia": { "fechaDesde": "1956-01-01", "fechaHasta": null },
       "origen": "estandar"
     }
